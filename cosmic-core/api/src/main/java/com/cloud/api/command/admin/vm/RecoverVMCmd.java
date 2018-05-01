@@ -9,7 +9,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;

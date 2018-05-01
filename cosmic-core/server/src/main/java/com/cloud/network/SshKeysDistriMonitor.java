@@ -11,12 +11,12 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.model.enumeration.HypervisorType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

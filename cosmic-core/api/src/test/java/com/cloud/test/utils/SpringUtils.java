@@ -1,10 +1,10 @@
 package com.cloud.test.utils;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ComponentInstantiationPostProcessor;
 import com.cloud.utils.component.ComponentMethodInterceptor;
 import com.cloud.utils.db.TransactionContextBuilder;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class SpringUtils {
      * In order to use this method properly, you must do the following: <li>
      * - Specify @ComponentScan with basePackageClasses, includeFilters, and
      * useDefaultFilters=true.  See the following example.
-     * <p>
+     *
      * <pre>
      *     @ComponentScan(basePackageClasses={AffinityGroupServiceImpl.class, EventUtils.class},
      *     includeFilters={@Filter(value=TestConfiguration.Library.class, type=FilterType.CUSTOM)},
@@ -38,7 +38,7 @@ public class SpringUtils {
      * - Create a Library class and use that to call this method.  See the
      * following example.  The Library class you define here is the Library
      * class being added in the filter above.
-     * <p>
+     *
      * <pre>
      * public static class Library implements TypeFilter {
      *      @Override

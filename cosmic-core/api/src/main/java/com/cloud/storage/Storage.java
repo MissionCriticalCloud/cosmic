@@ -1,5 +1,7 @@
 package com.cloud.storage;
 
+import com.cloud.model.enumeration.StoragePoolType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class Storage {
         return nonSharedStoragePoolTypes;
     }
 
-    public static enum ImageFormat {
+    public enum ImageFormat {
         QCOW2(true, true, false, "qcow2"),
         RAW(false, false, false, "raw"),
         VHD(true, true, true, "vhd"),
@@ -33,14 +35,14 @@ public class Storage {
         private final boolean supportSnapshot;
         private final String fileExtension;
 
-        private ImageFormat(final boolean supportThinProvisioning, final boolean supportSparse, final boolean supportSnapshot) {
+        ImageFormat(final boolean supportThinProvisioning, final boolean supportSparse, final boolean supportSnapshot) {
             this.supportThinProvisioning = supportThinProvisioning;
             this.supportSparse = supportSparse;
             this.supportSnapshot = supportSnapshot;
             fileExtension = null;
         }
 
-        private ImageFormat(final boolean supportThinProvisioning, final boolean supportSparse, final boolean supportSnapshot, final String fileExtension) {
+        ImageFormat(final boolean supportThinProvisioning, final boolean supportSparse, final boolean supportSnapshot, final String fileExtension) {
             this.supportThinProvisioning = supportThinProvisioning;
             this.supportSparse = supportSparse;
             this.supportSnapshot = supportSnapshot;
@@ -69,14 +71,14 @@ public class Storage {
 
     }
 
-    public static enum ProvisioningType {
+    public enum ProvisioningType {
         THIN("thin"),
         SPARSE("sparse"),
         FAT("fat");
 
         private final String provisionType;
 
-        private ProvisioningType(final String provisionType) {
+        ProvisioningType(final String provisionType) {
             this.provisionType = provisionType;
         }
 
@@ -99,11 +101,11 @@ public class Storage {
         }
     }
 
-    public static enum FileSystem {
+    public enum FileSystem {
         Unknown, ext3, ntfs, fat, fat32, ext2, ext4, cdfs, hpfs, ufs, hfs, hfsp
     }
 
-    public static enum TemplateType {
+    public enum TemplateType {
         ROUTING, // Router template
         SYSTEM, /* routing, system vm template */
         BUILTIN, /* buildin template */
@@ -111,35 +113,7 @@ public class Storage {
         USER /* User supplied template/iso */
     }
 
-    public static enum StoragePoolType {
-        Filesystem(false), // local directory
-        NetworkFilesystem(true), // NFS
-        IscsiLUN(true), // shared LUN, with a clusterfs overlay
-        Iscsi(true), // for e.g., ZFS Comstar
-        ISO(false), // for iso image
-        LVM(false), // XenServer local LVM SR
-        CLVM(true),
-        RBD(true), // http://libvirt.org/storage.html#StorageBackendRBD
-        SharedMountPoint(true),
-        PreSetup(true), // for XenServer, Storage Pool is set up by customers.
-        EXT(false), // XenServer local EXT SR
-        OCFS2(true),
-        SMB(true),
-        Gluster(true),
-        ManagedNFS(true);
-
-        boolean shared;
-
-        StoragePoolType(final boolean shared) {
-            this.shared = shared;
-        }
-
-        public boolean isShared() {
-            return shared;
-        }
-    }
-
-    public static enum StorageResourceType {
+    public enum StorageResourceType {
         STORAGE_POOL, STORAGE_HOST, SECONDARY_STORAGE, LOCAL_SECONDARY_STORAGE
     }
 }

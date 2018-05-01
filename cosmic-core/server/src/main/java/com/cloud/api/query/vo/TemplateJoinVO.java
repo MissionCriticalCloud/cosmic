@@ -1,7 +1,7 @@
 package com.cloud.api.query.vo;
 
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage;

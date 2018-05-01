@@ -16,20 +16,20 @@ import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.ResourceInUseException;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
 import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
 import com.cloud.model.Zone;
-import com.cloud.org.Cluster;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceState.Event;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.naming.ConfigurationException;
@@ -85,7 +85,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceService#updateCluster(com.cloud.org.Cluster, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     * @see com.cloud.resource.ResourceService#updateCluster(com.cloud.legacymodel.dc.Cluster, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public Cluster updateCluster(final Cluster cluster, final String clusterType, final String hypervisor, final String allocationState, final String managedstate) {

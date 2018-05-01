@@ -1,11 +1,11 @@
 package com.cloud.network.rules;
 
 import com.cloud.api.command.user.firewall.ListPortForwardingRulesCmd;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.net.Ip;
 
 import java.util.List;

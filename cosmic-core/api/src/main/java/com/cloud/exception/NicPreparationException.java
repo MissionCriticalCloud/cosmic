@@ -1,5 +1,6 @@
 package com.cloud.exception;
 
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.vm.Nic;
 
 public class NicPreparationException extends InsufficientCapacityException {

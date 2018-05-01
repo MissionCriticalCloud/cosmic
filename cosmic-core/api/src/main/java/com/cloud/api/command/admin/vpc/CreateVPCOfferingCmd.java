@@ -10,7 +10,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.vpc.VpcOffering;
 

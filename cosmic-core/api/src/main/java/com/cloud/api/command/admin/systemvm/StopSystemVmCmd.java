@@ -13,8 +13,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.vm.VirtualMachine;
 

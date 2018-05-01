@@ -12,14 +12,13 @@ import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.DiscoveredWithErrorException;
-import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.DiscoveredWithErrorException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
@@ -296,7 +295,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     }
 
     @Override
-    public abstract Hypervisor.HypervisorType getHypervisorType();
+    public abstract HypervisorType getHypervisorType();
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {

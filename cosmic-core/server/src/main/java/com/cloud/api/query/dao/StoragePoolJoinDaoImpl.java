@@ -5,7 +5,7 @@ import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.storage.StorageStats;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.db.GenericDaoBase;

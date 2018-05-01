@@ -1,8 +1,8 @@
 package com.cloud.hypervisor.kvm.resource;
 
 import com.cloud.agent.api.to.NicTO;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.network.Networks;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.OutputInterpreter;
@@ -91,7 +91,7 @@ public class OvsVifDriver extends VifDriverBase {
                         networkRateKBps);
             }
         } else if (nic.getType() == Networks.TrafficType.Control) {
-      /* Make sure the network is still there */
+            /* Make sure the network is still there */
             createControlNetwork(bridges.get("linklocal"));
             intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
         } else if (nic.getType() == Networks.TrafficType.Public) {

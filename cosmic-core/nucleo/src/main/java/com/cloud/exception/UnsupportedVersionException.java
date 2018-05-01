@@ -1,5 +1,7 @@
 package com.cloud.exception;
 
+import com.cloud.legacymodel.exceptions.CloudException;
+
 public class UnsupportedVersionException extends CloudException {
 
     public static final String UnknownVersion = "unknown.version";

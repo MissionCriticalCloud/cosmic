@@ -9,8 +9,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.api.response.VpcResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.Site2SiteVpnConnection;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVpnConnections", group = APICommandGroup.VPNService, description = "Lists site to site vpn connection gateways", responseObject = Site2SiteVpnConnectionResponse.class, entityType =
-        {Site2SiteVpnConnection.class},
+@APICommand(name = "listVpnConnections", group = APICommandGroup.VPNService, description = "Lists site to site vpn connection gateways", responseObject = Site2SiteVpnConnectionResponse.class,
+        entityType =
+                {Site2SiteVpnConnection.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVpnConnectionsCmd extends BaseListProjectAndAccountResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVpnConnectionsCmd.class.getName());

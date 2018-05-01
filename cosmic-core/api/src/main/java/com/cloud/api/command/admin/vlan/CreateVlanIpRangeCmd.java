@@ -14,11 +14,11 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.VlanIpRangeResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.net.NetUtils;
 

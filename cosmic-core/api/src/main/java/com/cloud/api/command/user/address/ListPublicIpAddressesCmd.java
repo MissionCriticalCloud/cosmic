@@ -15,8 +15,8 @@ import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.VlanIpRangeResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.IpAddress;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listPublicIpAddresses", group = APICommandGroup.PublicIPAddressService, description = "Lists all public IP addresses", responseObject = IPAddressResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "listPublicIpAddresses", group = APICommandGroup.PublicIPAddressService, description = "Lists all public IP addresses", responseObject = IPAddressResponse.class, responseView =
+        ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = {IpAddress.class})
 public class ListPublicIpAddressesCmd extends BaseListTaggedResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListPublicIpAddressesCmd.class.getName());

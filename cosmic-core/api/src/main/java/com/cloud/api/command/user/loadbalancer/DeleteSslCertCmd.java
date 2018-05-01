@@ -9,13 +9,13 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SslCertResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.lb.CertService;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 

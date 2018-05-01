@@ -11,8 +11,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SslCertResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.network.lb.CertService;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.List;

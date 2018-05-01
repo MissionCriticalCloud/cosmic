@@ -5,10 +5,10 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.host.AddHostCmd;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.exception.DiscoveryException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.host.Host;
 import com.cloud.resource.ResourceService;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import java.util.Arrays;
 

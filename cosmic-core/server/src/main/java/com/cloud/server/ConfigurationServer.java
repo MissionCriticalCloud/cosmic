@@ -1,7 +1,7 @@
 package com.cloud.server;
 
-import com.cloud.exception.InternalErrorException;
 import com.cloud.framework.config.impl.ConfigurationVO;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
 
 import java.util.List;
 

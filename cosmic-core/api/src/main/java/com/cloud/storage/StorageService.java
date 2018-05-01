@@ -7,11 +7,12 @@ import com.cloud.api.command.admin.storage.DeleteImageStoreCmd;
 import com.cloud.api.command.admin.storage.DeletePoolCmd;
 import com.cloud.api.command.admin.storage.DeleteSecondaryStagingStoreCmd;
 import com.cloud.api.command.admin.storage.UpdateStoragePoolCmd;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceInUseException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
 
 import java.net.UnknownHostException;
 import java.util.Map;

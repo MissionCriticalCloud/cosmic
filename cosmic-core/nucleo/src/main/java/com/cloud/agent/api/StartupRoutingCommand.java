@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.Networks.RouterPrivateIpStrategy;
 
 import java.util.ArrayList;

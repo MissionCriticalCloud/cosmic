@@ -1,9 +1,10 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -12,7 +13,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.UserVmVO;

@@ -14,7 +14,8 @@ import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.Status.Event;
 import com.cloud.info.RunningHostCountInfo;
-import com.cloud.org.Managed;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.ManagedState;
 import com.cloud.resource.ResourceState;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.Attribute;
@@ -30,7 +31,6 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;
@@ -464,7 +464,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
             // handle clusters already owned by @managementServerId
             final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
             sc.setParameters("lastPinged", lastPingSecondsAfter);
-            sc.setJoinParameters("ClusterManagedSearch", "managed", Managed.ManagedState.Managed);
+            sc.setJoinParameters("ClusterManagedSearch", "managed", ManagedState.Managed);
             sc.setParameters("clusterIn", clusters.toArray());
             final List<HostVO> unmanagedHosts = lockRows(sc, new Filter(HostVO.class, "clusterId", true, 0L, limit), true); // host belongs to clusters owned by @managementServerId
             final StringBuilder sb = new StringBuilder();
@@ -496,7 +496,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
             if (updatedClusters.size() > 0) {
                 final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
                 sc.setParameters("lastPinged", lastPingSecondsAfter);
-                sc.setJoinParameters("ClusterManagedSearch", "managed", Managed.ManagedState.Managed);
+                sc.setJoinParameters("ClusterManagedSearch", "managed", ManagedState.Managed);
                 sc.setParameters("clusterIn", updatedClusters.toArray());
                 final List<HostVO> unmanagedHosts = lockRows(sc, null, true);
 
@@ -948,7 +948,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
      */
     private List<Long> listAllClusters() {
         final SearchCriteria<Long> sc = AllClustersSearch.create();
-        sc.setParameters("managed", Managed.ManagedState.Managed);
+        sc.setParameters("managed", ManagedState.Managed);
 
         final List<Long> clusters = _clusterDao.customSearch(sc, null);
         return clusters;

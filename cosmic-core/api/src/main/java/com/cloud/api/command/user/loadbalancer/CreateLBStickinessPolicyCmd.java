@@ -13,13 +13,13 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.LBStickinessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Map;
 

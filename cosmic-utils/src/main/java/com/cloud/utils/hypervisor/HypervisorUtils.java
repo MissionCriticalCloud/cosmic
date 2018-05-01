@@ -1,6 +1,6 @@
 package com.cloud.utils.hypervisor;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.io.File;
 import java.io.IOException;

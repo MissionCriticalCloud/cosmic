@@ -15,17 +15,18 @@ import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.storage.Volume;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "uploadVolume", group = APICommandGroup.VolumeService, description = "Uploads a data disk.", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted, entityType = {Volume.class},
+@APICommand(name = "uploadVolume", group = APICommandGroup.VolumeService, description = "Uploads a data disk.", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted,
+        entityType = {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UploadVolumeCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UploadVolumeCmd.class.getName());

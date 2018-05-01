@@ -11,15 +11,15 @@ import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
 import com.cloud.agent.api.to.NfsTO;
 import com.cloud.exception.UnsupportedVersionException;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.storage.command.DownloadCommand;
 import com.cloud.storage.to.TemplateObjectTO;
+import com.cloud.template.VirtualMachineTemplate;
 
 import java.nio.ByteBuffer;
 

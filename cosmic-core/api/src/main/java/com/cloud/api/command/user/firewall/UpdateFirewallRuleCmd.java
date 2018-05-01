@@ -11,10 +11,10 @@ import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.FirewallRule.TrafficType;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

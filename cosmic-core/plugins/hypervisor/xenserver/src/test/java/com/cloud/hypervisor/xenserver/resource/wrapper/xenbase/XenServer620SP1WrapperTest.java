@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.GetGPUStatsCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.HashMap;
 

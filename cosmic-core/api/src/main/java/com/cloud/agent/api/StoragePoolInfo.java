@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.model.enumeration.StoragePoolType;
 
 import java.util.Map;
 

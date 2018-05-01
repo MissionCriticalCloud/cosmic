@@ -11,24 +11,24 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.NetworkResponse;
-import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcGateway;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createPrivateGateway", group = APICommandGroup.VPCService, description = "Creates a private gateway", responseObject = PrivateGatewayResponse.class, entityType = {VpcGateway.class},
+@APICommand(name = "createPrivateGateway", group = APICommandGroup.VPCService, description = "Creates a private gateway", responseObject = PrivateGatewayResponse.class, entityType = {VpcGateway
+        .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreatePrivateGatewayCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreatePrivateGatewayCmd.class.getName());

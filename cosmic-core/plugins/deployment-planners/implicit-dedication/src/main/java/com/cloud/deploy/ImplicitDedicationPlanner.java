@@ -1,8 +1,8 @@
 package com.cloud.deploy;
 
 import com.cloud.configuration.Config;
-import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;

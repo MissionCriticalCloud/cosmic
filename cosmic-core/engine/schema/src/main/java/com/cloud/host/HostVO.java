@@ -1,9 +1,9 @@
 package com.cloud.host;
 
 import com.cloud.agent.api.VgpuTypesInfo;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.ResourceState;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 

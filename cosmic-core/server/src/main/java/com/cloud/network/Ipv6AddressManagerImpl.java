@@ -5,16 +5,16 @@ import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
-import com.cloud.exception.InsufficientAddressCapacityException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 
 import javax.inject.Inject;

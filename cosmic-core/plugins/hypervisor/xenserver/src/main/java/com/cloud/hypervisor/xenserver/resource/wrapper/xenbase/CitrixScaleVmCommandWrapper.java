@@ -5,9 +5,9 @@ import com.cloud.agent.api.ScaleVmAnswer;
 import com.cloud.agent.api.ScaleVmCommand;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.Iterator;
 import java.util.Set;

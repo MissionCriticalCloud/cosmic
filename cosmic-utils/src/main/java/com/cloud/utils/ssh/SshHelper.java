@@ -1,6 +1,6 @@
 package com.cloud.utils.ssh;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.io.File;
 import java.io.IOException;

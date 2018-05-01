@@ -21,11 +21,11 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.DateUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

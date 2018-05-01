@@ -15,7 +15,7 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

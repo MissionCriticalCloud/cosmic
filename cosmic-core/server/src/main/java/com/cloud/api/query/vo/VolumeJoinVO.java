@@ -1,7 +1,7 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;

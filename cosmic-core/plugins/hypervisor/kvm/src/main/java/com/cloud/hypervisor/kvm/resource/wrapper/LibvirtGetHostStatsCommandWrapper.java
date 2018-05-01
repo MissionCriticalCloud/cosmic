@@ -5,9 +5,9 @@ import com.cloud.agent.api.GetHostStatsAnswer;
 import com.cloud.agent.api.GetHostStatsCommand;
 import com.cloud.agent.api.HostStatsEntry;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.Pair;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
 

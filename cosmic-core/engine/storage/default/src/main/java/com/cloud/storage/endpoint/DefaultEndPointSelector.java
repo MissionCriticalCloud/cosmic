@@ -13,7 +13,8 @@ import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.LocalHostEndpoint;
 import com.cloud.storage.RemoteHostEndPoint;
@@ -23,7 +24,6 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine;
 
 import javax.inject.Inject;
@@ -187,7 +187,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
             final SnapshotInfo srcSnapshot = (SnapshotInfo) srcData;
             final VolumeInfo volumeInfo = srcSnapshot.getBaseVolume();
             final VirtualMachine vm = volumeInfo.getAttachedVM();
-            if (srcSnapshot.getHypervisorType() == Hypervisor.HypervisorType.KVM) {
+            if (srcSnapshot.getHypervisorType() == HypervisorType.KVM) {
                 if (vm != null && vm.getState() == VirtualMachine.State.Running) {
                     return getEndPointFromHostId(vm.getHostId());
                 }
@@ -294,7 +294,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
     public EndPoint select(final DataObject object, final StorageAction action) {
         if (StorageAction.TAKESNAPSHOT.equals(action)) {
             final SnapshotInfo snapshotInfo = (SnapshotInfo) object;
-            if (Hypervisor.HypervisorType.KVM.equals(snapshotInfo.getHypervisorType())) {
+            if (HypervisorType.KVM.equals(snapshotInfo.getHypervisorType())) {
                 final VolumeInfo volumeInfo = snapshotInfo.getBaseVolume();
                 final VirtualMachine vm = volumeInfo.getAttachedVM();
                 if (vm != null && VirtualMachine.State.Running.equals(vm.getState())) {
@@ -304,7 +304,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
             }
         } else if (StorageAction.MIGRATEVOLUME.equals(action)) {
             final VolumeInfo volumeInfo = (VolumeInfo) object;
-            if (Hypervisor.HypervisorType.KVM.equals(volumeInfo.getHypervisorType())) {
+            if (HypervisorType.KVM.equals(volumeInfo.getHypervisorType())) {
                 final VirtualMachine vm = volumeInfo.getAttachedVM();
                 if (vm != null && VirtualMachine.State.Running.equals(vm.getState()) && volumeInfo.isToBeLiveMigrated()) {
                     final Long hostId = vm.getHostId();

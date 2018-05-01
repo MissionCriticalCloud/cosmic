@@ -19,6 +19,7 @@ import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.test.utils.SpringUtils;
@@ -27,8 +28,7 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;

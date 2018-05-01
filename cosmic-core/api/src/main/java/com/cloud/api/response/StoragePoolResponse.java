@@ -3,9 +3,9 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.serializer.Param;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.StoragePoolStatus;
 
 import java.util.Date;
 import java.util.Map;

@@ -11,8 +11,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.vpc.Vpc;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

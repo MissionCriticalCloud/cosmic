@@ -1,8 +1,8 @@
 package com.cloud.network.rules;
 
-import com.cloud.exception.CloudException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;

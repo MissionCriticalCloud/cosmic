@@ -5,9 +5,9 @@ import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
-import com.cloud.exception.ConnectionException;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
+import com.cloud.legacymodel.exceptions.ConnectionException;
 
 /**
  * There are several types of events that the AgentManager forwards

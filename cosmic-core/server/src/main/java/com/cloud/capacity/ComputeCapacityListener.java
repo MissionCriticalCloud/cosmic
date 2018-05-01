@@ -8,9 +8,9 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.capacity.dao.CapacityDao;
-import com.cloud.exception.ConnectionException;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
+import com.cloud.legacymodel.exceptions.ConnectionException;
 
 public class ComputeCapacityListener implements Listener {
     CapacityDao _capacityDao;

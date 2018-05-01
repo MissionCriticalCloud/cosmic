@@ -15,7 +15,7 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.legacymodel.dc.DedicatedResources;
 import com.cloud.dedicated.DedicatedService;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

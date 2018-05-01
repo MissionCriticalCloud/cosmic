@@ -3,12 +3,12 @@ package com.cloud.agent.service;
 import static java.util.stream.Collectors.toMap;
 
 import com.cloud.agent.service.Agent.ExitStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.ProcessUtil;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.backoff.impl.ConstantTimeBackoff;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.annotation.PreDestroy;
 import javax.naming.ConfigurationException;

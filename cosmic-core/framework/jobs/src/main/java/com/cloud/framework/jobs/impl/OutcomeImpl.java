@@ -1,10 +1,10 @@
 package com.cloud.framework.jobs.impl;
 
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobExecutionContext;
 import com.cloud.framework.jobs.Outcome;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.utils.Predicate;
 
 import java.util.concurrent.ExecutionException;

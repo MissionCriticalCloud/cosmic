@@ -2,9 +2,9 @@ package com.cloud.server;
 
 import com.cloud.host.DetailVO;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.PluggableService;
 import com.cloud.vm.VirtualMachine;
 

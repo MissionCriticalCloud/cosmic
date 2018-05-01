@@ -1,9 +1,9 @@
 package com.cloud.utils.identity;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ComponentLifecycle;
 import com.cloud.utils.component.SystemIntegrityChecker;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.MacAddress;
 
 import org.slf4j.Logger;

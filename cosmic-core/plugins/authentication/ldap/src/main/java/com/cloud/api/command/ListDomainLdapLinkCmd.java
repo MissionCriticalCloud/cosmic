@@ -10,8 +10,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.ldap.LdapManager;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 

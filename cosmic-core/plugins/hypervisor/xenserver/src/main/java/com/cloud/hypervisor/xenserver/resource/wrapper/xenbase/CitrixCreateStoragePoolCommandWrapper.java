@@ -6,7 +6,7 @@ import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.model.enumeration.StoragePoolType;
 
 import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;

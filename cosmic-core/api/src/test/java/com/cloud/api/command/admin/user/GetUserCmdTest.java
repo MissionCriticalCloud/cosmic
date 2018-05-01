@@ -8,7 +8,7 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.user.AccountService;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import org.junit.After;
 import org.junit.Before;

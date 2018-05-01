@@ -10,7 +10,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 
 import java.net.MalformedURLException;
 import java.util.Collection;
@@ -19,7 +19,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getUploadParamsForTemplate", group = APICommandGroup.TemplateService, description = "upload an existing template into the CloudStack cloud. ", responseObject = GetUploadParamsResponse.class, since =
+@APICommand(name = "getUploadParamsForTemplate", group = APICommandGroup.TemplateService, description = "upload an existing template into the CloudStack cloud. ", responseObject =
+        GetUploadParamsResponse.class, since =
         "4.6.0", requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GetUploadParamsForTemplateCmd extends AbstractGetUploadParamsCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetUploadParamsForTemplateCmd.class.getName());

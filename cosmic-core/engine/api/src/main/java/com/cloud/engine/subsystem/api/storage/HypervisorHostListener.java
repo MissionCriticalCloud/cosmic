@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.exception.StorageConflictException;
+import com.cloud.legacymodel.exceptions.StorageConflictException;
 
 public interface HypervisorHostListener {
     boolean hostConnect(long hostId, long poolId) throws StorageConflictException;

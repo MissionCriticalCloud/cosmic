@@ -1,6 +1,6 @@
 package com.cloud.api;
 
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 
 public abstract class BaseAsyncCreateCmd extends BaseAsyncCmd {
     private Long id;

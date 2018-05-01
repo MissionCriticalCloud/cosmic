@@ -8,8 +8,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.DestroyVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
 
@@ -18,8 +18,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "destroyVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Destroys a virtual machine. Once destroyed, only the administrator can recover it.", responseObject = UserVmResponse
-        .class, responseView = ResponseView.Full, entityType = {VirtualMachine.class},
+@APICommand(name = "destroyVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Destroys a virtual machine. Once destroyed, only the administrator can recover it.",
+        responseObject = UserVmResponse
+                .class, responseView = ResponseView.Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = true)
 public class DestroyVMCmdByAdmin extends DestroyVMCmd {

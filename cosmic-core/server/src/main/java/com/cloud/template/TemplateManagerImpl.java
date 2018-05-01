@@ -59,9 +59,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
@@ -70,12 +67,19 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.DataStoreRole;
@@ -88,9 +92,7 @@ import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.Upload;
 import com.cloud.storage.VMTemplateHostVO;
@@ -133,7 +135,6 @@ import com.cloud.uservm.UserVm;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.EnumUtils;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -142,8 +143,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
@@ -981,7 +980,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             throw new InvalidParameterValueException("Please specify a VM that is either Stopped or Running.");
         }
 
-        if ("xen-pv-drv-iso".equals(iso.getDisplayText()) && vm.getHypervisorType() != Hypervisor.HypervisorType.XenServer) {
+        if ("xen-pv-drv-iso".equals(iso.getDisplayText()) && vm.getHypervisorType() != HypervisorType.XenServer) {
             throw new InvalidParameterValueException("Cannot attach Xenserver PV drivers to incompatible hypervisor " + vm.getHypervisorType());
         }
 

@@ -1,6 +1,6 @@
 package com.cloud.network.vpc;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;
 import java.util.Map;

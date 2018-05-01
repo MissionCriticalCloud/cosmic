@@ -1,8 +1,8 @@
 package com.cloud.network.router;
 
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.network.Network;

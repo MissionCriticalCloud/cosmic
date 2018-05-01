@@ -21,7 +21,7 @@ import com.cloud.host.Host;
 import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.StorageStats;
 import com.cloud.user.AccountVO;
 import com.cloud.user.dao.AccountDao;
@@ -204,7 +204,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                 }
             }
 
-            if (details.contains(HostDetails.all) && host.getHypervisorType() == Hypervisor.HypervisorType.KVM) {
+            if (details.contains(HostDetails.all) && host.getHypervisorType() == HypervisorType.KVM) {
                 //only kvm has the requirement to return host details
                 try {
                     final HostVO h = hostDao.findById(host.getId());

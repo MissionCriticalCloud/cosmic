@@ -1,6 +1,7 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.DataCenterIpAddressVO;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -8,7 +9,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 
 import java.sql.PreparedStatement;

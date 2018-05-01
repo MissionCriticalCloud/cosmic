@@ -3,8 +3,8 @@ package com.cloud.network.vpc;
 import com.cloud.api.command.user.network.CreateNetworkACLCmd;
 import com.cloud.api.command.user.network.ListNetworkACLListsCmd;
 import com.cloud.api.command.user.network.ListNetworkACLsCmd;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;
 

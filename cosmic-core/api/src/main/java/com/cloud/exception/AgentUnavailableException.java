@@ -1,6 +1,7 @@
 package com.cloud.exception;
 
 import com.cloud.host.Host;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 
 public class AgentUnavailableException extends ResourceUnavailableException {
     public AgentUnavailableException(final long agentId) {

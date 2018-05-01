@@ -6,7 +6,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.server.ResourceTag;
 import com.cloud.server.TaggedResourceService;
 import com.cloud.storage.dao.VolumeDetailsDao;

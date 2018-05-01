@@ -10,6 +10,7 @@ import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.RegisterVolumePayload;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
@@ -31,7 +32,6 @@ import com.cloud.storage.upload.UploadListener;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Proxy;
 
 import javax.inject.Inject;

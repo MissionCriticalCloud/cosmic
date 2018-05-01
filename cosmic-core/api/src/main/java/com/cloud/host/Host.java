@@ -1,8 +1,8 @@
 package com.cloud.host;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceState;
 import com.cloud.utils.fsm.StateObject;
 

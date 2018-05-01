@@ -6,9 +6,9 @@ import com.cloud.agent.api.PrepareForMigrationCommand;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.Volume;
@@ -47,7 +47,7 @@ public final class LibvirtPrepareForMigrationCommandWrapper
                 libvirtComputingResource.getVifDriver(nic.getType()).plug(nic, null, "");
             }
 
-      /* setup disks, e.g for iso */
+            /* setup disks, e.g for iso */
             final DiskTO[] volumes = vm.getDisks();
             for (final DiskTO volume : volumes) {
                 if (volume.getType() == Volume.Type.ISO) {

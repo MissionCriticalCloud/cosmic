@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.router.VirtualRouter;
 
 import javax.persistence.Column;

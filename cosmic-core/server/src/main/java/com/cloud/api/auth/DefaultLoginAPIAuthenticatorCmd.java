@@ -10,7 +10,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ApiResponseSerializer;
 import com.cloud.api.response.LoginCmdResponse;
-import com.cloud.exception.CloudAuthenticationException;
+import com.cloud.legacymodel.exceptions.CloudAuthenticationException;
 import com.cloud.legacymodel.user.Account;
 
 import javax.inject.Inject;

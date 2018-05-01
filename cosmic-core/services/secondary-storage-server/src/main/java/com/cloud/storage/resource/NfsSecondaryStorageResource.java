@@ -2,9 +2,7 @@ package com.cloud.storage.resource;
 
 import static com.cloud.utils.StringUtils.join;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.substringAfterLast;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthAnswer;
@@ -27,7 +25,6 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupSecondaryStorageCommand;
 import com.cloud.agent.api.storage.CreateEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
-import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.storage.ListTemplateAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
 import com.cloud.agent.api.storage.ListVolumeAnswer;
@@ -37,17 +34,18 @@ import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.command.CopyCmdAnswer;
 import com.cloud.storage.command.CopyCommand;
 import com.cloud.storage.command.DeleteCommand;
@@ -76,21 +74,16 @@ import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
 import com.cloud.vm.SecondaryStorageVm;
 
 import javax.naming.ConfigurationException;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,7 +115,6 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -911,11 +903,11 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         final StringBuilder result = new StringBuilder();
         for (final String cidr : cmd.getAllowedInternalSites()) {
             if (nfsIps.contains(cidr)) {
-        /*
-         * if the internal download ip is the same with secondary
-         * storage ip, adding internal sites will flush ip route to nfs
-         * through storage ip.
-         */
+                /*
+                 * if the internal download ip is the same with secondary
+                 * storage ip, adding internal sites will flush ip route to nfs
+                 * through storage ip.
+                 */
                 continue;
             }
             final String tmpresult = allowOutgoingOnPrivate(cidr);

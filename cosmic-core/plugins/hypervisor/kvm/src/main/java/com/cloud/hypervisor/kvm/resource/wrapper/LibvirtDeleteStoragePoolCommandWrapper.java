@@ -5,9 +5,9 @@ import com.cloud.agent.api.DeleteStoragePoolCommand;
 import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 @ResourceWrapper(handles = DeleteStoragePoolCommand.class)
 public final class LibvirtDeleteStoragePoolCommandWrapper

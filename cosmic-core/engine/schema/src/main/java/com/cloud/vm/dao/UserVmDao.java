@@ -1,6 +1,6 @@
 package com.cloud.vm.dao;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachine;

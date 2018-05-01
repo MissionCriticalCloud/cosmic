@@ -16,9 +16,9 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.vm.VMInstanceVO;
 
 import java.util.List;

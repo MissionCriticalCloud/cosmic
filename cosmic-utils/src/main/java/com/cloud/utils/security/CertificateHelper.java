@@ -1,7 +1,7 @@
 package com.cloud.utils.security;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.Ternary;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

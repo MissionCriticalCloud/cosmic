@@ -1,6 +1,6 @@
 package com.cloud.network.rules;
 
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.network.vpc.StaticRouteProfile;

@@ -1,8 +1,8 @@
 package com.cloud.framework.security.keystore;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.security.CertificateHelper;
 
 import javax.inject.Inject;

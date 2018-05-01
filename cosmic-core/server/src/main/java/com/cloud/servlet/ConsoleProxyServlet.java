@@ -1,17 +1,17 @@
 package com.cloud.servlet;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.user.AccountManager;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.ConstantTimeComparator;
-import com.cloud.utils.Pair;
 import com.cloud.utils.Ternary;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.vm.UserVmDetailVO;

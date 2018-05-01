@@ -21,17 +21,18 @@ import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.StorageAction;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.CreateSnapshotPayload;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ResizeVolumePayload;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.command.CopyCmdAnswer;
@@ -230,7 +231,7 @@ public class CloudStackPrimaryDataStoreDriverImpl implements PrimaryDataStoreDri
         if (store.getRole() == DataStoreRole.Primary && srcData.getType() == DataObjectType.TEMPLATE
                 && (destData.getType() == DataObjectType.TEMPLATE || destData.getType() == DataObjectType.VOLUME)) {
             final StoragePoolVO storagePoolVO = primaryStoreDao.findById(store.getId());
-            if (storagePoolVO != null && storagePoolVO.getPoolType() == Storage.StoragePoolType.CLVM) {
+            if (storagePoolVO != null && storagePoolVO.getPoolType() == StoragePoolType.CLVM) {
                 return true;
             }
         }

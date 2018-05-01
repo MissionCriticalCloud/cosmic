@@ -15,6 +15,7 @@ import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.engine.subsystem.api.storage.StorageCacheManager;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.cache.allocator.StorageCacheAllocator;
@@ -26,7 +27,6 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

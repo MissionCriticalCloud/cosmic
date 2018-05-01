@@ -29,17 +29,18 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -72,8 +73,6 @@ import com.cloud.user.ResourceLimitService;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
@@ -452,7 +451,7 @@ public class UserVmManagerTest {
         serviceOfferingIdField.set(cmd, 1L);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
+        doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
         doReturn(VirtualMachine.State.Running).when(_vmInstance).getState();
 
@@ -508,7 +507,7 @@ public class UserVmManagerTest {
         serviceOfferingIdField.set(cmd, 1L);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
+        doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
         final ServiceOffering so1 = getSvcoffering(512);
         final ServiceOffering so2 = getSvcoffering(256);
@@ -553,7 +552,7 @@ public class UserVmManagerTest {
         //UserContext.registerContext(1, account, null, true);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
+        doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
         final ServiceOffering so1 = getSvcoffering(512);
         final ServiceOffering so2 = getSvcoffering(256);

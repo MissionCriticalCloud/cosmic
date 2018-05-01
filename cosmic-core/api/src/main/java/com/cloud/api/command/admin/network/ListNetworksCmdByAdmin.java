@@ -6,8 +6,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.network.ListNetworksCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.Network;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listNetworks", group = APICommandGroup.NetworkService, description = "Lists all available networks.", responseObject = NetworkResponse.class, responseView = ResponseView.Full, entityType = {Network
-        .class},
+@APICommand(name = "listNetworks", group = APICommandGroup.NetworkService, description = "Lists all available networks.", responseObject = NetworkResponse.class, responseView = ResponseView.Full,
+        entityType = {Network
+                .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListNetworksCmdByAdmin extends ListNetworksCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListNetworksCmdByAdmin.class.getName());

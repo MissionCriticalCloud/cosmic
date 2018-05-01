@@ -1,10 +1,10 @@
 package com.cloud.storage.datastore.db;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;

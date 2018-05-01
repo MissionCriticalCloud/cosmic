@@ -14,10 +14,10 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.Ternary;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

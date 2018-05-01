@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.cloud.agent.api.BackupSnapshotAnswer;
 import com.cloud.agent.api.BackupSnapshotCommand;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
 
 import org.junit.Before;
 import org.junit.Test;

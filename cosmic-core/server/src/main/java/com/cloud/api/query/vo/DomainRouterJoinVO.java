@@ -1,6 +1,6 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.router.VirtualRouter;
@@ -87,7 +87,7 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     private String hostName;
     @Column(name = "hypervisor_type")
     @Enumerated(value = EnumType.STRING)
-    private Hypervisor.HypervisorType hypervisorType;
+    private HypervisorType hypervisorType;
     @Column(name = "template_id", updatable = true, nullable = true, length = 17)
     private long templateId;
     @Column(name = "template_uuid")
@@ -283,7 +283,7 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
         this.hostName = hostName;
     }
 
-    public void setHypervisorType(final Hypervisor.HypervisorType hypervisorType) {
+    public void setHypervisorType(final HypervisorType hypervisorType) {
         this.hypervisorType = hypervisorType;
     }
 
@@ -539,7 +539,7 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
         return hostName;
     }
 
-    public Hypervisor.HypervisorType getHypervisorType() {
+    public HypervisorType getHypervisorType() {
         return hypervisorType;
     }
 

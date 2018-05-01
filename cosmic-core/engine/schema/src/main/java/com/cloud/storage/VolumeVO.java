@@ -1,8 +1,8 @@
 package com.cloud.storage;
 
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 

@@ -1,7 +1,7 @@
 package com.cloud.vm.dao;
 
 import com.cloud.info.ConsoleProxyLoadInfo;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;

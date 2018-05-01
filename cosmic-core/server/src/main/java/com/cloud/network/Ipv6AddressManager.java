@@ -1,6 +1,6 @@
 package com.cloud.network;
 
-import com.cloud.exception.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.component.Manager;
 

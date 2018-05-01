@@ -8,12 +8,12 @@ import com.cloud.api.ApiServer;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.ResponseObject;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ExceptionProxyObject;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.serializer.Param;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.encoding.URLEncoder;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.ExceptionProxyObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

@@ -1,6 +1,6 @@
 package com.cloud.network.element;
 
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;

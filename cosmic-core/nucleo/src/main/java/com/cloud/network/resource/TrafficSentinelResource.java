@@ -15,8 +15,8 @@ import com.cloud.agent.api.RecurringNetworkUsageCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupTrafficMonitorCommand;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.exceptions.ExecutionException;
 import com.cloud.resource.ServerResource;
-import com.cloud.utils.exception.ExecutionException;
 
 import javax.naming.ConfigurationException;
 import java.io.BufferedReader;

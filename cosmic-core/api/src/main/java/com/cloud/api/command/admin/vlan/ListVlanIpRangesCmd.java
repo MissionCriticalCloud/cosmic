@@ -14,7 +14,7 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.VlanIpRangeResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.legacymodel.dc.Vlan;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

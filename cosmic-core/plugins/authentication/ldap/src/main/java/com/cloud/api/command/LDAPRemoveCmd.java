@@ -8,7 +8,7 @@ import com.cloud.api.response.LDAPRemoveResponse;
 import com.cloud.ldap.LdapConfigurationVO;
 import com.cloud.ldap.LdapManager;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.inject.Inject;
 import java.util.List;

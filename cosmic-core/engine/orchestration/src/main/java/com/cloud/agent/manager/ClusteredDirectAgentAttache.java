@@ -4,8 +4,8 @@ import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.UnsupportedVersionException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.ServerResource;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 public class ClusteredDirectAgentAttache extends DirectAgentAttache implements Routable {
     private final long _nodeId;

@@ -9,7 +9,7 @@ import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.vm.VirtualMachine;
 

@@ -4,10 +4,10 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PlugNicAnswer;
 import com.cloud.agent.api.PlugNicCommand;
 import com.cloud.agent.api.to.NicTO;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

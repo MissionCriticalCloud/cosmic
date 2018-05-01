@@ -1,6 +1,6 @@
 package com.cloud.agent.transport;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.lang.reflect.Type;
 import java.util.Map;

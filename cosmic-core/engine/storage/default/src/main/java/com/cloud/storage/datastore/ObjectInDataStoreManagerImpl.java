@@ -12,7 +12,8 @@ import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
-import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
@@ -27,7 +28,6 @@ import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
 import com.cloud.storage.template.TemplateConstants;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 

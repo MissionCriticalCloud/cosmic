@@ -1,6 +1,6 @@
 package com.cloud.network.topology;
 
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.rules.AdvancedVpnRules;
 import com.cloud.network.rules.BasicVpnRules;
 import com.cloud.network.rules.DhcpEntryRules;

@@ -7,7 +7,7 @@ import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
 
@@ -43,7 +43,7 @@ public class KvmInvestigator extends AdapterBase implements Investigator {
 
     @Override
     public Status isAgentAlive(final Host agent) {
-        if (agent.getHypervisorType() != Hypervisor.HypervisorType.KVM) {
+        if (agent.getHypervisorType() != HypervisorType.KVM) {
             return null;
         }
         Status hostStatus = null;
@@ -64,7 +64,7 @@ public class KvmInvestigator extends AdapterBase implements Investigator {
 
         final List<HostVO> neighbors = resourceMgr.listHostsInClusterByStatus(agent.getClusterId(), Status.Up);
         for (final HostVO neighbor : neighbors) {
-            if (neighbor.getId() == agent.getId() || neighbor.getHypervisorType() != Hypervisor.HypervisorType.KVM) {
+            if (neighbor.getId() == agent.getId() || neighbor.getHypervisorType() != HypervisorType.KVM) {
                 continue;
             }
             logger.debug("Investigating host:" + agent.getId() + " via neighbouring host:" + neighbor.getId());

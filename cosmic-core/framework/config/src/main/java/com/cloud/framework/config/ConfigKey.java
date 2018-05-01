@@ -2,7 +2,7 @@ package com.cloud.framework.config;
 
 import com.cloud.framework.config.impl.ConfigDepotImpl;
 import com.cloud.framework.config.impl.ConfigurationVO;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.sql.Date;
 

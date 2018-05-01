@@ -12,7 +12,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.Volume;
 

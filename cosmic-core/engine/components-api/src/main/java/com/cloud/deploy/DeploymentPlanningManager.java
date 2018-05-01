@@ -1,7 +1,7 @@
 package com.cloud.deploy;
 
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.exception.InsufficientServerCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.VirtualMachineProfile;
 

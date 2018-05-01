@@ -11,7 +11,7 @@ import com.cloud.api.response.NetworkACLItemResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;

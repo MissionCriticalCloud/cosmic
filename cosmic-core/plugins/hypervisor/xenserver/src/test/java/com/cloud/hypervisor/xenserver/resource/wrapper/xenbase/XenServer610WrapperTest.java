@@ -24,10 +24,10 @@ import com.cloud.host.HostEnvironment;
 import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkSetupInfo;
-import com.cloud.storage.StoragePool;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;

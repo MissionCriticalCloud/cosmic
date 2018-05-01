@@ -15,7 +15,7 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.template.VirtualMachineTemplate;
 
 import java.util.List;
@@ -23,8 +23,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerIso", group = APICommandGroup.ISOService, responseObject = TemplateResponse.class, description = "Registers an existing ISO into the CloudStack Cloud.", responseView = ResponseView
-        .Restricted,
+@APICommand(name = "registerIso", group = APICommandGroup.ISOService, responseObject = TemplateResponse.class, description = "Registers an existing ISO into the CloudStack Cloud.", responseView =
+        ResponseView
+                .Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RegisterIsoCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RegisterIsoCmd.class.getName());

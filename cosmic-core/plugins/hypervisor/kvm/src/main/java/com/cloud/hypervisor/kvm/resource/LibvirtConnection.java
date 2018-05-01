@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 
 import java.util.HashMap;
 import java.util.Map;

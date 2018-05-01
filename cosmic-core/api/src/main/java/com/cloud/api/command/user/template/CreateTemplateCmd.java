@@ -18,14 +18,14 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Volume;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.Collection;
 import java.util.List;

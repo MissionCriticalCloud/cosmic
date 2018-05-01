@@ -13,10 +13,10 @@ import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

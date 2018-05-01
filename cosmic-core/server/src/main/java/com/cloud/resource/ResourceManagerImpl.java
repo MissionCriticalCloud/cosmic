@@ -56,8 +56,6 @@ import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
 import com.cloud.event.EventVO;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.ResourceInUseException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.gpu.HostGpuGroupsVO;
@@ -76,23 +74,26 @@ import com.cloud.host.Status.Event;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
 import com.cloud.host.dao.HostTagsDao;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.discoverer.KvmDummyResourceBase;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ManagedState;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.org.Cluster;
-import com.cloud.org.Managed;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.StorageService;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.GuestOSCategoryDao;
@@ -120,8 +121,6 @@ import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.net.Ip;
@@ -922,7 +921,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public Discoverer getMatchingDiscover(final Hypervisor.HypervisorType hypervisorType) {
+    public Discoverer getMatchingDiscover(final HypervisorType hypervisorType) {
         for (final Discoverer discoverer : _discoverers) {
             if (discoverer.getHypervisorType() == hypervisorType) {
                 return discoverer;
@@ -1920,7 +1919,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             throw new InvalidParameterValueException("Please specify a hypervisor");
         }
 
-        final Hypervisor.HypervisorType hypervisorType = Hypervisor.HypervisorType.getType(cmd.getHypervisor());
+        final HypervisorType hypervisorType = HypervisorType.getType(cmd.getHypervisor());
         if (hypervisorType == null) {
             s_logger.error("Unable to resolve " + cmd.getHypervisor() + " to a valid supported hypervisor type");
             throw new InvalidParameterValueException("Unable to resolve " + cmd.getHypervisor() + " to a supported ");
@@ -2088,7 +2087,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         boolean doUpdate = false;
 
         if (hypervisor != null && !hypervisor.isEmpty()) {
-            final Hypervisor.HypervisorType hypervisorType = Hypervisor.HypervisorType.getType(hypervisor);
+            final HypervisorType hypervisorType = HypervisorType.getType(hypervisor);
             if (hypervisorType == null) {
                 s_logger.error("Unable to resolve " + hypervisor + " to a valid supported hypervisor type");
                 throw new InvalidParameterValueException("Unable to resolve " + hypervisor + " to a supported type");
@@ -2130,11 +2129,11 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        Managed.ManagedState newManagedState = null;
-        final Managed.ManagedState oldManagedState = cluster.getManagedState();
+        ManagedState newManagedState = null;
+        final ManagedState oldManagedState = cluster.getManagedState();
         if (managedstate != null && !managedstate.isEmpty()) {
             try {
-                newManagedState = Managed.ManagedState.valueOf(managedstate);
+                newManagedState = ManagedState.valueOf(managedstate);
             } catch (final IllegalArgumentException ex) {
                 throw new InvalidParameterValueException("Unable to resolve Managed State '" + managedstate + "' to a supported state");
             }
@@ -2151,10 +2150,10 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         }
 
         if (newManagedState != null && !newManagedState.equals(oldManagedState)) {
-            if (newManagedState.equals(Managed.ManagedState.Unmanaged)) {
+            if (newManagedState.equals(ManagedState.Unmanaged)) {
                 boolean success = false;
                 try {
-                    cluster.setManagedState(Managed.ManagedState.PrepareUnmanaged);
+                    cluster.setManagedState(ManagedState.PrepareUnmanaged);
                     _clusterDao.update(cluster.getId(), cluster);
                     List<HostVO> hosts = listAllUpAndEnabledHosts(Host.Type.Routing, cluster.getId(), cluster.getPodId(), cluster.getDataCenterId());
                     for (final HostVO host : hosts) {
@@ -2194,11 +2193,11 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                         throw new CloudRuntimeException("PrepareUnmanaged Failed due to some hosts are still in UP status after 5 Minutes, please try later ");
                     }
                 } finally {
-                    cluster.setManagedState(success ? Managed.ManagedState.Unmanaged : Managed.ManagedState.PrepareUnmanagedError);
+                    cluster.setManagedState(success ? ManagedState.Unmanaged : ManagedState.PrepareUnmanagedError);
                     _clusterDao.update(cluster.getId(), cluster);
                 }
-            } else if (newManagedState.equals(Managed.ManagedState.Managed)) {
-                cluster.setManagedState(Managed.ManagedState.Managed);
+            } else if (newManagedState.equals(ManagedState.Managed)) {
+                cluster.setManagedState(ManagedState.Managed);
                 _clusterDao.update(cluster.getId(), cluster);
             }
         }

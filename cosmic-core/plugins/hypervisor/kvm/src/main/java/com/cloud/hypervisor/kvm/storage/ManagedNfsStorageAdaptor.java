@@ -6,11 +6,11 @@ import com.cloud.hypervisor.kvm.resource.LibvirtStoragePoolDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtStoragePoolDef.PoolType;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeXmlParser;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageLayer;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
 

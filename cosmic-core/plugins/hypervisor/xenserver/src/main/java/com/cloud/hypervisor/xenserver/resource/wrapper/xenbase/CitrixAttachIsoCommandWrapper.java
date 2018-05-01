@@ -3,9 +3,9 @@ package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.AttachIsoCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.Set;
 

@@ -1,6 +1,6 @@
 package com.cloud.storage.template;
 
-import com.cloud.exception.InternalErrorException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.utils.component.Adapter;
 

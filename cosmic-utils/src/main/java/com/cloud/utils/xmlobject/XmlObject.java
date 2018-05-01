@@ -1,6 +1,6 @@
 package com.cloud.utils.xmlobject;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -7,9 +7,9 @@ import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.HypervisorCapabilitiesResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HypervisorType;
 
 import java.util.ArrayList;
 import java.util.List;

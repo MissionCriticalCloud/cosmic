@@ -1,7 +1,7 @@
 package com.cloud.utils.crypt;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.db.DbProperties;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.Properties;
 

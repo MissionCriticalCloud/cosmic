@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.dao;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;

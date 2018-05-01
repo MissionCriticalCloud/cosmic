@@ -2,8 +2,8 @@ package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.async.AsyncCompletionCallback;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.command.CommandResult;
 
 public interface TemplateService {

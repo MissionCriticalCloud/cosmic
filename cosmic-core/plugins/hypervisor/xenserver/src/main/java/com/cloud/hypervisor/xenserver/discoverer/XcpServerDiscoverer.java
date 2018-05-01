@@ -17,16 +17,11 @@ import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.DiscoveredWithErrorException;
-import com.cloud.exception.DiscoveryException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostEnvironment;
 import com.cloud.host.HostInfo;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
 import com.cloud.hypervisor.xenserver.resource.CitrixHelper;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
@@ -42,8 +37,14 @@ import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServer650Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServerConnectionPool;
 import com.cloud.hypervisor.xenserver.resource.Xenserver625Resource;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.DiscoveredWithErrorException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.HypervisorVersionChangedException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.Zone;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
 import com.cloud.resource.ResourceStateAdapter;
@@ -56,8 +57,6 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.HypervisorVersionChangedException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -422,12 +421,12 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         if (hypervisor == null) {
             return true;
         }
-        return Hypervisor.HypervisorType.XenServer.toString().equalsIgnoreCase(hypervisor);
+        return HypervisorType.XenServer.toString().equalsIgnoreCase(hypervisor);
     }
 
     @Override
-    public Hypervisor.HypervisorType getHypervisorType() {
-        return Hypervisor.HypervisorType.XenServer;
+    public HypervisorType getHypervisorType() {
+        return HypervisorType.XenServer;
     }
 
     String getPoolUuid(final Connection conn) throws XenAPIException, XmlRpcException {

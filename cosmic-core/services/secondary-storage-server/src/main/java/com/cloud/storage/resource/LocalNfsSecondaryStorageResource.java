@@ -2,9 +2,9 @@ package com.cloud.storage.resource;
 
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.template.DownloadManagerImpl;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
 
 import java.net.URI;

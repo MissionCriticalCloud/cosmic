@@ -13,13 +13,13 @@ import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 

@@ -6,7 +6,7 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.ha.HighAvailabilityManager;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.StorageManager;

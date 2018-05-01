@@ -12,7 +12,7 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.config.Configuration;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,10 +11,10 @@ import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.exception.ResourceInUseException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.storage.StoragePool;
 
 import java.net.UnknownHostException;
 import java.util.Map;

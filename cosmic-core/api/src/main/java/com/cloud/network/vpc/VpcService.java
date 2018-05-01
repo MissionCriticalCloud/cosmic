@@ -2,14 +2,14 @@ package com.cloud.network.vpc;
 
 import com.cloud.api.command.user.vpc.ListPrivateGatewaysCmd;
 import com.cloud.api.command.user.vpc.ListStaticRoutesCmd;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.IpAddress;
-import com.cloud.utils.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,8 @@ public interface VpcService {
      * @return
      * @throws ResourceAllocationException TODO
      */
-    public Vpc createVpc(long zoneId, long vpcOffId, long vpcOwnerId, String vpcName, String displayText, String cidr, String networkDomain, Boolean displayVpc, String sourceNatList, String syslogServerList)
+    public Vpc createVpc(long zoneId, long vpcOffId, long vpcOwnerId, String vpcName, String displayText, String cidr, String networkDomain, Boolean displayVpc, String sourceNatList, String
+            syslogServerList)
             throws ResourceAllocationException;
 
     /**

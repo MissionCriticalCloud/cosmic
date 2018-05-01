@@ -4,11 +4,11 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.SecStorageFirewallCfgCommand.PortConfig;
 import com.cloud.exception.UnsupportedVersionException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

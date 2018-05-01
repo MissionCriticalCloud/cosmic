@@ -1,6 +1,6 @@
 package com.cloud.utils.testcase;
 
-import com.cloud.utils.exception.NioConnectionException;
+import com.cloud.legacymodel.exceptions.NioConnectionException;
 import com.cloud.utils.nio.HandlerFactory;
 import com.cloud.utils.nio.Link;
 import com.cloud.utils.nio.NioClient;

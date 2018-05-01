@@ -2,8 +2,8 @@ package com.cloud.utils.nio;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 
+import com.cloud.legacymodel.exceptions.NioConnectionException;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.exception.NioConnectionException;
 import com.cloud.utils.security.SSLUtils;
 
 import javax.net.ssl.SSLContext;

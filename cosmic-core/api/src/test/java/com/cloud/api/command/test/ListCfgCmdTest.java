@@ -6,7 +6,7 @@ import com.cloud.api.response.ConfigurationResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.config.Configuration;
 import com.cloud.server.ManagementService;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

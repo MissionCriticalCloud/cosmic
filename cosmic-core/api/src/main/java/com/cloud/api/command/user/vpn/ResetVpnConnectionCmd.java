@@ -11,7 +11,7 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Site2SiteVpnConnection;
 

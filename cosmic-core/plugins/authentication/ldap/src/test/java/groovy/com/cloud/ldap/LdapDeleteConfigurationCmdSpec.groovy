@@ -4,7 +4,7 @@ import com.cloud.api.ServerApiException
 import com.cloud.api.command.LdapDeleteConfigurationCmd
 import com.cloud.api.response.LdapConfigurationResponse
 import com.cloud.ldap.LdapManager
-import com.cloud.utils.exception.InvalidParameterValueException
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException
 
 class LdapDeleteConfigurationCmdSpec extends spock.lang.Specification {
 

@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.kvm.resource;
 
 import com.cloud.agent.api.to.NicTO;
-import com.cloud.exception.InternalErrorException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.network.Networks;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
@@ -119,7 +119,7 @@ public class BridgeVifDriver extends VifDriverBase {
                 intf.defBridgeNet(brname, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter), networkRateKBps);
             }
         } else if (nic.getType() == Networks.TrafficType.Control) {
-      /* Make sure the network is still there */
+            /* Make sure the network is still there */
             createControlNetwork();
             intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
         } else if (nic.getType() == Networks.TrafficType.Public) {

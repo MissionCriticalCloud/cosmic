@@ -18,20 +18,21 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.network.Network;
 import com.cloud.network.Network.GuestType;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createNetwork", group = APICommandGroup.NetworkService, description = "Creates a network", responseObject = NetworkResponse.class, responseView = ResponseView.Restricted, entityType = {Network.class},
+@APICommand(name = "createNetwork", group = APICommandGroup.NetworkService, description = "Creates a network", responseObject = NetworkResponse.class, responseView = ResponseView.Restricted,
+        entityType = {Network.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateNetworkCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateNetworkCmd.class.getName());

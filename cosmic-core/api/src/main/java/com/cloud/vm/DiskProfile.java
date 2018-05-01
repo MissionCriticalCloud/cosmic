@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.Volume;

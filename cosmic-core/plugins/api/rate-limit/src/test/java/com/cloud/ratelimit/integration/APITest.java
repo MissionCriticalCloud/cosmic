@@ -2,7 +2,7 @@ package com.cloud.ratelimit.integration;
 
 import com.cloud.api.ApiGsonHelper;
 import com.cloud.api.response.SuccessResponse;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.io.BufferedReader;
 import java.io.EOFException;

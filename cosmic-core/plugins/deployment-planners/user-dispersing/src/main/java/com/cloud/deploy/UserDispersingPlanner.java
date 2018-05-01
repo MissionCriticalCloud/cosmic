@@ -2,7 +2,7 @@ package com.cloud.deploy;
 
 import com.cloud.configuration.Config;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.naming.ConfigurationException;

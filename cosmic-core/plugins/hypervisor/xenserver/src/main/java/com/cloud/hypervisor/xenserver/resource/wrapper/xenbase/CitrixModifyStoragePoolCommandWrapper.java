@@ -5,10 +5,10 @@ import com.cloud.agent.api.ModifyStoragePoolAnswer;
 import com.cloud.agent.api.ModifyStoragePoolCommand;
 import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.template.TemplateProp;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.HashMap;
 import java.util.Map;

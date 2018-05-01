@@ -1,6 +1,6 @@
 package com.cloud.framework.jobs.impl;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

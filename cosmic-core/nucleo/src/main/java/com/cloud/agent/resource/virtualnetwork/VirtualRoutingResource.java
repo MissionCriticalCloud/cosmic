@@ -12,9 +12,9 @@ import com.cloud.agent.api.routing.AggregationControlCommand.Action;
 import com.cloud.agent.api.routing.GroupAnswer;
 import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -285,7 +285,6 @@ public class VirtualRoutingResource {
             assert (!_vrAggregateCommandsSet.containsKey(routerName));
             _vrAggregateCommandsSet.put(routerName, new LinkedBlockingQueue<>());
             return new Answer(aggregationCommand, true, "Command aggregation started");
-
         } else if (Action.Finish.equals(action)) {
             final Queue<NetworkElementCommand> queue = _vrAggregateCommandsSet.get(routerName);
             try {

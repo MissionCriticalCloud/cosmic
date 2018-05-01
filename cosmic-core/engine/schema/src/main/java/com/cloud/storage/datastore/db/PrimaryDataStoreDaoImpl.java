@@ -1,10 +1,11 @@
 package com.cloud.storage.datastore.db;
 
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -16,7 +17,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

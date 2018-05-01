@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;

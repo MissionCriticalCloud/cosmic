@@ -1,9 +1,9 @@
 package com.cloud.utils.db;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.SearchCriteria.SelectType;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.persistence.Column;
 import javax.persistence.Transient;

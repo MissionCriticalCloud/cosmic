@@ -7,10 +7,10 @@ import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.utils.Pair;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;

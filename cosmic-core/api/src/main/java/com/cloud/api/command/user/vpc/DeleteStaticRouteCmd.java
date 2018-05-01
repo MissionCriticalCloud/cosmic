@@ -15,9 +15,9 @@ import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.vpc.StaticRoute;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

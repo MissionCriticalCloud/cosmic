@@ -1,11 +1,11 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.network.Network.GuestType;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.Volume;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.VirtualMachine;

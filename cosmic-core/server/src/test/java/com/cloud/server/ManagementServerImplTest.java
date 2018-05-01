@@ -9,7 +9,7 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.user.SSHKeyPairVO;
 import com.cloud.user.dao.SSHKeyPairDao;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

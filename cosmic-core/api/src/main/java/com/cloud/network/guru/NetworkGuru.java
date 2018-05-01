@@ -2,9 +2,9 @@ package com.cloud.network.guru;
 
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkProfile;

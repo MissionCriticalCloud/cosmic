@@ -8,16 +8,17 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vmsnapshot.RevertToVMSnapshotCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.uservm.UserVm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "revertToVMSnapshot", group = APICommandGroup.SnapshotService, description = "Revert VM from a vmsnapshot.", responseObject = UserVmResponse.class, since = "4.2.0", responseView = ResponseView.Full,
+@APICommand(name = "revertToVMSnapshot", group = APICommandGroup.SnapshotService, description = "Revert VM from a vmsnapshot.", responseObject = UserVmResponse.class, since = "4.2.0", responseView
+        = ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RevertToVMSnapshotCmdByAdmin extends RevertToVMSnapshotCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RevertToVMSnapshotCmdByAdmin.class.getName());

@@ -1,5 +1,6 @@
 package com.cloud.service.dao;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.Storage.ProvisioningType;
@@ -7,7 +8,6 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VirtualMachine;
 
 import javax.inject.Inject;

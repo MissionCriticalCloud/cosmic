@@ -8,8 +8,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.GuestOSHypervisor;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

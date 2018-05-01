@@ -1,6 +1,6 @@
 package com.cloud.utils;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.nio.ByteBuffer;
 import java.text.ParseException;

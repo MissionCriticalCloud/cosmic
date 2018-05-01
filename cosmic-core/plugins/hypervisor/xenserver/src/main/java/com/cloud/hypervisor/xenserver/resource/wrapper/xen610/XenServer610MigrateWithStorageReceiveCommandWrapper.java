@@ -10,11 +10,11 @@ import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

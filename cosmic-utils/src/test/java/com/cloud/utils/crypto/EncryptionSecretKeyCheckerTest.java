@@ -1,8 +1,8 @@
 package com.cloud.utils.crypto;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.crypt.EncryptionSecretKeyChecker;
 import com.cloud.utils.db.DbProperties;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

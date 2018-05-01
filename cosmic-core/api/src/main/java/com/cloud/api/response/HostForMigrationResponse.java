@@ -5,7 +5,7 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.serializer.Param;
 
 import java.util.Date;

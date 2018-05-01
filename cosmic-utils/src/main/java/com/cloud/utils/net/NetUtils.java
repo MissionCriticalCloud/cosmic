@@ -1,8 +1,8 @@
 package com.cloud.utils.net;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.IteratorUtil;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
 
 import java.io.BufferedReader;

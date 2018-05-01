@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
 
 public class CreatePrivateTemplateFromVolumeCommand extends SnapshotCommand {
     StorageFilerTO _primaryPool;

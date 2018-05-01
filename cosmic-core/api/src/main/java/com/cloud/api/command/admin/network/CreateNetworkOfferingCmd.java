@@ -9,12 +9,12 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.NetworkOfferingResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Service;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.Collection;

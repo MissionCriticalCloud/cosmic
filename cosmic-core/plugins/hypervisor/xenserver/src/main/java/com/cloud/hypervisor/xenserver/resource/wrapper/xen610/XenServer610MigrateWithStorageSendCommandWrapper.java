@@ -7,10 +7,10 @@ import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.HashMap;
 import java.util.List;

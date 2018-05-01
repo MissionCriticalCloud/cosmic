@@ -1,7 +1,7 @@
 package com.cloud.network.element;
 
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.Network;
 
 public interface AggregatedCommandExecutor {

@@ -1,6 +1,6 @@
 package com.cloud.utils.nio;
 
-import com.cloud.utils.exception.TaskExecutionException;
+import com.cloud.legacymodel.exceptions.TaskExecutionException;
 
 import java.util.concurrent.Callable;
 

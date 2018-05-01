@@ -8,16 +8,17 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "changeServiceForVirtualMachine", group = APICommandGroup.VirtualMachineService, responseObject = UserVmResponse.class, description = "Changes the service offering for a virtual machine. " +
+@APICommand(name = "changeServiceForVirtualMachine", group = APICommandGroup.VirtualMachineService, responseObject = UserVmResponse.class, description = "Changes the service offering for a virtual " +
+        "machine. " +
         "The virtual machine must be in a \"Stopped\" state for " +
         "this command to take effect.", responseView = ResponseView.Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)

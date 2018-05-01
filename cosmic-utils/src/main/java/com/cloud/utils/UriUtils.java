@@ -1,7 +1,8 @@
 package com.cloud.utils;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.crypt.DBEncryptionUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.File;

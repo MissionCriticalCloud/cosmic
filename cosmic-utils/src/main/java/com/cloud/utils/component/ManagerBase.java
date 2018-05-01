@@ -1,7 +1,7 @@
 package com.cloud.utils.component;
 
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.utils.UriUtils;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -10,8 +10,8 @@ import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.LinkedList;

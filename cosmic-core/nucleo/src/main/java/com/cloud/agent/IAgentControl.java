@@ -2,7 +2,7 @@ package com.cloud.agent;
 
 import com.cloud.agent.api.AgentControlAnswer;
 import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.exception.AgentControlChannelException;
+import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 
 public interface IAgentControl {
     void registerControlListener(IAgentControlListener listener);

@@ -1,7 +1,7 @@
 package com.cloud.network.dao;
 
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.utils.Pair;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,9 +1,10 @@
 package com.cloud.network;
 
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.IpAddresses;
 import com.cloud.network.Network.Provider;
@@ -13,7 +14,6 @@ import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.VirtualMachine;

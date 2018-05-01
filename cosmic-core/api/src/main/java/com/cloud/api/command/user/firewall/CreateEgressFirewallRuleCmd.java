@@ -14,12 +14,12 @@ import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.Network;
 import com.cloud.network.rules.FirewallRule;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;

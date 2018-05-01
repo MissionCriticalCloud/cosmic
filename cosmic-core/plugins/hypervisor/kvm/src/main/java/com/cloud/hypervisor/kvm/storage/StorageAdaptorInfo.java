@@ -2,7 +2,7 @@ package com.cloud.hypervisor.kvm.storage;
 
 import static java.lang.annotation.ElementType.TYPE;
 
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.model.enumeration.StoragePoolType;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

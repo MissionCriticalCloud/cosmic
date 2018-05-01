@@ -9,10 +9,10 @@ import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DiskProfile;
 
 import org.slf4j.Logger;

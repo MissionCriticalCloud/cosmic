@@ -18,9 +18,9 @@ import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.domain.Domain;
 import com.cloud.ldap.dao.LdapConfigurationDao;
 import com.cloud.ldap.dao.LdapTrustMapDao;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.user.DomainManager;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.ejb.Local;
 import javax.inject.Inject;

@@ -3,7 +3,7 @@ package com.cloud.storage.resource;
 import com.cloud.agent.AgentManager;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status.Event;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
 import com.cloud.resource.ServerResource;
@@ -253,8 +253,8 @@ public class SecondaryStorageDiscoverer extends DiscovererBase implements Discov
     }
 
     @Override
-    public Hypervisor.HypervisorType getHypervisorType() {
-        return Hypervisor.HypervisorType.None;
+    public HypervisorType getHypervisorType() {
+        return HypervisorType.None;
     }
 
     private void associateTemplatesToZone(final long hostId, final long dcId) {

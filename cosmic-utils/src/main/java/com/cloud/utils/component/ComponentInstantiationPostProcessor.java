@@ -1,6 +1,6 @@
 package com.cloud.utils.component;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;

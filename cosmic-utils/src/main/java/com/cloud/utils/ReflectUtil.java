@@ -4,7 +4,8 @@ import static java.beans.Introspector.getBeanInfo;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

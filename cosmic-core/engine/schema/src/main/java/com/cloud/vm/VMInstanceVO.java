@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.StateMachine;

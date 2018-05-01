@@ -7,9 +7,9 @@ import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public final class LibvirtPrimaryStorageDownloadCommandWrapper
         try {
             secondaryPool = storagePoolMgr.getStoragePoolByUri(mountpoint);
 
-      /* Get template vol */
+            /* Get template vol */
             if (tmpltname == null) {
                 secondaryPool.refresh();
                 final List<KvmPhysicalDisk> disks = secondaryPool.listPhysicalDisks();
@@ -56,7 +56,7 @@ public final class LibvirtPrimaryStorageDownloadCommandWrapper
                 tmplVol = secondaryPool.getPhysicalDisk(tmpltname);
             }
 
-      /* Copy volume to primary storage */
+            /* Copy volume to primary storage */
             final KvmStoragePool primaryPool = storagePoolMgr.getStoragePool(command.getPool().getType(),
                     command.getPoolUuid());
 

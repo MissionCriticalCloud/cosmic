@@ -10,10 +10,10 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.Ip;
 
 import org.slf4j.Logger;

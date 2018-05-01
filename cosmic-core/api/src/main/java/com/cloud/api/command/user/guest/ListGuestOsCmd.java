@@ -9,8 +9,8 @@ import com.cloud.api.command.user.iso.ListIsosCmd;
 import com.cloud.api.response.GuestOSCategoryResponse;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.GuestOS;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

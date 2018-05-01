@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.Host;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;
 import java.util.Map;

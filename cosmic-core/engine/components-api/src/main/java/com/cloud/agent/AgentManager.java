@@ -5,13 +5,13 @@ import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ServerResource;
 
 /**

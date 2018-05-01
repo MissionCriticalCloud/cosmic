@@ -2,7 +2,7 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.response.StoragePoolResponse;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

@@ -5,10 +5,10 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.UserVmService;
 

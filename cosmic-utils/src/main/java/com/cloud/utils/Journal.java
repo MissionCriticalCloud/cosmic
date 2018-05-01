@@ -1,5 +1,7 @@
 package com.cloud.utils;
 
+import com.cloud.legacymodel.utils.Pair;
+
 import java.util.ArrayList;
 
 import org.slf4j.Logger;

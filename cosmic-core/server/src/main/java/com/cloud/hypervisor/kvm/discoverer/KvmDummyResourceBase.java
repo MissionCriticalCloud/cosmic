@@ -6,7 +6,7 @@ import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.host.Host.Type;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 
@@ -29,7 +29,7 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
 
     @Override
     public StartupCommand[] initialize() {
-        final StartupRoutingCommand cmd = new StartupRoutingCommand(0, 0, 0, null, Hypervisor.HypervisorType.KVM, new HashMap<>());
+        final StartupRoutingCommand cmd = new StartupRoutingCommand(0, 0, 0, null, HypervisorType.KVM, new HashMap<>());
         cmd.setDataCenter(_zoneId);
         cmd.setPod(_podId);
         cmd.setCluster(_clusterId);

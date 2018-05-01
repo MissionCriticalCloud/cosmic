@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.agent.api.to.DiskTO;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;

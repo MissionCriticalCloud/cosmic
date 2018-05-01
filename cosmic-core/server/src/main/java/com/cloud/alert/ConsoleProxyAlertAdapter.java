@@ -4,9 +4,9 @@ import com.cloud.consoleproxy.ConsoleProxyAlertEventArgs;
 import com.cloud.consoleproxy.ConsoleProxyManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.events.SubscriptionMgr;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.dao.ConsoleProxyDao;
 

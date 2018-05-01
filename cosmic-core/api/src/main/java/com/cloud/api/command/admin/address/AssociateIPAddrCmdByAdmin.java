@@ -8,16 +8,17 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.address.AssociateIPAddrCmd;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "associateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
+@APICommand(name = "associateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse
+        .class, responseView =
         ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AssociateIPAddrCmdByAdmin extends AssociateIPAddrCmd {

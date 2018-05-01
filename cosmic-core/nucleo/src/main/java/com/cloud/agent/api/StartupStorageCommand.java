@@ -1,8 +1,8 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.Host;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.template.TemplateProp;
 
 import java.util.HashMap;

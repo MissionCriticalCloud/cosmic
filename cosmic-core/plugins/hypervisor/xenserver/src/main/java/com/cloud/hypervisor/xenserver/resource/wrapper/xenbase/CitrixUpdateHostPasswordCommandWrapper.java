@@ -8,7 +8,7 @@ import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

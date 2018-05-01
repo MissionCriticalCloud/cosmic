@@ -13,7 +13,6 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
 import com.cloud.host.Host;
@@ -21,8 +20,9 @@ import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceState;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -373,7 +373,7 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
             sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
             final List<HostVO> hosts = _hostDao.search(sc, null);
 
-                /* HashMap for metrics to be send to Graphite */
+            /* HashMap for metrics to be send to Graphite */
             final HashMap metrics = new HashMap<>();
 
             for (final HostVO host : hosts) {

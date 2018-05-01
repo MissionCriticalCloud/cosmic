@@ -7,6 +7,7 @@ import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.Upload;
@@ -16,7 +17,6 @@ import com.cloud.storage.template.TemplateUploader.Status;
 import com.cloud.storage.template.TemplateUploader.UploadCompleteCallback;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
 
 import javax.naming.ConfigurationException;

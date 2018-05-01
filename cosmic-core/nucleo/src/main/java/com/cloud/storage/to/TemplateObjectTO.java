@@ -4,7 +4,7 @@ import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.template.VirtualMachineTemplate;
 
@@ -22,7 +22,7 @@ public class TemplateObjectTO implements DataTO {
     private String guestOsType;
     private Long size;
     private Long physicalSize;
-    private Hypervisor.HypervisorType hypervisorType;
+    private HypervisorType hypervisorType;
 
     public TemplateObjectTO() {
 
@@ -107,7 +107,7 @@ public class TemplateObjectTO implements DataTO {
     }
 
     @Override
-    public Hypervisor.HypervisorType getHypervisorType() {
+    public HypervisorType getHypervisorType() {
         return this.hypervisorType;
     }
 
@@ -129,7 +129,7 @@ public class TemplateObjectTO implements DataTO {
         this.path = path;
     }
 
-    public void setHypervisorType(final Hypervisor.HypervisorType hypervisorType) {
+    public void setHypervisorType(final HypervisorType hypervisorType) {
         this.hypervisorType = hypervisorType;
     }
 

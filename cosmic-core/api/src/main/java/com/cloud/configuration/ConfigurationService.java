@@ -22,20 +22,20 @@ import com.cloud.api.command.admin.zone.UpdateZoneCmd;
 import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
 import com.cloud.config.Configuration;
 import com.cloud.domain.Domain;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

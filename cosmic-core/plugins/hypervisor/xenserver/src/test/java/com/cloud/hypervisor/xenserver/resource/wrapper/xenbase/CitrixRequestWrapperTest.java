@@ -76,7 +76,7 @@ import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachine;
 

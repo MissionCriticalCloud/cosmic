@@ -1,7 +1,7 @@
 package com.cloud.acl;
 
 import com.cloud.api.APICommand;
-import com.cloud.exception.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.user.AccountService;

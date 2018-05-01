@@ -5,7 +5,7 @@ import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import com.cloud.exception.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.utils.fsm.NoTransitionException;
 

@@ -4,7 +4,7 @@ import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 import com.cloud.network.lb.LoadBalancingRule.LbHealthCheckPolicy;
 import com.cloud.network.lb.LoadBalancingRule.LbSslCert;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,7 +13,7 @@ import com.cloud.api.response.Site2SiteVpnGatewayResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.vpc.Vpc;
 

@@ -1,8 +1,8 @@
 package com.cloud.storage.dao;
 
 import com.cloud.host.Status;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

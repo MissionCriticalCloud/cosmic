@@ -6,12 +6,12 @@ import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

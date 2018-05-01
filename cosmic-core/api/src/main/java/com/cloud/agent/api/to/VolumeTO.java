@@ -1,8 +1,8 @@
 package com.cloud.agent.api.to;
 
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Volume;
 
 public class VolumeTO implements InternalIdentity {

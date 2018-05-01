@@ -1,6 +1,6 @@
 package com.cloud.acl;
 
-import com.cloud.exception.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.user.User;
 import com.cloud.utils.component.Adapter;
 

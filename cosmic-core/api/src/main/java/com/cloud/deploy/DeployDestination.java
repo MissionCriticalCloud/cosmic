@@ -2,9 +2,9 @@ package com.cloud.deploy;
 
 import com.cloud.db.model.Zone;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.Pod;
-import com.cloud.org.Cluster;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.storage.Volume;
 import com.cloud.utils.NumbersUtil;
 

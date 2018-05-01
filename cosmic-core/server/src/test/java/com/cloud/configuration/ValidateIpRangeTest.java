@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 import com.cloud.dc.VlanVO;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

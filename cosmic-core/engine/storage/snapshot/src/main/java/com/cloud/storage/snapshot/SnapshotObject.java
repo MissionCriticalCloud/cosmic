@@ -13,7 +13,8 @@ import com.cloud.engine.subsystem.api.storage.SnapshotStrategy.SnapshotOperation
 import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
@@ -29,7 +30,6 @@ import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.inject.Inject;

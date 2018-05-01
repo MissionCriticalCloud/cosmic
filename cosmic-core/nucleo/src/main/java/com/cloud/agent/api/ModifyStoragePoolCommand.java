@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePool;
 
 import java.io.File;
 import java.util.UUID;

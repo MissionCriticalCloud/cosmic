@@ -17,7 +17,7 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.util.HashMap;

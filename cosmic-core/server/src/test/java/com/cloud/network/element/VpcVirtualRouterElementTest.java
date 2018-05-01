@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpnUser;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManagerImpl;

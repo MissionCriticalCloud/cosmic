@@ -1,7 +1,10 @@
 package com.cloud.storage.dao;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage.ImageFormat;
@@ -11,7 +14,6 @@ import com.cloud.storage.Volume.State;
 import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -21,8 +23,6 @@ import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.sql.PreparedStatement;

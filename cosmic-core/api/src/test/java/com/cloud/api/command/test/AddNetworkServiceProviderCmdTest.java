@@ -2,7 +2,7 @@ package com.cloud.api.command.test;
 
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.network.AddNetworkServiceProviderCmd;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.network.NetworkService;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 

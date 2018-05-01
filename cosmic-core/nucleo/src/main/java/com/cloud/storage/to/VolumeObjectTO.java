@@ -4,7 +4,7 @@ import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.DataTO;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.Storage;
 import com.cloud.storage.Volume;
@@ -30,7 +30,7 @@ public class VolumeObjectTO implements DataTO {
     private Long iopsReadRate;
     private Long iopsWriteRate;
     private DiskCacheMode cacheMode;
-    private Hypervisor.HypervisorType hypervisorType;
+    private HypervisorType hypervisorType;
 
     public VolumeObjectTO() {
 
@@ -106,7 +106,7 @@ public class VolumeObjectTO implements DataTO {
     }
 
     @Override
-    public Hypervisor.HypervisorType getHypervisorType() {
+    public HypervisorType getHypervisorType() {
         return hypervisorType;
     }
 

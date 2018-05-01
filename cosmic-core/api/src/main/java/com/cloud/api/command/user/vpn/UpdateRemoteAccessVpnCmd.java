@@ -9,8 +9,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.RemoteAccessVpnResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

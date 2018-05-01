@@ -3,7 +3,8 @@ package com.cloud.storage.template;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.agent.api.to.NfsTO;
-import com.cloud.exception.InternalErrorException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.VMTemplateHostVO;
@@ -19,7 +20,6 @@ import com.cloud.storage.template.TemplateDownloader.Status;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.Proxy;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
@@ -769,7 +769,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         private long templatesize;
         private long templatePhysicalSize;
 
-        public DownloadJob(final TemplateDownloader td, final String jobId, final long id, final String tmpltName, final ImageFormat format, final Long  accountId,
+        public DownloadJob(final TemplateDownloader td, final String jobId, final long id, final String tmpltName, final ImageFormat format, final Long accountId,
                            final String descr, final String cksum, final String installPathPrefix, final ResourceType resourceType) {
             super();
             this.td = td;

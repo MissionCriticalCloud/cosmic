@@ -11,12 +11,12 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;

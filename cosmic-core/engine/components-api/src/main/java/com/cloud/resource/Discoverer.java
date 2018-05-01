@@ -1,8 +1,8 @@
 package com.cloud.resource;
 
-import com.cloud.exception.DiscoveryException;
 import com.cloud.host.HostVO;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.component.Adapter;
 
 import java.net.URI;
@@ -28,7 +28,7 @@ public interface Discoverer extends Adapter {
 
     boolean matchHypervisor(String hypervisor);
 
-    Hypervisor.HypervisorType getHypervisorType();
+    HypervisorType getHypervisorType();
 
     public void putParam(Map<String, String> params);
 

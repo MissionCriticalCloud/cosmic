@@ -3,7 +3,7 @@ package com.cloud.agent.manager;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.Command.OnError;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Iterator;

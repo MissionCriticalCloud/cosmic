@@ -2,10 +2,11 @@ package com.cloud.vm.dao;
 
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.DateUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
@@ -22,7 +23,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.db.UpdateBuilder;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
@@ -731,8 +731,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             return false;
         }
 
-        final
-        Pair<Long, Long> hosts = (Pair<Long, Long>) opaque;
+        final Pair<Long, Long> hosts = (Pair<Long, Long>) opaque;
         final Long newHostId = hosts.second();
 
         final VMInstanceVO vmi = (VMInstanceVO) vm;

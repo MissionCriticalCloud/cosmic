@@ -1,8 +1,8 @@
 package com.cloud.vm;
 
 import com.cloud.agent.api.to.DiskTO;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;

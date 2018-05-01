@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 
 import javax.persistence.Column;
 
@@ -16,7 +16,7 @@ public abstract class SystemVmVO extends VMInstanceVO {
     protected String publicNetmask;
 
     public SystemVmVO(final long id, final long serviceOfferingId, final String name, final long templateId,
-                      final Hypervisor.HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
+                      final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
         super(id, serviceOfferingId, name, name, Type.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
     }
 

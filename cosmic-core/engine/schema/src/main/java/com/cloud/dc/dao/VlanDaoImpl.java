@@ -6,15 +6,15 @@ import com.cloud.dc.PodVlanMapVO;
 import com.cloud.dc.VlanVO;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.dao.IPAddressDao;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

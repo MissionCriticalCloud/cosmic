@@ -4,7 +4,7 @@ import com.cloud.api.command.user.project.ActivateProjectCmd;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectService;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

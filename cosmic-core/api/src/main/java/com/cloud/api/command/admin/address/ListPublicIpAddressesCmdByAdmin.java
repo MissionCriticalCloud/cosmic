@@ -6,8 +6,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.address.ListPublicIpAddressesCmd;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.IpAddress;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listPublicIpAddresses", group = APICommandGroup.PublicIPAddressService, description = "Lists all public ip addresses", responseObject = IPAddressResponse.class, responseView = ResponseView.Full,
+@APICommand(name = "listPublicIpAddresses", group = APICommandGroup.PublicIPAddressService, description = "Lists all public ip addresses", responseObject = IPAddressResponse.class, responseView =
+        ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false, entityType = {IpAddress.class})
 public class ListPublicIpAddressesCmdByAdmin extends ListPublicIpAddressesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListPublicIpAddressesCmdByAdmin.class.getName());

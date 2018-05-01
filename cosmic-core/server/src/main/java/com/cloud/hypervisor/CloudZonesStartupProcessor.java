@@ -5,7 +5,7 @@ import com.cloud.agent.StartupCommandProcessor;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.exception.ConnectionException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.net.MacAddress;
 

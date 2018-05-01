@@ -5,7 +5,7 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PingTestCommand;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.router.VirtualRouter;

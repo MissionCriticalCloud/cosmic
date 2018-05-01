@@ -2,9 +2,9 @@ package com.cloud.storage.allocator;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.vm.DiskProfile;

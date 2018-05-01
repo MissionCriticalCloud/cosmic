@@ -1,7 +1,7 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.DedicatedResourceVO;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;

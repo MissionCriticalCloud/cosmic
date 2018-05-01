@@ -4,7 +4,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.FirewallRulesDao;

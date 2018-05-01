@@ -1,6 +1,7 @@
 package com.cloud.exception;
 
 import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.exceptions.CloudException;
 
 /**
  * wait timeout.

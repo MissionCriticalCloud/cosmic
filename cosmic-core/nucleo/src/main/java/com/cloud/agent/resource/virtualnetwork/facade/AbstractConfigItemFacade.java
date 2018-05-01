@@ -16,7 +16,7 @@ import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.FileConfigItem;
 import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.Hashtable;
 import java.util.LinkedList;

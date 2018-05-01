@@ -1,6 +1,6 @@
 package com.cloud.api;
 
-import com.cloud.exception.CloudAuthenticationException;
+import com.cloud.legacymodel.exceptions.CloudAuthenticationException;
 
 import javax.servlet.http.HttpSession;
 import java.net.InetAddress;

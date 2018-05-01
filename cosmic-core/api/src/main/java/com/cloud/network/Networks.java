@@ -1,6 +1,6 @@
 package com.cloud.network;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.net.URI;
 import java.net.URISyntaxException;

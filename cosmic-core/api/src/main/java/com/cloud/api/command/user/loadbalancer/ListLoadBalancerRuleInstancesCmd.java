@@ -10,8 +10,8 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.LoadBalancerRuleVmMapResponse;
 import com.cloud.api.response.UserVmResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.Pair;
 import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
@@ -20,8 +20,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLoadBalancerRuleInstances", group = APICommandGroup.LoadBalancerService, description = "List all virtual machine instances that are assigned to a load balancer rule.", responseObject =
-        LoadBalancerRuleVmMapResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "listLoadBalancerRuleInstances", group = APICommandGroup.LoadBalancerService, description = "List all virtual machine instances that are assigned to a load balancer rule.",
+        responseObject =
+                LoadBalancerRuleVmMapResponse.class, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = true)
 public class ListLoadBalancerRuleInstancesCmd extends BaseListCmd {

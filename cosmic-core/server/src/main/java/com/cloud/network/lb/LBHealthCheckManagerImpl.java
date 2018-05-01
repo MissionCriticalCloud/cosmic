@@ -3,8 +3,8 @@ package com.cloud.network.lb;
 import static java.lang.String.format;
 
 import com.cloud.configuration.Config;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.NumbersUtil;

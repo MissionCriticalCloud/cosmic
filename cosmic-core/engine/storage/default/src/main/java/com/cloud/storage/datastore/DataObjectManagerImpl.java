@@ -6,11 +6,11 @@ import com.cloud.engine.subsystem.api.storage.DataMotionService;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import com.cloud.exception.ConcurrentOperationException;
 import com.cloud.framework.async.AsyncCallbackDispatcher;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.inject.Inject;

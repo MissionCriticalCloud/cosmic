@@ -13,14 +13,15 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VMSnapshotResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.snapshot.VMSnapshot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVMSnapshot", group = APICommandGroup.SnapshotService, description = "Creates snapshot for a vm.", responseObject = VMSnapshotResponse.class, since = "4.2.0", entityType = {VMSnapshot.class},
+@APICommand(name = "createVMSnapshot", group = APICommandGroup.SnapshotService, description = "Creates snapshot for a vm.", responseObject = VMSnapshotResponse.class, since = "4.2.0", entityType =
+        {VMSnapshot.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
 

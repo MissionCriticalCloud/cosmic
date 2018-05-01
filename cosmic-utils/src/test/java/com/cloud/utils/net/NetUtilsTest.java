@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils.SupersetOrSubset;
 
 import java.math.BigInteger;
@@ -676,6 +676,7 @@ public class NetUtilsTest {
         assertTrue(longList.contains(167772162L));
         assertTrue(longList.contains(167772163L));
     }
+
     @Test
     public void testIsIpInCidrList() throws UnknownHostException {
         String[] cidrs = "0.0.0.0/0,::/0".split(",");

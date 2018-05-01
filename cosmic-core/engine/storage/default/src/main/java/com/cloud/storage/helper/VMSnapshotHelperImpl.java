@@ -12,7 +12,7 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.storage.vmsnapshot.VMSnapshotHelper;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.vm.UserVmVO;

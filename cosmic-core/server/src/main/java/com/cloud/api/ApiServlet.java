@@ -5,13 +5,13 @@ import com.cloud.api.auth.APIAuthenticationType;
 import com.cloud.api.auth.APIAuthenticator;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.user.AccountService;
 import com.cloud.utils.HttpUtils;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 
 import javax.inject.Inject;

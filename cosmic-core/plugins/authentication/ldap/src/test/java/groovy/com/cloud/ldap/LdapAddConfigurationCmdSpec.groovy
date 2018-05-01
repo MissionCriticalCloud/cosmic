@@ -4,7 +4,7 @@ import com.cloud.api.ServerApiException
 import com.cloud.api.command.LdapAddConfigurationCmd
 import com.cloud.api.response.LdapConfigurationResponse
 import com.cloud.ldap.LdapManager
-import com.cloud.utils.exception.InvalidParameterValueException
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException
 
 class LdapAddConfigurationCmdSpec extends spock.lang.Specification {
 

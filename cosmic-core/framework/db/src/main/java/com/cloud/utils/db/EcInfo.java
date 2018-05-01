@@ -1,6 +1,6 @@
 package com.cloud.utils.db;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;

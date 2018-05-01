@@ -1,13 +1,13 @@
 package com.cloud.agent.api.to;
 
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.model.enumeration.HypervisorType;
 
 public interface DataTO {
     public DataObjectType getObjectType();
 
     public DataStoreTO getDataStore();
 
-    public Hypervisor.HypervisorType getHypervisorType();
+    public HypervisorType getHypervisorType();
 
     /**
      * @return

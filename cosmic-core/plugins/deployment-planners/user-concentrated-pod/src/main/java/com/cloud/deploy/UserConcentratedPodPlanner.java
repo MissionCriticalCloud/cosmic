@@ -1,6 +1,6 @@
 package com.cloud.deploy;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.ArrayList;

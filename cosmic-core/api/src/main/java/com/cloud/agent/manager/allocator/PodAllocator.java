@@ -2,9 +2,9 @@ package com.cloud.agent.manager.allocator;
 
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.Adapter;
 import com.cloud.vm.VirtualMachineProfile;
 
