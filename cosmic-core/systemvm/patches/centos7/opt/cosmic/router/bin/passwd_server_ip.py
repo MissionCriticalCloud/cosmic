@@ -7,7 +7,7 @@
 # Send ack:
 #   wget -t 3 -T 20 -O - --header 'DomU_Request: saved_password' localhost:8080
 # Save password only from within router:
-#   /opt/cosmic/router/scripts/savepassword.sh -v <IP> -p <password>
+#   systemctl stop cosmic-password-server@10.0.0.1
 #   curl --header 'DomU_Request: save_password' http://localhost:8080/ -F ip=<IP> -F password=<passwd>
 
 import binascii
@@ -20,14 +20,14 @@ import threading
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from SocketServer import ThreadingMixIn  # , ForkingMixIn
 
-passMap = { }
+passMap = {}
 secureToken = None
 listeningAddress = '127.0.0.1'
 lock = threading.RLock()
 
 
 def getTokenFile():
-    return '/tmp/passwdsrvrtoken'
+    return '/var/cache/cloud/passwdsrvrtoken'
 
 
 def getPasswordFile():
@@ -107,7 +107,8 @@ class PasswordRequestHandler(BaseHTTPRequestHandler):
             password = getPassword(clientAddress)
             if not password:
                 self.wfile.write('saved_password')
-                syslog.syslog('serve_password[%s]: requested password not found for %s' % (listeningAddress, clientAddress))
+                syslog.syslog(
+                    'serve_password[%s]: requested password not found for %s' % (listeningAddress, clientAddress))
             else:
                 self.wfile.write(password)
                 syslog.syslog('serve_password[%s]: password sent to %s' % (listeningAddress, clientAddress))
@@ -126,29 +127,34 @@ class PasswordRequestHandler(BaseHTTPRequestHandler):
         form = cgi.FieldStorage(
             fp=self.rfile,
             headers=self.headers,
-            environ={ 'REQUEST_METHOD': 'POST',
-                      'CONTENT_TYPE': self.headers['Content-Type'],
-                      })
+            environ={'REQUEST_METHOD': 'POST',
+                     'CONTENT_TYPE': self.headers['Content-Type'],
+                     })
         self.send_response(200)
         self.end_headers()
         clientAddress = self.client_address[0]
         if clientAddress not in ['localhost', '127.0.0.1', listeningAddress]:
-            syslog.syslog('serve_password[%s]: non-localhost IP trying to save password: %s' % (listeningAddress, clientAddress))
+            syslog.syslog(
+                'serve_password[%s]: non-localhost IP trying to save password: %s' % (listeningAddress, clientAddress))
             self.send_response(403)
             return
-        if 'ip' not in form or 'password' not in form or 'token' not in form or self.headers.get('DomU_Request') != 'save_password':
-            syslog.syslog('serve_password[%s]: request trying to save password does not contain both ip and password' % listeningAddress)
+        if 'ip' not in form or 'password' not in form or 'token' not in form or self.headers.get(
+                'DomU_Request') != 'save_password':
+            syslog.syslog(
+                'serve_password[%s]: request trying to save password does not contain both ip and password' % listeningAddress)
             self.send_response(403)
             return
         token = form['token'].value
         if not checkToken(token):
-            syslog.syslog('serve_password[%s]: invalid save_password token received from %s' % (listeningAddress, clientAddress))
+            syslog.syslog(
+                'serve_password[%s]: invalid save_password token received from %s' % (listeningAddress, clientAddress))
             self.send_response(403)
             return
         ip = form['ip'].value
         password = form['password'].value
         if not ip or not password:
-            syslog.syslog('serve_password[%s]: empty ip/password[%s/%s] received from savepassword' % (listeningAddress, ip, password))
+            syslog.syslog('serve_password[%s]: empty ip/password[%s/%s] received from savepassword' % (
+                listeningAddress, ip, password))
             return
         syslog.syslog('serve_password[%s]: password saved for VM IP %s' % (listeningAddress, ip))
         setPassword(ip, password)
