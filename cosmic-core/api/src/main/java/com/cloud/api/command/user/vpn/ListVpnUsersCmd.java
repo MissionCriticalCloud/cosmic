@@ -7,8 +7,8 @@ import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.VpnUsersResponse;
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.VpnUser;
 
 import java.util.ArrayList;
 import java.util.List;

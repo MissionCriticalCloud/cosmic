@@ -1,7 +1,7 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.to.TemplateTO;
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.to.TemplateTO;
 import com.cloud.storage.Upload.Type;
 import com.cloud.template.VirtualMachineTemplate;
 
@@ -19,7 +19,7 @@ public class UploadCommand extends AbstractUploadCommand implements InternalIden
 
     public UploadCommand(final VirtualMachineTemplate template, final String url, final String installPath, final long sizeInBytes) {
 
-        this.template = new TemplateTO(template);
+        this.template = new TemplateTO(template.getId(), template.getUniqueName(), template.getFormat());
         this.url = url;
         this.installPath = installPath;
         checksum = template.getChecksum();

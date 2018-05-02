@@ -2,10 +2,10 @@ package com.cloud.vm;
 
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.statemachine.FiniteState;
+import com.cloud.legacymodel.statemachine.StateMachine;
 import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.Mode;
-import com.cloud.utils.fsm.FiniteState;
-import com.cloud.utils.fsm.StateMachine;
 
 import java.net.URI;
 import java.util.Date;

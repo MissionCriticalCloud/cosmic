@@ -2,12 +2,12 @@ package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import com.cloud.agent.api.StartAnswer;
 import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;

@@ -15,8 +15,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.vpc.Vpc;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

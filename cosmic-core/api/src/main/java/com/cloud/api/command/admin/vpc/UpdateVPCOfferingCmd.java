@@ -10,7 +10,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.vpc.VpcOffering;
+import com.cloud.legacymodel.network.vpc.VpcOffering;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.NicTO;
 
 import javax.naming.ConfigurationException;
 import java.util.Map;

@@ -5,9 +5,9 @@ import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
-import com.cloud.utils.fsm.NoTransitionException;
 
 public interface ObjectInDataStoreManager {
     DataObject create(DataObject dataObj, DataStore dataStore);

@@ -9,6 +9,7 @@ import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;

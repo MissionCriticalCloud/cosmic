@@ -20,7 +20,7 @@ import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressDao;

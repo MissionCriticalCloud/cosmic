@@ -24,6 +24,7 @@ import com.cloud.legacymodel.communication.command.UploadStatusCommand.EntityTyp
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Volume.Event;
@@ -41,7 +42,6 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.identity.ManagementServerNode;
 

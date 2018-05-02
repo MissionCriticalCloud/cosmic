@@ -2,7 +2,6 @@ package com.cloud.hypervisor.kvm.resource.wrapper;
 
 import com.cloud.agent.api.StartAnswer;
 import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
@@ -10,6 +9,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVmDef;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;

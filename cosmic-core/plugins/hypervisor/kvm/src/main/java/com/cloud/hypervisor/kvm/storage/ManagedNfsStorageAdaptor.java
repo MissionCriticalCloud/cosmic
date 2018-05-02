@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtStoragePoolDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtStoragePoolDef.PoolType;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage.ProvisioningType;

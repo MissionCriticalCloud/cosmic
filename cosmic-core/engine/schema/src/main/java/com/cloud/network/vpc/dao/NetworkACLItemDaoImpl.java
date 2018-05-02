@@ -1,6 +1,6 @@
 package com.cloud.network.vpc.dao;
 
-import com.cloud.network.vpc.NetworkACLItem.State;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem.State;
 import com.cloud.network.vpc.NetworkACLItemCidrsDao;
 import com.cloud.network.vpc.NetworkACLItemDao;
 import com.cloud.network.vpc.NetworkACLItemVO;

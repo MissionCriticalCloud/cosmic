@@ -1,6 +1,6 @@
 package com.cloud.network.vpc.dao;
 
-import com.cloud.network.vpc.StaticRoute;
+import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.network.vpc.StaticRouteVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;

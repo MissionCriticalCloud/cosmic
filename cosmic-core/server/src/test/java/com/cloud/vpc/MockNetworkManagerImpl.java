@@ -17,6 +17,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
@@ -40,7 +41,6 @@ import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.utils.component.ManagerBase;
@@ -503,7 +503,8 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.deploy.DeploymentPlan, boolean, com.cloud.network.vpc.Vpc, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.deploy.DeploymentPlan, boolean, com.cloud.legacymodel.network.vpc.Vpc, com.cloud.network
+     * .Network)
      */
     @Override
     public Network setupSyncNetwork(final Account owner, final DeploymentPlan plan, final boolean isVpcRouter, final Vpc vpc, final Network isolatedNetwork) {

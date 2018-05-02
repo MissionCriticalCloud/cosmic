@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
 import com.cloud.agent.api.storage.DestroyCommand;
-import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

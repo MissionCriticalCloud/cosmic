@@ -29,7 +29,7 @@ import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.NiciraNvpRouterMappingVO;
 import com.cloud.network.PublicIpAddress;

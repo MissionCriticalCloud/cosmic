@@ -15,8 +15,8 @@ import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.vpc.Vpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

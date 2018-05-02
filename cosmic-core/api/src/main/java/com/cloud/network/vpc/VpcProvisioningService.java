@@ -1,5 +1,6 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.VpcOffering;
 import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;

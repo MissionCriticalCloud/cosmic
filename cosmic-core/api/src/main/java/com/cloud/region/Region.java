@@ -1,8 +1,5 @@
 package com.cloud.region;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public interface Region {
 
     int getId();
@@ -13,3 +10,4 @@ public interface Region {
 
     String getEndPoint();
 }
+

@@ -1,6 +1,6 @@
 package com.cloud.host;
 
-import com.cloud.utils.fsm.NoTransitionException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 
 import java.util.List;

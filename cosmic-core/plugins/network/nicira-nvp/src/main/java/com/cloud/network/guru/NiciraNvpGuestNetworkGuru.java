@@ -24,7 +24,7 @@ import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.PhysicalNetwork.IsolationMethod;

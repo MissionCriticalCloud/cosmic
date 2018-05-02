@@ -7,7 +7,7 @@ import com.cloud.agent.api.MigrateWithStorageReceiveCommand;
 import com.cloud.agent.api.MigrateWithStorageSendAnswer;
 import com.cloud.agent.api.MigrateWithStorageSendCommand;
 import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;

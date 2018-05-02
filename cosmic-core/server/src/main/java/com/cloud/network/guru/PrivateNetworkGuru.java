@@ -25,7 +25,7 @@ import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.Networks.Mode;
 import com.cloud.network.PhysicalNetwork;

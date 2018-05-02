@@ -1,10 +1,10 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.VmPassword;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 
 import java.util.List;
 

@@ -13,8 +13,10 @@ import com.cloud.legacymodel.exceptions.IllegalVirtualMachineException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
@@ -23,13 +25,11 @@ import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkMigrationResponder;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
-import com.cloud.network.VpnUser;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.network.lb.LoadBalancingRule;
@@ -996,7 +996,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
     @Override
     public boolean prepareMigration(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context) {
-        if (nic.getBroadcastType() != Networks.BroadcastDomainType.Pvlan) {
+        if (nic.getBroadcastType() != BroadcastDomainType.Pvlan) {
             return true;
         }
         if (vm.getType() == VirtualMachine.Type.DomainRouter) {
@@ -1021,7 +1021,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
     @Override
     public void rollbackMigration(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final ReservationContext src, final ReservationContext dst) {
-        if (nic.getBroadcastType() != Networks.BroadcastDomainType.Pvlan) {
+        if (nic.getBroadcastType() != BroadcastDomainType.Pvlan) {
             return;
         }
         if (vm.getType() == VirtualMachine.Type.DomainRouter) {
@@ -1045,7 +1045,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
 
     @Override
     public void commitMigration(final NicProfile nic, final Network network, final VirtualMachineProfile vm, final ReservationContext src, final ReservationContext dst) {
-        if (nic.getBroadcastType() != Networks.BroadcastDomainType.Pvlan) {
+        if (nic.getBroadcastType() != BroadcastDomainType.Pvlan) {
             return;
         }
         if (vm.getType() == VirtualMachine.Type.DomainRouter) {

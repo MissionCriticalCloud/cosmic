@@ -1,12 +1,12 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRule;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRules;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 
 import java.util.ArrayList;
 import java.util.List;

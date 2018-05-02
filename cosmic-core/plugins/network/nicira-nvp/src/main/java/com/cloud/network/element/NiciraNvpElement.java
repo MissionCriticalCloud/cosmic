@@ -46,13 +46,12 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.ExternalNetworkDeviceManager.NetworkDevice;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.NiciraNvpNicMappingVO;
 import com.cloud.network.NiciraNvpRouterMappingVO;
@@ -597,7 +596,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
             if (networkList != null) {
                 // Networks with broadcast type lswitch are ours
                 for (final NetworkVO network : networkList) {
-                    if (network.getBroadcastDomainType() == Networks.BroadcastDomainType.Lswitch) {
+                    if (network.getBroadcastDomainType() == BroadcastDomainType.Lswitch) {
                         if (network.getState() != Network.State.Shutdown && network.getState() != Network.State.Destroy) {
                             throw new CloudRuntimeException("This Nicira Nvp device can not be deleted as there are one or more logical networks provisioned by cloudstack.");
                         }
@@ -642,7 +641,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         // Networks with broadcast type lswitch are ours
         final List<NetworkVO> responseList = new ArrayList<>();
         for (final NetworkVO network : networkList) {
-            if (network.getBroadcastDomainType() == Networks.BroadcastDomainType.Lswitch) {
+            if (network.getBroadcastDomainType() == BroadcastDomainType.Lswitch) {
                 responseList.add(network);
             }
         }

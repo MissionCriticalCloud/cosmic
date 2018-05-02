@@ -3,7 +3,7 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.network.VpnUser;
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.serializer.Param;
 
 import com.google.gson.annotations.SerializedName;

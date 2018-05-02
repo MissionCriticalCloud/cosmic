@@ -1,6 +1,5 @@
 package com.cloud.engine.orchestration;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.manager.allocator.PodAllocator;
 import com.cloud.dao.EntityManager;
@@ -44,9 +43,11 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientStorageCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DataStoreRole;
@@ -82,7 +83,6 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.UserVmVO;

@@ -2,10 +2,10 @@ package com.cloud.network.router;
 
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
-import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.vm.DomainRouterVO;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 
 import java.util.List;
 

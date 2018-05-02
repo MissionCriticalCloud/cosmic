@@ -1,7 +1,7 @@
 package com.cloud.vm;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.dao.EntityManager;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.ServiceOffering;

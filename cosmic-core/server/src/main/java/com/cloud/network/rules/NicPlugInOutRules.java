@@ -10,7 +10,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.router.VirtualRouter;

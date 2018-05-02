@@ -7,7 +7,7 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vpc.UpdateVPCCmd;
 import com.cloud.api.response.VpcResponse;
-import com.cloud.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.Vpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

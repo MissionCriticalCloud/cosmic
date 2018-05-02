@@ -1,6 +1,7 @@
 package com.cloud.agent.api.to;
 
 import com.cloud.host.Host;
+import com.cloud.legacymodel.to.NetworkTO;
 
 public class HostTO {
     private String guid;

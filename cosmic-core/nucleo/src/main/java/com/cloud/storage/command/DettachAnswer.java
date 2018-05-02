@@ -1,7 +1,7 @@
 package com.cloud.storage.command;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.to.DiskTO;
 
 public final class DettachAnswer extends Answer {
     private DiskTO disk;

@@ -5,16 +5,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
 import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRule;
 import com.cloud.agent.resource.virtualnetwork.model.ForwardingRules;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRule;
 import com.cloud.agent.resource.virtualnetwork.model.LoadBalancerRules;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.network.lb.LoadBalancingRule.LbDestination;
 
 import java.util.ArrayList;

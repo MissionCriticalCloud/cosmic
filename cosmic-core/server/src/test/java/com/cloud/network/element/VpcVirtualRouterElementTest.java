@@ -12,13 +12,13 @@ import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VpnUser;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.VpnUser;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManagerImpl;
 import com.cloud.network.topology.AdvancedNetworkTopology;
 import com.cloud.network.topology.BasicNetworkTopology;
 import com.cloud.network.topology.NetworkTopologyContext;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.dao.DomainRouterDao;
 

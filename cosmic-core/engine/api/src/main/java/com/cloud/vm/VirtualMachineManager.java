@@ -1,6 +1,5 @@
 package com.cloud.vm;
 
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
@@ -11,9 +10,11 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.Network;
@@ -21,7 +22,6 @@ import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.Manager;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import java.net.URI;
 import java.util.LinkedHashMap;

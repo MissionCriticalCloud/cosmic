@@ -6,6 +6,8 @@ import com.cloud.exception.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.network.Network;
@@ -14,8 +16,6 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VirtualMachineProfile;
@@ -202,7 +202,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#destroyPrivateGateway(com.cloud.network.vpc.PrivateGateway, com.cloud.network.router.VirtualRouter)
+     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#destroyPrivateGateway(com.cloud.legacymodel.network.vpc.PrivateGateway, com.cloud.network.router.VirtualRouter)
      */
     @Override
     public boolean destroyPrivateGateway(final PrivateGateway gateway, final VirtualRouter router) throws ConcurrentOperationException, ResourceUnavailableException {

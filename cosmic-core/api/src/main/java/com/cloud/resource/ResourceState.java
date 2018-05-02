@@ -1,6 +1,6 @@
 package com.cloud.resource;
 
-import com.cloud.utils.fsm.StateMachine;
+import com.cloud.legacymodel.statemachine.StateMachine;
 
 import java.util.List;
 import java.util.Set;

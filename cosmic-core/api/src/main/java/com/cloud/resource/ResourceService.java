@@ -13,9 +13,9 @@ import com.cloud.host.Host;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceInUseException;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import java.util.List;
 

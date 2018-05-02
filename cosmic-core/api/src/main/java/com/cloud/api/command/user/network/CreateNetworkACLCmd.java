@@ -15,8 +15,8 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;

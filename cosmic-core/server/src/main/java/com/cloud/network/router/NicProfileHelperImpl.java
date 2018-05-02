@@ -1,15 +1,15 @@
 package com.cloud.network.router;
 
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.utils.db.DB;

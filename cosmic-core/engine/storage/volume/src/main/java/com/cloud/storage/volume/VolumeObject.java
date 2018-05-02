@@ -28,7 +28,7 @@ import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.fsm.NoTransitionException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.storage.encoding.EncodingType;
 import com.cloud.vm.VMInstanceVO;

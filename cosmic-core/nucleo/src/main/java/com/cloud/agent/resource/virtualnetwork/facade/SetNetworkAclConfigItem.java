@@ -1,8 +1,6 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.AclRule;
@@ -12,6 +10,8 @@ import com.cloud.agent.resource.virtualnetwork.model.NetworkACL;
 import com.cloud.agent.resource.virtualnetwork.model.ProtocolAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.TcpAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.UdpAclRule;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;
@@ -72,7 +72,6 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
                 egressRules.add(aclRule);
             }
         }
-
 
         final NetworkACL networkACL = new NetworkACL(nic.getMac(), privateGw != null, nic.getIp(), netmask, ingressRules.toArray(new AclRule[ingressRules.size()]),
                 egressRules.toArray(new AclRule[egressRules.size()]));

@@ -3,8 +3,7 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.network.Network;
-import com.cloud.network.vpc.VpcGateway;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
 import com.cloud.serializer.Param;
 
 import com.google.gson.annotations.SerializedName;

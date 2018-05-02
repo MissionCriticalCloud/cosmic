@@ -11,7 +11,7 @@ import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
-import com.cloud.utils.fsm.NoTransitionException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 
 import javax.inject.Inject;
 

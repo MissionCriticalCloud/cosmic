@@ -20,11 +20,8 @@ import com.cloud.agent.api.StopCommand;
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
@@ -33,17 +30,19 @@ import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.CitrixRequestWrap
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.XenServerUtilitiesHelper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.network.Networks;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.hypervisor.HypervisorResource;
 import com.cloud.storage.Storage;
@@ -1168,7 +1167,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         // Nuage Vsp needs Virtual Router IP to be passed in the otherconfig
         // get the virtual router IP information from broadcast uri
         final URI broadcastUri = nic.getBroadcastUri();
-        if (broadcastUri != null && broadcastUri.getScheme().equalsIgnoreCase(Networks.BroadcastDomainType.Vsp.scheme())) {
+        if (broadcastUri != null && broadcastUri.getScheme().equalsIgnoreCase(BroadcastDomainType.Vsp.scheme())) {
             final String path = broadcastUri.getPath();
             vifr.otherConfig.put("vsp-vr-ip", path.substring(1));
         }

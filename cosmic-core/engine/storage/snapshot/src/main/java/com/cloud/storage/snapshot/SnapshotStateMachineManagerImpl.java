@@ -1,12 +1,12 @@
 package com.cloud.storage.snapshot;
 
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Event;
 import com.cloud.storage.Snapshot.State;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.listener.SnapshotStateListener;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 
 import javax.inject.Inject;

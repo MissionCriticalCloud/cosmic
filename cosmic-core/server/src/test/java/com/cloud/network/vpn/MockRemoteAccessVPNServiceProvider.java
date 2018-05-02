@@ -2,7 +2,7 @@ package com.cloud.network.vpn;
 
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.VpnUser;
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.network.element.RemoteAccessVPNServiceProvider;
 import com.cloud.utils.component.ManagerBase;
 

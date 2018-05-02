@@ -4,7 +4,6 @@ import com.cloud.agent.api.SetupVRCommand;
 import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.api.routing.SavePasswordCommand;
 import com.cloud.agent.api.routing.SetFirewallRulesCommand;
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
@@ -16,6 +15,7 @@ import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.FileConfigItem;
 import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.Hashtable;

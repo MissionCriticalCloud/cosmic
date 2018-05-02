@@ -4,7 +4,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.topology.NetworkTopologyVisitor;

@@ -1,6 +1,6 @@
 package com.cloud.agent.resource.virtualnetwork;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.utils.ExecutionResult;
 
 public interface VirtualRouterDeployer {

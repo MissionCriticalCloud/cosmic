@@ -1,8 +1,8 @@
 package com.cloud.agent.api.to;
 
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.network.vpc.NetworkACLItem.TrafficType;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem.TrafficType;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;

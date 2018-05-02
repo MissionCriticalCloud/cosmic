@@ -1,7 +1,8 @@
 package com.cloud.agent.api.routing;
 
 import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.agent.api.to.NicTO;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.NicTO;
 
 /**
  * LoadBalancerConfigCommand sends the load balancer configuration

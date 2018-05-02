@@ -9,6 +9,7 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
@@ -26,7 +27,6 @@ import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.inject.Inject;
 import java.util.Date;

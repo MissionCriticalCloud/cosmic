@@ -25,12 +25,12 @@ import com.cloud.host.Status;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceInUseException;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceState.Event;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;

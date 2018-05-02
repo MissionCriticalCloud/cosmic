@@ -1,5 +1,7 @@
 package com.cloud.agent.api.routing;
 
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+
 public class AggregationControlCommand extends NetworkElementCommand {
     private Action action;
 

@@ -21,6 +21,7 @@ import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
@@ -29,7 +30,6 @@ import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.template.TemplateConstants;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.inject.Inject;
 import java.util.List;

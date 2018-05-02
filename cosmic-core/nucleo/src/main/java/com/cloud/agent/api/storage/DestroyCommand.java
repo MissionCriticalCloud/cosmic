@@ -1,7 +1,7 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.Volume;
 

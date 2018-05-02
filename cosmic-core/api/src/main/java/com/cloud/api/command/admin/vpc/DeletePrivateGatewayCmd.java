@@ -15,7 +15,7 @@ import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
-import com.cloud.network.vpc.VpcGateway;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

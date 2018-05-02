@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.PoolType;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.Storage;

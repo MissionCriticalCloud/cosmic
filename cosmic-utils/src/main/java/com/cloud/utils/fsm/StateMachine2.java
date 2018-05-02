@@ -1,5 +1,7 @@
 package com.cloud.utils.fsm;
 
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;

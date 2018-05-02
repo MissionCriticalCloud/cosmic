@@ -20,9 +20,9 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

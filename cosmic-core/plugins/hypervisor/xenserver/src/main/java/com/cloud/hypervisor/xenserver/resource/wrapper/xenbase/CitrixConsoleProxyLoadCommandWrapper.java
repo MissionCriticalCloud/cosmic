@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ServerResource;

@@ -1,7 +1,6 @@
 package com.cloud.storage.snapshot;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreCapabilities;
@@ -20,6 +19,8 @@ import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
@@ -38,7 +39,6 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.db.DB;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 

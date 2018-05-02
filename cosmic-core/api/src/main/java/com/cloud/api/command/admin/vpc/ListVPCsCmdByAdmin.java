@@ -6,8 +6,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.vpc.ListVPCsCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.VpcResponse;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.vpc.Vpc;
 
 import java.util.ArrayList;
 import java.util.List;

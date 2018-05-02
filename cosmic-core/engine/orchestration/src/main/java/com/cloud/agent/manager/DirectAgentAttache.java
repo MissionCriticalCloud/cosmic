@@ -1,6 +1,5 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.api.CronCommand;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.StartupAnswer;
 import com.cloud.agent.transport.Request;
@@ -10,6 +9,7 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Status;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CronCommand;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.resource.ServerResource;
 

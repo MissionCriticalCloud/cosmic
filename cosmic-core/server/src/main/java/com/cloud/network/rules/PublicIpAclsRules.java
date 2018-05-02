@@ -1,10 +1,10 @@
 package com.cloud.network.rules;
 
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
 import com.cloud.network.IpAddress;
 import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.topology.NetworkTopologyVisitor;
-import com.cloud.network.vpc.NetworkACLItem;
 
 import java.util.List;
 

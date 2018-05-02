@@ -170,12 +170,6 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
     }
 
     @Override
-    public List<String> listAclGroupsByAccount(final Long accountId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public String getName() {
         // TODO Auto-generated method stub
         return null;

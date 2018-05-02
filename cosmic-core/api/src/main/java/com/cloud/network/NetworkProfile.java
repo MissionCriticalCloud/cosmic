@@ -1,8 +1,8 @@
 package com.cloud.network;
 
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.Mode;
 
 import java.net.URI;

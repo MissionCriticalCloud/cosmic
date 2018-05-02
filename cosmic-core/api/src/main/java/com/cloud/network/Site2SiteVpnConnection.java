@@ -1,6 +1,6 @@
 package com.cloud.network;
 
-import com.cloud.api.Displayable;
+import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
 

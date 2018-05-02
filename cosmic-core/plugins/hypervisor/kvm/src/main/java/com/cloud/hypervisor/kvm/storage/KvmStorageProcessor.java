@@ -1,7 +1,6 @@
 package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.agent.api.storage.PrimaryStorageDownloadAnswer;
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
@@ -20,6 +19,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DiskControllerType;

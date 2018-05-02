@@ -13,10 +13,10 @@ import com.cloud.host.Host.Type;
 import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceState.Event;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import java.util.HashMap;
 import java.util.List;

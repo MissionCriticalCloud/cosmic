@@ -1,6 +1,5 @@
 package com.cloud.network.router;
 
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -9,6 +8,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.HypervisorType;

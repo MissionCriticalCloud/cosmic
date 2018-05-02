@@ -12,7 +12,7 @@ import com.cloud.api.response.VpcOfferingResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.vpc.VpcOffering;
+import com.cloud.legacymodel.network.vpc.VpcOffering;
 
 import java.util.ArrayList;
 import java.util.Collection;

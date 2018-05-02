@@ -1,6 +1,6 @@
 package com.cloud.network.vpc.dao;
 
-import com.cloud.network.vpc.VpcGateway;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
 import com.cloud.network.vpc.VpcGatewayVO;
 import com.cloud.utils.db.GenericDao;
 

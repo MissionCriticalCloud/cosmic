@@ -1,6 +1,7 @@
 package com.cloud.agent.api.routing;
 
 import com.cloud.agent.api.to.StaticNatRuleTO;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 
 import java.util.List;
 

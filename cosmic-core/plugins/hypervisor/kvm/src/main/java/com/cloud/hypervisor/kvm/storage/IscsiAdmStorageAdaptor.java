@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;

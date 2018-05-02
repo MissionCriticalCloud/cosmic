@@ -1,13 +1,14 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.network.vpc.Vpc;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.network.vpc.Vpc;
 
 public class SetupVRCommand extends NetworkElementCommand {
     private String sourceNatList;
     private String vpcName;
 
-    protected SetupVRCommand() {}
+    protected SetupVRCommand() {
+    }
 
     public SetupVRCommand(final Vpc vpc) {
         this.sourceNatList = vpc.getSourceNatList();

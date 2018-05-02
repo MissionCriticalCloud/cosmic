@@ -167,6 +167,4 @@ public interface AccountManager extends AccountService {
      * @return account object
      */
     Account lockAccount(String accountName, Long domainId, Long accountId);
-
-    List<String> listAclGroupsByAccount(Long accountId);
 }

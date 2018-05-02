@@ -2,7 +2,7 @@ package com.cloud.network;
 
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.network.Networks.BroadcastDomainType;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 
 import java.net.URISyntaxException;

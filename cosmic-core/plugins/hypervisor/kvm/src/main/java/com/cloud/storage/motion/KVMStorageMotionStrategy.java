@@ -3,7 +3,7 @@ package com.cloud.storage.motion;
 import com.cloud.agent.api.MigrateWithStorageAcrossClustersAnswer;
 import com.cloud.agent.api.MigrateWithStorageAcrossClustersCommand;
 import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;

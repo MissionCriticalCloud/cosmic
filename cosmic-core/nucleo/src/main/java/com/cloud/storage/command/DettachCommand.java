@@ -1,7 +1,7 @@
 package com.cloud.storage.command;
 
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
+import com.cloud.legacymodel.to.DiskTO;
 
 public class DettachCommand extends StorageSubSystemCommand {
     private DiskTO disk;

@@ -18,8 +18,8 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
-import com.cloud.network.vpc.StaticRoute;
-import com.cloud.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.StaticRoute;
+import com.cloud.legacymodel.network.vpc.Vpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

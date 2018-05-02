@@ -46,6 +46,7 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.Account.State;
 import com.cloud.legacymodel.user.User;
@@ -65,7 +66,6 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.RemoteAccessVpnDao;
 import com.cloud.network.dao.RemoteAccessVpnVO;
 import com.cloud.network.dao.VpnUserDao;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpn.RemoteAccessVpnService;
 import com.cloud.network.vpn.Site2SiteVpnManager;
@@ -2471,15 +2471,5 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
                 sc.setParameters("domainId", domainId);
             }
         }
-    }
-
-    @Override
-    public List<String> listAclGroupsByAccount(final Long accountId) {
-        if (_querySelectors == null || _querySelectors.size() == 0) {
-            return new ArrayList<>();
-        }
-
-        final QuerySelector qs = _querySelectors.get(0);
-        return qs.listAclGroupsByAccount(accountId);
     }
 }

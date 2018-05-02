@@ -34,6 +34,7 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.DeleteCommand;
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
@@ -62,7 +63,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.fsm.StateMachine2;
 
 import javax.inject.Inject;

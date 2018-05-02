@@ -1,13 +1,13 @@
 package com.cloud.hypervisor;
 
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.gpu.GPU;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.MetadataTO;
+import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
