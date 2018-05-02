@@ -3,9 +3,9 @@ package com.cloud.network.resource.wrapper;
 import static com.cloud.network.resource.NiciraNvpResource.NAME_MAX_LEN;
 import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CreateLogicalRouterAnswer;
 import com.cloud.agent.api.CreateLogicalRouterCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.network.nicira.L3GatewayAttachment;
 import com.cloud.network.nicira.LogicalRouter;
 import com.cloud.network.nicira.LogicalRouterPort;

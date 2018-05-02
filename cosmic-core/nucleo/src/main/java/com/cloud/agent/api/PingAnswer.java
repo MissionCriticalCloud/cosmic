@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class PingAnswer extends Answer {
     private PingCommand _command = null;
 

@@ -1,7 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Level;
 import com.cloud.host.HostStats;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
+import com.cloud.legacymodel.communication.answer.Answer;
 
 @LogLevel(Level.Trace)
 public class GetHostStatsAnswer extends Answer implements HostStats {

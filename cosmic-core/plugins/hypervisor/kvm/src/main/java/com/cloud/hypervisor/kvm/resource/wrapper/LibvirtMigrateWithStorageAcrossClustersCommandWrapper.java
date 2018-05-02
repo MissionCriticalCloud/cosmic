@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageAcrossClustersAnswer;
 import com.cloud.agent.api.MigrateWithStorageAcrossClustersCommand;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.resource.CommandWrapper;

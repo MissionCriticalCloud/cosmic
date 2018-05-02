@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class SetupAnswer extends Answer {
     // indicate if agent reconnect is needed after setup command
     private boolean _reconnect;

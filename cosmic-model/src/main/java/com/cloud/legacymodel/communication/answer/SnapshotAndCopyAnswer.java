@@ -1,6 +1,4 @@
-package com.cloud.storage.command;
-
-import com.cloud.agent.api.Answer;
+package com.cloud.legacymodel.communication.answer;
 
 public class SnapshotAndCopyAnswer extends Answer {
     private String _path;

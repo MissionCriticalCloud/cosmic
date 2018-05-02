@@ -1,8 +1,8 @@
 package com.cloud.vm;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 
 /**

@@ -1,8 +1,8 @@
 package com.cloud.agent.api.proxy;
 
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Level;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class StartConsoleProxyAgentHttpHandlerCommand extends Command {
     @LogLevel(Level.Off)

@@ -1,10 +1,10 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.transport.Request;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.utils.nio.Link;
 
 import javax.net.ssl.SSLEngine;

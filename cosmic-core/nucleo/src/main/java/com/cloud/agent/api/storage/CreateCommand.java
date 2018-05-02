@@ -1,6 +1,6 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.vm.DiskProfile;

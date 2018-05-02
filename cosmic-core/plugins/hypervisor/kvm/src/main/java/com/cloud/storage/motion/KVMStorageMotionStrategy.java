@@ -1,6 +1,5 @@
 package com.cloud.storage.motion;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageAcrossClustersAnswer;
 import com.cloud.agent.api.MigrateWithStorageAcrossClustersCommand;
 import com.cloud.agent.api.to.VirtualMachineTO;
@@ -11,6 +10,7 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.utils.Pair;

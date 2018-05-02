@@ -1,6 +1,5 @@
 package com.cloud.storage.motion;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.MigrateVolumeAnswer;
 import com.cloud.agent.api.storage.MigrateVolumeCommand;
 import com.cloud.agent.api.to.VirtualMachineTO;
@@ -26,6 +25,8 @@ import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.DataStoreTO;
@@ -36,7 +37,6 @@ import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.RemoteHostEndPoint;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.command.CopyCommand;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.utils.NumbersUtil;

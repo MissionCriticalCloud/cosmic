@@ -1,4 +1,4 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.command;
 
 public class TemplateOrVolumePostUploadCommand {
 

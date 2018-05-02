@@ -1,13 +1,13 @@
 package com.cloud.network.resource;
 
 import com.cloud.agent.IAgentControl;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupNiciraNvpCommand;
 import com.cloud.host.Host;
 import com.cloud.host.Host.Type;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.network.nicira.ControlClusterStatus;
 import com.cloud.network.nicira.ControlClusterStatus.ClusterRoleConfig;
 import com.cloud.network.nicira.DestinationNatRule;

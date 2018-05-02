@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class MigrateAnswer extends Answer {
     Integer vncPort = null;
 

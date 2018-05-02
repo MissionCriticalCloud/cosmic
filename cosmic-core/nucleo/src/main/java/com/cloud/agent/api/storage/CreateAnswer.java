@@ -1,7 +1,7 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.communication.answer.Answer;
 
 public class CreateAnswer extends Answer {
     VolumeTO volume;
@@ -26,7 +26,7 @@ public class CreateAnswer extends Answer {
     }
 
     public CreateAnswer(final CreateCommand cmd, final Exception e) {
-        super(cmd, e);
+        super(cmd, false, e.getMessage());
     }
 
     public VolumeTO getVolume() {

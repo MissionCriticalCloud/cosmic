@@ -1,10 +1,10 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.PingTestCommand;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.NetworkModel;

@@ -1,16 +1,16 @@
 package com.cloud.storage;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.resource.ServerResource;
-import com.cloud.storage.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.storage.command.DownloadCommand;
 import com.cloud.storage.resource.LocalNfsSecondaryStorageResource;
 import com.cloud.utils.component.ComponentContext;

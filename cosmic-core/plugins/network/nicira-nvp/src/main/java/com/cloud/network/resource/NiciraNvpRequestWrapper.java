@@ -1,7 +1,7 @@
 package com.cloud.network.resource;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.RequestWrapper;
 import com.cloud.resource.ServerResource;
@@ -28,7 +28,7 @@ public class NiciraNvpRequestWrapper extends RequestWrapper {
 
     private void init() {
         // NiciraNvpResource commands
-        final Hashtable<Class<? extends com.cloud.agent.api.Command>, CommandWrapper> niciraCommands = processAnnotations(baseSet);
+        final Hashtable<Class<? extends Command>, CommandWrapper> niciraCommands = processAnnotations(baseSet);
 
         resources.put(NiciraNvpResource.class, niciraCommands);
     }
@@ -38,7 +38,7 @@ public class NiciraNvpRequestWrapper extends RequestWrapper {
     }
 
     @Override
-    public Answer execute(final com.cloud.agent.api.Command command, final ServerResource serverResource) {
+    public Answer execute(final Command command, final ServerResource serverResource) {
         final Class<? extends ServerResource> resourceClass = serverResource.getClass();
 
         final Hashtable<Class<? extends Command>, CommandWrapper> resourceCommands = retrieveResource(command, resourceClass);

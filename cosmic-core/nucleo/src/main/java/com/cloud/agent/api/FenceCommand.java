@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.vm.VirtualMachine;
 
 public class FenceCommand extends Command {

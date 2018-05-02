@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 import java.util.HashMap;
 
 public class ClusterVMMetaDataSyncAnswer extends Answer {

@@ -1,7 +1,7 @@
 package com.cloud.framework.security.keystore;
 
-import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Level;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
 import com.cloud.utils.component.Manager;
 
 public interface KeystoreManager extends Manager {

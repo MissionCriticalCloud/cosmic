@@ -1,24 +1,15 @@
 package com.cloud.agent.api;
 
-/**
- *
- */
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+
 public class ConfigureStaticNatRulesOnLogicalRouterAnswer extends Answer {
 
-    /**
-     * @param command
-     * @param success
-     * @param details
-     */
-    public ConfigureStaticNatRulesOnLogicalRouterAnswer(final Command command, final boolean success, final String details) {
-        super(command, success, details);
+    public ConfigureStaticNatRulesOnLogicalRouterAnswer(final Command command, final Exception e) {
+        super(command, false, e.getMessage());
     }
 
-    /**
-     * @param command
-     * @param e
-     */
-    public ConfigureStaticNatRulesOnLogicalRouterAnswer(final Command command, final Exception e) {
-        super(command, e);
+    public ConfigureStaticNatRulesOnLogicalRouterAnswer(final Command command, final boolean success, final String details) {
+        super(command, success, details);
     }
 }

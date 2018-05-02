@@ -1,7 +1,5 @@
 package com.cloud.storage.snapshot;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.DeleteSnapshotsDirCommand;
 import com.cloud.api.command.user.snapshot.ListSnapshotsCmd;
 import com.cloud.configuration.Config;
@@ -26,6 +24,8 @@ import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;

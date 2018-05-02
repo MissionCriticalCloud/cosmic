@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 /*
  * This is used to schedule an explicit host scan in MS peers. Currently used during
  * add host operation so that correct MS can take host ownership. On receiving the

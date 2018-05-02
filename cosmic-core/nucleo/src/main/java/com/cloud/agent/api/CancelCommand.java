@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 public class CancelCommand extends Command {
     protected long sequence;
     protected String reason;

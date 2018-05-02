@@ -1,6 +1,7 @@
 package com.cloud.storage.command;
 
 import com.cloud.agent.api.to.DiskTO;
+import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 
 import java.util.Map;
 

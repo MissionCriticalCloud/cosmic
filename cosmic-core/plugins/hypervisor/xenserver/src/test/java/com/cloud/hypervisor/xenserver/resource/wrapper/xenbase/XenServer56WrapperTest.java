@@ -7,7 +7,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckOnHostCommand;
 import com.cloud.agent.api.FenceCommand;
 import com.cloud.agent.api.NetworkUsageCommand;
@@ -16,6 +15,7 @@ import com.cloud.host.Host;
 import com.cloud.host.HostEnvironment;
 import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.vm.VMInstanceVO;
 

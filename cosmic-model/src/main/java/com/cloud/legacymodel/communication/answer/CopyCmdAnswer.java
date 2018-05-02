@@ -1,6 +1,5 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.legacymodel.to.DataTO;
 
 public class CopyCmdAnswer extends Answer {

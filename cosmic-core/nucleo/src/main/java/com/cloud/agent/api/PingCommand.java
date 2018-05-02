@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class PingCommand extends Command {
     Host.Type hostType;

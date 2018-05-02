@@ -2,9 +2,9 @@ package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620Resource;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 
 import java.util.ArrayList;

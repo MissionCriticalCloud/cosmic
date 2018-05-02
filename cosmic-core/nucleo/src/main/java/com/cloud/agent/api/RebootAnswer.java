@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class RebootAnswer extends Answer {
     Integer vncPort;
 
@@ -17,7 +19,7 @@ public class RebootAnswer extends Answer {
     }
 
     public RebootAnswer(final RebootCommand cmd, final Exception e) {
-        super(cmd, e);
+        super(cmd, false, e.getMessage());
     }
 
     public Integer getVncPort() {

@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.communication.answer.Answer;
 
 public class CreateVolumeFromVMSnapshotAnswer extends Answer {
     private String path;

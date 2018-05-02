@@ -24,7 +24,7 @@ import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.command.CreateObjectAnswer;
+import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;

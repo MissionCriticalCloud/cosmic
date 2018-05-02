@@ -1,6 +1,6 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.utils.exception.ExceptionUtil;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class Answer extends Command {
     protected boolean result;
@@ -17,10 +17,6 @@ public class Answer extends Command {
     public Answer(final Command command, final boolean success, final String details) {
         result = success;
         this.details = details;
-    }
-
-    public Answer(final Command command, final Exception e) {
-        this(command, false, ExceptionUtil.toString(e));
     }
 
     public static UnsupportedAnswer createUnsupportedCommandAnswer(final Command cmd) {

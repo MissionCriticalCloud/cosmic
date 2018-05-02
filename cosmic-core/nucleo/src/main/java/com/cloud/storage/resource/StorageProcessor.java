@@ -1,51 +1,51 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.Answer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CreateObjectCommand;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.ForgetObjectCommand;
+import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
+import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.CreateObjectCommand;
-import com.cloud.storage.command.DeleteCommand;
 import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.ForgetObjectCmd;
-import com.cloud.storage.command.IntroduceObjectCmd;
-import com.cloud.storage.command.SnapshotAndCopyCommand;
 
 public interface StorageProcessor {
-    public Answer copyTemplateToPrimaryStorage(CopyCommand cmd);
+    Answer copyTemplateToPrimaryStorage(CopyCommand cmd);
 
-    public Answer cloneVolumeFromBaseTemplate(CopyCommand cmd);
+    Answer cloneVolumeFromBaseTemplate(CopyCommand cmd);
 
-    public Answer copyVolumeFromImageCacheToPrimary(CopyCommand cmd);
+    Answer copyVolumeFromImageCacheToPrimary(CopyCommand cmd);
 
-    public Answer copyVolumeFromPrimaryToSecondary(CopyCommand cmd);
+    Answer copyVolumeFromPrimaryToSecondary(CopyCommand cmd);
 
-    public Answer createTemplateFromVolume(CopyCommand cmd);
+    Answer createTemplateFromVolume(CopyCommand cmd);
 
-    public Answer createTemplateFromSnapshot(CopyCommand cmd);
+    Answer createTemplateFromSnapshot(CopyCommand cmd);
 
-    public Answer backupSnapshot(CopyCommand cmd);
+    Answer backupSnapshot(CopyCommand cmd);
 
-    public Answer attachIso(AttachCommand cmd);
+    Answer attachIso(AttachCommand cmd);
 
-    public Answer attachVolume(AttachCommand cmd);
+    Answer attachVolume(AttachCommand cmd);
 
-    public Answer dettachIso(DettachCommand cmd);
+    Answer dettachIso(DettachCommand cmd);
 
-    public Answer dettachVolume(DettachCommand cmd);
+    Answer dettachVolume(DettachCommand cmd);
 
-    public Answer createVolume(CreateObjectCommand cmd);
+    Answer createVolume(CreateObjectCommand cmd);
 
-    public Answer createSnapshot(CreateObjectCommand cmd);
+    Answer createSnapshot(CreateObjectCommand cmd);
 
-    public Answer deleteVolume(DeleteCommand cmd);
+    Answer deleteVolume(DeleteCommand cmd);
 
-    public Answer createVolumeFromSnapshot(CopyCommand cmd);
+    Answer createVolumeFromSnapshot(CopyCommand cmd);
 
-    public Answer deleteSnapshot(DeleteCommand cmd);
+    Answer deleteSnapshot(DeleteCommand cmd);
 
-    public Answer introduceObject(IntroduceObjectCmd cmd);
+    Answer introduceObject(IntroduceObjectCommand cmd);
 
-    public Answer forgetObject(ForgetObjectCmd cmd);
+    Answer forgetObject(ForgetObjectCommand cmd);
 
-    public Answer snapshotAndCopy(SnapshotAndCopyCommand cmd);
+    Answer snapshotAndCopy(SnapshotAndCopyCommand cmd);
 }

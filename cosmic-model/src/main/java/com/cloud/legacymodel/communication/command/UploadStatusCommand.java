@@ -1,6 +1,4 @@
-package com.cloud.storage.command;
-
-import com.cloud.agent.api.Command;
+package com.cloud.legacymodel.communication.command;
 
 public class UploadStatusCommand extends Command {
     private String entityUuid;

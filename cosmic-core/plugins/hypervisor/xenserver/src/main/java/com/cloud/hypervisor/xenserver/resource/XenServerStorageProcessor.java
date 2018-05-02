@@ -1,8 +1,20 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase.SRType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.AttachPrimaryDataStoreAnswer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
+import com.cloud.legacymodel.communication.answer.IntroduceObjectAnswer;
+import com.cloud.legacymodel.communication.answer.SnapshotAndCopyAnswer;
+import com.cloud.legacymodel.communication.command.AttachPrimaryDataStoreCommand;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CreateObjectCommand;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.ForgetObjectCommand;
+import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
+import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.DataStoreTO;
@@ -15,20 +27,8 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.AttachPrimaryDataStoreAnswer;
-import com.cloud.storage.command.AttachPrimaryDataStoreCmd;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.CreateObjectAnswer;
-import com.cloud.storage.command.CreateObjectCommand;
-import com.cloud.storage.command.DeleteCommand;
 import com.cloud.storage.command.DettachAnswer;
 import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.ForgetObjectCmd;
-import com.cloud.storage.command.IntroduceObjectAnswer;
-import com.cloud.storage.command.IntroduceObjectCmd;
-import com.cloud.storage.command.SnapshotAndCopyAnswer;
-import com.cloud.storage.command.SnapshotAndCopyCommand;
 import com.cloud.storage.datastore.protocol.DataStoreProtocol;
 import com.cloud.storage.resource.StorageProcessor;
 import com.cloud.storage.to.PrimaryDataStoreTO;
@@ -211,7 +211,7 @@ public class XenServerStorageProcessor implements StorageProcessor {
         return new Answer(cmd, false, "Failed to download template");
     }
 
-    protected Answer execute(final AttachPrimaryDataStoreCmd cmd) {
+    protected Answer execute(final AttachPrimaryDataStoreCommand cmd) {
         final String dataStoreUri = cmd.getDataStore();
         final Connection conn = hypervisorResource.getConnection();
         try {
@@ -234,11 +234,11 @@ public class XenServerStorageProcessor implements StorageProcessor {
             answer.setAvailable(available);
             return answer;
         } catch (final XenAPIException e) {
-            final String msg = "AttachPrimaryDataStoreCmd add XenAPIException:" + e.toString();
+            final String msg = "AttachPrimaryDataStoreCommand add XenAPIException:" + e.toString();
             s_logger.warn(msg, e);
             return new Answer(cmd, false, msg);
         } catch (final Exception e) {
-            final String msg = "AttachPrimaryDataStoreCmd failed:" + e.getMessage();
+            final String msg = "AttachPrimaryDataStoreCommand failed:" + e.getMessage();
             s_logger.warn(msg, e);
             return new Answer(cmd, false, msg);
         }
@@ -1388,7 +1388,7 @@ public class XenServerStorageProcessor implements StorageProcessor {
     }
 
     @Override
-    public Answer introduceObject(final IntroduceObjectCmd cmd) {
+    public Answer introduceObject(final IntroduceObjectCommand cmd) {
         try {
             final Connection conn = hypervisorResource.getConnection();
             final DataStoreTO store = cmd.getDataTO().getDataStore();
@@ -1402,7 +1402,7 @@ public class XenServerStorageProcessor implements StorageProcessor {
     }
 
     @Override
-    public Answer forgetObject(final ForgetObjectCmd cmd) {
+    public Answer forgetObject(final ForgetObjectCommand cmd) {
         try {
             final Connection conn = hypervisorResource.getConnection();
             final DataTO data = cmd.getDataTO();

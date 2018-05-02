@@ -1,7 +1,7 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class CopyVolumeAnswer extends Answer {
     private String volumeFolder;

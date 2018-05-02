@@ -1,9 +1,9 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.command;
 
-public final class AttachPrimaryDataStoreCmd extends StorageSubSystemCommand {
+public final class AttachPrimaryDataStoreCommand extends StorageSubSystemCommand {
     private final String dataStore;
 
-    public AttachPrimaryDataStoreCmd(final String uri) {
+    public AttachPrimaryDataStoreCommand(final String uri) {
         super();
         dataStore = uri;
     }

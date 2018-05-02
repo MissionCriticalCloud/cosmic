@@ -1,6 +1,6 @@
 package com.cloud.agent.api.routing;
 
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.command.Command;
 
 import java.util.HashMap;
 import java.util.Map;

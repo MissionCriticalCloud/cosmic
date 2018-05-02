@@ -1,4 +1,6 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.answer;
+
+import com.cloud.legacymodel.communication.command.Command;
 
 public class UnsupportedAnswer extends Answer {
     protected UnsupportedAnswer() {

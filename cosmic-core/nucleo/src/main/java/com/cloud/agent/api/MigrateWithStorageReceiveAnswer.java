@@ -2,6 +2,7 @@ package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public class MigrateWithStorageReceiveAnswer extends Answer {
     Map<String, String> token;
 
     public MigrateWithStorageReceiveAnswer(final MigrateWithStorageReceiveCommand cmd, final Exception ex) {
-        super(cmd, ex);
+        super(cmd, false, ex.getMessage());
         volumeToSr = null;
         nicToNetwork = null;
         token = null;

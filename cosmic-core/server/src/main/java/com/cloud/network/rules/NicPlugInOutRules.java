@@ -1,8 +1,8 @@
 package com.cloud.network.rules;
 
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.agent.manager.Commands;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;

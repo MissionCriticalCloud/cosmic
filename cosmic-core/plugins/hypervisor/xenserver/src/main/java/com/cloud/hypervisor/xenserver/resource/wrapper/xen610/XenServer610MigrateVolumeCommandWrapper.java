@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.MigrateVolumeAnswer;
 import com.cloud.agent.api.storage.MigrateVolumeCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;

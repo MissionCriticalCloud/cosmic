@@ -1,5 +1,6 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.vm.VirtualMachine.PowerState;
 
@@ -39,5 +40,4 @@ public class RestoreVMSnapshotAnswer extends Answer {
     public void setVmState(final PowerState vmState) {
         this.vmState = vmState;
     }
-
 }

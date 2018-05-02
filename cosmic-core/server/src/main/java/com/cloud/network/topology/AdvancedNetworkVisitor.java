@@ -1,12 +1,12 @@
 package com.cloud.network.topology;
 
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PvlanSetupCommand;
 import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.Network;

@@ -1,7 +1,6 @@
 package com.cloud.server;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.GetStorageStatsCommand;
 import com.cloud.agent.api.HostStatsEntry;
 import com.cloud.agent.api.VgpuTypesInfo;
@@ -20,6 +19,7 @@ import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.HypervisorType;

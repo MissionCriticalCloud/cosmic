@@ -1,9 +1,9 @@
 package com.cloud.resource;
 
 import com.cloud.agent.IAgentControl;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
 

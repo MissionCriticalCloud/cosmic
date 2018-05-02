@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.discoverer;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.host.Host.Type;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;

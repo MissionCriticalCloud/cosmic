@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.CreateLogicalSwitchAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
 import com.cloud.db.model.Zone;
@@ -23,6 +22,7 @@ import com.cloud.deploy.DeploymentPlan;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.user.Account;

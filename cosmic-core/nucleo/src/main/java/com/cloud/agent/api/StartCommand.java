@@ -2,6 +2,7 @@ package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.command.Command;
 
 /**
  */

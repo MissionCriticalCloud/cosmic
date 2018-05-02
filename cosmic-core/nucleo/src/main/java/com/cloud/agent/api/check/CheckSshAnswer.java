@@ -1,6 +1,6 @@
 package com.cloud.agent.api.check;
 
-import com.cloud.agent.api.Answer;
+import com.cloud.legacymodel.communication.answer.Answer;
 
 public class CheckSshAnswer extends Answer {
     protected CheckSshAnswer() {

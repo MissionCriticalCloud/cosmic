@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.Answer;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.storage.command.CommandResult;
 
 public class SnapshotResult extends CommandResult {

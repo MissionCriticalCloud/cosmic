@@ -1,6 +1,6 @@
 package com.cloud.agent.api.storage;
 
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.command.Command;
 
 public abstract class SsCommand extends Command {
     private String secUrl;

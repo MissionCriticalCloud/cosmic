@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.command.Command;
 
 /**
  * Implementation of bootstrap command sent from management server to agent running on

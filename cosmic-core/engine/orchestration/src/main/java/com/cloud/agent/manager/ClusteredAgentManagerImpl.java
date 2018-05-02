@@ -1,10 +1,8 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CancelCommand;
 import com.cloud.agent.api.ChangeAgentAnswer;
 import com.cloud.agent.api.ChangeAgentCommand;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.PropagateResourceEventCommand;
 import com.cloud.agent.api.ScheduleHostScanTaskCommand;
 import com.cloud.agent.api.TransferAgentCommand;
@@ -29,6 +27,8 @@ import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.Status;
 import com.cloud.host.Status.Event;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.TaskExecutionException;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;

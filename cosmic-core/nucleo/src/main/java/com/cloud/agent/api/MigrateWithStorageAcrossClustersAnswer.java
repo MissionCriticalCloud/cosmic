@@ -1,5 +1,6 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.storage.to.VolumeObjectTO;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public class MigrateWithStorageAcrossClustersAnswer extends Answer {
     }
 
     public MigrateWithStorageAcrossClustersAnswer(final MigrateWithStorageAcrossClustersCommand cmd, final Exception ex) {
-        super(cmd, ex);
+        super(cmd, false, ex.getMessage());
     }
 
     public List<VolumeObjectTO> getVolumes() {

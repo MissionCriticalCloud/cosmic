@@ -1,6 +1,6 @@
 package com.cloud.agent.api.routing;
 
-import com.cloud.agent.api.Answer;
+import com.cloud.legacymodel.communication.answer.Answer;
 
 public class SetPublicIpACLAnswer extends Answer {
     String[] results;

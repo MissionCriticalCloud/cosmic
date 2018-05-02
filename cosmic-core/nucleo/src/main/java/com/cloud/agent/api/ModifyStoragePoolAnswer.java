@@ -1,5 +1,6 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.storage.template.TemplateProp;
 
 import java.util.Map;

@@ -1,6 +1,5 @@
 package com.cloud.storage.volume;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.storage.ListVolumeAnswer;
 import com.cloud.agent.api.storage.ListVolumeCommand;
 import com.cloud.agent.api.storage.ResizeVolumeCommand;
@@ -33,6 +32,9 @@ import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -55,8 +57,6 @@ import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.State;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.DeleteCommand;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.PrimaryDataStoreProviderManager;

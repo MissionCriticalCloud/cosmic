@@ -1,12 +1,12 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.command;
 
 import com.cloud.legacymodel.to.DataTO;
 
-public class ForgetObjectCmd extends StorageSubSystemCommand {
+public class IntroduceObjectCommand extends StorageSubSystemCommand {
     private final DataTO dataTO;
 
-    public ForgetObjectCmd(final DataTO data) {
-        dataTO = data;
+    public IntroduceObjectCommand(final DataTO dataTO) {
+        this.dataTO = dataTO;
     }
 
     public DataTO getDataTO() {

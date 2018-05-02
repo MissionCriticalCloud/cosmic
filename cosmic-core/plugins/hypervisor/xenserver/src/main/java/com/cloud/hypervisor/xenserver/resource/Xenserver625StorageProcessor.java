@@ -1,7 +1,9 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.DiskTO;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.DataStoreTO;
@@ -10,8 +12,6 @@ import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.CopyCommand;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.storage.to.TemplateObjectTO;

@@ -2,13 +2,13 @@ package com.cloud.agent.transport;
 
 import static org.junit.Assert.assertEquals;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.GetHostStatsCommand;
 import com.cloud.agent.api.SecStorageFirewallCfgCommand;
 import com.cloud.agent.api.UpdateHostPasswordCommand;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.DataStoreRole;

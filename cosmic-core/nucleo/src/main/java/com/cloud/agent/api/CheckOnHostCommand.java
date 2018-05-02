@@ -2,6 +2,7 @@ package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.HostTO;
 import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class CheckOnHostCommand extends Command {
     HostTO host;

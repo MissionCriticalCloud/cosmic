@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.Answer;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.DiskOffering.DiskCacheMode;

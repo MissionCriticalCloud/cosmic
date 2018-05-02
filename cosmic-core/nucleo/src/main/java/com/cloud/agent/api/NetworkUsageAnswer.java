@@ -1,6 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Level;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 
 @LogLevel(Level.Debug)
 public class NetworkUsageAnswer extends Answer {
@@ -18,8 +21,8 @@ public class NetworkUsageAnswer extends Answer {
         routerName = cmd.getDomRName();
     }
 
-    public NetworkUsageAnswer(final Command command, final Exception e) {
-        super(command, e);
+    public NetworkUsageAnswer(final Command command, final boolean success, final String details) {
+        super(command, success, details);
     }
 
     public Long getBytesReceived() {

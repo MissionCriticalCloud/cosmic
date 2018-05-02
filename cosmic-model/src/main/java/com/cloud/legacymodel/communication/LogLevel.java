@@ -1,4 +1,4 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;

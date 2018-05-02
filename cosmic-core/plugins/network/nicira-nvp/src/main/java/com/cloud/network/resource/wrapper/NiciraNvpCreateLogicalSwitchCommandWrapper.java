@@ -2,9 +2,9 @@ package com.cloud.network.resource.wrapper;
 
 import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CreateLogicalSwitchAnswer;
 import com.cloud.agent.api.CreateLogicalSwitchCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.network.nicira.LogicalSwitch;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;

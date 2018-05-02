@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.StaticNatRuleTO;
+import com.cloud.legacymodel.communication.command.Command;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class ConfigureStaticNatRulesOnLogicalRouterCommand extends Command {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.agent.api.Command#executeInSequence()
+     * @see com.cloud.legacymodel.communication.command.Command#executeInSequence()
      */
     @Override
     public boolean executeInSequence() {

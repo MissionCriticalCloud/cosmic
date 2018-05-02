@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class PrepareForMigrationAnswer extends Answer {
     protected PrepareForMigrationAnswer() {
     }
@@ -9,7 +11,7 @@ public class PrepareForMigrationAnswer extends Answer {
     }
 
     public PrepareForMigrationAnswer(final PrepareForMigrationCommand cmd, final Exception ex) {
-        super(cmd, ex);
+        super(cmd, false, ex.getMessage());
     }
 
     public PrepareForMigrationAnswer(final PrepareForMigrationCommand cmd) {

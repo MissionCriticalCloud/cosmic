@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 public class UnregisterVMCommand extends Command {
     String vmName;
     boolean cleanupVmFiles = false;

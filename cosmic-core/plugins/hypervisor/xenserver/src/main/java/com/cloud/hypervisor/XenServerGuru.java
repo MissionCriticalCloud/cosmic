@@ -1,6 +1,5 @@
 package com.cloud.hypervisor;
 
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
@@ -12,6 +11,7 @@ import com.cloud.framework.config.Configurable;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.NfsTO;
@@ -21,9 +21,9 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.StorageSubSystemCommand;
+import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;

@@ -1,5 +1,8 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +18,8 @@ public class DirectNetworkUsageAnswer extends Answer {
         this.ipBytesSentAndReceived = new HashMap<>();
     }
 
-    public DirectNetworkUsageAnswer(final Command command, final Exception e) {
-        super(command, e);
+    public DirectNetworkUsageAnswer(final Command command, final boolean success, final String details) {
+        super(command, success, details);
         this.ipBytesSentAndReceived = null;
     }
 

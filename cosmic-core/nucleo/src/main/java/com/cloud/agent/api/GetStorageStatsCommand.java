@@ -1,6 +1,8 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.LogLevel.Level;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.model.enumeration.StoragePoolType;
 

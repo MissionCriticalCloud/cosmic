@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class GetDomRVersionAnswer extends Answer {
     public static final String ROUTER_NAME = "router.name";
     public static final String ROUTER_IP = "router.ip";

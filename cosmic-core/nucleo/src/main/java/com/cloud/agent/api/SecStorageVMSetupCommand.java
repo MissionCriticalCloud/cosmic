@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 public class SecStorageVMSetupCommand extends Command {
     String[] allowedInternalSites = new String[0];
     String[] allowedExternalCidrs = new String[0];

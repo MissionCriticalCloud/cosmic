@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 public class RebootCommand extends Command {
     String vmName;
     protected boolean executeInSequence = false;

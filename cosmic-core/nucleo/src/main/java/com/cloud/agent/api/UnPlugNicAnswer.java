@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class UnPlugNicAnswer extends Answer {
     public UnPlugNicAnswer() {
     }

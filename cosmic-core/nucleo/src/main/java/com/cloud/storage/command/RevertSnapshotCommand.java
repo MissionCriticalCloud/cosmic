@@ -1,5 +1,6 @@
 package com.cloud.storage.command;
 
+import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 import com.cloud.storage.to.SnapshotObjectTO;
 
 public final class RevertSnapshotCommand extends StorageSubSystemCommand {

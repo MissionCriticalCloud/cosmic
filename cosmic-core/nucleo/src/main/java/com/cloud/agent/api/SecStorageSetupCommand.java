@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.framework.security.keystore.KeystoreManager;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.DataStoreTO;
 
 public class SecStorageSetupCommand extends Command {

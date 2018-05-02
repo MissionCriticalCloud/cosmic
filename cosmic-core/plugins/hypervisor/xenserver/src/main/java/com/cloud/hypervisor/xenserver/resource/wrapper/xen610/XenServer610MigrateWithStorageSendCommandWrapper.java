@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.MigrateWithStorageSendAnswer;
 import com.cloud.agent.api.MigrateWithStorageSendCommand;
 import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.resource.CommandWrapper;

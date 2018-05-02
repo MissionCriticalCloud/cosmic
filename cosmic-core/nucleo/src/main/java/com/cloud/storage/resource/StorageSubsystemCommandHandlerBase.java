@@ -1,22 +1,22 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
 import com.cloud.agent.api.to.DiskTO;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CreateObjectCommand;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
+import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
+import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Volume;
 import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.CreateObjectAnswer;
-import com.cloud.storage.command.CreateObjectCommand;
-import com.cloud.storage.command.DeleteCommand;
 import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.IntroduceObjectCmd;
-import com.cloud.storage.command.SnapshotAndCopyCommand;
-import com.cloud.storage.command.StorageSubSystemCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +41,8 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
             return execute((AttachCommand) command);
         } else if (command instanceof DettachCommand) {
             return execute((DettachCommand) command);
-        } else if (command instanceof IntroduceObjectCmd) {
-            return processor.introduceObject((IntroduceObjectCmd) command);
+        } else if (command instanceof IntroduceObjectCommand) {
+            return processor.introduceObject((IntroduceObjectCommand) command);
         } else if (command instanceof SnapshotAndCopyCommand) {
             return processor.snapshotAndCopy((SnapshotAndCopyCommand) command);
         }

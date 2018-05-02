@@ -1,7 +1,7 @@
 package com.cloud.network.utils;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.resource.ServerResource;
 
 import java.lang.reflect.Constructor;
@@ -22,7 +22,7 @@ public class CommandRetryUtility {
         instance = new CommandRetryUtility();
     }
 
-    private final ConcurrentHashMap<com.cloud.agent.api.Command, Integer> commandsToRetry;
+    private final ConcurrentHashMap<Command, Integer> commandsToRetry;
     private ServerResource serverResource;
 
     private CommandRetryUtility() {

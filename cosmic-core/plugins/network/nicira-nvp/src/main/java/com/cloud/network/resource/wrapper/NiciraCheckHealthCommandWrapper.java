@@ -1,8 +1,8 @@
 package com.cloud.network.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthAnswer;
 import com.cloud.agent.api.CheckHealthCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.network.nicira.ControlClusterStatus;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;

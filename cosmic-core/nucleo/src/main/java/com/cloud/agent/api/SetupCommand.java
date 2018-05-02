@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.host.HostEnvironment;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class SetupCommand extends Command {
 

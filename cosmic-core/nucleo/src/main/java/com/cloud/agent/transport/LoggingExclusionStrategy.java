@@ -1,8 +1,8 @@
 package com.cloud.agent.transport;
 
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.LogLevel;
-import com.cloud.agent.api.LogLevel.Level;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
+import com.cloud.legacymodel.communication.command.Command;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;

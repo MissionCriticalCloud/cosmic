@@ -1,5 +1,8 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+
 public class AgentControlAnswer extends Answer {
     public AgentControlAnswer() {
     }

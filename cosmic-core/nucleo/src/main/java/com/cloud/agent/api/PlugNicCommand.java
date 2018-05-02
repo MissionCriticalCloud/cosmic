@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.NicTO;
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.vm.VirtualMachine;
 
 import java.util.Map;

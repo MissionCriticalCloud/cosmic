@@ -1,7 +1,6 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class AttachPrimaryDataStoreAnswer extends Answer {
     private String uuid;

@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class CheckNetworkAnswer extends Answer {
     // indicate if agent reconnect is needed after setupNetworkNames command
     private boolean _reconnect;

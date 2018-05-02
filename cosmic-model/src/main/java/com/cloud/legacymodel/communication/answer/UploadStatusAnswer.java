@@ -1,6 +1,6 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.agent.api.Answer;
+import com.cloud.legacymodel.communication.command.UploadStatusCommand;
 
 public class UploadStatusAnswer extends Answer {
     private UploadStatus status;

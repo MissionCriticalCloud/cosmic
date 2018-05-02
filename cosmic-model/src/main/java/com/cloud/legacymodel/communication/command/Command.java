@@ -1,6 +1,7 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.command;
 
-import com.cloud.agent.api.LogLevel.Level;
+import com.cloud.legacymodel.communication.LogLevel;
+import com.cloud.legacymodel.communication.LogLevel.Level;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.answer.Answer;
+
 public class ValidateSnapshotAnswer extends Answer {
     private String expectedSnapshotBackupUuid;
     private String actualSnapshotBackupUuid;

@@ -1,6 +1,6 @@
 package com.cloud.agent.api.check;
 
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.command.Command;
 
 public class CheckSshCommand extends Command {
     String ip;

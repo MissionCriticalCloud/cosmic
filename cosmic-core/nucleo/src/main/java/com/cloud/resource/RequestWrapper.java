@@ -1,7 +1,7 @@
 package com.cloud.resource;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
 
 import java.text.MessageFormat;
 import java.util.Hashtable;

@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 public class ReadyCommand extends Command {
     private String _details;
     private Long dcId;

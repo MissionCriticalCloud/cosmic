@@ -1,7 +1,7 @@
 package com.cloud.agent.api.routing;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.to.LoadBalancerTO;
+import com.cloud.legacymodel.communication.answer.Answer;
 
 import java.util.List;
 
