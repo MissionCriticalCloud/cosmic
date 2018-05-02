@@ -3,12 +3,16 @@ package com.cloud.affinity;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.configuration.Config;
+import com.cloud.dc.ClusterVO;
+import com.cloud.dc.dao.ClusterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.engine.cloud.entity.api.db.VMReservationVO;
 import com.cloud.engine.cloud.entity.api.db.dao.VMReservationDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.host.HostVO;
+import com.cloud.host.dao.HostDao;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.vm.VMInstanceVO;
@@ -41,6 +45,11 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
     @Inject
     protected VMReservationDao _reservationDao;
     private int _vmCapacityReleaseInterval;
+    @Inject
+    protected HostDao _hostDao;
+    @Inject
+    protected ClusterDao _clusterDao;
+
 
     @Override
     public void process(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid) {
@@ -75,6 +84,38 @@ public class HostAntiAffinityProcessor extends AffinityProcessorBase implements 
                                             " is present on the host, in Stopped state but has reserved capacity");
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add a random host to the avoid list to get N+1 in case of affinity groups
+        if (vmGroupMappings.size() > 0) {
+            // cluster in plan
+            if (plan.getClusterId() != null) {
+                final long clusterId = plan.getClusterId();
+                final ClusterVO cluster = _clusterDao.findById(clusterId);
+                final List<HostVO> hosts = _hostDao.findByClusterId(clusterId);
+
+                for (final HostVO host : hosts) {
+                    if (!avoid.getHostsToAvoid().contains(host.getId())) {
+                        s_logger.debug("Need to maintain N+1 on cluster " + cluster.getName() + ", so adding host " + host.getName() + " to the avoid set.");
+                        avoid.addHost(host.getId());
+                        break;
+                    }
+                }
+            // pod in plan
+            } else if (plan.getPodId() != null) {
+                List<ClusterVO> clusters = _clusterDao.listByPodId(plan.getPodId());
+                for (final ClusterVO cluster : clusters) {
+                    List<HostVO> hosts = _hostDao.findByClusterId(cluster.getId());
+
+                    for (final HostVO host : hosts) {
+                        if (!avoid.getHostsToAvoid().contains(host.getId())) {
+                            avoid.addHost(host.getId());
+                            s_logger.debug("Need to maintain N+1 on cluster " + cluster.getName() + ", so adding host " + host.getName() + " to the avoid set.");
+                            break;
                         }
                     }
                 }
