@@ -240,13 +240,13 @@ public class LibvirtVmDef {
         private final Map<String, String> features = new HashMap<>();
         private int retries = 4096; // set to sane default
 
-        public void setFeature(final String feature, final boolean on) {
+        public void addFeature(final String feature, final boolean on) {
             if (on && Enlight.isValidFeature(feature)) {
-                setFeature(feature);
+                addFeature(feature);
             }
         }
 
-        private void setFeature(final String feature) {
+        private void addFeature(final String feature) {
             features.put(feature, "on");
         }
 
@@ -275,7 +275,7 @@ public class LibvirtVmDef {
         }
 
         public void setRetries(final int retry) {
-            if (retry >= retries) {
+            if (retry > retries) {
                 retries = retry;
             }
         }
@@ -293,9 +293,9 @@ public class LibvirtVmDef {
                 feaBuilder.append(e.getKey());
 
                 if (e.getKey().equals("spinlocks")) {
-                    feaBuilder.append(" state='" + e.getValue() + "' retries='" + getRetries() + "'");
+                    feaBuilder.append(" state='").append(e.getValue()).append("' retries='").append(getRetries()).append("'");
                 } else {
-                    feaBuilder.append(" state='" + e.getValue() + "'");
+                    feaBuilder.append(" state='").append(e.getValue()).append("'");
                 }
 
                 feaBuilder.append("/>\n");
@@ -310,7 +310,7 @@ public class LibvirtVmDef {
 
         private HyperVEnlightenmentFeatureDef hyperVEnlightenmentFeatureDef = null;
 
-        public void addFeatures(final String feature) {
+        public void addFeature(final String feature) {
             features.add(feature);
         }
 
@@ -371,17 +371,15 @@ public class LibvirtVmDef {
         public static class Timer {
             private String name;
             private String tickPolicy;
-            private String track;
-            private boolean noKvmClock;
+            private boolean present;
 
             public Timer() {
             }
 
-            private Timer(final String name, final String tickPolicy, final String track, final boolean noKvmClock) {
+            private Timer(final String name, final String tickPolicy, final boolean present) {
                 this.name = name;
                 this.tickPolicy = tickPolicy;
-                this.track = track;
-                this.noKvmClock = noKvmClock;
+                this.present = present;
             }
 
             @Override
@@ -392,18 +390,12 @@ public class LibvirtVmDef {
                     timerBuilder.append(name);
                     timerBuilder.append("' ");
 
-                    if (name.equals("kvmclock") && noKvmClock) {
-                        timerBuilder.append("present='no' />");
+                    if ("hpet".equals(name) || "kvmclock".equals(name) || "hypervclock".equals(name)) {
+                        timerBuilder.append("present='").append(present ? "yes" : "no").append("' />");
                     } else {
                         if (tickPolicy != null) {
                             timerBuilder.append("tickpolicy='");
                             timerBuilder.append(tickPolicy);
-                            timerBuilder.append("' ");
-                        }
-
-                        if (track != null) {
-                            timerBuilder.append("track='");
-                            timerBuilder.append(track);
                             timerBuilder.append("' ");
                         }
 
@@ -424,12 +416,12 @@ public class LibvirtVmDef {
             this.offset = offset;
         }
 
-        public void addTimer(final String timerName, final String tickPolicy, final String track, final boolean noKvmClock) {
-            timers.add(new Timer(timerName, tickPolicy, track, noKvmClock));
+        public void addTimer(final String timerName, final String tickPolicy, final boolean present) {
+            timers.add(new Timer(timerName, tickPolicy, present));
         }
 
-        public void addTimer(final String timerName, final String tickPolicy, final String track) {
-            timers.add(new Timer(timerName, tickPolicy, track, false));
+        public void addTimer(final String timerName, final String tickPolicy) {
+            timers.add(new Timer(timerName, tickPolicy, true));
         }
 
         public enum ClockOffset {

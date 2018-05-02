@@ -81,9 +81,9 @@ public class LibvirtVMDefTest extends TestCase {
     public void testHypervEnlightDef() {
         LibvirtVmDef.FeaturesDef featuresDef = new LibvirtVmDef.FeaturesDef();
         final LibvirtVmDef.HyperVEnlightenmentFeatureDef hyperVEnlightenmentFeatureDef = new LibvirtVmDef.HyperVEnlightenmentFeatureDef();
-        hyperVEnlightenmentFeatureDef.setFeature("relaxed", true);
-        hyperVEnlightenmentFeatureDef.setFeature("vapic", true);
-        hyperVEnlightenmentFeatureDef.setFeature("spinlocks", true);
+        hyperVEnlightenmentFeatureDef.addFeature("relaxed", true);
+        hyperVEnlightenmentFeatureDef.addFeature("vapic", true);
+        hyperVEnlightenmentFeatureDef.addFeature("spinlocks", true);
         hyperVEnlightenmentFeatureDef.setRetries(8096);
         featuresDef.addHyperVFeature(hyperVEnlightenmentFeatureDef);
         String defs = featuresDef.toString();
@@ -92,7 +92,7 @@ public class LibvirtVMDefTest extends TestCase {
         assertTrue(defs.contains("spinlocks"));
 
         featuresDef = new LibvirtVmDef.FeaturesDef();
-        featuresDef.addFeatures("pae");
+        featuresDef.addFeature("pae");
         defs = featuresDef.toString();
         assertFalse(defs.contains("relaxed"));
         assertFalse(defs.contains("vapic"));
