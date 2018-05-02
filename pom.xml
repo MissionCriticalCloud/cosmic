@@ -107,7 +107,6 @@
         <cs.trilead-ssh2.version>1.0.0-build217</cs.trilead-ssh2.version>
         <cs.xalan.version>2.7.2</cs.xalan.version>
         <cs.xen-api.version>6.2.0-3.1</cs.xen-api.version>
-        <cs.xercesimpl.version>2.11.0</cs.xercesimpl.version>
         <cs.xml-apis.version>1.4.01</cs.xml-apis.version>
         <cs.xmlrpc-client.version>3.1.3</cs.xmlrpc-client.version>
         <cs.xmlrpc-common.version>3.1.3</cs.xmlrpc-common.version>
@@ -199,11 +198,6 @@
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
                 <version>${cs.commons-httpclient.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>${cs.xercesimpl.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
