@@ -131,6 +131,7 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -205,7 +206,6 @@ import com.cloud.storage.StorageStats;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
@@ -774,7 +774,7 @@ public class ApiDBUtils {
     }
 
     public static VolumeVO findRootVolume(final long vmId) {
-        final List<VolumeVO> volumes = s_volumeDao.findByInstanceAndType(vmId, Type.ROOT);
+        final List<VolumeVO> volumes = s_volumeDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (volumes != null && volumes.size() == 1) {
             return volumes.get(0);
         } else {

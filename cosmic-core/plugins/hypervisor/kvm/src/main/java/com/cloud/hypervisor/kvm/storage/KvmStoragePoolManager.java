@@ -7,9 +7,9 @@ import com.cloud.hypervisor.kvm.resource.KvmHaBase.PoolType;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.Volume;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
@@ -95,7 +95,7 @@ public class KvmStoragePoolManager {
         final List<DiskTO> disks = Arrays.asList(vmSpec.getDisks());
 
         for (final DiskTO disk : disks) {
-            if (disk.getType() != Volume.Type.ISO) {
+            if (disk.getType() != VolumeType.ISO) {
                 final VolumeObjectTO vol = (VolumeObjectTO) disk.getData();
                 final PrimaryDataStoreTO store = (PrimaryDataStoreTO) vol.getDataStore();
                 final KvmStoragePool pool = getStoragePool(store.getPoolType(), store.getUuid());
@@ -196,7 +196,7 @@ public class KvmStoragePoolManager {
         final List<DiskTO> disks = Arrays.asList(vmSpec.getDisks());
 
         for (final DiskTO disk : disks) {
-            if (disk.getType() != Volume.Type.ISO) {
+            if (disk.getType() != VolumeType.ISO) {
                 s_logger.debug("Disconnecting disk " + disk.getPath());
 
                 final VolumeObjectTO vol = (VolumeObjectTO) disk.getData();

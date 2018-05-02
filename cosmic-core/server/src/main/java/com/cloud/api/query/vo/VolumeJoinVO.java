@@ -3,6 +3,7 @@ package com.cloud.api.query.vo;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
@@ -38,7 +39,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     Long deviceId = null;
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
-    Volume.Type volumeType;
+    VolumeType volumeType;
     @Column(name = "provisioning_type")
     @Enumerated(EnumType.STRING)
     Storage.ProvisioningType provisioningType;
@@ -223,7 +224,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.deviceId = deviceId;
     }
 
-    public void setVolumeType(final Volume.Type volumeType) {
+    public void setVolumeType(final VolumeType volumeType) {
         this.volumeType = volumeType;
     }
 
@@ -545,7 +546,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return deviceId;
     }
 
-    public Volume.Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeType;
     }
 

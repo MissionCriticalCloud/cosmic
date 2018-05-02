@@ -125,6 +125,7 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.IpAddresses;
@@ -654,7 +655,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             return false;
         }
         try {
-            final List<VolumeVO> rootVol = _volsDao.findByInstanceAndType(vm.getId(), Volume.Type.ROOT);
+            final List<VolumeVO> rootVol = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.ROOT);
             // expunge the vm
             _itMgr.advanceExpunge(vm.getUuid());
             // Update Resource count
@@ -1640,13 +1641,13 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _resourceLimitMgr.changeResourceCount(vmInstance.getAccountId(), ResourceType.memory, isDisplayVm, new Long(offering.getRamSize()));
 
             // take care of the root volume as well.
-            final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(id, Volume.Type.ROOT);
+            final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(id, VolumeType.ROOT);
             if (!rootVols.isEmpty()) {
                 _volumeService.updateDisplay(rootVols.get(0), isDisplayVm);
             }
 
             // take care of the data volumes as well.
-            final List<VolumeVO> dataVols = _volsDao.findByInstanceAndType(id, Volume.Type.DATADISK);
+            final List<VolumeVO> dataVols = _volsDao.findByInstanceAndType(id, VolumeType.DATADISK);
             for (final Volume dataVol : dataVols) {
                 _volumeService.updateDisplay(dataVol, isDisplayVm);
             }
@@ -2155,7 +2156,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 // Recover the VM's disks
                 final List<VolumeVO> volumes = _volsDao.findByInstance(vmId);
                 for (final VolumeVO volume : volumes) {
-                    if (volume.getVolumeType().equals(Volume.Type.ROOT)) {
+                    if (volume.getVolumeType().equals(VolumeType.ROOT)) {
                         // Create an event
                         final Long templateId = volume.getTemplateId();
                         final Long diskOfferingId = volume.getDiskOfferingId();
@@ -2543,7 +2544,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (svcOffering.getUseLocalStorage()) {
             usesLocalStorage = true;
         } else {
-            final List<VolumeVO> volumes = _volsDao.findByInstanceAndType(vm.getId(), Volume.Type.DATADISK);
+            final List<VolumeVO> volumes = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.DATADISK);
             for (final VolumeVO vol : volumes) {
                 final DiskOfferingVO diskOffering = _diskOfferingDao.findById(vol.getDiskOfferingId());
                 if (diskOffering.getUseLocalStorage()) {
@@ -3550,7 +3551,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             needRestart = true;
         }
 
-        final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(vmId, Volume.Type.ROOT);
+        final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (rootVols.isEmpty()) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("Can not find root volume for VM " + vm.getUuid());
             ex.addProxyObject(vm.getUuid(), "vmId");

@@ -1,8 +1,6 @@
-package com.cloud.storage.to;
+package com.cloud.legacymodel.to;
 
-import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.model.enumeration.DataStoreRole;
-import com.cloud.storage.image.datastore.ImageStoreInfo;
 
 public class ImageStoreTO implements DataStoreTO {
     private static final String pathSeparator = "/";
@@ -14,13 +12,6 @@ public class ImageStoreTO implements DataStoreTO {
 
     public ImageStoreTO() {
 
-    }
-
-    public ImageStoreTO(final ImageStoreInfo dataStore) {
-        this.type = dataStore.getType();
-        this.uri = dataStore.getUri();
-        this.providerName = null;
-        this.role = dataStore.getRole();
     }
 
     public String getProtocol() {

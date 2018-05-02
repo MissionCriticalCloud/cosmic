@@ -79,6 +79,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.Volume;
@@ -925,7 +926,7 @@ public class LibvirtComputingResourceTest {
         when(vm.getDisks()).thenReturn(new DiskTO[]{diskTO});
 
         when(nicTO.getType()).thenReturn(TrafficType.Guest);
-        when(diskTO.getType()).thenReturn(Volume.Type.ISO);
+        when(diskTO.getType()).thenReturn(VolumeType.ISO);
 
         when(libvirtComputingResource.getVifDriver(nicTO.getType())).thenReturn(vifDriver);
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolManager);
@@ -973,7 +974,7 @@ public class LibvirtComputingResourceTest {
         when(vm.getDisks()).thenReturn(new DiskTO[]{diskTO});
 
         when(nicTO.getType()).thenReturn(TrafficType.Guest);
-        when(diskTO.getType()).thenReturn(Volume.Type.ISO);
+        when(diskTO.getType()).thenReturn(VolumeType.ISO);
 
         when(libvirtComputingResource.getVifDriver(nicTO.getType())).thenReturn(vifDriver);
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolManager);
@@ -1063,7 +1064,7 @@ public class LibvirtComputingResourceTest {
         when(vm.getDisks()).thenReturn(new DiskTO[]{volume});
 
         when(nicTO.getType()).thenReturn(TrafficType.Guest);
-        when(volume.getType()).thenReturn(Volume.Type.ISO);
+        when(volume.getType()).thenReturn(VolumeType.ISO);
 
         when(libvirtComputingResource.getVifDriver(nicTO.getType())).thenReturn(vifDriver);
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolManager);

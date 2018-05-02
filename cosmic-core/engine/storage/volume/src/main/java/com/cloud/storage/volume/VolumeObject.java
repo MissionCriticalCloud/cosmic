@@ -15,6 +15,7 @@ import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.Storage.ProvisioningType;
@@ -563,7 +564,7 @@ public class VolumeObject implements VolumeInfo {
     }
 
     @Override
-    public Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeVO.getVolumeType();
     }
 

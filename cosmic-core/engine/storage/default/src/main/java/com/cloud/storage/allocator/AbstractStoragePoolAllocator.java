@@ -13,6 +13,7 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.Volume;
 import com.cloud.storage.dao.DiskOfferingDao;
@@ -231,7 +232,7 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
     /*
     Check StoragePool and Volume type compatibility for the hypervisor
      */
-    private boolean checkHypervisorCompatibility(final HypervisorType hyperType, final Volume.Type volType, final StoragePoolType poolType) {
+    private boolean checkHypervisorCompatibility(final HypervisorType hyperType, final VolumeType volType, final StoragePoolType poolType) {
         return true;
     }
 }

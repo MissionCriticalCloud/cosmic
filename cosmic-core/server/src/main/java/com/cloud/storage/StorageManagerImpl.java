@@ -89,12 +89,12 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ResourceState;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.StatsCollector;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -288,7 +288,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     public boolean share(final VMInstanceVO vm, final List<VolumeVO> vols, final HostVO host, final boolean cancelPreviousShare) throws StorageUnavailableException {
 
         // if pool is in maintenance and it is the ONLY pool available; reject
-        final List<VolumeVO> rootVolForGivenVm = _volsDao.findByInstanceAndType(vm.getId(), Type.ROOT);
+        final List<VolumeVO> rootVolForGivenVm = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.ROOT);
         if (rootVolForGivenVm != null && rootVolForGivenVm.size() > 0) {
             final boolean isPoolAvailable = isPoolAvailable(rootVolForGivenVm.get(0).getPoolId());
             if (!isPoolAvailable) {
@@ -808,7 +808,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @DB
     public List<VMInstanceVO> listByStoragePool(final long storagePoolId) {
         final SearchCriteria<VMInstanceVO> sc = StoragePoolSearch.create();
-        sc.setJoinParameters("vmVolume", "volumeType", Volume.Type.ROOT);
+        sc.setJoinParameters("vmVolume", "volumeType", VolumeType.ROOT);
         sc.setJoinParameters("vmVolume", "poolId", storagePoolId);
         sc.setJoinParameters("vmVolume", "state", Volume.State.Ready);
         return _vmInstanceDao.search(sc, null);

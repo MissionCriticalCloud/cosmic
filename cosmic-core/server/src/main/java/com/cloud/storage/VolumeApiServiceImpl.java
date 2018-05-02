@@ -76,6 +76,7 @@ import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
@@ -491,7 +492,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(userSpecifiedName, -1, -1, -1, -1, new Long(-1), null, null, provisioningType, 0, Volume.Type.DATADISK, diskController);
+                VolumeVO volume = new VolumeVO(userSpecifiedName, -1, -1, -1, -1, new Long(-1), null, null, provisioningType, 0, VolumeType.DATADISK, diskController);
                 volume.setPoolId(null);
                 volume.setUuid(uuid);
                 volume.setDataCenterId(zoneId);
@@ -609,8 +610,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         // Check that the volume ID is valid
         final VolumeInfo volumeToAttach = volFactory.getVolume(volumeId);
         // Check that the volume is a data volume
-        if (volumeToAttach == null || !(volumeToAttach.getVolumeType() == Volume.Type.DATADISK || volumeToAttach.getVolumeType() == Volume.Type.ROOT)) {
-            throw new InvalidParameterValueException("Please specify a volume with the valid type: " + Volume.Type.ROOT.toString() + " or " + Volume.Type.DATADISK.toString());
+        if (volumeToAttach == null || !(volumeToAttach.getVolumeType() == VolumeType.DATADISK || volumeToAttach.getVolumeType() == VolumeType.ROOT)) {
+            throw new InvalidParameterValueException("Please specify a volume with the valid type: " + VolumeType.ROOT.toString() + " or " + VolumeType.DATADISK.toString());
         }
 
         // Check that the volume is not currently attached to any VM
@@ -658,7 +659,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         // Check that the number of data volumes attached to VM is less than
         // that supported by hypervisor
         if (deviceId == null || deviceId.longValue() != 0) {
-            final List<VolumeVO> existingDataVolumes = _volsDao.findByInstanceAndType(vmId, Volume.Type.DATADISK);
+            final List<VolumeVO> existingDataVolumes = _volsDao.findByInstanceAndType(vmId, VolumeType.DATADISK);
             final int maxDataVolumesSupported = getMaxDataVolumesSupported(vm);
             if (existingDataVolumes.size() >= maxDataVolumesSupported) {
                 throw new InvalidParameterValueException("The specified VM already has the maximum number of data disks (" + maxDataVolumesSupported + "). Please specify another" +
@@ -831,7 +832,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         UserVmVO vm = _userVmDao.findById(vmId);
         VolumeVO exstingVolumeOfVm = null;
-        final List<VolumeVO> rootVolumesOfVm = _volsDao.findByInstanceAndType(vmId, Volume.Type.ROOT);
+        final List<VolumeVO> rootVolumesOfVm = _volsDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (rootVolumesOfVm.size() > 1) {
             throw new CloudRuntimeException("The VM " + vm.getHostName() + " has more than one ROOT volume and is in an invalid state.");
         } else {
@@ -839,7 +840,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 exstingVolumeOfVm = rootVolumesOfVm.get(0);
             } else {
                 // locate data volume of the vm
-                final List<VolumeVO> diskVolumesOfVm = _volsDao.findByInstanceAndType(vmId, Volume.Type.DATADISK);
+                final List<VolumeVO> diskVolumesOfVm = _volsDao.findByInstanceAndType(vmId, VolumeType.DATADISK);
                 for (final VolumeVO diskVolume : diskVolumesOfVm) {
                     if (diskVolume.getState() != Volume.State.Allocated) {
                         exstingVolumeOfVm = diskVolume;
@@ -1204,7 +1205,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
             // if the caller is looking to change the size of the volume
             if (newSize != null) {
-                if (!diskOffering.isCustomized() && !volume.getVolumeType().equals(Volume.Type.ROOT)) {
+                if (!diskOffering.isCustomized() && !volume.getVolumeType().equals(VolumeType.ROOT)) {
                     throw new InvalidParameterValueException("To change a volume's size without providing a new disk offering, its current disk offering must be " +
                             "customizable or it must be a root volume (if providing a disk offering, make sure it is different from the current disk offering).");
                 }
@@ -1278,7 +1279,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 newSize = newDiskOffering.getDiskSize();
             }
 
-            if (!volume.getSize().equals(newSize) && !volume.getVolumeType().equals(Volume.Type.DATADISK)) {
+            if (!volume.getSize().equals(newSize) && !volume.getVolumeType().equals(VolumeType.DATADISK)) {
                 throw new InvalidParameterValueException("Only data volumes can be resized via a new disk offering.");
             }
 
@@ -1940,12 +1941,12 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
 
         // Check that the volume is a data/root volume
-        if (!(volume.getVolumeType() == Volume.Type.ROOT || volume.getVolumeType() == Volume.Type.DATADISK)) {
-            throw new InvalidParameterValueException("Please specify volume of type " + Volume.Type.DATADISK.toString() + " or " + Volume.Type.ROOT.toString());
+        if (!(volume.getVolumeType() == VolumeType.ROOT || volume.getVolumeType() == VolumeType.DATADISK)) {
+            throw new InvalidParameterValueException("Please specify volume of type " + VolumeType.DATADISK.toString() + " or " + VolumeType.ROOT.toString());
         }
 
         // Root volume detach is allowed for following hypervisors: Xen/KVM/VmWare
-        if (volume.getVolumeType() == Volume.Type.ROOT) {
+        if (volume.getVolumeType() == VolumeType.ROOT) {
             validateRootVolumeDetachAttach(volume, vm);
         }
 
@@ -2430,7 +2431,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             throw ex;
         }
 
-        if (volume.getVolumeType() != Volume.Type.DATADISK) {
+        if (volume.getVolumeType() != VolumeType.DATADISK) {
             // Datadisk dont have any template dependence.
 
             final VMTemplateVO template = ApiDBUtils.findTemplateById(volume.getTemplateId());
@@ -2672,7 +2673,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, Storage.ProvisioningType.THIN, 0, Volume.Type.DATADISK, getDiskControllerType());
+                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, Storage.ProvisioningType.THIN, 0, VolumeType.DATADISK, getDiskControllerType());
                 volume.setPoolId(null);
                 volume.setDataCenterId(zoneId);
                 volume.setPodId(null);

@@ -5,8 +5,8 @@ import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.storage.Volume;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
@@ -164,7 +164,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private DiskControllerType volumeDiskController;
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
-    private Volume.Type volumeType;
+    private VolumeType volumeType;
     @Column(name = "vpc_id")
     private long vpcId;
     @Column(name = "vpc_uuid")
@@ -512,7 +512,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.volumeUuid = volumeUuid;
     }
 
-    public void setVolumeType(final Volume.Type volumeType) {
+    public void setVolumeType(final VolumeType volumeType) {
         this.volumeType = volumeType;
     }
 
@@ -960,7 +960,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         return volumeDeviceId;
     }
 
-    public Volume.Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeType;
     }
 

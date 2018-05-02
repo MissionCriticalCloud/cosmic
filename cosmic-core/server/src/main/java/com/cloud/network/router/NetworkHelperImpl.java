@@ -30,6 +30,7 @@ import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
@@ -50,7 +51,6 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -411,7 +411,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         avoids[1] = new ExcludeList();
         avoids[1].addCluster(_hostDao.findById(routerToBeAvoid.getHostId()).getClusterId());
         avoids[2] = new ExcludeList();
-        final List<VolumeVO> volumes = _volumeDao.findByInstanceAndType(routerToBeAvoid.getId(), Volume.Type.ROOT);
+        final List<VolumeVO> volumes = _volumeDao.findByInstanceAndType(routerToBeAvoid.getId(), VolumeType.ROOT);
         if (volumes != null && volumes.size() != 0) {
             avoids[2].addPool(volumes.get(0).getPoolId());
         }

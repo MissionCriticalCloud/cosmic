@@ -14,7 +14,8 @@ public class DestroyCommand extends StorageCommand {
     }
 
     public DestroyCommand(final StoragePool pool, final Volume volume, final String vmName) {
-        this.volume = new VolumeTO(volume, pool);
+        this.volume = new VolumeTO(volume.getId(), volume.getVolumeType(), pool.getPoolType(), pool.getUuid(), volume.getName(), volume.getFolder(), volume.getPath(),
+                volume.getSize(), volume.getChainInfo());
         this.vmName = vmName;
     }
 

@@ -79,6 +79,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.RouterPrivateIpStrategy;
 import com.cloud.resource.ServerResource;
@@ -86,7 +87,6 @@ import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.Volume;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.storage.to.PrimaryDataStoreTO;
@@ -1596,7 +1596,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final DataTO data = volume.getData();
         final DataStoreTO store = data.getDataStore();
 
-        if (volume.getType() == Volume.Type.ISO && data.getPath() != null) {
+        if (volume.getType() == VolumeType.ISO && data.getPath() != null) {
             final NfsTO nfsStore = (NfsTO) store;
             final String isoPath = nfsStore.getUrl() + File.separator + data.getPath();
             final int index = isoPath.lastIndexOf("/");
@@ -1629,7 +1629,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             KvmPhysicalDisk physicalDisk = null;
             KvmStoragePool pool = null;
             final DataTO data = volume.getData();
-            if (volume.getType() == Volume.Type.ISO && data.getPath() != null) {
+            if (volume.getType() == VolumeType.ISO && data.getPath() != null) {
                 final NfsTO nfsStore = (NfsTO) data.getDataStore();
                 final String volPath = nfsStore.getUrl() + File.separator + data.getPath();
                 final int index = volPath.lastIndexOf("/");
@@ -1637,7 +1637,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 final String volName = volPath.substring(index + 1);
                 final KvmStoragePool secondaryStorage = storagePoolMgr.getStoragePoolByUri(volDir);
                 physicalDisk = secondaryStorage.getPhysicalDisk(volName);
-            } else if (volume.getType() != Volume.Type.ISO) {
+            } else if (volume.getType() != VolumeType.ISO) {
                 final PrimaryDataStoreTO store = (PrimaryDataStoreTO) data.getDataStore();
                 physicalDisk = storagePoolMgr.getPhysicalDisk(store.getPoolType(), store.getUuid(), data.getPath());
                 pool = physicalDisk.getPool();
@@ -1662,7 +1662,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
 
             final LibvirtDiskDef disk = new LibvirtDiskDef();
-            if (volume.getType() == Volume.Type.ISO) {
+            if (volume.getType() == VolumeType.ISO) {
                 if (volPath == null) {
                     /* Add iso as placeholder */
                     disk.defIsoDisk(null);

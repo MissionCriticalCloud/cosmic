@@ -3,6 +3,7 @@ package com.cloud.agent.api.to;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.Volume;
 
 public class VolumeTO implements InternalIdentity {
@@ -11,7 +12,7 @@ public class VolumeTO implements InternalIdentity {
     private String mountPoint;
     private String path;
     private long size;
-    private Volume.Type type;
+    private VolumeType type;
     private StoragePoolType storagePoolType;
     private String storagePoolUuid;
     private long deviceId;
@@ -27,7 +28,7 @@ public class VolumeTO implements InternalIdentity {
     protected VolumeTO() {
     }
 
-    public VolumeTO(final long id, final Volume.Type type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
+    public VolumeTO(final long id, final VolumeType type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
                     final long size, final String chainInfo) {
         this.id = id;
         this.name = name;
@@ -40,7 +41,7 @@ public class VolumeTO implements InternalIdentity {
         this.chainInfo = chainInfo;
     }
 
-    public VolumeTO(final long id, final Volume.Type type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
+    public VolumeTO(final long id, final VolumeType type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
                     final long size, final String chainInfo,
                     final String guestOsType) {
         this.id = id;
@@ -53,22 +54,6 @@ public class VolumeTO implements InternalIdentity {
         this.mountPoint = mountPoint;
         this.chainInfo = chainInfo;
         this.guestOsType = guestOsType;
-    }
-
-    public VolumeTO(final Volume volume, final StoragePool pool) {
-        this.id = volume.getId();
-        this.name = volume.getName();
-        this.path = volume.getPath();
-        this.size = volume.getSize();
-        this.type = volume.getVolumeType();
-        this.storagePoolType = pool.getPoolType();
-        this.storagePoolUuid = pool.getUuid();
-        this.mountPoint = volume.getFolder();
-        this.chainInfo = volume.getChainInfo();
-        this.chainSize = volume.getVmSnapshotChainSize();
-        if (volume.getDeviceId() != null) {
-            this.deviceId = volume.getDeviceId();
-        }
     }
 
     public long getDeviceId() {
@@ -96,7 +81,7 @@ public class VolumeTO implements InternalIdentity {
         return size;
     }
 
-    public Volume.Type getType() {
+    public VolumeType getType() {
         return type;
     }
 

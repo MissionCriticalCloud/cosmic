@@ -7,9 +7,9 @@ import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Volume;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.script.Script;
@@ -50,7 +50,7 @@ public final class LibvirtDeleteVMSnapshotCommandWrapper extends CommandWrapper<
                 s_logger.debug("Can not find running vm: " + vmName + ", now we are trying to delete the vm snapshot using qemu-img if the format of root volume is QCOW2");
                 VolumeObjectTO rootVolume = null;
                 for (VolumeObjectTO volume : cmd.getVolumeTOs()) {
-                    if (volume.getVolumeType() == Volume.Type.ROOT) {
+                    if (volume.getVolumeType() == VolumeType.ROOT) {
                         rootVolume = volume;
                         break;
                     }

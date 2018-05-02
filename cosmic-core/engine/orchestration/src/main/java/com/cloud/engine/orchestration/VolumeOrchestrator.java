@@ -53,6 +53,7 @@ import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.GuestOS;
@@ -60,7 +61,6 @@ import com.cloud.storage.ScopeType;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.dao.GuestOSDao;
@@ -314,7 +314,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                     clusterId = vmHost.getClusterId();
                 }
             } else {
-                final List<VolumeVO> rootVolumesOfVm = _volsDao.findByInstanceAndType(vm.getId(), Volume.Type.ROOT);
+                final List<VolumeVO> rootVolumesOfVm = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.ROOT);
                 if (rootVolumesOfVm.size() != 1) {
                     throw new CloudRuntimeException("The VM " + vm.getHostName() + " has more than one ROOT volume and is in an invalid state. Please contact Cloud Support.");
                 } else {
@@ -562,7 +562,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @Override
-    public DiskProfile allocateRawVolume(final Type type, final String name, final DiskOffering offering, Long size, Long minIops, Long maxIops, final VirtualMachine vm, final
+    public DiskProfile allocateRawVolume(final VolumeType type, final String name, final DiskOffering offering, Long size, Long minIops, Long maxIops, final VirtualMachine vm, final
     VirtualMachineTemplate template, final Account owner, final DiskControllerType diskControllerType) {
         if (size == null) {
             size = offering.getDiskSize();
@@ -591,7 +591,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         vm.getGuestOSId();
 
-        if (type.equals(Type.ROOT)) {
+        if (type.equals(VolumeType.ROOT)) {
             vol.setDeviceId(0l);
         } else {
             vol.setDeviceId(1l);
@@ -675,7 +675,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         StoragePool pool = null;
 
         DiskProfile dskCh = null;
-        if (volume.getVolumeType() == Type.ROOT && ImageFormat.ISO != template.getFormat()) {
+        if (volume.getVolumeType() == VolumeType.ROOT && ImageFormat.ISO != template.getFormat()) {
             dskCh = createDiskCharacteristics(volume, template, dc, offering);
         } else {
             dskCh = createDiskCharacteristics(volume, template, dc, diskOffering);
@@ -749,7 +749,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     protected DiskProfile createDiskCharacteristics(final VolumeInfo volume, final VirtualMachineTemplate template, final DataCenter dc, final DiskOffering diskOffering) {
-        if (volume.getVolumeType() == Type.ROOT && ImageFormat.ISO != template.getFormat()) {
+        if (volume.getVolumeType() == VolumeType.ROOT && ImageFormat.ISO != template.getFormat()) {
             final TemplateDataStoreVO ss = _vmTemplateStoreDao.findByTemplateZoneDownloadStatus(template.getId(), dc.getId(), VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
             if (ss == null) {
                 throw new CloudRuntimeException("Template " + template.getName() + " has not been completely downloaded to zone " + dc.getId());
@@ -815,7 +815,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             @Override
             public void doInTransactionWithoutResult(final TransactionStatus status) {
                 for (final VolumeVO vol : volumesForVm) {
-                    if (vol.getVolumeType().equals(Type.ROOT)) {
+                    if (vol.getVolumeType().equals(VolumeType.ROOT)) {
                         // Destroy volume if not already destroyed
                         final boolean volumeAlreadyDestroyed = (vol.getState() == Volume.State.Destroy || vol.getState() == Volume.State.Expunged || vol.getState() == Volume
                                 .State.Expunging);
@@ -1011,7 +1011,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         }
 
         // don't allow to start vm that doesn't have a root volume
-        if (_volsDao.findByInstanceAndType(vm.getId(), Volume.Type.ROOT).isEmpty()) {
+        if (_volsDao.findByInstanceAndType(vm.getId(), VolumeType.ROOT).isEmpty()) {
             throw new CloudRuntimeException("Unable to prepare volumes for vm as ROOT volume is missing");
         }
 
@@ -1275,7 +1275,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @Override
-    public DiskProfile allocateTemplatedVolume(final Type type, final String name, final DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, final
+    public DiskProfile allocateTemplatedVolume(final VolumeType type, final String name, final DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, final
     VirtualMachineTemplate template, final VirtualMachine vm, final Account owner, DiskControllerType diskControllerType) {
         assert (template.getFormat() != ImageFormat.ISO) : "ISO is not a template really....";
 
@@ -1317,7 +1317,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         }
         vol.setTemplateId(template.getId());
 
-        if (type.equals(Type.ROOT)) {
+        if (type.equals(VolumeType.ROOT)) {
             vol.setDeviceId(0l);
             if (!vm.getType().equals(VirtualMachine.Type.User)) {
                 vol.setRecreatable(true);

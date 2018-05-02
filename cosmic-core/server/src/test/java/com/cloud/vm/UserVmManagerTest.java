@@ -40,10 +40,11 @@ import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Service;
@@ -58,7 +59,6 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -247,7 +247,7 @@ public class UserVmManagerTest {
 
         doReturn(VirtualMachine.State.Stopped).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(3L).when(_volumeMock).getTemplateId();
@@ -283,7 +283,7 @@ public class UserVmManagerTest {
 
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(3L).when(_volumeMock).getTemplateId();
@@ -318,7 +318,7 @@ public class UserVmManagerTest {
             ResourceAllocationException {
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(3L).when(_volumeMock).getTemplateId();
@@ -362,7 +362,7 @@ public class UserVmManagerTest {
             ResourceAllocationException {
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(null).when(_volumeMock).getTemplateId();

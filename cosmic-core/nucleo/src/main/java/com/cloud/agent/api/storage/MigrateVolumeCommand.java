@@ -3,7 +3,7 @@ package com.cloud.agent.api.storage;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.StorageFilerTO;
-import com.cloud.storage.Volume;
+import com.cloud.model.enumeration.VolumeType;
 
 public class MigrateVolumeCommand extends Command {
 
@@ -11,7 +11,7 @@ public class MigrateVolumeCommand extends Command {
     String volumePath;
     StorageFilerTO pool;
     String attachedVmName;
-    Volume.Type volumeType;
+    VolumeType volumeType;
 
     public MigrateVolumeCommand(final long volumeId, final String volumePath, final StoragePool pool, final int timeout) {
         this.volumeId = volumeId;
@@ -20,7 +20,7 @@ public class MigrateVolumeCommand extends Command {
         this.setWait(timeout);
     }
 
-    public MigrateVolumeCommand(final long volumeId, final String volumePath, final StoragePool pool, final String attachedVmName, final Volume.Type volumeType, final int
+    public MigrateVolumeCommand(final long volumeId, final String volumePath, final StoragePool pool, final String attachedVmName, final VolumeType volumeType, final int
             timeout) {
         this.volumeId = volumeId;
         this.volumePath = volumePath;
@@ -51,7 +51,7 @@ public class MigrateVolumeCommand extends Command {
         return attachedVmName;
     }
 
-    public Volume.Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeType;
     }
 }

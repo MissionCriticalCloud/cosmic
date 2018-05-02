@@ -9,6 +9,7 @@ import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateHostVO;
@@ -139,7 +140,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
         // ApiDBUtils.findDiskOfferingById(volume.getDiskOfferingId());
         if (volume.getDiskOfferingId() > 0) {
             boolean isServiceOffering = false;
-            if (volume.getVolumeType().equals(Volume.Type.ROOT)) {
+            if (volume.getVolumeType().equals(VolumeType.ROOT)) {
                 isServiceOffering = true;
             } else {
                 // can't rely on the fact that the volume is the datadisk as it might have been created as a root, and
@@ -185,7 +186,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
         volResponse.setAttached(volume.getAttached());
         volResponse.setDestroyed(volume.getState() == Volume.State.Destroy);
         boolean isExtractable = true;
-        if (volume.getVolumeType() != Volume.Type.DATADISK) { // Datadisk dont
+        if (volume.getVolumeType() != VolumeType.DATADISK) { // Datadisk dont
             // have any
             // template
             // dependence.

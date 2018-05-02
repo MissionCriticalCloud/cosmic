@@ -14,7 +14,7 @@ import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
-import com.cloud.storage.Volume;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.DettachCommand;
 
@@ -118,7 +118,7 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
 
     protected Answer execute(final AttachCommand cmd) {
         final DiskTO disk = cmd.getDisk();
-        if (disk.getType() == Volume.Type.ISO) {
+        if (disk.getType() == VolumeType.ISO) {
             return processor.attachIso(cmd);
         } else {
             return processor.attachVolume(cmd);
@@ -127,7 +127,7 @@ public class StorageSubsystemCommandHandlerBase implements StorageSubsystemComma
 
     protected Answer execute(final DettachCommand cmd) {
         final DiskTO disk = cmd.getDisk();
-        if (disk.getType() == Volume.Type.ISO) {
+        if (disk.getType() == VolumeType.ISO) {
             return processor.dettachIso(cmd);
         } else {
             return processor.dettachVolume(cmd);

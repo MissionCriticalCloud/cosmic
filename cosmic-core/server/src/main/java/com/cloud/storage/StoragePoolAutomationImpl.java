@@ -16,6 +16,7 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -356,7 +357,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                     // check if the vm has a root volume. If not, remove the item from the queue, the vm should be
                     // started only when it has at least one root volume attached to it
                     // don't allow to start vm that doesn't have a root volume
-                    if (volumeDao.findByInstanceAndType(vmInstance.getId(), Volume.Type.ROOT).isEmpty()) {
+                    if (volumeDao.findByInstanceAndType(vmInstance.getId(), VolumeType.ROOT).isEmpty()) {
                         _storagePoolWorkDao.remove(work.getId());
                     } else {
                         final UserVmVO userVm = userVmDao.findById(vmInstance.getId());

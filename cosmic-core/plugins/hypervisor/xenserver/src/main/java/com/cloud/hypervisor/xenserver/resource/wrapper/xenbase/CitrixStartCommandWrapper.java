@@ -8,9 +8,9 @@ import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Volume;
 import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
             final List<DiskTO> disks = new ArrayList<>(vmSpec.getDisks().length);
             int index = 0;
             for (final DiskTO disk : vmSpec.getDisks()) {
-                if (Volume.Type.ISO.equals(disk.getType())) {
+                if (VolumeType.ISO.equals(disk.getType())) {
                     disks.add(0, disk);
                 } else {
                     disks.add(index, disk);

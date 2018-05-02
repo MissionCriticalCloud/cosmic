@@ -6,6 +6,7 @@ import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.fsm.StateObject;
 
@@ -50,7 +51,7 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, St
 
     long getDataCenterId();
 
-    Type getVolumeType();
+    VolumeType getVolumeType();
 
     Long getPoolId();
 
@@ -99,10 +100,6 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, St
     boolean isDisplayVolume();
 
     boolean isDisplay();
-
-    enum Type {
-        UNKNOWN, ROOT, SWAP, DATADISK, ISO
-    }
 
     enum State {
         Allocated("The volume is allocated but has not been created yet."),

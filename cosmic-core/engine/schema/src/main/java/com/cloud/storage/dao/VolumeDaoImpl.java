@@ -6,12 +6,12 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Volume;
 import com.cloud.storage.Volume.Event;
 import com.cloud.storage.Volume.State;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.db.DB;
@@ -215,7 +215,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
         final SearchCriteria<SumCount> sc = TotalVMSnapshotSizeByPoolSearch.create();
         sc.setParameters("poolId", poolId);
         sc.setParameters("state", State.Destroy);
-        sc.setParameters("vType", Volume.Type.ROOT.toString());
+        sc.setParameters("vType", VolumeType.ROOT.toString());
         final List<SumCount> results = customSearch(sc, null);
         if (results != null) {
             return results.get(0).sum;
@@ -232,7 +232,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     }
 
     @Override
-    public List<VolumeVO> findByInstanceAndType(final long id, final Type vType) {
+    public List<VolumeVO> findByInstanceAndType(final long id, final VolumeType vType) {
         final SearchCriteria<VolumeVO> sc = AllFieldsSearch.create();
         sc.setParameters("instanceId", id);
         sc.setParameters("vType", vType.toString());
@@ -297,7 +297,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
         volume.setUpdated(new Date());
         volume.setAttached(new Date());
         if (deviceId == 0L) {
-            volume.setVolumeType(Type.ROOT);
+            volume.setVolumeType(VolumeType.ROOT);
         }
         if (diskController != null) {
             volume.setDiskController(diskController);
@@ -312,8 +312,8 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
         volume.setDeviceId(null);
         volume.setUpdated(new Date());
         volume.setAttached(null);
-        if (findById(volumeId).getVolumeType() == Type.ROOT) {
-            volume.setVolumeType(Type.DATADISK);
+        if (findById(volumeId).getVolumeType() == VolumeType.ROOT) {
+            volume.setVolumeType(VolumeType.DATADISK);
         }
         update(volumeId, volume);
     }
@@ -343,7 +343,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
         final SearchCriteria<VolumeVO> sc = AllFieldsSearch.create();
         sc.setParameters("poolId", poolId);
         sc.setParameters("notDestroyed", Volume.State.Destroy);
-        sc.setParameters("vType", Volume.Type.ROOT.toString());
+        sc.setParameters("vType", VolumeType.ROOT.toString());
         return listBy(sc);
     }
 
@@ -356,7 +356,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     }
 
     @Override
-    public List<VolumeVO> findByPoolId(final long poolId, final Volume.Type volumeType) {
+    public List<VolumeVO> findByPoolId(final long poolId, final VolumeType volumeType) {
         final SearchCriteria<VolumeVO> sc = AllFieldsSearch.create();
         sc.setParameters("poolId", poolId);
         sc.setParameters("notDestroyed", Volume.State.Destroy);
@@ -439,7 +439,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     public List<VolumeVO> listNonRootVolumesToBeDestroyed(final Date date) {
         final SearchCriteria<VolumeVO> sc = AllFieldsSearch.create();
         sc.setParameters("state", Volume.State.Destroy);
-        sc.setParameters("notVolumeType", Volume.Type.ROOT.toString());
+        sc.setParameters("notVolumeType", VolumeType.ROOT.toString());
         sc.setParameters("updateTime", date);
 
         return listBy(sc);
@@ -463,7 +463,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
         final SearchCriteria<VolumeVO> sc = AllFieldsSearch.create();
         sc.setParameters("instanceId", instanceId);
         sc.setParameters("state", Volume.State.Ready);
-        sc.setParameters("vType", Volume.Type.ROOT);
+        sc.setParameters("vType", VolumeType.ROOT);
         return listBy(sc);
     }
 

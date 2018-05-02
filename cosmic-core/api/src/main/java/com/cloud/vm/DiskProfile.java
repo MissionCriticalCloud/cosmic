@@ -1,6 +1,7 @@
 package com.cloud.vm;
 
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.DiskOffering;
 import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.Volume;
@@ -12,7 +13,7 @@ import com.cloud.storage.Volume;
 public class DiskProfile {
     private long size;
     private String[] tags;
-    private Volume.Type type;
+    private VolumeType type;
     private String name;
     private boolean useLocalStorage;
     private boolean recreatable;
@@ -45,7 +46,7 @@ public class DiskProfile {
         this.hyperType = hyperType;
     }
 
-    public DiskProfile(final long volumeId, final Volume.Type type, final String name, final long diskOfferingId, final long size, final String[] tags, final boolean
+    public DiskProfile(final long volumeId, final VolumeType type, final String name, final long diskOfferingId, final long size, final String[] tags, final boolean
             useLocalStorage, final boolean recreatable,
                        final Long templateId) {
         this.type = type;
@@ -98,7 +99,7 @@ public class DiskProfile {
     /**
      * @return type of volume.
      */
-    public Volume.Type getType() {
+    public VolumeType getType() {
         return type;
     }
 

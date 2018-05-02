@@ -83,6 +83,7 @@ import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.GuestOSVO;
@@ -102,7 +103,6 @@ import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.CommandResult;
@@ -900,12 +900,12 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
             final TemplateObjectTO iso = (TemplateObjectTO) template.getTO();
             iso.setGuestOsType(displayName);
-            final DiskTO disk = new DiskTO(iso, 3L, null, Volume.Type.ISO);
+            final DiskTO disk = new DiskTO(iso, 3L, null, VolumeType.ISO);
             profile.addDisk(disk);
         } else {
             final TemplateObjectTO iso = new TemplateObjectTO();
             iso.setFormat(ImageFormat.ISO);
-            final DiskTO disk = new DiskTO(iso, 3L, null, Volume.Type.ISO);
+            final DiskTO disk = new DiskTO(iso, 3L, null, VolumeType.ISO);
             profile.addDisk(disk);
         }
     }
@@ -1876,7 +1876,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         }
 
         final DataTO isoTO = tmplt.getTO();
-        final DiskTO disk = new DiskTO(isoTO, null, null, Volume.Type.ISO);
+        final DiskTO disk = new DiskTO(isoTO, null, null, VolumeType.ISO);
         final Command cmd;
         if (attach) {
             cmd = new AttachCommand(disk, vmName);

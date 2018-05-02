@@ -145,7 +145,9 @@ public abstract class AbstractHyperVisorStorageMotionStrategy implements DataMot
 
         for (final Map.Entry<VolumeInfo, DataStore> entry : volumeToPool.entrySet()) {
             final VolumeInfo volume = entry.getKey();
-            final VolumeTO volumeTo = new VolumeTO(volume, storagePoolDao.findById(volume.getPoolId()));
+            final StoragePool storagePool = storagePoolDao.findById(volume.getPoolId());
+            final VolumeTO volumeTo = new VolumeTO(volume.getId(), volume.getVolumeType(), storagePool.getPoolType(), storagePool.getUuid(), volume.getName(), volume.getFolder(), volume.getPath(),
+                    volume.getSize(), volume.getChainInfo());
             final StorageFilerTO filerTo = new StorageFilerTO((StoragePool) entry.getValue());
             volumeToFilerto.add(new Pair<>(volumeTo, filerTo));
         }

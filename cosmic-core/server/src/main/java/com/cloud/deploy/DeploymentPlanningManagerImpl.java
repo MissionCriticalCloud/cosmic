@@ -55,6 +55,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
@@ -531,7 +532,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
         }
 
         // don't allow to start vm that doesn't have a root volume
-        if (_volsDao.findByInstanceAndType(vmProfile.getId(), Volume.Type.ROOT).isEmpty()) {
+        if (_volsDao.findByInstanceAndType(vmProfile.getId(), VolumeType.ROOT).isEmpty()) {
             throw new CloudRuntimeException("Unable to prepare volumes for vm as ROOT volume is missing");
         }
 
@@ -550,7 +551,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
             // volume is ready and the pool should be reused.
             // In this case, also check if rest of the volumes are ready and can
             // be reused.
-            if (plan.getPoolId() != null || (toBeCreated.getVolumeType() == Volume.Type.DATADISK && toBeCreated.getPoolId() != null && toBeCreated.getState() == Volume.State
+            if (plan.getPoolId() != null || (toBeCreated.getVolumeType() == VolumeType.DATADISK && toBeCreated.getPoolId() != null && toBeCreated.getState() == Volume.State
                     .Ready)) {
                 s_logger.debug("Volume has pool already allocated, checking if pool can be reused, poolId: " + toBeCreated.getPoolId());
                 final List<StoragePool> suitablePools = new ArrayList<>();
@@ -644,7 +645,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                 // saved in service offering, override the flag from service
                 // offering when it is a ROOT disk
                 if (!useLocalStorage && vmProfile.getServiceOffering().getUseLocalStorage()) {
-                    if (toBeCreated.getVolumeType() == Volume.Type.ROOT) {
+                    if (toBeCreated.getVolumeType() == VolumeType.ROOT) {
                         useLocalStorage = true;
                     }
                 }

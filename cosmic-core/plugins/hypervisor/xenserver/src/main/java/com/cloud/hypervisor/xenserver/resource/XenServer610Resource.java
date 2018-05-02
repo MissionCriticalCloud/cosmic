@@ -2,8 +2,8 @@ package com.cloud.hypervisor.xenserver.resource;
 
 import com.cloud.agent.api.to.DiskTO;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ServerResource;
-import com.cloud.storage.Volume;
 import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.ejb.Local;
@@ -46,7 +46,7 @@ public class XenServer610Resource extends XenServer600Resource {
             }
 
             for (final DiskTO volumeTo : volumes) {
-                if (volumeTo.getType() != Volume.Type.ISO) {
+                if (volumeTo.getType() != VolumeType.ISO) {
                     final VolumeObjectTO vol = (VolumeObjectTO) volumeTo.getData();
                     final Long deviceId = volumeTo.getDiskSeq();
                     final VDI vdi = deviceIdToVdiMap.get(deviceId.toString());

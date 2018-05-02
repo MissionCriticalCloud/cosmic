@@ -41,12 +41,12 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.Networks;
 import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.hypervisor.HypervisorResource;
 import com.cloud.storage.Storage;
-import com.cloud.storage.Volume;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.storage.to.TemplateObjectTO;
@@ -950,7 +950,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     public VBD createVbd(final Connection conn, final DiskTO volume, final String vmName, final VM vm,
                          final BootloaderType bootLoaderType, VDI vdi) throws XmlRpcException,
             XenAPIException {
-        final Volume.Type type = volume.getType();
+        final VolumeType type = volume.getType();
 
         if (vdi == null) {
             vdi = mount(conn, vmName, volume);
@@ -976,20 +976,20 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         } else {
             vbdr.empty = true;
         }
-        if (type == Volume.Type.ROOT && bootLoaderType == BootloaderType.PyGrub) {
+        if (type == VolumeType.ROOT && bootLoaderType == BootloaderType.PyGrub) {
             vbdr.bootable = true;
-        } else if (type == Volume.Type.ISO && bootLoaderType == BootloaderType.CD) {
+        } else if (type == VolumeType.ISO && bootLoaderType == BootloaderType.CD) {
             vbdr.bootable = true;
         }
 
-        if (volume.getType() == Volume.Type.ISO) {
+        if (volume.getType() == VolumeType.ISO) {
             vbdr.mode = Types.VbdMode.RO;
             vbdr.type = Types.VbdType.CD;
             vbdr.userdevice = "3";
         } else {
             vbdr.mode = Types.VbdMode.RW;
             vbdr.type = Types.VbdType.DISK;
-            vbdr.unpluggable = volume.getType() == Volume.Type.ROOT ? false : true;
+            vbdr.unpluggable = volume.getType() == VolumeType.ROOT ? false : true;
             vbdr.userdevice = "autodetect";
             final Long deviceId = volume.getDiskSeq();
             if (deviceId != null && !isDeviceUsed(conn, vm, deviceId) || deviceId > 3) {
@@ -1008,8 +1008,8 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     protected VDI mount(final Connection conn, final String vmName, final DiskTO volume)
             throws XmlRpcException, XenAPIException {
         final DataTO data = volume.getData();
-        final Volume.Type type = volume.getType();
-        if (type == Volume.Type.ISO) {
+        final VolumeType type = volume.getType();
+        if (type == VolumeType.ISO) {
             final TemplateObjectTO iso = (TemplateObjectTO) data;
             final DataStoreTO store = iso.getDataStore();
 
@@ -1271,7 +1271,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             if (vmSpec.getBootloader() == BootloaderType.CD) {
                 final DiskTO[] disks = vmSpec.getDisks();
                 for (final DiskTO disk : disks) {
-                    if (disk.getType() == Volume.Type.ISO) {
+                    if (disk.getType() == VolumeType.ISO) {
                         final TemplateObjectTO iso = (TemplateObjectTO) disk.getData();
                         final String osType = iso.getGuestOsType();
                         if (osType != null) {
@@ -1421,7 +1421,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             final VBD.Record vbdr = new VBD.Record();
             vbdr.VM = vm;
             vbdr.VDI = vdi;
-            if (volumeTO.getVolumeType() == Volume.Type.ROOT) {
+            if (volumeTO.getVolumeType() == VolumeType.ROOT) {
                 vbdr.bootable = true;
                 vbdr.unpluggable = false;
             } else {
@@ -2852,7 +2852,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
     public long getVMSnapshotChainSize(final Connection conn, final VolumeObjectTO volumeTo, final String vmName)
             throws BadServerResponse, XenAPIException, XmlRpcException {
-        if (volumeTo.getVolumeType() == Volume.Type.DATADISK) {
+        if (volumeTo.getVolumeType() == VolumeType.DATADISK) {
             final VDI dataDisk = VDI.getByUuid(conn, volumeTo.getPath());
             if (dataDisk != null) {
                 final String dataDiskName = dataDisk.getNameLabel(conn);
@@ -2881,7 +2881,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 continue;
             }
         }
-        if (volumeTo.getVolumeType() == Volume.Type.ROOT) {
+        if (volumeTo.getVolumeType() == VolumeType.ROOT) {
             final Map<VM, VM.Record> allVMs = VM.getAllRecords(conn);
             // add size of memory snapshot vdi
             if (allVMs != null && allVMs.size() > 0) {

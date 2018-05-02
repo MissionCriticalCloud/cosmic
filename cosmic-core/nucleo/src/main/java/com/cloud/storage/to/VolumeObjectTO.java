@@ -6,13 +6,13 @@ import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.Storage;
-import com.cloud.storage.Volume;
 
 public class VolumeObjectTO implements DataTO {
     private String uuid;
-    private Volume.Type volumeType;
+    private VolumeType volumeType;
     private DataStoreTO dataStore;
     private String name;
     private Long size;
@@ -72,7 +72,7 @@ public class VolumeObjectTO implements DataTO {
         this.uuid = uuid;
     }
 
-    public Volume.Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeType;
     }
 

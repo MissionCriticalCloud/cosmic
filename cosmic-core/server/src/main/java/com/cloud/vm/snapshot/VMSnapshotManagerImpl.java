@@ -37,13 +37,13 @@ import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -801,7 +801,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             throw new InvalidParameterValueException("Create vm to snapshot failed due to vm: " + vmId + " is not found");
         }
 
-        final List<VolumeVO> volumeVos = _volumeDao.findByInstanceAndType(vmId, Type.ROOT);
+        final List<VolumeVO> volumeVos = _volumeDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (volumeVos == null || volumeVos.isEmpty()) {
             throw new CloudRuntimeException("Create vm to snapshot failed due to no root disk found");
         }

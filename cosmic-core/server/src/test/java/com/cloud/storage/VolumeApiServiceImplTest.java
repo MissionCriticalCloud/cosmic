@@ -29,6 +29,7 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
@@ -136,7 +137,7 @@ public class VolumeApiServiceImplTest {
         try {
             // volume of running vm id=1
             final VolumeVO volumeOfRunningVm = new VolumeVO("root", 1L, 1L, 1L, 1L, 1L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
+                    null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(1L)).thenReturn(volumeOfRunningVm);
 
             final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
@@ -147,7 +148,7 @@ public class VolumeApiServiceImplTest {
 
             // volume of stopped vm id=2
             final VolumeVO volumeOfStoppedVm = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
+                    null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             volumeOfStoppedVm.setPoolId(1L);
             when(_svc._volsDao.findById(2L)).thenReturn(volumeOfStoppedVm);
 
@@ -165,39 +166,39 @@ public class VolumeApiServiceImplTest {
             managedPool.setManaged(true);
             when(_svc._storagePoolDao.findById(2L)).thenReturn(managedPool);
             final VolumeVO managedPoolVolume = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
+                    null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             managedPoolVolume.setPoolId(2L);
             when(_svc._volsDao.findById(4L)).thenReturn(managedPoolVolume);
 
             // non-root non-datadisk volume
             final VolumeInfo volumeWithIncorrectVolumeType = Mockito.mock(VolumeInfo.class);
             when(volumeWithIncorrectVolumeType.getId()).thenReturn(5L);
-            when(volumeWithIncorrectVolumeType.getVolumeType()).thenReturn(Volume.Type.ISO);
+            when(volumeWithIncorrectVolumeType.getVolumeType()).thenReturn(VolumeType.ISO);
             when(_svc.volFactory.getVolume(5L)).thenReturn(volumeWithIncorrectVolumeType);
 
             // correct root volume
             final VolumeInfo correctRootVolume = Mockito.mock(VolumeInfo.class);
             when(correctRootVolume.getId()).thenReturn(6L);
             when(correctRootVolume.getDataCenterId()).thenReturn(1L);
-            when(correctRootVolume.getVolumeType()).thenReturn(Volume.Type.ROOT);
+            when(correctRootVolume.getVolumeType()).thenReturn(VolumeType.ROOT);
             when(correctRootVolume.getInstanceId()).thenReturn(null);
             when(_svc.volFactory.getVolume(6L)).thenReturn(correctRootVolume);
 
             final VolumeVO correctRootVolumeVO = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
+                    null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(6L)).thenReturn(correctRootVolumeVO);
 
             // managed root volume
             final VolumeInfo managedVolume = Mockito.mock(VolumeInfo.class);
             when(managedVolume.getId()).thenReturn(7L);
             when(managedVolume.getDataCenterId()).thenReturn(1L);
-            when(managedVolume.getVolumeType()).thenReturn(Volume.Type.ROOT);
+            when(managedVolume.getVolumeType()).thenReturn(VolumeType.ROOT);
             when(managedVolume.getInstanceId()).thenReturn(null);
             when(managedVolume.getPoolId()).thenReturn(2L);
             when(_svc.volFactory.getVolume(7L)).thenReturn(managedVolume);
 
             final VolumeVO managedVolume1 = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
+                    null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             managedVolume1.setPoolId(2L);
             managedVolume1.setDataCenterId(1L);
             when(_svc._volsDao.findById(7L)).thenReturn(managedVolume1);
@@ -216,14 +217,14 @@ public class VolumeApiServiceImplTest {
             final VolumeInfo uploadedVolume = Mockito.mock(VolumeInfo.class);
             when(uploadedVolume.getId()).thenReturn(8L);
             when(uploadedVolume.getDataCenterId()).thenReturn(1L);
-            when(uploadedVolume.getVolumeType()).thenReturn(Volume.Type.ROOT);
+            when(uploadedVolume.getVolumeType()).thenReturn(VolumeType.ROOT);
             when(uploadedVolume.getInstanceId()).thenReturn(null);
             when(uploadedVolume.getPoolId()).thenReturn(1L);
             when(uploadedVolume.getState()).thenReturn(Volume.State.Uploaded);
             when(_svc.volFactory.getVolume(8L)).thenReturn(uploadedVolume);
 
             final VolumeVO upVolume = new VolumeVO("root", 1L, 1L, 1L, 1L, 2L, "root", "root", Storage.ProvisioningType.THIN, 1, null,
-                    null, "root", Volume.Type.ROOT, DiskControllerType.SCSI);
+                    null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             upVolume.setPoolId(1L);
             upVolume.setDataCenterId(1L);
             upVolume.setState(Volume.State.Uploaded);
@@ -364,13 +365,13 @@ public class VolumeApiServiceImplTest {
         VolumeInfo volumeToAttach = Mockito.mock(VolumeInfo.class);
         when(volumeToAttach.getId()).thenReturn(9L);
         when(volumeToAttach.getDataCenterId()).thenReturn(34L);
-        when(volumeToAttach.getVolumeType()).thenReturn(Volume.Type.DATADISK);
+        when(volumeToAttach.getVolumeType()).thenReturn(VolumeType.DATADISK);
         when(volumeToAttach.getInstanceId()).thenReturn(null);
         when(_userVmDao.findById(anyLong())).thenReturn(vm);
         when(vm.getType()).thenReturn(VirtualMachine.Type.User);
         when(vm.getState()).thenReturn(State.Running);
         when(vm.getDataCenterId()).thenReturn(34L);
-        when(_svc._volsDao.findByInstanceAndType(anyLong(), any(Volume.Type.class))).thenReturn(new ArrayList(10));
+        when(_svc._volsDao.findByInstanceAndType(anyLong(), any(VolumeType.class))).thenReturn(new ArrayList(10));
         when(_svc.volFactory.getVolume(9L)).thenReturn(volumeToAttach);
         when(volumeToAttach.getState()).thenReturn(Volume.State.Uploaded);
         DataCenterVO zoneWithDisabledLocalStorage = Mockito.mock(DataCenterVO.class);
