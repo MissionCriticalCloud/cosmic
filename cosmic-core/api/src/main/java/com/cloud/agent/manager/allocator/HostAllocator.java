@@ -3,7 +3,7 @@ package com.cloud.agent.manager.allocator;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.utils.component.Adapter;
 import com.cloud.vm.VirtualMachine;
@@ -33,7 +33,7 @@ public interface HostAllocator extends Adapter {
      * @return List<Host> List of hosts that are suitable for VM allocation
      **/
 
-    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, int returnUpTo);
+    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, HostType type, ExcludeList avoid, int returnUpTo);
 
     /**
      * Determines which physical hosts are suitable to allocate the guest
@@ -54,7 +54,7 @@ public interface HostAllocator extends Adapter {
      * @return List<Host> List of hosts that are suitable for VM allocation
      **/
 
-    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, int returnUpTo, boolean considerReservedCapacity);
+    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, HostType type, ExcludeList avoid, int returnUpTo, boolean considerReservedCapacity);
 
     /**
      * Determines which physical hosts are suitable to allocate the guest
@@ -75,6 +75,6 @@ public interface HostAllocator extends Adapter {
      *                              capacity)
      * @return List<Host> List of hosts that are suitable for VM allocation
      **/
-    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, Type type, ExcludeList avoid, List<? extends Host> hosts, int returnUpTo,
+    public List<Host> allocateTo(VirtualMachineProfile vmProfile, DeploymentPlan plan, HostType type, ExcludeList avoid, List<? extends Host> hosts, int returnUpTo,
                                  boolean considerReservedCapacity);
 }

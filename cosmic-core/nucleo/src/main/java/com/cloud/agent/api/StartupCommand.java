@@ -1,10 +1,10 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupCommand extends Command {
-    Host.Type type;
+    HostType type;
     String dataCenter;
     String pod;
     String cluster;
@@ -29,17 +29,17 @@ public class StartupCommand extends Command {
     String resourceName;
     String gatewayIpAddress;
 
-    public StartupCommand(final Host.Type type) {
+    public StartupCommand(final HostType type) {
         this.type = type;
     }
 
-    public StartupCommand(final Long id, final Host.Type type, final String name, final String dataCenter, final String pod, final String guid, final String version, final
+    public StartupCommand(final Long id, final HostType type, final String name, final String dataCenter, final String pod, final String guid, final String version, final
     String gatewayIpAddress) {
         this(id, type, name, dataCenter, pod, guid, version);
         this.gatewayIpAddress = gatewayIpAddress;
     }
 
-    public StartupCommand(final Long id, final Host.Type type, final String name, final String dataCenter, final String pod, final String guid, final String version) {
+    public StartupCommand(final Long id, final HostType type, final String name, final String dataCenter, final String pod, final String guid, final String version) {
         super();
         this.id = id;
         this.dataCenter = dataCenter;
@@ -50,11 +50,11 @@ public class StartupCommand extends Command {
         this.type = type;
     }
 
-    public Host.Type getHostType() {
+    public HostType getHostType() {
         return type;
     }
 
-    public void setHostType(final Host.Type type) {
+    public void setHostType(final HostType type) {
         this.type = type;
     }
 

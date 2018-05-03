@@ -4,11 +4,12 @@ import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.fsm.StateObject;
+import com.cloud.utils.fsm.Transition;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -124,59 +125,59 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, St
         private final static StateMachine2<State, Event, Volume> s_fsm = new StateMachine2<>();
 
         static {
-            s_fsm.addTransition(new StateMachine2.Transition<>(Allocated, Event.CreateRequested, Creating, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Allocated, Event.DestroyRequested, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.OperationRetry, Creating, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.OperationFailed, Allocated, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.OperationSucceeded, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.DestroyRequested, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.CreateRequested, Creating, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Ready, Event.ResizeRequested, Resizing, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Resizing, Event.OperationSucceeded, Ready, Arrays.asList(new StateMachine2.Transition
-                    .Impact[]{StateMachine2.Transition.Impact.USAGE})));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Resizing, Event.OperationFailed, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Allocated, Event.UploadRequested, UploadOp, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Uploaded, Event.CopyRequested, Copying, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Copying, Event.OperationSucceeded, Ready, Arrays.asList(new StateMachine2.Transition
-                    .Impact[]{StateMachine2.Transition.Impact.USAGE})));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Copying, Event.OperationFailed, Uploaded, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadOp, Event.DestroyRequested, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Ready, Event.DestroyRequested, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Destroy, Event.ExpungingRequested, Expunging, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Expunging, Event.ExpungingRequested, Expunging, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Expunging, Event.OperationSucceeded, Expunged, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Expunging, Event.OperationFailed, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Ready, Event.SnapshotRequested, Snapshotting, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Snapshotting, Event.OperationSucceeded, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Snapshotting, Event.OperationFailed, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Ready, Event.RevertSnapshotRequested, RevertSnapshotting, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(RevertSnapshotting, Event.OperationSucceeded, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(RevertSnapshotting, Event.OperationFailed, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Allocated, Event.MigrationCopyRequested, Creating, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.MigrationCopyFailed, Allocated, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Creating, Event.MigrationCopySucceeded, Ready, Arrays.asList(new StateMachine2.Transition
-                    .Impact[]{StateMachine2.Transition.Impact.USAGE})));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Ready, Event.MigrationRequested, Migrating, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Migrating, Event.OperationSucceeded, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Migrating, Event.OperationFailed, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Destroy, Event.OperationSucceeded, Destroy, Arrays.asList(new StateMachine2.Transition
-                    .Impact[]{StateMachine2.Transition.Impact.USAGE})));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Destroy, Event.OperationFailed, Destroy, Arrays.asList(StateMachine2.Transition.Impact.USAGE)));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadOp, Event.OperationSucceeded, Uploaded, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadOp, Event.OperationFailed, Allocated, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Uploaded, Event.DestroyRequested, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Expunged, Event.ExpungingRequested, Expunged, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Expunged, Event.OperationSucceeded, Expunged, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(Expunged, Event.OperationFailed, Expunged, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.OperationTimeout, UploadAbandoned, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.UploadRequested, UploadInProgress, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.OperationSucceeded, Uploaded, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.OperationFailed, UploadError, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadInProgress, Event.OperationSucceeded, Uploaded, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadInProgress, Event.OperationFailed, UploadError, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadInProgress, Event.OperationTimeout, UploadError, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadError, Event.DestroyRequested, Destroy, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadAbandoned, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Allocated, Event.CreateRequested, Creating, null));
+            s_fsm.addTransition(new Transition<>(Allocated, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.OperationRetry, Creating, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.OperationFailed, Allocated, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.OperationSucceeded, Ready, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.CreateRequested, Creating, null));
+            s_fsm.addTransition(new Transition<>(Ready, Event.ResizeRequested, Resizing, null));
+            s_fsm.addTransition(new Transition<>(Resizing, Event.OperationSucceeded, Ready, Arrays.asList(new Transition
+                    .Impact[]{Transition.Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(Resizing, Event.OperationFailed, Ready, null));
+            s_fsm.addTransition(new Transition<>(Allocated, Event.UploadRequested, UploadOp, null));
+            s_fsm.addTransition(new Transition<>(Uploaded, Event.CopyRequested, Copying, null));
+            s_fsm.addTransition(new Transition<>(Copying, Event.OperationSucceeded, Ready, Arrays.asList(new Transition
+                    .Impact[]{Transition.Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(Copying, Event.OperationFailed, Uploaded, null));
+            s_fsm.addTransition(new Transition<>(UploadOp, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Ready, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Destroy, Event.ExpungingRequested, Expunging, null));
+            s_fsm.addTransition(new Transition<>(Expunging, Event.ExpungingRequested, Expunging, null));
+            s_fsm.addTransition(new Transition<>(Expunging, Event.OperationSucceeded, Expunged, null));
+            s_fsm.addTransition(new Transition<>(Expunging, Event.OperationFailed, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Ready, Event.SnapshotRequested, Snapshotting, null));
+            s_fsm.addTransition(new Transition<>(Snapshotting, Event.OperationSucceeded, Ready, null));
+            s_fsm.addTransition(new Transition<>(Snapshotting, Event.OperationFailed, Ready, null));
+            s_fsm.addTransition(new Transition<>(Ready, Event.RevertSnapshotRequested, RevertSnapshotting, null));
+            s_fsm.addTransition(new Transition<>(RevertSnapshotting, Event.OperationSucceeded, Ready, null));
+            s_fsm.addTransition(new Transition<>(RevertSnapshotting, Event.OperationFailed, Ready, null));
+            s_fsm.addTransition(new Transition<>(Allocated, Event.MigrationCopyRequested, Creating, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.MigrationCopyFailed, Allocated, null));
+            s_fsm.addTransition(new Transition<>(Creating, Event.MigrationCopySucceeded, Ready, Arrays.asList(new Transition
+                    .Impact[]{Transition.Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(Ready, Event.MigrationRequested, Migrating, null));
+            s_fsm.addTransition(new Transition<>(Migrating, Event.OperationSucceeded, Ready, null));
+            s_fsm.addTransition(new Transition<>(Migrating, Event.OperationFailed, Ready, null));
+            s_fsm.addTransition(new Transition<>(Destroy, Event.OperationSucceeded, Destroy, Arrays.asList(new Transition
+                    .Impact[]{Transition.Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(Destroy, Event.OperationFailed, Destroy, Arrays.asList(Transition.Impact.USAGE)));
+            s_fsm.addTransition(new Transition<>(UploadOp, Event.OperationSucceeded, Uploaded, null));
+            s_fsm.addTransition(new Transition<>(UploadOp, Event.OperationFailed, Allocated, null));
+            s_fsm.addTransition(new Transition<>(Uploaded, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(Expunged, Event.ExpungingRequested, Expunged, null));
+            s_fsm.addTransition(new Transition<>(Expunged, Event.OperationSucceeded, Expunged, null));
+            s_fsm.addTransition(new Transition<>(Expunged, Event.OperationFailed, Expunged, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.OperationTimeout, UploadAbandoned, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.UploadRequested, UploadInProgress, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.OperationSucceeded, Uploaded, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.OperationFailed, UploadError, null));
+            s_fsm.addTransition(new Transition<>(UploadInProgress, Event.OperationSucceeded, Uploaded, null));
+            s_fsm.addTransition(new Transition<>(UploadInProgress, Event.OperationFailed, UploadError, null));
+            s_fsm.addTransition(new Transition<>(UploadInProgress, Event.OperationTimeout, UploadError, null));
+            s_fsm.addTransition(new Transition<>(UploadError, Event.DestroyRequested, Destroy, null));
+            s_fsm.addTransition(new Transition<>(UploadAbandoned, Event.DestroyRequested, Destroy, null));
         }
 
         String _description;

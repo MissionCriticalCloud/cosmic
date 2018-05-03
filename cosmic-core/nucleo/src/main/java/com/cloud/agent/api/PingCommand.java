@@ -1,21 +1,21 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.model.enumeration.HostType;
 
 public class PingCommand extends Command {
-    Host.Type hostType;
+    HostType hostType;
     long hostId;
 
     protected PingCommand() {
     }
 
-    public PingCommand(final Host.Type type, final long id) {
+    public PingCommand(final HostType type, final long id) {
         hostType = type;
         hostId = id;
     }
 
-    public Host.Type getHostType() {
+    public HostType getHostType() {
         return hostType;
     }
 

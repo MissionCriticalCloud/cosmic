@@ -59,6 +59,7 @@ import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -506,7 +507,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             return null;
         }
 
-        final List<StoragePoolHostVO> vos = _poolHostDao.listByHostStatus(poolId, com.cloud.host.Status.Up);
+        final List<StoragePoolHostVO> vos = _poolHostDao.listByHostStatus(poolId, HostStatus.Up);
         if (vos == null || vos.isEmpty()) {
             throw new CloudRuntimeException("Cannot download " + templateId + " to poolId " + poolId + " since there is no host in the Up state connected to this pool");
         }

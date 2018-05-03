@@ -35,7 +35,7 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.DedicatedResources;
@@ -733,7 +733,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
             throw new InvalidParameterValueException("Unable to find host by id " + hostId);
         } else {
             //check if host is of routing type
-            if (host.getType() != Host.Type.Routing) {
+            if (host.getType() != HostType.Routing) {
                 throw new CloudRuntimeException("Invalid host type for host " + host.getName());
             }
 

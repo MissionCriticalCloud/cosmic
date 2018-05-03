@@ -20,20 +20,20 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.CapacityState;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceListener;
 import com.cloud.resource.ResourceManager;
-import com.cloud.resource.ResourceState;
 import com.cloud.resource.ServerResource;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -52,7 +52,7 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.Transition;
 import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
@@ -149,7 +149,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final VirtualMachine vm, final boolean status, final Object opaque) {
+    public boolean postStateTransitionEvent(final Transition<State, Event> transition, final VirtualMachine vm, final boolean status, final Object opaque) {
         if (!status) {
             return false;
         }
@@ -846,7 +846,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         // TODO Auto-generated method stub
         return false;
     }

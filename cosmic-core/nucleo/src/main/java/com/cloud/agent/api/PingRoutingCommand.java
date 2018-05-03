@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ public class PingRoutingCommand extends PingCommand {
     protected PingRoutingCommand() {
     }
 
-    public PingRoutingCommand(final Host.Type type, final long id, final Map<String, HostVmStateReportEntry> hostVmStateReport) {
+    public PingRoutingCommand(final HostType type, final long id, final Map<String, HostVmStateReportEntry> hostVmStateReport) {
         super(type, id);
         this._hostVmStateReport = hostVmStateReport;
     }

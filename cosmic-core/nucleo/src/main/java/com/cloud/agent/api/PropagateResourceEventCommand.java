@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.resource.ResourceState;
+import com.cloud.legacymodel.resource.ResourceState;
 
 public class PropagateResourceEventCommand extends Command {
     long hostId;

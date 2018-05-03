@@ -9,12 +9,12 @@ import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.StorageAction;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.LocalHostEndpoint;
 import com.cloud.storage.RemoteHostEndPoint;
@@ -223,8 +223,8 @@ public class DefaultEndPointSelector implements EndPointSelector {
         if (dcId != null) {
             sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
         }
-        sc.and(sc.entity().getStatus(), Op.IN, Status.Up, Status.Connecting);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.SecondaryStorageVM);
+        sc.and(sc.entity().getStatus(), Op.IN, HostStatus.Up, HostStatus.Connecting);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.SecondaryStorageVM);
         return sc.list();
     }
 

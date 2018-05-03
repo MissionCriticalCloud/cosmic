@@ -25,7 +25,7 @@ import com.cloud.agent.api.to.GPUDeviceTO;
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.host.Host.Type;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.CitrixRequestWrapper;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.XenServerUtilitiesHelper;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -2251,8 +2251,8 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     }
 
     @Override
-    public Type getType() {
-        return com.cloud.host.Host.Type.Routing;
+    public HostType getType() {
+        return HostType.Routing;
     }
 
     @Override

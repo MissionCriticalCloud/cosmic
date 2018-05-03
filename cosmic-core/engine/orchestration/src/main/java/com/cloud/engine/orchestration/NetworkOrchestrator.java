@@ -33,7 +33,7 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -3090,7 +3090,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 

@@ -40,8 +40,8 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageSubscriber;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
@@ -54,6 +54,7 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
@@ -83,7 +84,7 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.Transition;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VMInstanceVO;
@@ -971,7 +972,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     protected List<Host> findSuitableHosts(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final ExcludeList avoid, final int returnUpTo) {
         List<Host> suitableHosts = new ArrayList<>();
         for (final HostAllocator allocator : _hostAllocators) {
-            suitableHosts = allocator.allocateTo(vmProfile, plan, Host.Type.Routing, avoid, returnUpTo);
+            suitableHosts = allocator.allocateTo(vmProfile, plan, HostType.Routing, avoid, returnUpTo);
             if (suitableHosts != null && !suitableHosts.isEmpty()) {
                 break;
             }
@@ -1001,7 +1002,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
         boolean avoidAllSharedPools = true;
 
         final List<HostVO> allhostsInCluster =
-                _hostDao.listAllUpAndEnabledNonHAHosts(Host.Type.Routing, clusterVO.getId(), clusterVO.getPodId(), clusterVO.getDataCenterId(), null);
+                _hostDao.listAllUpAndEnabledNonHAHosts(HostType.Routing, clusterVO.getId(), clusterVO.getPodId(), clusterVO.getDataCenterId(), null);
         for (final HostVO host : allhostsInCluster) {
             if (!allocatorAvoidOutput.shouldAvoid(host)) {
                 // there's some host in the cluster that is not yet in avoid set
@@ -1298,7 +1299,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -1372,7 +1373,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
+    public boolean postStateTransitionEvent(final Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
         if (!status) {
             return false;
         }

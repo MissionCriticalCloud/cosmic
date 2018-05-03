@@ -35,9 +35,9 @@ import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
@@ -68,7 +68,7 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.Storage;
@@ -863,7 +863,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         try {
             _itMgr.expunge(ssvm.getUuid());
             _secStorageVmDao.remove(ssvm.getId());
-            final HostVO host = _hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), Host.Type.SecondaryStorageVM);
+            final HostVO host = _hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), HostType.SecondaryStorageVM);
             if (host != null) {
                 logger.debug("Removing host entry for ssvm id=" + vmId);
                 _hostDao.remove(host.getId());
@@ -901,8 +901,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         thiscpc.addPortConfig(thisSecStorageVm.getPublicIpAddress(), copyPort, true, TemplateConstants.DEFAULT_TMPLT_COPY_INTF);
 
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.SecondaryStorageVM);
-        sc.and(sc.entity().getStatus(), Op.IN, Status.Up, Status.Connecting);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.SecondaryStorageVM);
+        sc.and(sc.entity().getStatus(), Op.IN, HostStatus.Up, HostStatus.Connecting);
         final List<HostVO> ssvms = sc.list();
         for (final HostVO ssvm : ssvms) {
             if (ssvm.getId() == ssAHostId) {
@@ -939,7 +939,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public boolean generateVMSetupCommand(final Long ssAHostId) {
         final HostVO ssAHost = _hostDao.findById(ssAHostId);
-        if (ssAHost.getType() != Host.Type.SecondaryStorageVM) {
+        if (ssAHost.getType() != HostType.SecondaryStorageVM) {
             return false;
         }
         final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(ssAHost.getName());
@@ -994,7 +994,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     public boolean generateSetupCommand(final Long ssHostId) {
         final HostVO cssHost = _hostDao.findById(ssHostId);
         final Long zoneId = cssHost.getDataCenterId();
-        if (cssHost.getType() == Host.Type.SecondaryStorageVM) {
+        if (cssHost.getType() == HostType.SecondaryStorageVM) {
 
             final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(cssHost.getName());
             if (secStorageVm == null) {
@@ -1045,16 +1045,16 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         if (dcId != null) {
             sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
         }
-        sc.and(sc.entity().getState(), Op.IN, Status.Up, Status.Connecting);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.SecondaryStorageVM);
+        sc.and(sc.entity().getState(), Op.IN, HostStatus.Up, HostStatus.Connecting);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.SecondaryStorageVM);
         return sc.list();
     }
 
     @Override
     public HostVO pickSsvmHost(final HostVO ssHost) {
-        if (ssHost.getType() == Host.Type.LocalSecondaryStorage) {
+        if (ssHost.getType() == HostType.LocalSecondaryStorage) {
             return ssHost;
-        } else if (ssHost.getType() == Host.Type.SecondaryStorage) {
+        } else if (ssHost.getType() == HostType.SecondaryStorage) {
             final Long dcId = ssHost.getDataCenterId();
             final List<HostVO> ssAHosts = listUpAndConnectingSecondaryStorageVmHost(dcId);
             if (ssAHosts == null || ssAHosts.isEmpty()) {
@@ -1185,7 +1185,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             return null;
         }
 
-        host.setType(com.cloud.host.Host.Type.SecondaryStorageVM);
+        host.setType(HostType.SecondaryStorageVM);
         return host;
     }
 

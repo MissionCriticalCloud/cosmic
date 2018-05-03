@@ -16,9 +16,9 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HaWork.HaWorkStep;
 import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.dao.HighAvailabilityDao;
-import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.model.enumeration.HypervisorType;
@@ -137,7 +137,7 @@ public class HighAvailabilityManagerImplTest {
 
     @Test
     public void scheduleRestartForVmsOnHost() {
-        Mockito.when(hostVO.getType()).thenReturn(Host.Type.Routing);
+        Mockito.when(hostVO.getType()).thenReturn(HostType.Routing);
         Mockito.when(hostVO.getHypervisorType()).thenReturn(HypervisorType.KVM);
         Mockito.when(_instanceDao.listByHostId(42l)).thenReturn(Arrays.asList(Mockito.mock(VMInstanceVO.class)));
         Mockito.when(_podDao.findById(Mockito.anyLong())).thenReturn(Mockito.mock(HostPodVO.class));
@@ -149,7 +149,7 @@ public class HighAvailabilityManagerImplTest {
     @Test
     public void scheduleRestartForVmsOnHostNonEmptyVMList() {
         Mockito.when(hostVO.getId()).thenReturn(1l);
-        Mockito.when(hostVO.getType()).thenReturn(Host.Type.Routing);
+        Mockito.when(hostVO.getType()).thenReturn(HostType.Routing);
         Mockito.when(hostVO.getHypervisorType()).thenReturn(HypervisorType.XenServer);
         final List<VMInstanceVO> vms = new ArrayList<>();
         final VMInstanceVO vm1 = Mockito.mock(VMInstanceVO.class);
@@ -184,9 +184,9 @@ public class HighAvailabilityManagerImplTest {
         investigators.add(investigator);
         highAvailabilityManager.setInvestigators(investigators);
         // Mock isAgentAlive to return host status as Down
-        Mockito.when(investigator.isAgentAlive(hostVO)).thenReturn(Status.Down);
+        Mockito.when(investigator.isAgentAlive(hostVO)).thenReturn(HostStatus.Down);
 
-        assertTrue(highAvailabilityManager.investigate(1l) == Status.Down);
+        assertTrue(highAvailabilityManager.investigate(1l) == HostStatus.Down);
     }
 
     @Test

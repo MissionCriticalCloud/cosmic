@@ -4,7 +4,8 @@ import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.serializer.Param;
 
@@ -27,7 +28,7 @@ public class HostResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.STATE)
     @Param(description = "the state of the host")
-    private Status state;
+    private HostStatus state;
 
     @SerializedName("disconnected")
     @Param(description = "true if the host is disconnected. False otherwise.")
@@ -35,7 +36,7 @@ public class HostResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.TYPE)
     @Param(description = "the host type")
-    private Host.Type hostType;
+    private HostType hostType;
 
     @SerializedName("oscategoryid")
     @Param(description = "the OS category ID of the host")
@@ -265,7 +266,7 @@ public class HostResponse extends BaseResponse {
         this.name = name;
     }
 
-    public void setState(final Status state) {
+    public void setState(final HostStatus state) {
         this.state = state;
     }
 
@@ -273,7 +274,7 @@ public class HostResponse extends BaseResponse {
         this.disconnectedOn = disconnectedOn;
     }
 
-    public void setHostType(final Host.Type hostType) {
+    public void setHostType(final HostType hostType) {
         this.hostType = hostType;
     }
 

@@ -25,8 +25,7 @@ import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.framework.security.keystore.KeystoreVO;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.info.ConsoleProxyLoadInfo;
@@ -38,9 +37,11 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managementserver.ManagementServerService;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolStatus;
@@ -58,7 +59,6 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.Storage;
@@ -1263,7 +1263,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             proxy.setPrivateIpAddress(null);
             _consoleProxyDao.update(proxy.getId(), proxy);
             _consoleProxyDao.remove(vmId);
-            final HostVO host = _hostDao.findByTypeNameAndZoneId(proxy.getDataCenterId(), proxy.getHostName(), Host.Type.ConsoleProxy);
+            final HostVO host = _hostDao.findByTypeNameAndZoneId(proxy.getDataCenterId(), proxy.getHostName(), HostType.ConsoleProxy);
             if (host != null) {
                 logger.debug("Removing host entry for proxy id=" + vmId);
                 return _hostDao.remove(host.getId());
@@ -1314,7 +1314,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             return null;
         }
 
-        host.setType(com.cloud.host.Host.Type.ConsoleProxy);
+        host.setType(HostType.ConsoleProxy);
         return host;
     }
 
@@ -1331,7 +1331,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
 
     protected HostVO findConsoleProxyHostByName(final String name) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.ConsoleProxy);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.ConsoleProxy);
         sc.and(sc.entity().getName(), Op.EQ, name);
         return sc.find();
     }
@@ -1379,16 +1379,16 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         }
 
         @Override
-        public void onAgentDisconnect(final long agentId, final com.cloud.host.Status state) {
+        public void onAgentDisconnect(final long agentId, final HostStatus state) {
 
-            if (state == com.cloud.host.Status.Alert || state == com.cloud.host.Status.Disconnected) {
+            if (state == HostStatus.Alert || state == HostStatus.Disconnected) {
                 // be it either in alert or in disconnected state, the agent
                 // process
                 // may be gone in the VM,
                 // we will be reacting to stop the corresponding VM and let the
                 // scan
                 final HostVO host = _hostDao.findById(agentId);
-                if (host.getType() == Type.ConsoleProxy) {
+                if (host.getType() == HostType.ConsoleProxy) {
                     final String name = host.getName();
                     logger.info("Console proxy agent disconnected, proxy: " + name);
                     if (name != null && name.startsWith("v-")) {

@@ -90,7 +90,7 @@ public class XenserverSnapshotStrategy extends SnapshotStrategyBase {
         }
 
         if (!Snapshot.State.BackedUp.equals(snapshotVO.getState()) && !Snapshot.State.Error.equals(snapshotVO.getState())) {
-            throw new InvalidParameterValueException("Can't delete snapshotshot " + snapshotId + " due to it is in " + snapshotVO.getState() + " Status");
+            throw new InvalidParameterValueException("Can't delete snapshotshot " + snapshotId + " due to it is in " + snapshotVO.getState() + " HostStatus");
         }
 
         // first mark the snapshot as destroyed, so that ui can't see it, but we

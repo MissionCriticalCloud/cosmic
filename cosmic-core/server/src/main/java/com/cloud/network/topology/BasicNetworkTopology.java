@@ -3,7 +3,7 @@ package com.cloud.network.topology;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Pod;
@@ -368,7 +368,7 @@ public class BasicNetworkTopology implements NetworkTopology {
             s_logger.debug("Applying " + typeString + " in network " + network);
 
             if (router.isStopPending()) {
-                if (_hostDao.findById(router.getHostId()).getState() == Status.Up) {
+                if (_hostDao.findById(router.getHostId()).getState() == HostStatus.Up) {
                     throw new ResourceUnavailableException("Unable to process due to the stop pending router " + router.getInstanceName()
                             + " haven't been stopped after it's host coming back!", DataCenter.class, router.getDataCenterId());
                 }

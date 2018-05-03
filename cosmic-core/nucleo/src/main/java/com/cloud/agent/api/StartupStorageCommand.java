@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.Storage;
 import com.cloud.storage.template.TemplateProp;
@@ -20,11 +20,11 @@ public class StartupStorageCommand extends StartupCommand {
     String nfsShare;
 
     public StartupStorageCommand() {
-        super(Host.Type.Storage);
+        super(HostType.Storage);
     }
 
     public StartupStorageCommand(final String parent, final StoragePoolType fsType, final long totalSize, final Map<String, TemplateProp> info) {
-        super(Host.Type.Storage);
+        super(HostType.Storage);
         this.parent = parent;
         this.totalSize = totalSize;
         this.templateInfo = info;
@@ -33,7 +33,7 @@ public class StartupStorageCommand extends StartupCommand {
     }
 
     public StartupStorageCommand(final String parent, final StoragePoolType fsType, final Map<String, TemplateProp> templateInfo, final StoragePoolInfo poolInfo) {
-        super(Host.Type.Storage);
+        super(HostType.Storage);
         this.parent = parent;
         this.templateInfo = templateInfo;
         this.totalSize = poolInfo.capacityBytes;

@@ -61,8 +61,8 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -78,6 +78,7 @@ import com.cloud.legacymodel.exceptions.ResourceInUseException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.StorageConflictException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
@@ -85,12 +86,12 @@ import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.CapacityState;
 import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.resource.ResourceState;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.StatsCollector;
@@ -341,7 +342,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
              * cmd
              */
         }
-        final List<StoragePoolHostVO> poolHosts = _storagePoolHostDao.listByHostStatus(poolVO.getId(), Status.Up);
+        final List<StoragePoolHostVO> poolHosts = _storagePoolHostDao.listByHostStatus(poolVO.getId(), HostStatus.Up);
         Collections.shuffle(poolHosts);
         if (poolHosts != null && poolHosts.size() > 0) {
             for (final StoragePoolHostVO sphvo : poolHosts) {
@@ -835,7 +836,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             throw new InvalidParameterValueException("Can not find out the secondary storage id: " + secStorageId);
         }
 
-        if (secHost.getType() != Host.Type.SecondaryStorage) {
+        if (secHost.getType() != HostType.SecondaryStorage) {
             throw new InvalidParameterValueException("host: " + secStorageId + " is not a secondary storage");
         }
 
@@ -864,7 +865,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     public List<Long> getUpHostsInPool(final long poolId) {
         final SearchCriteria<Long> sc = UpHostsInPoolSearch.create();
         sc.setParameters("pool", poolId);
-        sc.setJoinParameters("hosts", "status", Status.Up);
+        sc.setJoinParameters("hosts", "status", HostStatus.Up);
         sc.setJoinParameters("hosts", "resourceState", ResourceState.Enabled);
         return _storagePoolHostDao.customSearch(sc, null);
     }

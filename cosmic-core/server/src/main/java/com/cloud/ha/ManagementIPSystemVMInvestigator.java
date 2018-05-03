@@ -1,8 +1,8 @@
 package com.cloud.ha;
 
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.NetworkModel;
@@ -59,20 +59,20 @@ public class ManagementIPSystemVMInvestigator extends AbstractInvestigatorImpl {
             // get the data center IP address, find a host on the pod, use that host to ping the data center IP address
             final List<Long> otherHosts = findHostByPod(vmHost.getPodId(), vm.getHostId());
             for (final Long otherHost : otherHosts) {
-                final Status vmState = testIpAddress(otherHost, nic.getIPv4Address());
+                final HostStatus vmState = testIpAddress(otherHost, nic.getIPv4Address());
                 assert vmState != null;
-                // In case of Status.Unknown, next host will be tried
-                if (vmState == Status.Up) {
+                // In case of HostStatus.Unknown, next host will be tried
+                if (vmState == HostStatus.Up) {
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("successfully pinged vm's private IP (" + vm.getPrivateIpAddress() + "), returning that the VM is up");
                     }
                     return Boolean.TRUE;
-                } else if (vmState == Status.Down) {
+                } else if (vmState == HostStatus.Down) {
                     // We can't ping the VM directly...if we can ping the host, then report the VM down.
                     // If we can't ping the host, then we don't have enough information.
-                    final Status vmHostState = testIpAddress(otherHost, vmHost.getPrivateIpAddress());
+                    final HostStatus vmHostState = testIpAddress(otherHost, vmHost.getPrivateIpAddress());
                     assert vmHostState != null;
-                    if (vmHostState == Status.Up) {
+                    if (vmHostState == HostStatus.Up) {
                         if (s_logger.isDebugEnabled()) {
                             s_logger.debug("successfully pinged vm's host IP (" + vmHost.getPrivateIpAddress() +
                                     "), but could not ping VM, returning that the VM is down");
@@ -90,7 +90,7 @@ public class ManagementIPSystemVMInvestigator extends AbstractInvestigatorImpl {
     }
 
     @Override
-    public Status isAgentAlive(final Host agent) {
+    public HostStatus isAgentAlive(final Host agent) {
         return null;
     }
 

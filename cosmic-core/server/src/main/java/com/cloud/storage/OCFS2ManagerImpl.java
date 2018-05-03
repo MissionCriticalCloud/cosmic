@@ -11,6 +11,7 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.ResourceListener;
 import com.cloud.resource.ResourceManager;
@@ -131,7 +132,7 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
         sc.and(sc.entity().getClusterId(), Op.EQ, clusterId);
         sc.and(sc.entity().getPodId(), Op.EQ, cluster.getPodId());
         sc.and(sc.entity().getDataCenterId(), Op.EQ, cluster.getDataCenterId());
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
         final List<HostVO> hosts = sc.list();
         if (hosts.isEmpty()) {
             s_logger.debug("There is no host in cluster " + clusterId + ", no need to prepare OCFS2 nodes");

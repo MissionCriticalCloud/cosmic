@@ -1,9 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupTrafficMonitorCommand extends StartupCommand {
     public StartupTrafficMonitorCommand() {
-        super(Host.Type.TrafficMonitor);
+        super(HostType.TrafficMonitor);
     }
 }

@@ -6,7 +6,7 @@ import com.cloud.agent.api.CheckVirtualMachineCommand;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.PowerState;
@@ -46,7 +46,7 @@ public class CheckOnAgentInvestigator extends AdapterBase implements Investigato
     }
 
     @Override
-    public Status isAgentAlive(final Host agent) {
+    public HostStatus isAgentAlive(final Host agent) {
         return null;
     }
 }

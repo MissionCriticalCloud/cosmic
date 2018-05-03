@@ -13,7 +13,7 @@ import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Stat
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.UploadStatusAnswer;
@@ -138,7 +138,7 @@ public class ImageStoreUploadMonitorImpl extends ManagerBase implements ImageSto
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 

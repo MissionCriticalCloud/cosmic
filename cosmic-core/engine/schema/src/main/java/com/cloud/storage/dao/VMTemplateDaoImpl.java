@@ -2,7 +2,7 @@ package com.cloud.storage.dao;
 
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -306,7 +306,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     public VMTemplateVO findSystemVMTemplate(final long zoneId) {
         final SearchCriteria<VMTemplateVO> sc = tmpltTypeHyperSearch.create();
         sc.setParameters("templateType", Storage.TemplateType.SYSTEM);
-        sc.setJoinParameters("tmplHyper", "type", Host.Type.Routing);
+        sc.setJoinParameters("tmplHyper", "type", HostType.Routing);
         sc.setJoinParameters("tmplHyper", "zoneId", zoneId);
 
         // order by descending order of id and select the first (this is going
@@ -325,7 +325,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
         final SearchCriteria<VMTemplateVO> sc = readySystemTemplateSearch.create();
         sc.setParameters("templateType", Storage.TemplateType.SYSTEM);
         sc.setParameters("state", VirtualMachineTemplate.State.Active);
-        sc.setJoinParameters("tmplHyper", "type", Host.Type.Routing);
+        sc.setJoinParameters("tmplHyper", "type", HostType.Routing);
         sc.setJoinParameters("tmplHyper", "zoneId", zoneId);
         sc.setJoinParameters("vmTemplateJoinTemplateStoreRef", "downloadState", VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
 

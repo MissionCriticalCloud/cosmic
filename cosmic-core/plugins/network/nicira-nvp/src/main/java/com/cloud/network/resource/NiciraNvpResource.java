@@ -4,10 +4,9 @@ import com.cloud.agent.IAgentControl;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupNiciraNvpCommand;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.network.nicira.ControlClusterStatus;
 import com.cloud.network.nicira.ControlClusterStatus.ClusterRoleConfig;
 import com.cloud.network.nicira.DestinationNatRule;
@@ -132,9 +131,9 @@ public class NiciraNvpResource implements ServerResource {
     }
 
     @Override
-    public Type getType() {
+    public HostType getType() {
         // Think up a better name for this Type?
-        return Host.Type.L2Networking;
+        return HostType.L2Networking;
     }
 
     @Override
@@ -175,7 +174,7 @@ public class NiciraNvpResource implements ServerResource {
             rotateNiciraNvpApi();
             return null;
         }
-        return new PingCommand(Host.Type.L2Networking, id);
+        return new PingCommand(HostType.L2Networking, id);
     }
 
     private void rotateNiciraNvpApi() {

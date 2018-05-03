@@ -11,7 +11,7 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
@@ -71,7 +71,7 @@ public class SshKeysDistriMonitor implements Listener {
     }
 
     @Override
-    public synchronized boolean processDisconnect(final long agentId, final Status state) {
+    public synchronized boolean processDisconnect(final long agentId, final HostStatus state) {
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Agent disconnected, agent id: " + agentId + ", state: " + state + ". Will notify waiters");
         }

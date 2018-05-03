@@ -24,9 +24,8 @@ import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.host.Status.Event;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -34,6 +33,8 @@ import com.cloud.legacymodel.exceptions.TaskExecutionException;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.model.enumeration.Event;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ServerResource;
 import com.cloud.serializer.GsonHelper;
 import com.cloud.utils.DateUtil;
@@ -185,17 +186,17 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
     }
 
     @Override
-    protected boolean handleDisconnectWithInvestigation(final AgentAttache attache, final Status.Event event) {
+    protected boolean handleDisconnectWithInvestigation(final AgentAttache attache, final Event event) {
         return handleDisconnect(attache, event, true, true, true);
     }
 
     @Override
-    protected boolean handleDisconnectWithoutInvestigation(final AgentAttache attache, final Status.Event event, final boolean transitState, final boolean removeAgent) {
+    protected boolean handleDisconnectWithoutInvestigation(final AgentAttache attache, final Event event, final boolean transitState, final boolean removeAgent) {
         return handleDisconnect(attache, event, false, true, removeAgent);
     }
 
     @Override
-    public void removeAgent(final AgentAttache attache, final Status nextState) {
+    public void removeAgent(final AgentAttache attache, final HostStatus nextState) {
         if (attache == null) {
             return;
         }
@@ -277,7 +278,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
             _agents.put(host.getId(), attache);
         }
         if (old != null) {
-            old.disconnect(Status.Removed);
+            old.disconnect(HostStatus.Removed);
         }
         return attache;
     }
@@ -292,7 +293,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
             _agents.put(host.getId(), attache);
         }
         if (old != null) {
-            old.disconnect(Status.Removed);
+            old.disconnect(HostStatus.Removed);
         }
         return attache;
     }
@@ -398,12 +399,12 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Remove stale agent attache from current management server");
             }
-            removeAgent(old, Status.Removed);
+            removeAgent(old, HostStatus.Removed);
         }
         return attache;
     }
 
-    protected boolean handleDisconnect(final AgentAttache agent, final Status.Event event, final boolean investigate, final boolean broadcast, final boolean removeAgent) {
+    protected boolean handleDisconnect(final AgentAttache agent, final Event event, final boolean investigate, final boolean broadcast, final boolean removeAgent) {
         final boolean res;
         if (!investigate) {
             res = super.handleDisconnectWithoutInvestigation(agent, event, true, removeAgent);
@@ -456,11 +457,11 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
                 if (!_agentLbHappened) {
                     QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
                     sc.and(sc.entity().getManagementServerId(), Op.NNULL);
-                    sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
+                    sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
                     final List<HostVO> allManagedRoutingAgents = sc.list();
 
                     sc = QueryBuilder.create(HostVO.class);
-                    sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
+                    sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
                     final List<HostVO> allAgents = sc.list();
                     final double allHostsCount = allAgents.size();
                     final double managedHostsCount = allManagedRoutingAgents.size();
@@ -602,7 +603,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
                                 if (s_logger.isInfoEnabled()) {
                                     s_logger.info(host + " is detected down, but we have a forward attache running, disconnect this one before launching the host");
                                 }
-                                removeAgent(agentattache, Status.Disconnected);
+                                removeAgent(agentattache, HostStatus.Disconnected);
                             } else {
                                 continue;
                             }
@@ -778,7 +779,7 @@ public class ClusteredAgentManagerImpl extends AgentManagerImpl implements Clust
         final List<ManagementServerHostVO> allMS = _mshostDao.listBy(ManagementServerHost.State.Up);
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getManagementServerId(), Op.NNULL);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
         final List<HostVO> allManagedAgents = sc.list();
 
         int avLoad = 0;

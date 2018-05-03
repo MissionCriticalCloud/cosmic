@@ -1,7 +1,7 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.host.Host;
 import com.cloud.info.RunningHostCountInfo;
+import com.cloud.model.enumeration.HostType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +17,10 @@ public class RunningHostInfoAgregator {
         if (countInfo.getCount() > 0) {
             final ZoneHostInfo zoneInfo = getZoneHostInfo(countInfo.getDcId());
 
-            final Host.Type type = Enum.valueOf(Host.Type.class, countInfo.getHostType());
-            if (type == Host.Type.Routing) {
+            final HostType type = Enum.valueOf(HostType.class, countInfo.getHostType());
+            if (type == HostType.Routing) {
                 zoneInfo.setFlag(ZoneHostInfo.ROUTING_HOST_MASK);
-            } else if (type == Host.Type.Storage || type == Host.Type.SecondaryStorage) {
+            } else if (type == HostType.Storage || type == HostType.SecondaryStorage) {
                 zoneInfo.setFlag(ZoneHostInfo.STORAGE_HOST_MASK);
             }
         }

@@ -45,8 +45,10 @@ import com.cloud.legacymodel.exceptions.IllegalVirtualMachineException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.network.ExternalNetworkDeviceManager.NetworkDevice;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
@@ -74,10 +76,9 @@ import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.resource.ResourceManager;
-import com.cloud.resource.ResourceState;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.DB;
@@ -536,7 +537,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         try {
             resource.configure(cmd.getHost(), hostdetails);
 
-            final Host host = resourceMgr.addHost(zoneId, resource, Host.Type.L2Networking, params);
+            final Host host = resourceMgr.addHost(zoneId, resource, HostType.L2Networking, params);
             if (host != null) {
                 return Transaction.execute(new TransactionCallback<NiciraNvpDeviceVO>() {
                     @Override
@@ -688,13 +689,13 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         if (!(startup[0] instanceof StartupNiciraNvpCommand)) {
             return null;
         }
-        host.setType(Host.Type.L2Networking);
+        host.setType(HostType.L2Networking);
         return host;
     }
 
     @Override
     public DeleteHostAnswer deleteHost(final HostVO host, final boolean isForced, final boolean isForceDeleteStorage) throws UnableDeleteHostException {
-        if (!(host.getType() == Host.Type.L2Networking)) {
+        if (!(host.getType() == HostType.L2Networking)) {
             return null;
         }
         return new DeleteHostAnswer(true);

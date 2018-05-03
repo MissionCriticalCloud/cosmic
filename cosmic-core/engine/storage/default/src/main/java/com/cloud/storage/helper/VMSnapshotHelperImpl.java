@@ -3,11 +3,12 @@ package com.cloud.storage.helper;
 import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -64,7 +65,7 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
         // check if lastHostId is available
         if (vm.getLastHostId() != null) {
             final HostVO lastHost = hostDao.findByIdIncludingRemoved(vm.getLastHostId());
-            if (lastHost.getStatus() == com.cloud.host.Status.Up && !lastHost.isInMaintenanceStates()) {
+            if (lastHost.getStatus() == HostStatus.Up && !lastHost.isInMaintenanceStates()) {
                 return lastHost.getId();
             }
         }
@@ -83,7 +84,7 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
             throw new InvalidParameterValueException("storage pool is not found");
         }
         final List<HostVO> listHost =
-                hostDao.listAllUpAndEnabledNonHAHosts(Host.Type.Routing, storagePool.getClusterId(), storagePool.getPodId(), storagePool.getDataCenterId(), null);
+                hostDao.listAllUpAndEnabledNonHAHosts(HostType.Routing, storagePool.getClusterId(), storagePool.getPodId(), storagePool.getDataCenterId(), null);
         if (listHost == null || listHost.size() == 0) {
             throw new InvalidParameterValueException("no host in up state is found");
         }

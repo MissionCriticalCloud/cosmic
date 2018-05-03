@@ -1,9 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupExternalLoadBalancerCommand extends StartupCommand {
     public StartupExternalLoadBalancerCommand() {
-        super(Host.Type.ExternalLoadBalancer);
+        super(HostType.ExternalLoadBalancer);
     }
 }

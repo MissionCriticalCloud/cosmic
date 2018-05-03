@@ -14,17 +14,17 @@ import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
-import com.cloud.host.Host;
 import com.cloud.host.HostStats;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
-import com.cloud.resource.ResourceState;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StorageStats;
@@ -314,16 +314,16 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
             s_logger.debug("HostStatsCollector is running...");
 
             final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
-            sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
+            sc.addAnd("status", SearchCriteria.Op.EQ, HostStatus.Up.toString());
             sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.Storage.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ConsoleProxy.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorage.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ExternalLoadBalancer.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.L2Networking.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.Storage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.ConsoleProxy.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.SecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.LocalSecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.TrafficMonitor.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.SecondaryStorageVM.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.ExternalLoadBalancer.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.L2Networking.toString());
             final ConcurrentHashMap<Long, HostStats> hostStats = new ConcurrentHashMap<>();
             final List<HostVO> hosts = _hostDao.search(sc, null);
             for (final HostVO host : hosts) {
@@ -363,14 +363,14 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
             s_logger.debug("VmStatsCollector is running...");
 
             final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
-            sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
+            sc.addAnd("status", SearchCriteria.Op.EQ, HostStatus.Up.toString());
             sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance);
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.Storage.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.ConsoleProxy.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorage.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.LocalSecondaryStorage.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.TrafficMonitor.toString());
-            sc.addAnd("type", SearchCriteria.Op.NEQ, Host.Type.SecondaryStorageVM.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.Storage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.ConsoleProxy.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.SecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.LocalSecondaryStorage.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.TrafficMonitor.toString());
+            sc.addAnd("type", SearchCriteria.Op.NEQ, HostType.SecondaryStorageVM.toString());
             final List<HostVO> hosts = _hostDao.search(sc, null);
 
             /* HashMap for metrics to be send to Graphite */
@@ -515,10 +515,10 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
                     @Override
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         final SearchCriteria<HostVO> sc = _hostDao.createSearchCriteria();
-                        sc.addAnd("status", SearchCriteria.Op.EQ, Status.Up.toString());
+                        sc.addAnd("status", SearchCriteria.Op.EQ, HostStatus.Up.toString());
                         sc.addAnd("resourceState", SearchCriteria.Op.NIN, ResourceState.Maintenance, ResourceState.PrepareForMaintenance,
                                 ResourceState.ErrorInMaintenance);
-                        sc.addAnd("type", SearchCriteria.Op.EQ, Host.Type.Routing.toString());
+                        sc.addAnd("type", SearchCriteria.Op.EQ, HostType.Routing.toString());
                         sc.addAnd("hypervisorType", SearchCriteria.Op.EQ, HypervisorType.KVM); // support KVM only util 2013.06.25
                         final List<HostVO> hosts = _hostDao.search(sc, null);
 

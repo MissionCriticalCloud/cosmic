@@ -31,7 +31,7 @@ import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.host.Host.Type;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ClockDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ConsoleDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.CpuModeDef;
@@ -1612,7 +1612,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingRoutingCommand(com.cloud.host.Host.Type.Routing, id, this.getHostVmStateReport());
+        return new PingRoutingCommand(HostType.Routing, id, this.getHostVmStateReport());
     }
 
     public void createVbd(final Connect conn, final VirtualMachineTO vmSpec, final String vmName, final LibvirtVmDef vm)
@@ -1738,8 +1738,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     @Override
-    public Type getType() {
-        return Type.Routing;
+    public HostType getType() {
+        return HostType.Routing;
     }
 
     private DiskControllerType getGuestDiskModel(final String platformEmulator) {

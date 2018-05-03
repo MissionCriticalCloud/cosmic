@@ -29,8 +29,7 @@ import com.cloud.agent.api.storage.ListVolumeAnswer;
 import com.cloud.agent.api.storage.ListVolumeCommand;
 import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.framework.security.keystore.KeystoreManager;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
 import com.cloud.legacymodel.communication.answer.UploadStatusAnswer;
@@ -1257,12 +1256,12 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     }
 
     @Override
-    public Type getType() {
+    public HostType getType() {
         if (SecondaryStorageVm.Role.templateProcessor.toString().equals(_role)) {
-            return Host.Type.SecondaryStorage;
+            return HostType.SecondaryStorage;
         }
 
-        return Host.Type.SecondaryStorageCmdExecutor;
+        return HostType.SecondaryStorageCmdExecutor;
     }
 
     @Override
@@ -1290,7 +1289,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingStorageCommand(Host.Type.Storage, id, new HashMap<>());
+        return new PingStorageCommand(HostType.Storage, id, new HashMap<>());
     }
 
     @Override

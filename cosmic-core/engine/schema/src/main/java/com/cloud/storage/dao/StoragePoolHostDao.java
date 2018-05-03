@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.utils.db.GenericDao;
@@ -14,7 +14,7 @@ public interface StoragePoolHostDao extends GenericDao<StoragePoolHostVO, Long> 
 
     public StoragePoolHostVO findByPoolHost(long poolId, long hostId);
 
-    List<StoragePoolHostVO> listByHostStatus(long poolId, Status hostStatus);
+    List<StoragePoolHostVO> listByHostStatus(long poolId, HostStatus hostStatus);
 
     List<Pair<Long, Integer>> getDatacenterStoragePoolHostInfo(long dcId, boolean sharedOnly);
 

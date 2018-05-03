@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HostType;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,7 @@ public class PingRoutingWithOvsCommand extends PingRoutingCommand {
         super();
     }
 
-    public PingRoutingWithOvsCommand(final Host.Type type, final long id, final Map<String, HostVmStateReportEntry> hostVmStateReport,
+    public PingRoutingWithOvsCommand(final HostType type, final long id, final Map<String, HostVmStateReportEntry> hostVmStateReport,
                                      final List<Pair<String, Long>> ovsStates) {
         super(type, id, hostVmStateReport);
 

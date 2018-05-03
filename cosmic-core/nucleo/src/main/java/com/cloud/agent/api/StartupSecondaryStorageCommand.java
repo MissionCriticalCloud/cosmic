@@ -1,11 +1,11 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupSecondaryStorageCommand extends StartupCommand {
 
     public StartupSecondaryStorageCommand() {
-        super(Host.Type.SecondaryStorage);
+        super(HostType.SecondaryStorage);
         setIqn("NoIqn");
     }
 

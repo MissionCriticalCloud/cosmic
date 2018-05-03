@@ -32,7 +32,7 @@ import java.util.UUID;
 @Table(name = "vm_instance")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING, length = 32)
-public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, VirtualMachine.Event> {
+public class VMEntityVO implements VirtualMachine, FiniteStateObject<State> {
     @Id
     @TableGenerator(name = "vm_instance_sq", table = "sequence", pkColumnName = "name", valueColumnName = "value", pkColumnValue = "vm_instance_seq", allocationSize = 1)
     @Column(name = "id", updatable = false, nullable = false)

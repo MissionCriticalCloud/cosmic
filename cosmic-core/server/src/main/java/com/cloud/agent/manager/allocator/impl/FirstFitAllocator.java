@@ -14,12 +14,12 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.host.DetailVO;
 import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingDetailsVO;
@@ -87,12 +87,12 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo) {
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo) {
         return allocateTo(vmProfile, plan, type, avoid, returnUpTo, true);
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo, final boolean
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo, final boolean
             considerReservedCapacity) {
 
         final long dcId = plan.getDataCenterId();
@@ -102,7 +102,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         final VMTemplateVO template = (VMTemplateVO) vmProfile.getTemplate();
         final Account account = vmProfile.getOwner();
 
-        if (type == Host.Type.Storage) {
+        if (type == HostType.Storage) {
             // FirstFitAllocator should be used for user VMs only since it won't care whether the host is capable of routing or not
             return new ArrayList<>();
         }
@@ -176,7 +176,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final List<? extends Host> hosts,
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final List<? extends Host> hosts,
                                  final int returnUpTo,
                                  final boolean considerReservedCapacity) {
         final long dcId = plan.getDataCenterId();
@@ -188,7 +188,7 @@ public class FirstFitAllocator extends AdapterBase implements HostAllocator {
         List<Host> suitableHosts = new ArrayList<>();
         final List<Host> hostsCopy = new ArrayList<>(hosts);
 
-        if (type == Host.Type.Storage) {
+        if (type == HostType.Storage) {
             // FirstFitAllocator should be used for user VMs only since it won't care whether the host is capable of
             // routing or not.
             return suitableHosts;

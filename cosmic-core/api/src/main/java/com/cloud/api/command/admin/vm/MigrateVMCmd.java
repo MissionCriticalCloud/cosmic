@@ -21,6 +21,7 @@ import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.uservm.UserVm;
 import com.cloud.vm.VirtualMachine;
 
@@ -109,7 +110,7 @@ public class MigrateVMCmd extends BaseAsyncCmd {
             if (destinationHost == null) {
                 throw new InvalidParameterValueException("Unable to find the host to migrate the VM, host id=" + getHostId());
             }
-            if (destinationHost.getType() != Host.Type.Routing) {
+            if (destinationHost.getType() != HostType.Routing) {
                 throw new InvalidParameterValueException("The specified host(" + destinationHost.getName() + ") is not suitable to migrate the VM, please specify another one");
             }
             CallContext.current().setEventDetails("VM Id: " + getVirtualMachineId() + " to host Id: " + getHostId());

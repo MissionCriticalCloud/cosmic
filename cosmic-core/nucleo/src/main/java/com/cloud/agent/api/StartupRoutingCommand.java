@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.Networks.RouterPrivateIpStrategy;
 
@@ -25,7 +25,7 @@ public class StartupRoutingCommand extends StartupCommand {
     HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<>();
 
     public StartupRoutingCommand() {
-        super(Host.Type.Routing);
+        super(HostType.Routing);
         hostDetails = new HashMap<>();
         getHostDetails().put(RouterPrivateIpStrategy.class.getCanonicalName(), RouterPrivateIpStrategy.DcGlobal.toString());
     }
@@ -48,7 +48,7 @@ public class StartupRoutingCommand extends StartupCommand {
     }
 
     public StartupRoutingCommand(final int cpus, final long memory, final long dom0MinMemory, final String caps, final HypervisorType hypervisorType, final Map<String, String> hostDetails) {
-        super(Host.Type.Routing);
+        super(HostType.Routing);
         this.cpus = cpus;
         this.memory = memory;
         this.dom0MinMemory = dom0MinMemory;

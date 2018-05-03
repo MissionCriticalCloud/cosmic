@@ -1,9 +1,9 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupExternalDhcpCommand extends StartupCommand {
     public StartupExternalDhcpCommand() {
-        super(Host.Type.ExternalDhcp);
+        super(HostType.ExternalDhcp);
     }
 }

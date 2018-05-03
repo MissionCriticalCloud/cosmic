@@ -3,8 +3,8 @@ package com.cloud.vm.snapshot;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.fsm.StateObject;
 
 import java.util.Date;
 

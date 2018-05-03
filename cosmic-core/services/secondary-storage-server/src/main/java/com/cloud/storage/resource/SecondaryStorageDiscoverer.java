@@ -2,7 +2,7 @@ package com.cloud.storage.resource;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status.Event;
+import com.cloud.model.enumeration.Event;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;

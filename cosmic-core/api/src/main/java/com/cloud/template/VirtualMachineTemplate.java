@@ -3,11 +3,12 @@ package com.cloud.template;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
 import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.fsm.StateObject;
+import com.cloud.utils.fsm.Transition;
 
 import java.util.Date;
 import java.util.Map;
@@ -83,13 +84,13 @@ public interface VirtualMachineTemplate extends ControlledEntity, Identity, Inte
         private final static StateMachine2<State, Event, VirtualMachineTemplate> s_fsm = new StateMachine2<>();
 
         static {
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.OperationTimeout, UploadAbandoned, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.UploadRequested, UploadInProgress, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.OperationSucceeded, Active, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(NotUploaded, Event.OperationFailed, UploadError, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadInProgress, Event.OperationSucceeded, Active, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadInProgress, Event.OperationFailed, UploadError, null));
-            s_fsm.addTransition(new StateMachine2.Transition<>(UploadInProgress, Event.OperationTimeout, UploadError, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.OperationTimeout, UploadAbandoned, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.UploadRequested, UploadInProgress, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.OperationSucceeded, Active, null));
+            s_fsm.addTransition(new Transition<>(NotUploaded, Event.OperationFailed, UploadError, null));
+            s_fsm.addTransition(new Transition<>(UploadInProgress, Event.OperationSucceeded, Active, null));
+            s_fsm.addTransition(new Transition<>(UploadInProgress, Event.OperationFailed, UploadError, null));
+            s_fsm.addTransition(new Transition<>(UploadInProgress, Event.OperationTimeout, UploadError, null));
         }
 
         public static StateMachine2<State, Event, VirtualMachineTemplate> getStateMachine() {

@@ -1,6 +1,6 @@
 package com.cloud.utils.fsm;
 
-public interface FiniteStateObject<S, E> {
+public interface FiniteStateObject<S> {
 
     void setState(S state);
 }

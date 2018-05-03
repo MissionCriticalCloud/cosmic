@@ -12,7 +12,7 @@ import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.jobs.AsyncJobManager;
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -292,7 +292,7 @@ public class UploadMonitorImpl extends ManagerBase implements UploadMonitor {
         String errorString = "";
         boolean success = false;
         try {
-            final List<HostVO> storageServers = _resourceMgr.listAllHostsInOneZoneByType(Host.Type.SecondaryStorage, dataCenterId);
+            final List<HostVO> storageServers = _resourceMgr.listAllHostsInOneZoneByType(HostType.SecondaryStorage, dataCenterId);
             if (storageServers == null) {
                 errorString = "No Storage Server found at the datacenter - " + dataCenterId;
                 throw new CloudRuntimeException(errorString);

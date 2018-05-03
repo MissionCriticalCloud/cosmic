@@ -13,7 +13,7 @@ import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreParameters;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -331,7 +331,7 @@ public class CloudStackPrimaryDataStoreLifeCycleImpl implements PrimaryDataStore
         final PrimaryDataStoreInfo primarystore = (PrimaryDataStoreInfo) store;
         // Check if there is host up in this cluster
         final List<HostVO> allHosts =
-                _resourceMgr.listAllUpAndEnabledHosts(Host.Type.Routing, primarystore.getClusterId(), primarystore.getPodId(), primarystore.getDataCenterId());
+                _resourceMgr.listAllUpAndEnabledHosts(HostType.Routing, primarystore.getClusterId(), primarystore.getPodId(), primarystore.getDataCenterId());
         if (allHosts.isEmpty()) {
             primaryDataStoreDao.expunge(primarystore.getId());
             throw new CloudRuntimeException("No host up to associate a storage pool with in cluster " + primarystore.getClusterId());

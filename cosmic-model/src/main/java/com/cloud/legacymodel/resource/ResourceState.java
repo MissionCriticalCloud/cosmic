@@ -1,4 +1,4 @@
-package com.cloud.resource;
+package com.cloud.legacymodel.resource;
 
 import com.cloud.legacymodel.statemachine.StateMachine;
 
@@ -6,7 +6,13 @@ import java.util.List;
 import java.util.Set;
 
 public enum ResourceState {
-    Creating, Enabled, Disabled, PrepareForMaintenance, ErrorInMaintenance, Maintenance, Error;
+    Creating,
+    Enabled,
+    Disabled,
+    PrepareForMaintenance,
+    ErrorInMaintenance,
+    Maintenance,
+    Error;
 
     protected static final StateMachine<ResourceState, Event> s_fsm = new StateMachine<>();
 

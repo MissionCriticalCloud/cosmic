@@ -1,7 +1,5 @@
 package com.cloud.utils.net;
 
-import com.cloud.utils.NumbersUtil;
-
 import java.io.Serializable;
 
 /**
@@ -39,7 +37,7 @@ public class Ip implements Comparable<Ip>, Serializable {
 
     @Override
     public int hashCode() {
-        return NumbersUtil.hash(ip);
+        return (int) (ip ^ (ip >>> 32));
     }
 
     @Override

@@ -457,7 +457,6 @@ import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.DetailVO;
 import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostTagVO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
@@ -486,6 +485,7 @@ import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.dao.IPAddressDao;
@@ -2788,7 +2788,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             throw new InvalidParameterValueException("Unsupported operation, VM uses Local storage, cannot migrate");
         }
 
-        final Type hostType = srcHost.getType();
+        final HostType hostType = srcHost.getType();
         final Pair<List<HostVO>, Integer> allHostsPair;
         final List<HostVO> allHosts;
         final Map<Host, Boolean> requiresStorageMotion = new HashMap<>();
@@ -2857,9 +2857,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         for (final HostAllocator allocator : hostAllocators) {
             if (canMigrateWithStorage) {
-                suitableHosts = allocator.allocateTo(vmProfile, plan, Host.Type.Routing, excludes, allHosts, HostAllocator.RETURN_UPTO_ALL, false);
+                suitableHosts = allocator.allocateTo(vmProfile, plan, HostType.Routing, excludes, allHosts, HostAllocator.RETURN_UPTO_ALL, false);
             } else {
-                suitableHosts = allocator.allocateTo(vmProfile, plan, Host.Type.Routing, excludes, HostAllocator.RETURN_UPTO_ALL, false);
+                suitableHosts = allocator.allocateTo(vmProfile, plan, HostType.Routing, excludes, HostAllocator.RETURN_UPTO_ALL, false);
             }
 
             if (suitableHosts != null && !suitableHosts.isEmpty()) {

@@ -4,8 +4,8 @@ import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.CheckOnHostAnswer;
 import com.cloud.agent.api.CheckOnHostCommand;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.model.enumeration.HypervisorType;
@@ -33,11 +33,11 @@ public class XenServerInvestigator extends AdapterBase implements Investigator {
 
     @Override
     public boolean isVmAlive(final VirtualMachine vm, final Host host) throws UnknownVM {
-        final Status status = isAgentAlive(host);
+        final HostStatus status = isAgentAlive(host);
         if (status == null) {
             throw new UnknownVM();
         }
-        if (status == Status.Up) {
+        if (status == HostStatus.Up) {
             return true;
         } else {
             throw new UnknownVM();
@@ -45,7 +45,7 @@ public class XenServerInvestigator extends AdapterBase implements Investigator {
     }
 
     @Override
-    public Status isAgentAlive(final Host agent) {
+    public HostStatus isAgentAlive(final Host agent) {
         if (agent.getHypervisorType() != HypervisorType.XenServer) {
             return null;
         }
@@ -64,7 +64,7 @@ public class XenServerInvestigator extends AdapterBase implements Investigator {
                     continue;
                 }
                 // even it returns true, that means host is up, but XAPI may not work
-                return ans.isAlive() ? null : Status.Down;
+                return ans.isAlive() ? null : HostStatus.Down;
             }
         }
 

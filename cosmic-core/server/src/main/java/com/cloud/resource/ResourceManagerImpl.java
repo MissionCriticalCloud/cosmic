@@ -62,11 +62,9 @@ import com.cloud.ha.HaWork;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.DetailVO;
 import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostStats;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.host.Status.Event;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
 import com.cloud.host.dao.HostTagsDao;
@@ -80,11 +78,15 @@ import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.CapacityState;
+import com.cloud.model.enumeration.Event;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ManagedState;
 import com.cloud.model.enumeration.StoragePoolStatus;
@@ -310,7 +312,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public Host addHost(final long zoneId, final ServerResource resource, final Type hostType, final Map<String, String> hostDetails) {
+    public Host addHost(final long zoneId, final ServerResource resource, final HostType hostType, final Map<String, String> hostDetails) {
         // Check if the zone exists in the system
         if (_dcDao.findById(zoneId) == null) {
             throw new InvalidParameterValueException("Can't find zone with id " + zoneId);
@@ -389,7 +391,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         final HostPodVO pod = _podDao.findById(host.getPodId());
         final DataCenterVO dc = _dcDao.findById(host.getDataCenterId());
         checkIPConflicts(pod, dc, ssCmd.getPrivateIpAddress(), ssCmd.getPublicIpAddress(), ssCmd.getPublicIpAddress(), ssCmd.getPublicNetmask());
-        host.setType(com.cloud.host.Host.Type.Routing);
+        host.setType(HostType.Routing);
         host.setDetails(details);
         host.setCaps(ssCmd.getCapabilities());
         host.setCpuSockets(ssCmd.getCpuSockets());
@@ -439,7 +441,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
 
     @Override
     public void deleteRoutingHost(final HostVO host, final boolean isForced, final boolean forceDestroyStorage) throws UnableDeleteHostException {
-        if (host.getType() != Host.Type.Routing) {
+        if (host.getType() != HostType.Routing) {
             throw new CloudRuntimeException("Non-Routing host gets in deleteRoutingHost, id is " + host.getId());
         }
 
@@ -534,7 +536,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         }
 
         // TO DO - Make it more granular and have better conversion into capacity type
-        if (host.getType() == Type.Routing) {
+        if (host.getType() == HostType.Routing) {
             final CapacityState capacityState = nextState == ResourceState.Enabled ? CapacityState.Enabled : CapacityState.Disabled;
             final short[] capacityTypes = {Capacity.CAPACITY_TYPE_CPU, Capacity.CAPACITY_TYPE_MEMORY};
             _capacityDao.updateCapacityState(null, null, null, host.getId(), capacityState.toString(), capacityTypes);
@@ -592,7 +594,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         final HostVO host = _hostDao.findById(hostId);
 
         try {
-            if (host.getType() != Host.Type.Storage) {
+            if (host.getType() != HostType.Storage) {
                 final List<VMInstanceVO> vos = _vmDao.listByHostId(hostId);
                 final List<VMInstanceVO> vosMigrating = _vmDao.listVmsMigratingFromHost(hostId);
                 if (vos.isEmpty() && vosMigrating.isEmpty()) {
@@ -671,7 +673,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public List<HostVO> listAllUpAndEnabledHosts(final Type type, final Long clusterId, final Long podId, final long dcId) {
+    public List<HostVO> listAllUpAndEnabledHosts(final HostType type, final Long clusterId, final Long podId, final long dcId) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         if (type != null) {
             sc.and(sc.entity().getType(), Op.EQ, type);
@@ -683,7 +685,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             sc.and(sc.entity().getPodId(), Op.EQ, podId);
         }
         sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         sc.and(sc.entity().getResourceState(), Op.EQ, ResourceState.Enabled);
         return sc.list();
     }
@@ -696,7 +698,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public List<HostVO> listHostsInClusterByStatus(final long clusterId, final Status status) {
+    public List<HostVO> listHostsInClusterByStatus(final long clusterId, final HostStatus status) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getClusterId(), Op.EQ, clusterId);
         sc.and(sc.entity().getStatus(), Op.EQ, status);
@@ -704,11 +706,11 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(final Type type, final long dcId) {
+    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(final HostType type, final long dcId) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getType(), Op.EQ, type);
         sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         sc.and(sc.entity().getResourceState(), Op.EQ, ResourceState.Enabled);
         return sc.list();
     }
@@ -718,7 +720,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getHypervisorType(), Op.EQ, type);
         sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         sc.and(sc.entity().getResourceState(), Op.EQ, ResourceState.Enabled);
         return sc.list();
     }
@@ -728,14 +730,14 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
 
         sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         sc.and(sc.entity().getResourceState(), Op.EQ, ResourceState.Enabled);
 
         return sc.list();
     }
 
     @Override
-    public List<HostVO> listAllHostsInOneZoneByType(final Type type, final long dcId) {
+    public List<HostVO> listAllHostsInOneZoneByType(final HostType type, final long dcId) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getType(), Op.EQ, type);
         sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
@@ -743,7 +745,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public List<HostVO> listAllHostsInAllZonesByType(final Type type) {
+    public List<HostVO> listAllHostsInAllZonesByType(final HostType type) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getType(), Op.EQ, type);
         return sc.list();
@@ -760,7 +762,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             // in adding this new host
             sc.setParameters("id", hostId);
         }
-        sc.setParameters("type", Host.Type.Routing);
+        sc.setParameters("type", HostType.Routing);
 
         // The search is not able to return list of enums, so getting
         // list of hypervisors as strings and then converting them to enum
@@ -852,7 +854,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public List<HostVO> listAllNotInMaintenanceHostsInOneZone(final Type type, final Long dcId) {
+    public List<HostVO> listAllNotInMaintenanceHostsInOneZone(final HostType type, final Long dcId) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
         if (dcId != null) {
             sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
@@ -939,7 +941,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
     }
 
     @Override
-    public List<HostVO> listAllUpAndEnabledNonHAHosts(final Type type, final Long clusterId, final Long podId, final long dcId) {
+    public List<HostVO> listAllUpAndEnabledNonHAHosts(final HostType type, final Long clusterId, final Long podId, final long dcId) {
         final String haTag = _haMgr.getHaTag();
         return _hostDao.listAllUpAndEnabledNonHAHosts(type, clusterId, podId, dcId, haTag);
     }
@@ -1030,14 +1032,14 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         _agentMgr.pullAgentToMaintenance(hostId);
 
         /* TODO: move below to listener */
-        if (host.getType() == Host.Type.Routing) {
+        if (host.getType() == HostType.Routing) {
 
             final List<VMInstanceVO> vms = _vmDao.listByHostId(hostId);
             if (vms.size() == 0) {
                 return true;
             }
 
-            final List<HostVO> hosts = listAllUpAndEnabledHosts(Host.Type.Routing, host.getClusterId(), host.getPodId(), host.getDataCenterId());
+            final List<HostVO> hosts = listAllUpAndEnabledHosts(HostType.Routing, host.getClusterId(), host.getPodId(), host.getDataCenterId());
             for (final VMInstanceVO vm : vms) {
                 if (hosts == null || hosts.isEmpty() || !answer.getMigrate()
                         || _serviceOfferingDetailsDao.findDetail(vm.getServiceOfferingId(), GPU.Keys.vgpuType.toString()) != null) {
@@ -1165,7 +1167,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             public void doInTransactionWithoutResult(final TransactionStatus status) {
 
                 _dcDao.releasePrivateIpAddress(host.getPrivateIpAddress(), host.getDataCenterId(), null);
-                _agentMgr.disconnectWithoutInvestigation(hostId, Status.Event.Remove);
+                _agentMgr.disconnectWithoutInvestigation(hostId, Event.Remove);
 
                 // delete host details
                 _hostDetailsDao.deleteDetails(hostId);
@@ -1473,10 +1475,10 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         try {
             resourceStateTransitTo(host, ResourceState.Event.InternalCreated, _nodeId);
             /* Agent goes to Connecting status */
-            _agentMgr.agentStatusTransitTo(host, Status.Event.AgentConnected, _nodeId);
+            _agentMgr.agentStatusTransitTo(host, Event.AgentConnected, _nodeId);
         } catch (final Exception e) {
             s_logger.debug("Cannot transmit host " + host.getId() + " to Creating state", e);
-            _agentMgr.agentStatusTransitTo(host, Status.Event.Error, _nodeId);
+            _agentMgr.agentStatusTransitTo(host, Event.Error, _nodeId);
             try {
                 resourceStateTransitTo(host, ResourceState.Event.Error, _nodeId);
             } catch (final NoTransitionException e1) {
@@ -1502,7 +1504,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         if (host != null) {
             // Change agent status to Alert, so that host is considered for
             // reconnection next time
-            _agentMgr.agentStatusTransitTo(host, Status.Event.AgentDisconnected, _nodeId);
+            _agentMgr.agentStatusTransitTo(host, Event.AgentDisconnected, _nodeId);
         }
     }
 
@@ -1630,7 +1632,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                     if (resource instanceof KvmDummyResourceBase) {
                         final Map<String, String> details = entry.getValue();
                         final String guid = details.get("guid");
-                        final List<HostVO> kvmHosts = listAllUpAndEnabledHosts(Host.Type.Routing, clusterId, podId, dcId);
+                        final List<HostVO> kvmHosts = listAllUpAndEnabledHosts(HostType.Routing, clusterId, podId, dcId);
                         for (final HostVO host : kvmHosts) {
                             if (host.getGuid().equalsIgnoreCase(guid)) {
                                 if (hostTags != null) {
@@ -2155,17 +2157,17 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                 try {
                     cluster.setManagedState(ManagedState.PrepareUnmanaged);
                     _clusterDao.update(cluster.getId(), cluster);
-                    List<HostVO> hosts = listAllUpAndEnabledHosts(Host.Type.Routing, cluster.getId(), cluster.getPodId(), cluster.getDataCenterId());
+                    List<HostVO> hosts = listAllUpAndEnabledHosts(HostType.Routing, cluster.getId(), cluster.getPodId(), cluster.getDataCenterId());
                     for (final HostVO host : hosts) {
-                        if (host.getType().equals(Host.Type.Routing) && !host.getStatus().equals(Status.Down) && !host.getStatus().equals(Status.Disconnected) &&
-                                !host.getStatus().equals(Status.Up) && !host.getStatus().equals(Status.Alert)) {
+                        if (host.getType().equals(HostType.Routing) && !host.getStatus().equals(HostStatus.Down) && !host.getStatus().equals(HostStatus.Disconnected) &&
+                                !host.getStatus().equals(HostStatus.Up) && !host.getStatus().equals(HostStatus.Alert)) {
                             final String msg = "host " + host.getPrivateIpAddress() + " should not be in " + host.getStatus().toString() + " status";
                             throw new CloudRuntimeException("PrepareUnmanaged Failed due to " + msg);
                         }
                     }
 
                     for (final HostVO host : hosts) {
-                        if (host.getStatus().equals(Status.Up)) {
+                        if (host.getStatus().equals(HostStatus.Up)) {
                             umanageHost(host.getId());
                         }
                     }
@@ -2177,9 +2179,9 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                             Thread.sleep(5 * 1000);
                         } catch (final Exception e) {
                         }
-                        hosts = listAllUpAndEnabledHosts(Host.Type.Routing, cluster.getId(), cluster.getPodId(), cluster.getDataCenterId());
+                        hosts = listAllUpAndEnabledHosts(HostType.Routing, cluster.getId(), cluster.getPodId(), cluster.getDataCenterId());
                         for (final HostVO host : hosts) {
-                            if (!host.getStatus().equals(Status.Down) && !host.getStatus().equals(Status.Disconnected) && !host.getStatus().equals(Status.Alert)) {
+                            if (!host.getStatus().equals(HostStatus.Down) && !host.getStatus().equals(HostStatus.Disconnected) && !host.getStatus().equals(HostStatus.Alert)) {
                                 lsuccess = false;
                                 break;
                             }
@@ -2521,7 +2523,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                     host = _hostDao.findById(host.getId()); // reload
                     // force host status to 'Alert' so that it is loaded for
                     // connection during next scan task
-                    _agentMgr.agentStatusTransitTo(host, Status.Event.AgentDisconnected, _nodeId);
+                    _agentMgr.agentStatusTransitTo(host, Event.AgentDisconnected, _nodeId);
 
                     host = _hostDao.findById(host.getId()); // reload
                     host.setLastPinged(0); // so that scan task can pick it up

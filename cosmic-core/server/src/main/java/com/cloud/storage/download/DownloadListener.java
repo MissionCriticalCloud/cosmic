@@ -16,6 +16,7 @@ import com.cloud.engine.subsystem.api.storage.VolumeService;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -268,7 +269,7 @@ public class DownloadListener implements Listener {
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final com.cloud.host.Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         setDisconnected();
         return true;
     }

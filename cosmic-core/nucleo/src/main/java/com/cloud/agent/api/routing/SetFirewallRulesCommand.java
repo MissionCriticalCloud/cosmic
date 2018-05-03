@@ -1,7 +1,7 @@
 package com.cloud.agent.api.routing;
 
-import com.cloud.agent.api.to.FirewallRuleTO;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.FirewallRuleTO;
 
 import java.util.List;
 

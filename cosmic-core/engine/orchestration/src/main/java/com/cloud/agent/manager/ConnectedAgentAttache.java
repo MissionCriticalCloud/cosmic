@@ -2,7 +2,7 @@ package com.cloud.agent.manager;
 
 import com.cloud.agent.transport.Request;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.utils.nio.Link;
 
 import java.nio.channels.ClosedChannelException;
@@ -53,7 +53,7 @@ public class ConnectedAgentAttache extends AgentAttache {
     }
 
     @Override
-    public void disconnect(final Status state) {
+    public void disconnect(final HostStatus state) {
         synchronized (this) {
             s_logger.debug("Processing Disconnect.");
             if (_link != null) {
@@ -86,7 +86,7 @@ public class ConnectedAgentAttache extends AgentAttache {
             synchronized (this) {
                 if (_link != null) {
                     s_logger.warn("Lost attache " + _id + "(" + _name + ")");
-                    disconnect(Status.Alert);
+                    disconnect(HostStatus.Alert);
                 }
             }
         } finally {

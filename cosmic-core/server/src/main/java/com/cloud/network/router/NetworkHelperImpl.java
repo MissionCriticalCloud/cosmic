@@ -12,8 +12,8 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.dc.DataCenter;
@@ -260,7 +260,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             final State state = router.getState();
             if (router.getHostId() != null && state != State.Running) {
                 final HostVO host = _hostDao.findById(router.getHostId());
-                if (host == null || host.getState() != Status.Up) {
+                if (host == null || host.getState() != HostStatus.Up) {
                     skip = true;
                 }
             }

@@ -19,7 +19,7 @@ import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.managed.context.ManagedContextRunnable;
@@ -78,7 +78,7 @@ public abstract class AgentAttache {
     protected final LinkedList<Request> _requests;
     protected String _name = null;
     protected Long _currentSequence;
-    protected Status _status = Status.Connecting;
+    protected HostStatus _status = HostStatus.Connecting;
     protected boolean _maintenance;
     protected long _nextSequence;
     protected AgentManagerImpl _agentMgr;
@@ -103,15 +103,15 @@ public abstract class AgentAttache {
     }
 
     public void ready() {
-        _status = Status.Up;
+        _status = HostStatus.Up;
     }
 
     public boolean isReady() {
-        return _status == Status.Up;
+        return _status == HostStatus.Up;
     }
 
     public boolean isConnecting() {
-        return _status == Status.Connecting;
+        return _status == HostStatus.Connecting;
     }
 
     public boolean forForward() {
@@ -119,7 +119,7 @@ public abstract class AgentAttache {
     }
 
     protected void checkAvailability(final Command[] cmds) throws AgentUnavailableException {
-        if (!_maintenance && _status != Status.Connecting) {
+        if (!_maintenance && _status != HostStatus.Connecting) {
             return;
         }
 
@@ -131,7 +131,7 @@ public abstract class AgentAttache {
             }
         }
 
-        if (_status == Status.Connecting) {
+        if (_status == HostStatus.Connecting) {
             for (final Command cmd : cmds) {
                 if (Arrays.binarySearch(s_commandsNotAllowedInConnectingMode, cmd.getClass().toString()) >= 0) {
                     throw new AgentUnavailableException("Unable to send " + cmd.getClass().toString() + " because agent " + _name + " is in connecting mode", _id);
@@ -157,7 +157,7 @@ public abstract class AgentAttache {
         }
         final Listener listener = _waitForList.remove(seq);
         if (listener != null) {
-            listener.processDisconnect(_id, Status.Disconnected);
+            listener.processDisconnect(_id, HostStatus.Disconnected);
         }
         final int index = findRequest(seq);
         if (index >= 0) {
@@ -302,12 +302,12 @@ public abstract class AgentAttache {
      */
     public abstract void send(Request req) throws AgentUnavailableException;
 
-    public void cleanup(final Status state) {
+    public void cleanup(final HostStatus state) {
         cancelAllCommands(state, true);
         _requests.clear();
     }
 
-    protected void cancelAllCommands(final Status state, final boolean cancelActive) {
+    protected void cancelAllCommands(final HostStatus state, final boolean cancelActive) {
         if (cancelActive) {
             final Set<Map.Entry<Long, Listener>> entries = _waitForList.entrySet();
             final Iterator<Map.Entry<Long, Listener>> it = entries.iterator();
@@ -459,7 +459,7 @@ public abstract class AgentAttache {
      *
      * @param state state of the agent.
      */
-    public abstract void disconnect(final Status state);
+    public abstract void disconnect(final HostStatus state);
 
     /**
      * Is the agent closed for more commands?

@@ -12,7 +12,7 @@ import com.cloud.storage.Snapshot.State;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.Transition;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;
@@ -53,7 +53,7 @@ public class SnapshotStateListener implements StateListener<State, Event, Snapsh
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final SnapshotVO vo, final boolean status, final Object opaque) {
+    public boolean postStateTransitionEvent(final Transition<State, Event> transition, final SnapshotVO vo, final boolean status, final Object opaque) {
         pubishOnEventBus(transition.getEvent().name(), "postStateTransitionEvent", vo, transition.getCurrentState(), transition.getToState());
         return true;
     }

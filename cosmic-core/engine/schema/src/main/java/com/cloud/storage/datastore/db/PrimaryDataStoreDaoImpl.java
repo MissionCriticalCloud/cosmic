@@ -1,6 +1,6 @@
 package com.cloud.storage.datastore.db;
 
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolStatus;
@@ -116,7 +116,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
             final SearchCriteria<StoragePoolVO> sc = DcPodSearch.create();
             sc.setParameters("datacenterId", datacenterId);
             sc.setParameters("podId", podId);
-            sc.setParameters("status", Status.Up);
+            sc.setParameters("status", HostStatus.Up);
             sc.setParameters("scope", scope);
 
             sc.setParameters("cluster", clusterId);
@@ -125,7 +125,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
             final SearchCriteria<StoragePoolVO> sc = DcPodAnyClusterSearch.create();
             sc.setParameters("datacenterId", datacenterId);
             sc.setParameters("podId", podId);
-            sc.setParameters("status", Status.Up);
+            sc.setParameters("status", HostStatus.Up);
             sc.setParameters("scope", scope);
             return listBy(sc);
         }
@@ -392,7 +392,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
         if (tags == null || tags.length == 0) {
             final QueryBuilder<StoragePoolVO> sc = QueryBuilder.create(StoragePoolVO.class);
             sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
-            sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+            sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
             sc.and(sc.entity().getScope(), Op.EQ, ScopeType.ZONE);
             return sc.list();
         } else {
@@ -440,7 +440,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
     public List<StoragePoolVO> findZoneWideStoragePoolsByHypervisor(final long dataCenterId, final HypervisorType hypervisorType) {
         final QueryBuilder<StoragePoolVO> sc = QueryBuilder.create(StoragePoolVO.class);
         sc.and(sc.entity().getDataCenterId(), Op.EQ, dataCenterId);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         sc.and(sc.entity().getScope(), Op.EQ, ScopeType.ZONE);
         sc.and(sc.entity().getHypervisor(), Op.EQ, hypervisorType);
         return sc.list();
@@ -469,7 +469,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
         final SearchCriteria<StoragePoolVO> sc = hostSearch.create();
         sc.setJoinParameters("hostJoin", "hostId", hostId);
         sc.setParameters("scope", ScopeType.HOST.toString());
-        sc.setParameters("status", Status.Up.toString());
+        sc.setParameters("status", HostStatus.Up.toString());
 
         if (!(tags == null || tags.length == 0)) {
             final Map<String, String> details = tagsToDetails(tags);

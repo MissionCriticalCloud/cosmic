@@ -9,14 +9,16 @@ import com.cloud.dc.PodCluster;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostStats;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.resource.ResourceState.Event;
 import com.cloud.model.Zone;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.resource.ResourceState.Event;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,7 @@ public interface ResourceManager extends ResourceService {
 
     public Host createHostAndAgent(Long hostId, ServerResource resource, Map<String, String> details, boolean old, List<String> hostTags, boolean forRebalance);
 
-    public Host addHost(long zoneId, ServerResource resource, Type hostType, Map<String, String> hostDetails);
+    public Host addHost(long zoneId, ServerResource resource, HostType hostType, Map<String, String> hostDetails);
 
     public HostVO createHostVOForConnectedAgent(StartupCommand[] cmds);
 
@@ -77,21 +79,21 @@ public interface ResourceManager extends ResourceService {
 
     public List<HostVO> findDirectlyConnectedHosts();
 
-    public List<HostVO> listAllUpAndEnabledHosts(Host.Type type, Long clusterId, Long podId, long dcId);
+    public List<HostVO> listAllUpAndEnabledHosts(HostType type, Long clusterId, Long podId, long dcId);
 
     public List<HostVO> listAllHostsInCluster(long clusterId);
 
-    public List<HostVO> listHostsInClusterByStatus(long clusterId, Status status);
+    public List<HostVO> listHostsInClusterByStatus(long clusterId, HostStatus status);
 
-    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(Host.Type type, long dcId);
+    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(HostType type, long dcId);
 
     public List<HostVO> listAllUpAndEnabledHostsInOneZoneByHypervisor(HypervisorType type, long dcId);
 
     public List<HostVO> listAllUpAndEnabledHostsInOneZone(long dcId);
 
-    public List<HostVO> listAllHostsInOneZoneByType(Host.Type type, long dcId);
+    public List<HostVO> listAllHostsInOneZoneByType(HostType type, long dcId);
 
-    public List<HostVO> listAllHostsInAllZonesByType(Type type);
+    public List<HostVO> listAllHostsInAllZonesByType(HostType type);
 
     public List<HypervisorType> listAvailHypervisorInZone(Long hostId, Long zoneId);
 
@@ -107,7 +109,7 @@ public interface ResourceManager extends ResourceService {
 
     List<PodCluster> listByDataCenter(long dcId);
 
-    List<HostVO> listAllNotInMaintenanceHostsInOneZone(Type type, Long dcId);
+    List<HostVO> listAllNotInMaintenanceHostsInOneZone(HostType type, Long dcId);
 
     HypervisorType getDefaultHypervisor(long zoneId);
 
@@ -124,7 +126,7 @@ public interface ResourceManager extends ResourceService {
      * @param dcId
      * @return
      */
-    List<HostVO> listAllUpAndEnabledNonHAHosts(Type type, Long clusterId, Long podId, long dcId);
+    List<HostVO> listAllUpAndEnabledNonHAHosts(HostType type, Long clusterId, Long podId, long dcId);
 
     /**
      * Check if host is GPU enabled

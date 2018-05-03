@@ -8,8 +8,7 @@ import com.cloud.agent.api.ReadyCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.agent.service.Agent.ExitStatus;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
@@ -68,8 +67,8 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
     private Thread _consoleProxyMain = null;
 
     @Override
-    public Type getType() {
-        return Host.Type.ConsoleProxy;
+    public HostType getType() {
+        return HostType.ConsoleProxy;
     }
 
     @Override
@@ -87,7 +86,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingCommand(Type.ConsoleProxy, id);
+        return new PingCommand(HostType.ConsoleProxy, id);
     }
 
     @Override

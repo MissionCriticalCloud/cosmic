@@ -2,6 +2,7 @@ package com.cloud.agent.api.to;
 
 import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.network.FirewallRule.State;
+import com.cloud.legacymodel.to.FirewallRuleTO;
 import com.cloud.network.rules.StaticNatRule;
 
 /**

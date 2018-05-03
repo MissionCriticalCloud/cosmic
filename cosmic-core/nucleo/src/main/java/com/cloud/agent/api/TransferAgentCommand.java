@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Status.Event;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.model.enumeration.Event;
 
 public class TransferAgentCommand extends Command {
     protected long agentId;

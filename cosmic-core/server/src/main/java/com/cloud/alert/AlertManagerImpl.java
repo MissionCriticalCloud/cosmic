@@ -24,12 +24,12 @@ import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.dc.Vlan.VlanType;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.CapacityState;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.resource.ResourceManager;
@@ -236,7 +236,7 @@ public class AlertManagerImpl extends ManagerBase implements AlertManager, Confi
 
         // Calculate CPU and RAM capacities
         //     get all hosts...even if they are not in 'UP' state
-        final List<HostVO> hosts = _resourceMgr.listAllNotInMaintenanceHostsInOneZone(Host.Type.Routing, null);
+        final List<HostVO> hosts = _resourceMgr.listAllNotInMaintenanceHostsInOneZone(HostType.Routing, null);
         if (hosts != null) {
             for (final HostVO host : hosts) {
                 _capacityMgr.updateCapacityForHost(host);

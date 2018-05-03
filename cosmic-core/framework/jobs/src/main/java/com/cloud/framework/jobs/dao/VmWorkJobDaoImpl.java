@@ -117,7 +117,7 @@ public class VmWorkJobDaoImpl extends GenericDaoBase<VmWorkJobVO, Long> implemen
         /*
                 SearchCriteria<VmWorkJobVO> sc = ExpungeWorkJobSearch.create();
                 sc.setParameters("lastUpdated",cutDate);
-                sc.setParameters("jobStatus", JobInfo.Status.IN_PROGRESS);
+                sc.setParameters("jobStatus", JobInfo.HostStatus.IN_PROGRESS);
 
                 expunge(sc);
         */

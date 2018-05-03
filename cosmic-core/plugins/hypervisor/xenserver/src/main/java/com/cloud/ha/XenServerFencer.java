@@ -6,8 +6,8 @@ import com.cloud.agent.api.FenceCommand;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.model.enumeration.HypervisorType;
@@ -49,7 +49,7 @@ public class XenServerFencer extends AdapterBase implements FenceBuilder {
 
         for (final HostVO h : hosts) {
             if (h.getHypervisorType() == HypervisorType.XenServer) {
-                if (h.getStatus() != Status.Up) {
+                if (h.getStatus() != HostStatus.Up) {
                     continue;
                 }
                 if (h.getId() == host.getId()) {

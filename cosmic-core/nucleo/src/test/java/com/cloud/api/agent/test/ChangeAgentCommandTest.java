@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.cloud.agent.api.ChangeAgentCommand;
-import com.cloud.host.Status.Event;
+import com.cloud.model.enumeration.Event;
 
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.utils.fsm.StateObject;
+import com.cloud.legacymodel.statemachine.StateObject;
 
 public interface ObjectInDataStoreStateMachine extends StateObject<ObjectInDataStoreStateMachine.State> {
     enum State {

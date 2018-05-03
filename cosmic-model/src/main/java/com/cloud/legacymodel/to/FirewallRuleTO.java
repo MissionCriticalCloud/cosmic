@@ -1,4 +1,4 @@
-package com.cloud.agent.api.to;
+package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.network.FirewallRule;

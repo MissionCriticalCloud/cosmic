@@ -6,7 +6,7 @@ import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.ConnectionException;
@@ -92,7 +92,7 @@ public class StoragePoolMonitor implements Listener {
     }
 
     @Override
-    public synchronized boolean processDisconnect(final long agentId, final Status state) {
+    public synchronized boolean processDisconnect(final long agentId, final HostStatus state) {
         return true;
     }
 

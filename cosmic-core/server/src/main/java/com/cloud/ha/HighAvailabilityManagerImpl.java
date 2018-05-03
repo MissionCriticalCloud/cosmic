@@ -17,9 +17,8 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HaWork.HaWorkStep;
 import com.cloud.ha.Investigator.UnknownVM;
 import com.cloud.ha.dao.HighAvailabilityDao;
-import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -28,6 +27,7 @@ import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.utils.NumbersUtil;
@@ -151,13 +151,13 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     }
 
     @Override
-    public Status investigate(final long hostId) {
+    public HostStatus investigate(final long hostId) {
         final HostVO host = _hostDao.findById(hostId);
         if (host == null) {
-            return Status.Alert;
+            return HostStatus.Alert;
         }
 
-        Status hostState = null;
+        HostStatus hostState = null;
         for (final Investigator investigator : investigators) {
             hostState = investigator.isAgentAlive(host);
             if (hostState != null) {
@@ -275,7 +275,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
     @Override
     public void scheduleRestartForVmsOnHost(final HostVO host, final boolean investigate) {
 
-        if (host.getType() != Host.Type.Routing) {
+        if (host.getType() != HostType.Routing) {
             return;
         }
 
@@ -367,7 +367,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
     @Override
     public void cancelScheduledMigrations(final HostVO host) {
-        final HaWork.HaWorkType type = host.getType() == HostVO.Type.Storage ? HaWork.HaWorkType.Stop : HaWork.HaWorkType.Migration;
+        final HaWork.HaWorkType type = host.getType() == HostType.Storage ? HaWork.HaWorkType.Stop : HaWork.HaWorkType.Migration;
 
         _haDao.deleteMigrationWorkItems(host.getId(), type, _serverId);
     }
@@ -554,7 +554,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
                     fenced = true;
                 } else {
                     s_logger.debug("VM " + vm.getInstanceName() + " is found to be alive by " + investigator.getName());
-                    if (host.getStatus() == Status.Up) {
+                    if (host.getStatus() == HostStatus.Up) {
                         s_logger.info(vm + " is alive and host is up. No need to restart it.");
                         return null;
                     } else {
@@ -612,7 +612,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             return null; // VM doesn't require HA
         }
 
-        if ((host == null || host.getRemoved() != null || host.getState() != Status.Up)
+        if ((host == null || host.getRemoved() != null || host.getState() != HostStatus.Up)
                 && !volumeMgr.canVmRestartOnAnotherServer(vm.getId())) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("VM can not restart on another server.");

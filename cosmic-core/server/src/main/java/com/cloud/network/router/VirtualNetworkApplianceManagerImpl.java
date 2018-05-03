@@ -47,8 +47,8 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CheckSshCommand;
@@ -140,7 +140,7 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.Transition;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.MacAddress;
@@ -501,7 +501,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             }
             final String privateIP = router.getPrivateIpAddress();
             final HostVO host = _hostDao.findById(router.getHostId());
-            if (host == null || host.getState() != Status.Up) {
+            if (host == null || host.getState() != HostStatus.Up) {
                 continue;
             } else if (host.getManagementServerId() != ManagementServerNode.getManagementServerId()) {
                 /* Only cover hosts managed by this management server */
@@ -568,7 +568,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         } else {
             final String privateIP = router.getPrivateIpAddress();
             final HostVO host = _hostDao.findById(router.getHostId());
-            if (host == null || host.getState() != Status.Up) {
+            if (host == null || host.getState() != HostStatus.Up) {
                 router.setRedundantState(RedundantState.UNKNOWN);
                 updated = true;
             } else if (privateIP != null) {
@@ -1731,7 +1731,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 
@@ -1768,7 +1768,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<VirtualMachine.State, VirtualMachine.Event> transition, final VirtualMachine vo, final boolean status,
+    public boolean postStateTransitionEvent(final Transition<VirtualMachine.State, VirtualMachine.Event> transition, final VirtualMachine vo, final boolean status,
                                             final Object opaque) {
         final VirtualMachine.State newState = transition.getToState();
         final VirtualMachine.Event event = transition.getEvent();

@@ -3,7 +3,7 @@ package com.cloud.agent.manager;
 import com.cloud.agent.Listener;
 import com.cloud.agent.transport.Request;
 import com.cloud.exception.AgentUnavailableException;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.utils.nio.Link;
 
@@ -43,7 +43,7 @@ public class ClusteredAgentAttache extends ConnectedAgentAttache implements Rout
     }
 
     @Override
-    public void disconnect(final Status state) {
+    public void disconnect(final HostStatus state) {
         super.disconnect(state);
         _transferRequests.clear();
     }
@@ -232,7 +232,7 @@ public class ClusteredAgentAttache extends ConnectedAgentAttache implements Rout
     }
 
     @Override
-    public void cleanup(final Status state) {
+    public void cleanup(final HostStatus state) {
         super.cleanup(state);
         _transferRequests.clear();
     }

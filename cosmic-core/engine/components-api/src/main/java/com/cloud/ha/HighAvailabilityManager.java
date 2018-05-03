@@ -1,8 +1,8 @@
 package com.cloud.ha;
 
 import com.cloud.deploy.DeploymentPlanner;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.VMInstanceVO;
 
@@ -18,7 +18,7 @@ public interface HighAvailabilityManager extends Manager {
      *
      * @param host - the host that has disconnected.
      */
-    Status investigate(long hostId);
+    HostStatus investigate(long hostId);
 
     /**
      * Restart a vm that has gone away due to various reasons.  Whether a

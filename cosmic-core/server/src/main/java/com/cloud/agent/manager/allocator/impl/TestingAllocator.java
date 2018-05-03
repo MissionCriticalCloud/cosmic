@@ -4,8 +4,8 @@ import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.dao.HostDao;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.vm.VirtualMachine;
@@ -31,18 +31,18 @@ public class TestingAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo) {
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo) {
         return allocateTo(vmProfile, plan, type, avoid, returnUpTo, true);
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo, final boolean
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo, final boolean
             considerReservedCapacity) {
         final List<Host> availableHosts = new ArrayList<>();
         Host host = null;
-        if (type == Host.Type.Routing && _routingHost != null) {
+        if (type == HostType.Routing && _routingHost != null) {
             host = _hostDao.findById(_routingHost);
-        } else if (type == Host.Type.Storage && _storageHost != null) {
+        } else if (type == HostType.Storage && _storageHost != null) {
             host = _hostDao.findById(_storageHost);
         }
         if (host != null) {
@@ -52,7 +52,7 @@ public class TestingAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final List<? extends Host> hosts,
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final List<? extends Host> hosts,
                                  final int returnUpTo,
                                  final boolean considerReservedCapacity) {
         return allocateTo(vmProfile, plan, type, avoid, returnUpTo, considerReservedCapacity);
@@ -60,10 +60,10 @@ public class TestingAllocator extends AdapterBase implements HostAllocator {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) {
-        String value = (String) params.get(Host.Type.Routing.toString());
+        String value = (String) params.get(HostType.Routing.toString());
         _routingHost = (value != null) ? Long.parseLong(value) : null;
 
-        value = (String) params.get(Host.Type.Storage.toString());
+        value = (String) params.get(HostType.Storage.toString());
         _storageHost = (value != null) ? Long.parseLong(value) : null;
 
         return true;

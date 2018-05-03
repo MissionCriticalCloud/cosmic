@@ -176,7 +176,7 @@ public class DedicatedApiUnitTest {
         public void runDedicateHostTest() {
             HostVO host = new HostVO(10L, "Host-1", Host.Type.Routing, null,
                     "10.0.0.0", null, null, null, null, null, null, null, null,
-                    Status.Up, null, null, null, 10L, 10L, 30L, 10233, null, null,
+                    HostStatus.Up, null, null, null, 10L, 10L, 30L, 10233, null, null,
                     null, 0, null);
             when(_hostDao.findById(10L)).thenReturn(host);
             try {

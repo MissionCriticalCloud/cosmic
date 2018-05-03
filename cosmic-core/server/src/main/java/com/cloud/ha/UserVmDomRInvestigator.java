@@ -3,7 +3,7 @@ package com.cloud.ha;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.PingTestCommand;
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
@@ -86,7 +86,7 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
     }
 
     @Override
-    public Status isAgentAlive(final Host agent) {
+    public HostStatus isAgentAlive(final Host agent) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("checking if agent (" + agent.getId() + ") is alive");
         }
@@ -101,20 +101,20 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("sending ping from (" + hostId + ") to agent's host ip address (" + agent.getPrivateIpAddress() + ")");
             }
-            final Status hostState = testIpAddress(hostId, agent.getPrivateIpAddress());
+            final HostStatus hostState = testIpAddress(hostId, agent.getPrivateIpAddress());
             assert hostState != null;
-            // In case of Status.Unknown, next host will be tried
-            if (hostState == Status.Up) {
+            // In case of HostStatus.Unknown, next host will be tried
+            if (hostState == HostStatus.Up) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("ping from (" + hostId + ") to agent's host ip address (" + agent.getPrivateIpAddress() +
                             ") successful, returning that agent is disconnected");
                 }
-                return Status.Disconnected; // the computing host ip is ping-able, but the computing agent is down, report that the agent is disconnected
-            } else if (hostState == Status.Down) {
+                return HostStatus.Disconnected; // the computing host ip is ping-able, but the computing agent is down, report that the agent is disconnected
+            } else if (hostState == HostStatus.Down) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("returning host state: " + hostState);
                 }
-                return Status.Down;
+                return HostStatus.Down;
             }
         }
 

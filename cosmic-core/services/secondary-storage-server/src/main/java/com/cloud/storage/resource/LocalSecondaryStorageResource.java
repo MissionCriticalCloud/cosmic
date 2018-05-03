@@ -12,8 +12,7 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.api.storage.ListTemplateAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.NfsTO;
@@ -60,8 +59,8 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     }
 
     @Override
-    public Type getType() {
-        return Host.Type.LocalSecondaryStorage;
+    public HostType getType() {
+        return HostType.LocalSecondaryStorage;
     }
 
     @Override
@@ -83,7 +82,7 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingStorageCommand(Host.Type.Storage, id, new HashMap<>());
+        return new PingStorageCommand(HostType.Storage, id, new HashMap<>());
     }
 
     @Override

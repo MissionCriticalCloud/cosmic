@@ -7,8 +7,8 @@ import com.cloud.context.CallContext;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.DataStoreProviderManager;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.StoragePool;
@@ -119,7 +119,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                     hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByHypervisor(pool.getHypervisor(), pool.getDataCenterId());
                 }
             } else {
-                hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), Status.Up);
+                hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), HostStatus.Up);
             }
 
             if (hosts == null || hosts.size() == 0) {
@@ -285,7 +285,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                 hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByHypervisor(poolVO.getHypervisor(), pool.getDataCenterId());
             }
         } else {
-            hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), Status.Up);
+            hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), HostStatus.Up);
         }
 
         if (hosts == null || hosts.size() == 0) {

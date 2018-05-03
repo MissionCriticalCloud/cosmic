@@ -1,7 +1,7 @@
 package com.cloud.ha;
 
 import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.utils.component.Adapter;
 import com.cloud.vm.VirtualMachine;
 
@@ -13,7 +13,7 @@ public interface Investigator extends Adapter {
      */
     boolean isVmAlive(VirtualMachine vm, Host host) throws UnknownVM;
 
-    Status isAgentAlive(Host agent);
+    HostStatus isAgentAlive(Host agent);
 
     class UnknownVM extends Exception {
     }

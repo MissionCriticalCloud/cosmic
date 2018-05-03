@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.model.enumeration.HostType;
 
 /**
  * Implementation of bootstrap command sent from management server to agent running on
@@ -9,7 +9,7 @@ import com.cloud.legacymodel.communication.command.Command;
  **/
 
 public class StartupVMMAgentCommand extends Command {
-    Host.Type type;
+    HostType type;
     long dataCenter;
     Long pod;
     String clusterName;
@@ -29,7 +29,7 @@ public class StartupVMMAgentCommand extends Command {
         this.pod = pod;
         this.clusterName = clusterName;
         this.guid = guid;
-        this.type = Host.Type.Routing;
+        this.type = HostType.Routing;
         this.managementServerIP = managementServerIP;
         this.port = port;
     }

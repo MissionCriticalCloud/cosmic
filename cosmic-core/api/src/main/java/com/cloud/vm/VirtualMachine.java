@@ -4,11 +4,11 @@ import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.fsm.StateMachine2.Transition;
-import com.cloud.utils.fsm.StateMachine2.Transition.Impact;
-import com.cloud.utils.fsm.StateObject;
+import com.cloud.utils.fsm.Transition;
+import com.cloud.utils.fsm.Transition.Impact;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, InternalIdentity, Displayable, StateObject<VirtualMachine.State> {
 
-    static final String IsDynamicScalingEnabled = "enable.dynamic.scaling";
+    String IsDynamicScalingEnabled = "enable.dynamic.scaling";
 
     /**
      * @return The name of the vm instance used by the cloud stack to uniquely
@@ -115,7 +115,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
     @Override
     boolean isDisplay();
 
-    public enum PowerState {
+    enum PowerState {
         PowerUnknown,
         PowerOn,
         PowerOff,
@@ -123,7 +123,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         PowerReportMissing
     }
 
-    public enum State {
+    enum State {
         Starting(true, "VM is being started.  At this state, you should find host id filled which means it's being started on that host."),
         Running(false, "VM is running.  host id has the host that it is running on."),
         Stopping(true, "VM is being stopped.  host id has the host that it is being stopped on."),
@@ -140,32 +140,32 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
 
         static {
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.StartRequested, State.Starting, null));
-            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.DestroyRequested, State.Destroyed, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.DestroyRequested, State.Destroyed, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.StopRequested, State.Stopped, null));
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.AgentReportStopped, State.Stopped, null));
 
             // please pay attention about state transition to Error state, there should be only one case (failed in VM
             // creation process)
             // that can have such transition
-            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.OperationFailedToError, State.Error, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.OperationFailedToError, State.Error, Arrays.asList(Impact.USAGE)));
 
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.OperationFailed, State.Stopped, null));
-            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.ExpungeOperation, State.Expunging, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.ExpungeOperation, State.Expunging, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, null));
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.StorageMigrationRequested, State.Migrating, null));
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.OperationRetry, State.Starting, null));
-            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.OperationSucceeded, State.Running, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.OperationSucceeded, State.Running, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.OperationFailed, State.Stopped, null));
-            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.AgentReportRunning, State.Running, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.AgentReportRunning, State.Running, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.AgentReportStopped, State.Stopped, null));
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, null));
-            s_fsm.addTransition(new Transition<>(State.Destroyed, VirtualMachine.Event.RecoveryRequested, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Destroyed, VirtualMachine.Event.RecoveryRequested, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Destroyed, VirtualMachine.Event.ExpungeOperation, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.MigrationRequested, State.Migrating, null));
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.AgentReportRunning, State.Running, null));
-            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.StopRequested, State.Stopping, null));
-            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.AgentReportMigrated, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.OperationSucceeded, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.MigrationRequested, State.Migrating, null));
@@ -174,19 +174,19 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.AgentReportRunning, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.AgentReportStopped, State.Stopped, null));
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, null));
-            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.OperationSucceeded, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.OperationSucceeded, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.OperationFailed, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.AgentReportRunning, State.Running, null));
-            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.StopRequested, State.Stopping, null));
-            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.AgentReportShutdowned, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Expunging, VirtualMachine.Event.OperationFailed, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Expunging, VirtualMachine.Event.ExpungeOperation, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Error, VirtualMachine.Event.DestroyRequested, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Error, VirtualMachine.Event.ExpungeOperation, State.Expunging, null));
             s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.AgentReportRunning, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.StopRequested, State.Stopping, null));
-            s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.AgentReportStopped, State.Stopped, Arrays.asList(Impact.USAGE)));
 
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
             s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
@@ -194,16 +194,16 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.FollowAgentPowerPausedReport, State.Paused, null));
 
-            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, null));
-            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, null));
             s_fsm.addTransition(new Transition<>(State.Paused, VirtualMachine.Event.FollowAgentPowerOnReport, State.Running, null));
 
             s_fsm.addTransition(new Transition<>(State.Starting, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, null));
-            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
-            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, Arrays.asList(new Impact[]{Impact.USAGE})));
+            s_fsm.addTransition(new Transition<>(State.Stopping, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, Arrays.asList(Impact.USAGE)));
+            s_fsm.addTransition(new Transition<>(State.Running, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, Arrays.asList(Impact.USAGE)));
             s_fsm.addTransition(new Transition<>(State.Migrating, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, null));
             s_fsm.addTransition(new Transition<>(State.Stopped, VirtualMachine.Event.FollowAgentPowerOffReport, State.Stopped, null));
         }
@@ -211,7 +211,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         private final boolean _transitional;
         String _description;
 
-        private State(final boolean transitional, final String description) {
+        State(final boolean transitional, final String description) {
             _transitional = transitional;
             _description = description;
         }
@@ -221,35 +221,22 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         }
 
         public static boolean isVmStarted(final State oldState, final Event e, final State newState) {
-            if (oldState == State.Starting && newState == State.Running) {
-                return true;
-            }
-            return false;
+            return oldState == State.Starting && newState == State.Running;
         }
 
         public static boolean isVmStopped(final State oldState, final Event e, final State newState) {
-            if ((oldState == State.Stopping && newState == State.Stopped) ||
+            return (oldState == State.Stopping && newState == State.Stopped) ||
                     (oldState == State.Running &&
                             newState == State.Stopped &&
-                            e == Event.FollowAgentPowerOffReport)) {
-                return true;
-            }
-            return false;
+                            e == Event.FollowAgentPowerOffReport);
         }
 
         public static boolean isVmMigrated(final State oldState, final Event e, final State newState) {
-            if (oldState == State.Migrating && newState == State.Running && (e == Event.OperationSucceeded || e == Event.AgentReportRunning)) {
-                return true;
-            }
-            return false;
+            return oldState == State.Migrating && newState == State.Running && (e == Event.OperationSucceeded || e == Event.AgentReportRunning);
         }
 
         public static boolean isVmCreated(final State oldState, final Event e, final State newState) {
-            if (oldState == State.Destroyed && newState == State.Stopped) {
-                // VM recover
-                return true;
-            }
-            return false;
+            return oldState == State.Destroyed && newState == State.Stopped;
         }
 
         public static boolean isVmDestroyed(final State oldState, final Event e, final State newState) {
@@ -260,11 +247,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
                 return true;
             }
 
-            if (oldState == State.Stopped && newState == State.Expunging) {
-                return true;
-            }
-
-            return false;
+            return oldState == State.Stopped && newState == State.Expunging;
         }
 
         public String getDescription() {
@@ -276,7 +259,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         }
     }
 
-    public enum Event {
+    enum Event {
         CreateRequested,
         StartRequested,
         StopRequested,
@@ -302,7 +285,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
         FollowAgentPowerPausedReport,
     }
 
-    public enum Type {
+    enum Type {
         User(false), DomainRouter(true), ConsoleProxy(true), SecondaryStorageVm(true),
 
         /*
@@ -312,7 +295,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
 
         boolean _isUsedBySystem;
 
-        private Type(final boolean isUsedBySystem) {
+        Type(final boolean isUsedBySystem) {
             _isUsedBySystem = isUsedBySystem;
         }
 

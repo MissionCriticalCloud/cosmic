@@ -29,7 +29,7 @@ import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -233,7 +233,7 @@ public class TemplateManagerImplTest {
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
         when(vmTemplatePoolDao.findByPoolTemplate(anyLong(), anyLong())).thenReturn(null);
         when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStorageResourceAssoc.Status.DOWNLOADED)).thenReturn(mockTemplateDataStore);
-        when(storagePoolHostDao.listByHostStatus(2l, Status.Up)).thenReturn(null);
+        when(storagePoolHostDao.listByHostStatus(2l, HostStatus.Up)).thenReturn(null);
 
         templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
     }

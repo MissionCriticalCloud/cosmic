@@ -3,9 +3,9 @@ package com.cloud.storage.datastore.db;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.fsm.StateObject;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

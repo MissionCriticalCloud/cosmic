@@ -6,7 +6,7 @@ import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.host.Status;
+import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.CronCommand;
@@ -87,7 +87,7 @@ public class DirectAgentAttache extends AgentAttache {
     }
 
     @Override
-    public void disconnect(final Status state) {
+    public void disconnect(final HostStatus state) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Processing disconnect " + _id + "(" + _name + ")");
         }
@@ -131,7 +131,7 @@ public class DirectAgentAttache extends AgentAttache {
             synchronized (this) {
                 if (_resource != null) {
                     s_logger.warn("Lost attache for " + _id + "(" + _name + ")");
-                    disconnect(Status.Alert);
+                    disconnect(HostStatus.Alert);
                 }
             }
         } finally {

@@ -7,8 +7,8 @@ import com.cloud.alert.AlertManager;
 import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
@@ -70,7 +70,7 @@ public class KVMFencer extends AdapterBase implements FenceBuilder {
         int i = 0;
         for (final HostVO h : hosts) {
             if (h.getHypervisorType() == HypervisorType.KVM) {
-                if (h.getStatus() != Status.Up) {
+                if (h.getStatus() != HostStatus.Up) {
                     continue;
                 }
 

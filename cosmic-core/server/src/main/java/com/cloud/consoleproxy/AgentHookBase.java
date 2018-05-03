@@ -16,8 +16,8 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
@@ -180,7 +180,7 @@ public abstract class AgentHookBase implements AgentHook {
     }
 
     @Override
-    public void onAgentDisconnect(final long agentId, final Status state) {
+    public void onAgentDisconnect(final long agentId, final HostStatus state) {
         // no-op
     }
 

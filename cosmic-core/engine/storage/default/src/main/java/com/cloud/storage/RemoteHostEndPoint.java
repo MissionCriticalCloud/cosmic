@@ -11,8 +11,8 @@ import com.cloud.exception.AgentUnavailableException;
 import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.host.Host;
+import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -20,6 +20,7 @@ import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.vm.SecondaryStorageVmVO;
@@ -62,7 +63,7 @@ public class RemoteHostEndPoint implements EndPoint {
         hostId = host.getId();
         hostAddress = host.getPrivateIpAddress();
         publicAddress = host.getPublicIpAddress();
-        if (Host.Type.SecondaryStorageVM == host.getType()) {
+        if (HostType.SecondaryStorageVM == host.getType()) {
             final String vmName = host.getName();
             final SecondaryStorageVmVO ssvm = vmDao.findByInstanceName(vmName);
             if (ssvm != null) {
@@ -105,7 +106,7 @@ public class RemoteHostEndPoint implements EndPoint {
         }
 
         @Override
-        public boolean processDisconnect(final long agentId, final Status state) {
+        public boolean processDisconnect(final long agentId, final HostStatus state) {
             // TODO Auto-generated method stub
             return false;
         }

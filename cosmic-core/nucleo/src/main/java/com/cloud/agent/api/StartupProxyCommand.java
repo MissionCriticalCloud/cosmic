@@ -1,13 +1,13 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupProxyCommand extends StartupCommand {
     private int proxyPort;
     private long proxyVmId;
 
     public StartupProxyCommand() {
-        super(Host.Type.ConsoleProxy);
+        super(HostType.ConsoleProxy);
         setIqn("NoIqn");
     }
 
