@@ -62,7 +62,6 @@
         <module>plugins/storage/volume-default</module>
         <module>scripts</module>
         <module>server</module>
-        <module>services/console-proxy-server</module>
         <module>services/secondary-storage-server</module>
     </modules>
 
