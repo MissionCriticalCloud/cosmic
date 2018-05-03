@@ -41,7 +41,7 @@ import com.cloud.storage.CreateSnapshotPayload;
 import com.cloud.storage.ResizeVolumePayload;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.RevertSnapshotCommand;
+import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;

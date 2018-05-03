@@ -1,14 +1,13 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.command;
 
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.auth.PasswordAuth;
-import com.cloud.legacymodel.communication.command.AbstractDownloadCommand;
+import com.cloud.legacymodel.network.Proxy;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.to.TemplateObjectTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.utils.net.Proxy;
 
 public class DownloadCommand extends AbstractDownloadCommand implements InternalIdentity {
 

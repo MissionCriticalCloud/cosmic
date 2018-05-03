@@ -1,8 +1,13 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
+import com.cloud.legacymodel.communication.command.DownloadCommand;
+import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.network.Proxy;
 import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.to.DataStoreTO;
@@ -10,10 +15,6 @@ import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.VMTemplateHostVO;
-import com.cloud.storage.command.DownloadCommand;
-import com.cloud.storage.command.DownloadCommand.ResourceType;
-import com.cloud.storage.command.DownloadProgressCommand;
-import com.cloud.storage.command.DownloadProgressCommand.RequestType;
 import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.TemplateDownloader.DownloadCompleteCallback;
@@ -21,7 +22,6 @@ import com.cloud.storage.template.TemplateDownloader.Status;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.net.Proxy;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
 

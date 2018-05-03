@@ -1,7 +1,7 @@
 package com.cloud.storage.download;
 
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.storage.command.DownloadProgressCommand.RequestType;
 
 public class NotDownloadedState extends DownloadActiveState {
 

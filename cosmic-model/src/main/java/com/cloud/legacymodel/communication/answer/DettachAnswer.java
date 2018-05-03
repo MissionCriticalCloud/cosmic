@@ -1,6 +1,5 @@
-package com.cloud.storage.command;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.to.DiskTO;
 
 public final class DettachAnswer extends Answer {

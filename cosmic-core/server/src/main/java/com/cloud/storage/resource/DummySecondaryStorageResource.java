@@ -7,6 +7,8 @@ import com.cloud.legacymodel.communication.answer.GetStorageStatsAnswer;
 import com.cloud.legacymodel.communication.answer.ReadyAnswer;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.DownloadCommand;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand;
 import com.cloud.legacymodel.communication.command.GetStorageStatsCommand;
 import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.communication.command.PingStorageCommand;
@@ -21,8 +23,6 @@ import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.command.DownloadCommand;
-import com.cloud.storage.command.DownloadProgressCommand;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.template.TemplateConstants;
 

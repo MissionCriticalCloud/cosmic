@@ -1,8 +1,8 @@
 package com.cloud.storage.download;
 
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.storage.command.DownloadProgressCommand.RequestType;
 
 public abstract class DownloadActiveState extends DownloadState {
 

@@ -1,5 +1,7 @@
 package com.cloud.utils.net;
 
+import com.cloud.legacymodel.network.Proxy;
+
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpClient;

@@ -14,7 +14,7 @@ import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.command.RevertSnapshotCommand;
+import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.utils.script.Script;
 
 import java.io.File;

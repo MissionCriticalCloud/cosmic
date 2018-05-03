@@ -1,9 +1,9 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
 import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.utils.NumbersUtil;
 

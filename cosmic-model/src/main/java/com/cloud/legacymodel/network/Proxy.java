@@ -1,4 +1,4 @@
-package com.cloud.utils.net;
+package com.cloud.legacymodel.network;
 
 import java.net.URI;
 

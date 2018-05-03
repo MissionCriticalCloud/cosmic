@@ -75,7 +75,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
-import com.cloud.storage.command.AttachAnswer;
+import com.cloud.legacymodel.communication.answer.AttachAnswer;
 import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
