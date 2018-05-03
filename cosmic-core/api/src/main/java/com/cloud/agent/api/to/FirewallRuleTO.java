@@ -1,9 +1,8 @@
 package com.cloud.agent.api.to;
 
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.State;
-import com.cloud.utils.net.NetUtils;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -225,14 +224,6 @@ public class FirewallRuleTO implements InternalIdentity {
 
     public Integer getIcmpCode() {
         return icmpCode;
-    }
-
-    public String getStringSrcPortRange() {
-        if (srcPortRange == null || srcPortRange.length < 2) {
-            return "0:0";
-        } else {
-            return NetUtils.portRangeToString(srcPortRange);
-        }
     }
 
     public boolean revoked() {

@@ -11,8 +11,8 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.rules.FirewallRule;
 
 import java.util.ArrayList;
 import java.util.List;

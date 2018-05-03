@@ -1,8 +1,8 @@
 package com.cloud.network.element;
 
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.network.Network;
-import com.cloud.network.rules.FirewallRule;
 
 import java.util.List;
 

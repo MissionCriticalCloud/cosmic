@@ -1,6 +1,7 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
 import com.cloud.agent.api.routing.SetNetworkACLCommand;
+import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.AclRule;
@@ -15,6 +16,7 @@ import com.cloud.legacymodel.to.NicTO;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -30,7 +32,7 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
 
         final String privateGw = cmd.getAccessDetail(NetworkElementCommand.VPC_PRIVATE_GATEWAY);
 
-        final String[][] rules = command.generateFwRules();
+        final String[][] rules = generateFwRules(command);
         final String[] aclRules = rules[0];
         final NicTO nic = command.getNic();
         final String netmask = Long.toString(NetUtils.getCidrSize(nic.getNetmask()));
@@ -76,6 +78,60 @@ public class SetNetworkAclConfigItem extends AbstractConfigItemFacade {
         final NetworkACL networkACL = new NetworkACL(nic.getMac(), privateGw != null, nic.getIp(), netmask, ingressRules.toArray(new AclRule[ingressRules.size()]),
                 egressRules.toArray(new AclRule[egressRules.size()]));
         return generateConfigItems(networkACL);
+    }
+
+    public String[][] generateFwRules(SetNetworkACLCommand command) {
+        final List<NetworkACLTO> aclList = Arrays.asList(command.getRules());
+
+        orderNetworkAclRulesByRuleNumber(aclList);
+
+        final String[][] result = new String[2][aclList.size()];
+        int i = 0;
+        for (final NetworkACLTO aclTO : aclList) {
+            /*  example  :  Ingress:tcp:80:80:0.0.0.0/0:ACCEPT:,Egress:tcp:220:220:0.0.0.0/0:DROP:,
+             *  each entry format      Ingress/Egress:protocol:start port: end port:scidrs:action:
+             *  reverted entry format  Ingress/Egress:reverted:0:0:0:
+             */
+            if (aclTO.revoked()) {
+                final StringBuilder sb = new StringBuilder();
+                /* This entry is added just to make sure at least there will one entry in the list to get the IP address */
+                sb.append(aclTO.getTrafficType().toString()).append(":reverted:0:0:0:");
+                final String aclRuleEntry = sb.toString();
+                result[0][i++] = aclRuleEntry;
+                continue;
+            }
+
+            final List<String> cidr;
+            final StringBuilder sb = new StringBuilder();
+            sb.append(aclTO.getTrafficType().toString()).append(":").append(aclTO.getProtocol()).append(":");
+            if ("icmp".equals(aclTO.getProtocol())) {
+                sb.append(aclTO.getIcmpType()).append(":").append(aclTO.getIcmpCode()).append(":");
+            } else {
+                sb.append(aclTO.getStringPortRange()).append(":");
+            }
+            cidr = aclTO.getSourceCidrList();
+            if (cidr == null || cidr.isEmpty()) {
+                sb.append("0.0.0.0/0");
+            } else {
+                Boolean firstEntry = true;
+                for (final String tag : cidr) {
+                    if (!firstEntry) {
+                        sb.append(",");
+                    }
+                    sb.append(tag);
+                    firstEntry = false;
+                }
+            }
+            sb.append(":").append(aclTO.getAction()).append(":");
+            final String aclRuleEntry = sb.toString();
+            result[0][i++] = aclRuleEntry;
+        }
+
+        return result;
+    }
+
+    protected void orderNetworkAclRulesByRuleNumber(final List<NetworkACLTO> aclList) {
+        aclList.sort((acl1, acl2) -> acl1.getNumber() > acl2.getNumber() ? 1 : -1);
     }
 
     @Override

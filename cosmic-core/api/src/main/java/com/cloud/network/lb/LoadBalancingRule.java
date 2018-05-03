@@ -1,7 +1,7 @@
 package com.cloud.network.lb;
 
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.net.Ip;

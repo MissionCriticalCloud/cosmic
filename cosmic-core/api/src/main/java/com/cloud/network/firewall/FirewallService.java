@@ -3,9 +3,9 @@ package com.cloud.network.firewall;
 import com.cloud.api.command.user.firewall.IListFirewallRulesCmd;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.rules.FirewallRule;
 
 import java.util.List;
 

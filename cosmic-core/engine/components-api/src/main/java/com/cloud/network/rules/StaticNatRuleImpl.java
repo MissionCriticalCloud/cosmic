@@ -1,5 +1,7 @@
 package com.cloud.network.rules;
 
+import com.cloud.legacymodel.network.FirewallRule;
+
 import java.util.List;
 
 public class StaticNatRuleImpl implements StaticNatRule {

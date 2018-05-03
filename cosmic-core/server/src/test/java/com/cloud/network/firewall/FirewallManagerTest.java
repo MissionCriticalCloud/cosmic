@@ -5,12 +5,12 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.rules.FirewallManager;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.user.AccountManager;

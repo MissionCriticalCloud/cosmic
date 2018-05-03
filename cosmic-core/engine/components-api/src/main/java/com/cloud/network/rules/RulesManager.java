@@ -3,6 +3,7 @@ package com.cloud.network.rules;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
 import com.cloud.uservm.UserVm;

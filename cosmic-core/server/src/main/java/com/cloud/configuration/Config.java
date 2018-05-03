@@ -1588,7 +1588,7 @@ public enum Config {
             Boolean.class,
             "execute.in.sequence.network.element.commands",
             "false",
-            "If set to true, DhcpEntryCommand, SavePasswordCommand, UserDataCommand, VmDataCommand will be synchronized on the agent side."
+            "If set to true, DhcpEntryCommand, SavePasswordCommand, VmDataCommand will be synchronized on the agent side."
                     + " If set to false, these commands become asynchronous. Default value is false.",
             null),
 

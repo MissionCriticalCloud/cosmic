@@ -11,8 +11,8 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.rules.FirewallRule;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.utils.net.Ip;
 

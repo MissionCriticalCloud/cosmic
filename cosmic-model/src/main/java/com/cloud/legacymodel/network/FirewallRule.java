@@ -1,4 +1,4 @@
-package com.cloud.network.rules;
+package com.cloud.legacymodel.network;
 
 import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.Identity;

@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.rules.FirewallRule.State;
+import com.cloud.legacymodel.network.FirewallRule.State;
 import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
