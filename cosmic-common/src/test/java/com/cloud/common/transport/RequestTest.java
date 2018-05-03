@@ -1,4 +1,4 @@
-package com.cloud.agent.transport;
+package com.cloud.common.transport;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,7 +11,6 @@ import com.cloud.legacymodel.communication.command.UpdateHostPasswordCommand;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.DataStoreRole;
-import com.cloud.serializer.GsonHelper;
 
 import java.nio.ByteBuffer;
 

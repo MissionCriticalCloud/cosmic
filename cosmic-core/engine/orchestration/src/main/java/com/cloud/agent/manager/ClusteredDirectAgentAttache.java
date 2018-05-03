@@ -1,7 +1,7 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.transport.Request;
-import com.cloud.agent.transport.Response;
+import com.cloud.common.transport.Request;
+import com.cloud.common.transport.Response;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;

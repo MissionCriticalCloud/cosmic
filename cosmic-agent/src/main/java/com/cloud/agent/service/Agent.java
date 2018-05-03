@@ -1,9 +1,9 @@
 package com.cloud.agent.service;
 
-import com.cloud.agent.IAgentControl;
-import com.cloud.agent.IAgentControlListener;
-import com.cloud.agent.transport.Request;
-import com.cloud.agent.transport.Response;
+import com.cloud.common.agent.IAgentControl;
+import com.cloud.common.agent.IAgentControlListener;
+import com.cloud.common.transport.Request;
+import com.cloud.common.transport.Response;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MaintainAnswer;
@@ -581,23 +581,6 @@ public class Agent implements HandlerFactory, IAgentControl {
             }
         } else {
             logger.warn("Ignoring an unknown task");
-        }
-    }
-
-    public enum ExitStatus {
-        Normal(0), // Normal status = 0.
-        Upgrade(65), // Exiting for upgrade.
-        Configuration(66), // Exiting due to configuration problems.
-        Error(67); // Exiting because of error.
-
-        int value;
-
-        ExitStatus(final int value) {
-            this.value = value;
-        }
-
-        public int value() {
-            return value;
         }
     }
 

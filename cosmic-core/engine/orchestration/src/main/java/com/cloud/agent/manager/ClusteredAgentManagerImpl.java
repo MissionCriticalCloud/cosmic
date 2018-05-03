@@ -1,8 +1,8 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.transport.Request;
-import com.cloud.agent.transport.Request.Version;
-import com.cloud.agent.transport.Response;
+import com.cloud.common.transport.Request;
+import com.cloud.common.transport.Request.Version;
+import com.cloud.common.transport.Response;
 import com.cloud.cluster.ClusterManager;
 import com.cloud.cluster.ClusterManagerListener;
 import com.cloud.cluster.ClusterServicePdu;
@@ -36,7 +36,7 @@ import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.Event;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ServerResource;
-import com.cloud.serializer.GsonHelper;
+import com.cloud.common.transport.GsonHelper;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.QueryBuilder;

@@ -1,7 +1,7 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.transport.Request;
-import com.cloud.agent.transport.Response;
+import com.cloud.common.transport.Request;
+import com.cloud.common.transport.Response;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.StartupAnswer;

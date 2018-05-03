@@ -2,8 +2,8 @@ package com.cloud.agent.service;
 
 import static java.util.stream.Collectors.toMap;
 
-import com.cloud.agent.service.Agent.ExitStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.ExitStatus;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.ProcessUtil;
 import com.cloud.utils.PropertiesUtil;

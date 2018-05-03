@@ -1,7 +1,6 @@
 package com.cloud.resource;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.transport.Request;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
@@ -17,6 +16,8 @@ import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.cluster.ClusterManager;
+import com.cloud.common.transport.GsonHelper;
+import com.cloud.common.transport.Request;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
@@ -94,7 +95,6 @@ import com.cloud.model.enumeration.ManagedState;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.serializer.GsonHelper;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.StorageManager;

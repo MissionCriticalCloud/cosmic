@@ -27,13 +27,6 @@ public class BasicAgentAuthManager extends AdapterBase implements AgentAuthorize
     AgentManager _agentManager = null;
 
     @Override
-    public boolean processInitialConnect(final StartupCommand[] cmd) {
-        authorizeAgent(cmd);
-        s_logger.debug("Authorized agent with guid " + cmd[0].getGuid());
-        return false;//so that the next host creator can process it
-    }
-
-    @Override
     public boolean authorizeAgent(final StartupCommand[] cmd) {
         return true;
     }

@@ -61,8 +61,8 @@
         <module>plugins/storage/image-default</module>
         <module>plugins/storage/volume-default</module>
         <module>scripts</module>
+        <module>secondary-storage-server</module>
         <module>server</module>
-        <module>services/secondary-storage-server</module>
     </modules>
 
     <dependencies>

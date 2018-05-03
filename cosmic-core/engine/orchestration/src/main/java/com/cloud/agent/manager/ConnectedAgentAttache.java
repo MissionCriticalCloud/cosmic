@@ -1,6 +1,6 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.transport.Request;
+import com.cloud.common.transport.Request;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.utils.nio.Link;

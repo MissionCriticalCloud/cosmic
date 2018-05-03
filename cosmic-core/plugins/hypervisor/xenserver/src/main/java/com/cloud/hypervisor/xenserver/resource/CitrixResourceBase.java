@@ -1,8 +1,8 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.IAgentControl;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
+import com.cloud.common.agent.IAgentControl;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.CitrixRequestWrapper;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.XenServerUtilitiesHelper;
 import com.cloud.legacymodel.communication.answer.Answer;

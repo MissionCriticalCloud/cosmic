@@ -1,4 +1,4 @@
-package com.cloud.agent.transport;
+package com.cloud.common.transport;
 
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
@@ -6,7 +6,6 @@ import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand.
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.serializer.GsonHelper;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.StringUtils;
 

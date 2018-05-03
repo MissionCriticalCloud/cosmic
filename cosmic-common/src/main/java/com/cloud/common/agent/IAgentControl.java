@@ -1,4 +1,4 @@
-package com.cloud.agent;
+package com.cloud.common.agent;
 
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;

@@ -1,4 +1,4 @@
-package com.cloud.agent.transport;
+package com.cloud.common.transport;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 

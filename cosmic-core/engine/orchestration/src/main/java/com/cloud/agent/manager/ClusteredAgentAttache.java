@@ -1,7 +1,7 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.transport.Request;
+import com.cloud.common.transport.Request;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
