@@ -1,11 +1,11 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.FenceAnswer;
-import com.cloud.agent.api.FenceCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.FenceAnswer;
+import com.cloud.legacymodel.communication.command.FenceCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;

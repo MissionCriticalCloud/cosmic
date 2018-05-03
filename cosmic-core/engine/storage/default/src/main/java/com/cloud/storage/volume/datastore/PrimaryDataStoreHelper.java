@@ -1,6 +1,5 @@
 package com.cloud.storage.volume.datastore;
 
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDao;
@@ -10,6 +9,7 @@ import com.cloud.engine.subsystem.api.storage.HostScope;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreParameters;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolStatus;

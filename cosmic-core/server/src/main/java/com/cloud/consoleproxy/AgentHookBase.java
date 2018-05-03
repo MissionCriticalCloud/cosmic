@@ -1,10 +1,6 @@
 package com.cloud.consoleproxy;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.GetVncPortAnswer;
-import com.cloud.agent.api.GetVncPortCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.configuration.Config;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keys.KeysManager;
@@ -14,17 +10,21 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ConsoleAccessAuthenticationAnswer;
+import com.cloud.legacymodel.communication.answer.GetVncPortAnswer;
 import com.cloud.legacymodel.communication.command.ConsoleAccessAuthenticationCommand;
 import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.GetVncPortCommand;
 import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.servlet.ConsoleProxyPasswordBasedEncryptor;
 import com.cloud.servlet.ConsoleProxyServlet;
-import com.cloud.utils.Ternary;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import java.security.NoSuchAlgorithmException;

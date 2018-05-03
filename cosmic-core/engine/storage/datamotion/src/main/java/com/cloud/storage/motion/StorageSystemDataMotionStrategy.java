@@ -1,7 +1,6 @@
 package com.cloud.storage.motion;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
@@ -29,6 +28,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;

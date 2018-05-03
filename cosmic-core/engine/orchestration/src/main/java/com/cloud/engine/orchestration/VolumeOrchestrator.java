@@ -1,6 +1,5 @@
 package com.cloud.engine.orchestration;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.manager.allocator.PodAllocator;
 import com.cloud.dao.EntityManager;
 import com.cloud.deploy.DataCenterDeployment;
@@ -53,6 +52,7 @@ import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;

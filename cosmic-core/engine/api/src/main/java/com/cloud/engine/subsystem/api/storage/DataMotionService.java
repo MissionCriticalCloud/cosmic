@@ -1,8 +1,8 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 
 import java.util.Map;
 

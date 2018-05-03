@@ -1,7 +1,6 @@
 package com.cloud.storage;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
@@ -16,6 +15,7 @@ import com.cloud.legacymodel.communication.answer.UploadStatusAnswer;
 import com.cloud.legacymodel.communication.answer.UploadStatusAnswer.UploadStatus;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.UploadStatusCommand;
 import com.cloud.legacymodel.communication.command.UploadStatusCommand.EntityType;
 import com.cloud.legacymodel.configuration.Resource;

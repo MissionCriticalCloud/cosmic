@@ -11,8 +11,8 @@ import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.StaticNatRule;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.rules.StaticNatRule;
 
 import java.util.ArrayList;
 import java.util.List;

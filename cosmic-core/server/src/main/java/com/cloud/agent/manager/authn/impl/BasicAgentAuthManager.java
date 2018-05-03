@@ -2,10 +2,10 @@ package com.cloud.agent.manager.authn.impl;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.StartupCommandProcessor;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.manager.authn.AgentAuthorizer;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.utils.component.AdapterBase;
 
 import javax.inject.Inject;

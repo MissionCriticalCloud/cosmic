@@ -4,29 +4,18 @@ import static com.cloud.utils.StringUtils.join;
 
 import static java.util.Arrays.asList;
 
-import com.cloud.legacymodel.communication.command.DeleteSnapshotsDirCommand;
-import com.cloud.agent.api.GetStorageStatsAnswer;
-import com.cloud.agent.api.GetStorageStatsCommand;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.PingStorageCommand;
-import com.cloud.agent.api.ReadyAnswer;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.SecStorageFirewallCfgCommand;
-import com.cloud.agent.api.SecStorageFirewallCfgCommand.PortConfig;
-import com.cloud.agent.api.SecStorageSetupAnswer;
-import com.cloud.agent.api.SecStorageSetupCommand;
-import com.cloud.agent.api.SecStorageVMSetupCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupSecondaryStorageCommand;
 import com.cloud.agent.api.storage.ListTemplateAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
 import com.cloud.agent.api.storage.ListVolumeAnswer;
 import com.cloud.agent.api.storage.ListVolumeCommand;
 import com.cloud.agent.api.storage.UploadCommand;
-import com.cloud.framework.security.keystore.KeystoreManager;
+import com.cloud.legacymodel.auth.Certificates;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.answer.GetStorageStatsAnswer;
+import com.cloud.legacymodel.communication.answer.ReadyAnswer;
+import com.cloud.legacymodel.communication.answer.SecStorageSetupAnswer;
 import com.cloud.legacymodel.communication.answer.UploadStatusAnswer;
 import com.cloud.legacymodel.communication.answer.UploadStatusAnswer.UploadStatus;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;
@@ -36,14 +25,27 @@ import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.CreateEntityDownloadURLCommand;
 import com.cloud.legacymodel.communication.command.DeleteCommand;
 import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLCommand;
+import com.cloud.legacymodel.communication.command.DeleteSnapshotsDirCommand;
+import com.cloud.legacymodel.communication.command.GetStorageStatsCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.PingStorageCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand;
+import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand.PortConfig;
+import com.cloud.legacymodel.communication.command.SecStorageSetupCommand;
+import com.cloud.legacymodel.communication.command.SecStorageVMSetupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupSecondaryStorageCommand;
 import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.legacymodel.communication.command.UploadStatusCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HostType;
@@ -62,14 +64,12 @@ import com.cloud.storage.template.RawImageProcessor;
 import com.cloud.storage.template.TARProcessor;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.storage.template.TemplateLocation;
-import com.cloud.storage.template.TemplateProp;
 import com.cloud.storage.template.UploadEntity;
 import com.cloud.storage.template.UploadManager;
 import com.cloud.storage.template.UploadManagerImpl;
 import com.cloud.storage.template.VhdProcessor;
 import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.imagestore.ImageStoreUtil;
@@ -667,7 +667,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         return new Answer(cmd, true, checksum);
     }
 
-    private void configCerts(final KeystoreManager.Certificates certs) {
+    private void configCerts(final Certificates certs) {
         if (certs == null) {
             configureSSL();
         } else {

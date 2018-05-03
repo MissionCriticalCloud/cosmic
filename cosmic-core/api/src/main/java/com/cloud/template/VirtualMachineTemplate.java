@@ -105,11 +105,7 @@ public interface VirtualMachineTemplate extends ControlledEntity, Identity, Inte
         OperationTimeout
     }
 
-    public static enum BootloaderType {
-        PyGrub, HVM, External, CD
-    }
-
-    public enum TemplateFilter {
+    enum TemplateFilter {
         featured, // returns templates that have been marked as featured and public
         self, // returns templates that have been registered or created by the calling user
         selfexecutable, // same as self, but only returns templates that are ready to be deployed with

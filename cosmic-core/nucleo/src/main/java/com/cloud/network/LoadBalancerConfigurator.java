@@ -1,7 +1,7 @@
 package com.cloud.network;
 
-import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
+import com.cloud.legacymodel.communication.command.LoadBalancerConfigCommand;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
 
 import java.util.List;
 

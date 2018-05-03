@@ -1,5 +1,6 @@
 package com.cloud.network;
 
+import com.cloud.legacymodel.network.Network;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;

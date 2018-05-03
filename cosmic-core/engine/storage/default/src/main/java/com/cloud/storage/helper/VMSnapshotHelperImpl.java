@@ -1,6 +1,5 @@
 package com.cloud.storage.helper;
 
-import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.host.HostVO;
@@ -9,6 +8,8 @@ import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.to.VMSnapshotTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HostType;
@@ -20,7 +21,6 @@ import com.cloud.storage.vmsnapshot.VMSnapshotHelper;
 import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 

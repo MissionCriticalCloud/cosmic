@@ -16,7 +16,7 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

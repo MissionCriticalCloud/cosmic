@@ -22,11 +22,11 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.PortForwardingRule;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.network.IpAddress;
-import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.List;

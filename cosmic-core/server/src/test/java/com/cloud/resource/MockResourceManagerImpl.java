@@ -1,9 +1,6 @@
 package com.cloud.resource;
 
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.VgpuTypesInfo;
-import com.cloud.agent.api.to.GPUDeviceTO;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
@@ -16,10 +13,11 @@ import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.gpu.HostGpuGroupsVO;
-import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStats;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
@@ -28,6 +26,8 @@ import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceInUseException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.resource.ResourceState.Event;
+import com.cloud.legacymodel.to.GPUDeviceTO;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -225,7 +225,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#createHostVOForConnectedAgent(com.cloud.agent.api.StartupCommand[])
+     * @see com.cloud.resource.ResourceManager#createHostVOForConnectedAgent(com.cloud.legacymodel.communication.command.StartupCommand[])
      */
     @Override
     public HostVO createHostVOForConnectedAgent(final StartupCommand[] cmds) {
@@ -243,7 +243,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.agent.api.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
+     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.legacymodel.communication.command.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
      * .HypervisorType, java.util.Map, java.util.List)
      */
     @Override

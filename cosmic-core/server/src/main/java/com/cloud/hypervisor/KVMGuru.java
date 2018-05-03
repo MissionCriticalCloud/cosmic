@@ -1,18 +1,18 @@
 package com.cloud.hypervisor;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
-import com.cloud.legacymodel.communication.command.CopyCommand;
-import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.vm.VirtualMachineProfile;

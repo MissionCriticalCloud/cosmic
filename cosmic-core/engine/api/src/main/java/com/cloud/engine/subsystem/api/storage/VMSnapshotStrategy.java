@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.vm.snapshot.VMSnapshot;
+import com.cloud.legacymodel.storage.VMSnapshot;
 
 public interface VMSnapshotStrategy {
     VMSnapshot takeVMSnapshot(VMSnapshot vmSnapshot);

@@ -1,17 +1,17 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.DeleteVMSnapshotAnswer;
-import com.cloud.agent.api.DeleteVMSnapshotCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.DeleteVMSnapshotAnswer;
+import com.cloud.legacymodel.communication.command.DeleteVMSnapshotCommand;
 import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.utils.script.Script;
 
 import org.libvirt.Connect;

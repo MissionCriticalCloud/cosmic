@@ -11,8 +11,8 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 

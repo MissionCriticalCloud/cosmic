@@ -1,6 +1,6 @@
 package com.cloud.storage.listener;
 
-import com.cloud.agent.api.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;

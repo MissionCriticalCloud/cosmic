@@ -1,6 +1,6 @@
 package com.cloud.agent.api.routing;
 
-import com.cloud.agent.api.to.PortForwardingRuleTO;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
 
 import java.util.List;
 

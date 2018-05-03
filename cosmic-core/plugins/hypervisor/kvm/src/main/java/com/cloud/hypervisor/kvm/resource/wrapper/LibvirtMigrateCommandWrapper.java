@@ -1,16 +1,16 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.MigrateAnswer;
-import com.cloud.agent.api.MigrateCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
 import com.cloud.hypervisor.kvm.resource.async.MigrateKvmAsync;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MigrateAnswer;
+import com.cloud.legacymodel.communication.command.MigrateCommand;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.Ternary;
 
 import java.util.List;
 import java.util.concurrent.Callable;

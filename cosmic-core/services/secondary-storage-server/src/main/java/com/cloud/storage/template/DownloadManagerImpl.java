@@ -3,6 +3,7 @@ package com.cloud.storage.template;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;

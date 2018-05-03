@@ -1,6 +1,6 @@
 package com.cloud.agent;
 
-import com.cloud.agent.api.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.utils.component.Adapter;
 

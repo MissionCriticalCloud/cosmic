@@ -24,10 +24,10 @@ import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.LoadBalancer;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.List;

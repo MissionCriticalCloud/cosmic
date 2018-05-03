@@ -1,14 +1,14 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.PrepareForMigrationAnswer;
-import com.cloud.agent.api.PrepareForMigrationCommand;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.PrepareForMigrationAnswer;
+import com.cloud.legacymodel.communication.command.PrepareForMigrationCommand;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;

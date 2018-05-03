@@ -2,9 +2,9 @@ package com.cloud.network;
 
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.network.lb.LoadBalancingRule.LbDestination;
+import com.cloud.legacymodel.communication.command.LoadBalancerConfigCommand;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbDestination;
+import com.cloud.legacymodel.to.LoadBalancerTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class HAProxyConfiguratorTest {
     }
 
     /**
-     * Test method for {@link com.cloud.network.HAProxyConfigurator#generateConfiguration(com.cloud.agent.api.routing.LoadBalancerConfigCommand)}.
+     * Test method for {@link com.cloud.network.HAProxyConfigurator#generateConfiguration(LoadBalancerConfigCommand)}.
      */
     @Test
     public void testGenerateConfigurationLoadBalancerConfigCommand() {
@@ -78,7 +78,7 @@ public class HAProxyConfiguratorTest {
     }
 
     /**
-     * Test method for {@link com.cloud.network.HAProxyConfigurator#generateConfiguration(com.cloud.agent.api.routing.LoadBalancerConfigCommand)}.
+     * Test method for {@link com.cloud.network.HAProxyConfigurator#generateConfiguration(LoadBalancerConfigCommand)}.
      */
     @Test
     public void testGenerateConfigurationLoadBalancerProxyProtocolConfigCommand() {

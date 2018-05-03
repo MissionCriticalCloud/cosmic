@@ -1,7 +1,7 @@
 package com.cloud.network.vpc.dao;
 
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.vpc.Vpc;
-import com.cloud.network.Network;
 import com.cloud.network.vpc.VpcServiceMapVO;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;

@@ -14,8 +14,8 @@ import com.cloud.api.response.VMSnapshotResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

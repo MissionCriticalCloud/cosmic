@@ -11,12 +11,13 @@ import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network.Service;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.vm.NicSecondaryIp;
 

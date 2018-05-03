@@ -1,8 +1,8 @@
 package com.cloud.agent.transport;
 
-import com.cloud.agent.api.SecStorageFirewallCfgCommand.PortConfig;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand.PortConfig;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
 import com.cloud.legacymodel.utils.Pair;

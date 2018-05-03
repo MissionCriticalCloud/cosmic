@@ -12,8 +12,8 @@ import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.Network;
 
 import java.util.ArrayList;
 import java.util.List;

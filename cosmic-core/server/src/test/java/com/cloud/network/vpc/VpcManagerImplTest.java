@@ -6,10 +6,10 @@ import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;

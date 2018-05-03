@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import com.cloud.agent.api.PvlanSetupCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.resource.CommandWrapper;

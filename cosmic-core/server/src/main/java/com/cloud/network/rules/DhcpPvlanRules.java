@@ -1,9 +1,9 @@
 package com.cloud.network.rules;
 
-import com.cloud.agent.api.PvlanSetupCommand;
+import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.VirtualRouter;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.topology.NetworkTopologyVisitor;

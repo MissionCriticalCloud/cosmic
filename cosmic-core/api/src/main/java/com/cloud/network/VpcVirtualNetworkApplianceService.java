@@ -3,6 +3,7 @@ package com.cloud.network;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.vm.VirtualMachineProfile;
 

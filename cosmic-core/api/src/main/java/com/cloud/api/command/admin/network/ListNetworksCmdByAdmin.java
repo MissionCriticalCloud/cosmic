@@ -6,8 +6,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.network.ListNetworksCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.Network;
 
 import java.util.ArrayList;
 import java.util.List;

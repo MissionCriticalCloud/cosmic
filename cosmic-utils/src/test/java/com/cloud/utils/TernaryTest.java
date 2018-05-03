@@ -1,6 +1,7 @@
 package com.cloud.utils;
 
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 
 import org.junit.Assert;
 import org.junit.Test;

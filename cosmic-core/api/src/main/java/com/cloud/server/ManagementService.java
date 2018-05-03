@@ -53,6 +53,7 @@ import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -60,7 +61,6 @@ import com.cloud.network.IpAddress;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.GuestOsCategory;
-import com.cloud.utils.Ternary;
 import com.cloud.vm.InstanceGroup;
 
 import java.util.ArrayList;

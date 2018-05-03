@@ -1,17 +1,17 @@
 package com.cloud.network.rules;
 
-import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.PublicIpAddress;

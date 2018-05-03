@@ -16,8 +16,8 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.utils.Ternary;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

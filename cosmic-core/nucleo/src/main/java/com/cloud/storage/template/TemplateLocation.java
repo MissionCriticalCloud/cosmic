@@ -1,5 +1,6 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.command.DownloadCommand.ResourceType;
@@ -130,21 +131,21 @@ public class TemplateLocation {
 
     public TemplateProp getTemplateInfo() {
         final TemplateProp tmplInfo = new TemplateProp();
-        tmplInfo.id = Long.parseLong(_props.getProperty("id"));
-        tmplInfo.installPath = _templatePath + _props.getProperty("filename"); // _templatePath endsWith /
+        tmplInfo.setId(Long.parseLong(_props.getProperty("id")));
+        tmplInfo.setInstallPath(_templatePath + _props.getProperty("filename")); // _templatePath endsWith /
         if (_resourceType == ResourceType.VOLUME) {
-            tmplInfo.installPath = tmplInfo.installPath.substring(tmplInfo.installPath.indexOf("volumes"));
+            tmplInfo.setInstallPath(tmplInfo.getInstallPath().substring(tmplInfo.getInstallPath().indexOf("volumes")));
         } else {
-            tmplInfo.installPath = tmplInfo.installPath.substring(tmplInfo.installPath.indexOf("template"));
+            tmplInfo.setInstallPath(tmplInfo.getInstallPath().substring(tmplInfo.getInstallPath().indexOf("template")));
         }
-        tmplInfo.isCorrupted = _isCorrupted;
-        tmplInfo.isPublic = Boolean.parseBoolean(_props.getProperty("public"));
-        tmplInfo.templateName = _props.getProperty("uniquename");
+        tmplInfo.setCorrupted(_isCorrupted);
+        tmplInfo.setPublic(Boolean.parseBoolean(_props.getProperty("public")));
+        tmplInfo.setTemplateName(_props.getProperty("uniquename"));
         if (_props.getProperty("virtualsize") != null) {
-            tmplInfo.size = Long.parseLong(_props.getProperty("virtualsize"));
+            tmplInfo.setSize(Long.parseLong(_props.getProperty("virtualsize")));
         }
         if (_props.getProperty("size") != null) {
-            tmplInfo.physicalSize = Long.parseLong(_props.getProperty("size"));
+            tmplInfo.setPhysicalSize(Long.parseLong(_props.getProperty("size")));
         }
 
         return tmplInfo;

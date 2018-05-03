@@ -1,11 +1,11 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.utils.Profiler;

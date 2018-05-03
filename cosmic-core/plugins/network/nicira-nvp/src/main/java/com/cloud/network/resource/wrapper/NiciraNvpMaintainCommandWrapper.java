@@ -1,8 +1,8 @@
 package com.cloud.network.resource.wrapper;
 
-import com.cloud.agent.api.MaintainAnswer;
-import com.cloud.agent.api.MaintainCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MaintainAnswer;
+import com.cloud.legacymodel.communication.command.MaintainCommand;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;

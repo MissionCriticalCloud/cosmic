@@ -1,6 +1,5 @@
 package com.cloud.storage;
 
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -13,6 +12,7 @@ import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.StorageConflictException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;

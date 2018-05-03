@@ -2,9 +2,9 @@ package com.cloud.hypervisor;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.StartupCommandProcessor;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.net.MacAddress;

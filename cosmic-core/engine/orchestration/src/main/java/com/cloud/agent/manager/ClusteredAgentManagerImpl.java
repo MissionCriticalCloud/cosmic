@@ -1,8 +1,5 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.api.PropagateResourceEventCommand;
-import com.cloud.agent.api.ScheduleHostScanTaskCommand;
-import com.cloud.agent.api.TransferAgentCommand;
 import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Request.Version;
 import com.cloud.agent.transport.Response;
@@ -24,6 +21,9 @@ import com.cloud.legacymodel.communication.answer.ChangeAgentAnswer;
 import com.cloud.legacymodel.communication.command.CancelCommand;
 import com.cloud.legacymodel.communication.command.ChangeAgentCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.PropagateResourceEventCommand;
+import com.cloud.legacymodel.communication.command.ScheduleHostScanTaskCommand;
+import com.cloud.legacymodel.communication.command.TransferAgentCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;

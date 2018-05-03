@@ -10,7 +10,7 @@ import com.cloud.api.response.NetworkResponse;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

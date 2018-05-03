@@ -3,13 +3,13 @@ package com.cloud.vm;
 import com.cloud.dao.EntityManager;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.BootloaderType;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

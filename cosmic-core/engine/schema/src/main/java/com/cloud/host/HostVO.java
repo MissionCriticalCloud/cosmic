@@ -1,9 +1,9 @@
 package com.cloud.host;
 
-import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;

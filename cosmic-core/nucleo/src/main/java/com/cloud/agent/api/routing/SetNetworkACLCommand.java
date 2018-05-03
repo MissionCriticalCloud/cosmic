@@ -1,7 +1,7 @@
 package com.cloud.agent.api.routing;
 
-import com.cloud.agent.api.to.NetworkACLTO;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.NetworkACLTO;
 import com.cloud.legacymodel.to.NicTO;
 
 import java.util.List;

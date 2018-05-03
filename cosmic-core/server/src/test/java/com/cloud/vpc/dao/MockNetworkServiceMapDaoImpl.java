@@ -1,7 +1,7 @@
 package com.cloud.vpc.dao;
 
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.NetworkServiceMapVO;
 import com.cloud.utils.db.DB;
@@ -13,7 +13,7 @@ import java.util.List;
 public class MockNetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceMapVO, Long> implements NetworkServiceMapDao {
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkServiceMapDao#areServicesSupportedInNetwork(long, com.cloud.network.Network.Service[])
+     * @see com.cloud.network.dao.NetworkServiceMapDao#areServicesSupportedInNetwork(long, com.cloud.legacymodel.network.Network.Service[])
      */
     @Override
     public boolean areServicesSupportedInNetwork(final long networkId, final Service... services) {
@@ -24,7 +24,7 @@ public class MockNetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceM
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkServiceMapDao#canProviderSupportServiceInNetwork(long, com.cloud.network.Network.Service, com.cloud.network.Network.Provider)
+     * @see com.cloud.network.dao.NetworkServiceMapDao#canProviderSupportServiceInNetwork(long, com.cloud.legacymodel.network.Network.Service, com.cloud.legacymodel.network.Network.Provider)
      */
     @Override
     public boolean canProviderSupportServiceInNetwork(final long networkId, final Service service, final Provider provider) {
@@ -42,7 +42,7 @@ public class MockNetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceM
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkServiceMapDao#getProviderForServiceInNetwork(long, com.cloud.network.Network.Service)
+     * @see com.cloud.network.dao.NetworkServiceMapDao#getProviderForServiceInNetwork(long, com.cloud.legacymodel.network.Network.Service)
      */
     @Override
     public String getProviderForServiceInNetwork(final long networkid, final Service service) {
@@ -69,7 +69,7 @@ public class MockNetworkServiceMapDaoImpl extends GenericDaoBase<NetworkServiceM
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkServiceMapDao#isProviderForNetwork(long, com.cloud.network.Network.Provider)
+     * @see com.cloud.network.dao.NetworkServiceMapDao#isProviderForNetwork(long, com.cloud.legacymodel.network.Network.Provider)
      */
     @Override
     public String isProviderForNetwork(final long networkId, final Provider provider) {

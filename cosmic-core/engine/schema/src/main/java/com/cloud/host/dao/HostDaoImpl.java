@@ -1,6 +1,5 @@
 package com.cloud.host.dao;
 
-import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.cluster.agentlb.HostTransferMapVO;
 import com.cloud.cluster.agentlb.dao.HostTransferMapDao;
 import com.cloud.dc.ClusterVO;
@@ -14,6 +13,7 @@ import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.model.enumeration.Event;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.ManagedState;

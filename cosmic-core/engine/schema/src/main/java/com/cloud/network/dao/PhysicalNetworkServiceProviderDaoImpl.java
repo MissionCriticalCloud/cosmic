@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;

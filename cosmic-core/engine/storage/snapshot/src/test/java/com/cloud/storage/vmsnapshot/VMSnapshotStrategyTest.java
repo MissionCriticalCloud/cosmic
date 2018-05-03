@@ -1,18 +1,20 @@
 package com.cloud.storage.vmsnapshot;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.CreateVMSnapshotAnswer;
-import com.cloud.agent.api.DeleteVMSnapshotAnswer;
-import com.cloud.agent.api.RevertToVMSnapshotAnswer;
-import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.CreateVMSnapshotAnswer;
+import com.cloud.legacymodel.communication.answer.DeleteVMSnapshotAnswer;
+import com.cloud.legacymodel.communication.answer.RevertToVMSnapshotAnswer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.to.VMSnapshotTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
@@ -20,13 +22,11 @@ import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.test.utils.SpringUtils;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
-import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 

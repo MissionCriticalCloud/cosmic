@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.ManageSnapshotAnswer;
-import com.cloud.agent.api.ManageSnapshotCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ManageSnapshotAnswer;
+import com.cloud.legacymodel.communication.command.ManageSnapshotCommand;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;

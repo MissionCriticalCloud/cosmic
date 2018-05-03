@@ -1,9 +1,9 @@
 package com.cloud.network.dao;
 
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.State;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network;
-import com.cloud.network.Network.State;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.fsm.StateDao;

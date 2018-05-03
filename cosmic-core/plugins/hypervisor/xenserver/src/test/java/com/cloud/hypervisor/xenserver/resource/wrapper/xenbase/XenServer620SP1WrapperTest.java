@@ -8,9 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.GetGPUStatsCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.GetGPUStatsCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.HashMap;

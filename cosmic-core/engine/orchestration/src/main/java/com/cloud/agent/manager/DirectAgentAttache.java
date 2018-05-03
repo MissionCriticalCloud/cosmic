@@ -1,13 +1,13 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.StartupAnswer;
 import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.StartupAnswer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.CronCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.managed.context.ManagedContextRunnable;

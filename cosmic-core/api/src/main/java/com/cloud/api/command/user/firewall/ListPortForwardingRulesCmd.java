@@ -10,8 +10,8 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
+import com.cloud.legacymodel.network.PortForwardingRule;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.rules.PortForwardingRule;
 
 import java.util.ArrayList;
 import java.util.List;

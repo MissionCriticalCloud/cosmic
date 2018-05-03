@@ -7,13 +7,6 @@ import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopped;
 import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopping;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.SecStorageFirewallCfgCommand;
-import com.cloud.agent.api.SecStorageSetupAnswer;
-import com.cloud.agent.api.SecStorageSetupCommand;
-import com.cloud.agent.api.SecStorageVMSetupCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupSecondaryStorageCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.configuration.Config;
@@ -36,10 +29,18 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.auth.Certificates;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
+import com.cloud.legacymodel.communication.answer.SecStorageSetupAnswer;
 import com.cloud.legacymodel.communication.command.CheckSshCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand;
+import com.cloud.legacymodel.communication.command.SecStorageSetupCommand;
+import com.cloud.legacymodel.communication.command.SecStorageVMSetupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupSecondaryStorageCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -47,6 +48,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.user.Account;
@@ -59,7 +61,6 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.StorageNetworkManager;
 import com.cloud.network.dao.IPAddressDao;
@@ -1013,7 +1014,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 if (!_useSSlCopy) {
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, null);
                 } else {
-                    final KeystoreManager.Certificates certs = _keystoreMgr.getCertificates(ConsoleProxyManager.CERTIFICATE_NAME);
+                    final Certificates certs = _keystoreMgr.getCertificates(ConsoleProxyManager.CERTIFICATE_NAME);
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, certs);
                 }
 

@@ -2,11 +2,11 @@ package com.cloud.vm.dao;
 
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.VirtualRouter.Role;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.GuestType;
-import com.cloud.network.Network;
 import com.cloud.network.dao.RouterNetworkDao;
 import com.cloud.network.dao.RouterNetworkVO;
 import com.cloud.offering.NetworkOffering;

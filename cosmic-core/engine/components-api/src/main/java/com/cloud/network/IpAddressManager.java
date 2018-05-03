@@ -11,6 +11,7 @@ import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityExcept
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.addr.PublicIp;

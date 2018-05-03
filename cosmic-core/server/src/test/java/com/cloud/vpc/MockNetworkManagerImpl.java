@@ -18,6 +18,9 @@ import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityExcept
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
@@ -28,9 +31,6 @@ import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.GuestVlan;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.NetworkService;
 import com.cloud.network.PhysicalNetwork;
@@ -489,7 +489,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.network.Network, com.cloud.deploy
+     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.legacymodel.network.Network, com.cloud.deploy
      * .DeploymentPlan, java.lang.String, java.lang.String, boolean, java.lang.Long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
      */
     @Override
@@ -639,7 +639,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#getPasswordResetProvider(com.cloud.network.Network)
+     * @see com.cloud.network.NetworkManager#getPasswordResetProvider(com.cloud.legacymodel.network.Network)
      */
     @Override
     public UserDataServiceProvider getPasswordResetProvider(final Network network) {
@@ -674,7 +674,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#allocateNic(com.cloud.vm.NicProfile, com.cloud.network.Network, java.lang.Boolean, com.cloud.vm.VirtualMachineProfile)
+     * @see com.cloud.network.NetworkManager#allocateNic(com.cloud.vm.NicProfile, com.cloud.legacymodel.network.Network, java.lang.Boolean, com.cloud.vm.VirtualMachineProfile)
      */
     @Override
     public NicProfile allocateNic(final NicProfile requested, final Network network, final Boolean isDefaultNic, final VirtualMachineProfile vm)
@@ -710,7 +710,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#createNicForVm(com.cloud.network.Network, com.cloud.vm.NicProfile, com.cloud.vm.ReservationContext, com.cloud.vm
+     * @see com.cloud.network.NetworkManager#createNicForVm(com.cloud.legacymodel.network.Network, com.cloud.vm.NicProfile, com.cloud.vm.ReservationContext, com.cloud.vm
      * .VirtualMachineProfileImpl, boolean, boolean)
      */
     @Override

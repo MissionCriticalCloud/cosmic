@@ -1,7 +1,7 @@
 package com.cloud.network.dao;
 
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.utils.db.GenericDao;
 

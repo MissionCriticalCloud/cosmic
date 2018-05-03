@@ -10,13 +10,6 @@ import java.net.URISyntaxException;
  */
 public class Networks {
 
-    public enum RouterPrivateIpStrategy {
-        None, DcGlobal, // global to data center
-        HostLocal;
-
-        public static final String DummyPrivateIp = "169.254.1.1";
-    }
-
     public enum IsolationType {
         None(null, null), Ec2("ec2", String.class), Vlan("vlan", Integer.class) {
             @Override

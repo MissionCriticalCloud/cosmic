@@ -1,7 +1,5 @@
 package com.cloud.vm;
 
-import com.cloud.agent.api.VmDiskStatsEntry;
-import com.cloud.agent.api.VmStatsEntry;
 import com.cloud.api.BaseCmd.HTTPMethod;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -9,8 +7,10 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ManagementServerException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.storage.VmDiskStatsEntry;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.uservm.UserVm;
 
 import java.util.HashMap;

@@ -18,8 +18,8 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.Network;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;

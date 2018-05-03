@@ -1,11 +1,11 @@
 package com.cloud.network.dao;
 
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.NetUtils;

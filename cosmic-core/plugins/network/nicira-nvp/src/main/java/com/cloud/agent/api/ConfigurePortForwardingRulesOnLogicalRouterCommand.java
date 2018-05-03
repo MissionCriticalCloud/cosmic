@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.PortForwardingRuleTO;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
 
 import java.util.List;
 

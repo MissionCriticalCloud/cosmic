@@ -5,9 +5,11 @@ import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.PortForwardingRule;
+import com.cloud.legacymodel.network.StaticNatRule;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.utils.net.Ip;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
 package com.cloud.storage.datastore.lifecycle;
 
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.HostScope;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;

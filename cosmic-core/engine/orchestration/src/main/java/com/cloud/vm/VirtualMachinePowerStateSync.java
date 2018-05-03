@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.agent.api.HostVmStateReportEntry;
+import com.cloud.legacymodel.vm.HostVmStateReportEntry;
 import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.Map;

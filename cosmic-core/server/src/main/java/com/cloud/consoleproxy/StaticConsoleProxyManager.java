@@ -1,9 +1,9 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ResourceManager;

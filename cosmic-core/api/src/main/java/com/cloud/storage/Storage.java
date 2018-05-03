@@ -23,8 +23,4 @@ public class Storage {
         PERHOST, /* every host has this template, don't need to install it in secondary storage */
         USER /* User supplied template/iso */
     }
-
-    public enum StorageResourceType {
-        STORAGE_POOL, STORAGE_HOST, SECONDARY_STORAGE, LOCAL_SECONDARY_STORAGE
-    }
 }

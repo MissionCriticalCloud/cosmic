@@ -1,16 +1,16 @@
 package com.cloud.storage.secondary;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupSecondaryStorageCommand;
-import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupSecondaryStorageCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
-import com.cloud.storage.Storage;
+import com.cloud.model.enumeration.StorageResourceType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class SecondaryStorageListener implements Listener {
     public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) {
         if ((cmd instanceof StartupStorageCommand)) {
             final StartupStorageCommand scmd = (StartupStorageCommand) cmd;
-            if (scmd.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE) {
+            if (scmd.getResourceType() == StorageResourceType.SECONDARY_STORAGE) {
                 _ssVmMgr.generateSetupCommand(agent.getId());
                 return;
             }

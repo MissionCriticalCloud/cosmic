@@ -1,14 +1,14 @@
 package com.cloud.consoleproxy;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.GetVncPortAnswer;
-import com.cloud.agent.api.GetVncPortCommand;
-import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.GetVncPortAnswer;
+import com.cloud.legacymodel.communication.command.GetVncPortCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
 import com.cloud.server.ManagementServer;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;

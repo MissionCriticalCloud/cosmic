@@ -1,6 +1,5 @@
 package com.cloud.storage.motion;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.DataMotionService;
 import com.cloud.engine.subsystem.api.storage.DataMotionStrategy;
@@ -11,6 +10,7 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.utils.StringUtils;
 
 import javax.inject.Inject;

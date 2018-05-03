@@ -1,6 +1,6 @@
 package com.cloud.network.element;
 
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 
 public interface IpDeployingRequester {
     /**

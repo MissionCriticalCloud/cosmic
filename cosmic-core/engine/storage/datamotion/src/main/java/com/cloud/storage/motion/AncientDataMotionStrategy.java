@@ -2,7 +2,6 @@ package com.cloud.storage.motion;
 
 import com.cloud.agent.api.storage.MigrateVolumeAnswer;
 import com.cloud.agent.api.storage.MigrateVolumeCommand;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
@@ -32,6 +31,7 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.StoragePoolType;

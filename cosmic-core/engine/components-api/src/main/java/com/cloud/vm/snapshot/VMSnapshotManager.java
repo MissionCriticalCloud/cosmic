@@ -1,6 +1,7 @@
 package com.cloud.vm.snapshot;
 
-import com.cloud.agent.api.RestoreVMSnapshotCommand;
+import com.cloud.legacymodel.communication.command.RestoreVMSnapshotCommand;
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;

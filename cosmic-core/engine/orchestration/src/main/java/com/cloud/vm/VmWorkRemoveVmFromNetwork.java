@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 
 import java.net.URI;
 

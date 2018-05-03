@@ -1,12 +1,12 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
 import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.StaticNatRule;
 import com.cloud.agent.resource.virtualnetwork.model.StaticNatRules;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.StaticNatRuleTO;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.LinkedList;

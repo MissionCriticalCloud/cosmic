@@ -1,6 +1,7 @@
 package com.cloud.network;
 
 import com.cloud.deploy.DeployDestination;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;

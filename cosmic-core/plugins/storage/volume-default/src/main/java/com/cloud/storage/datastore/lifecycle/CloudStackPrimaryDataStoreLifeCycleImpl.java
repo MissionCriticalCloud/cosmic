@@ -1,7 +1,6 @@
 package com.cloud.storage.datastore.lifecycle;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.alert.AlertManager;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -20,6 +19,7 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.StorageConflictException;
 import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;

@@ -1,7 +1,7 @@
 package com.cloud.gpu.dao;
 
-import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.gpu.VGPUTypesVO;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.HashMap;

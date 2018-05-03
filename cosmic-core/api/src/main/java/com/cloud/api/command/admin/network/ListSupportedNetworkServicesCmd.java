@@ -8,9 +8,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ServiceResponse;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Service;
 
 import java.util.ArrayList;
 import java.util.List;

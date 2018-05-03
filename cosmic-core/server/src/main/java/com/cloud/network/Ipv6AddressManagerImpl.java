@@ -10,6 +10,7 @@ import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.UserIpv6AddressDao;

@@ -14,6 +14,7 @@ import com.cloud.gpu.GPU;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.legacymodel.vm.VmStats;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.user.AccountManager;
@@ -24,7 +25,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.VmDetailConstants;
-import com.cloud.vm.VmStats;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.dao.UserVmDetailsDao;
 

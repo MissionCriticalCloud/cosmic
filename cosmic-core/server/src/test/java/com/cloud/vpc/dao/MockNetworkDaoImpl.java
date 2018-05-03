@@ -1,8 +1,8 @@
 package com.cloud.vpc.dao;
 
-import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.dao.NetworkAccountVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
@@ -50,7 +50,7 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#listByZoneAndGuestType(long, long, com.cloud.network.Network.GuestType, java.lang.Boolean)
+     * @see com.cloud.network.dao.NetworkDao#listByZoneAndGuestType(long, long, com.cloud.legacymodel.network.Network.GuestType, java.lang.Boolean)
      */
     @Override
     public List<NetworkVO> listByZoneAndGuestType(final long accountId, final long dataCenterId, final GuestType type, final Boolean isSystem) {
@@ -113,7 +113,7 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#countByZoneUriAndGuestType(long, java.lang.String, com.cloud.network.Network.GuestType)
+     * @see com.cloud.network.dao.NetworkDao#countByZoneUriAndGuestType(long, java.lang.String, com.cloud.legacymodel.network.Network.GuestType)
      */
     @Override
     public long countByZoneUriAndGuestType(final long zoneId, final String broadcastUri, final GuestType guestType) {
@@ -194,7 +194,7 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#listBy(long, long, com.cloud.network.Network.GuestType, com.cloud.network.Networks.TrafficType)
+     * @see com.cloud.network.dao.NetworkDao#listBy(long, long, com.cloud.legacymodel.network.Network.GuestType, com.cloud.network.Networks.TrafficType)
      */
     @Override
     public List<NetworkVO> listBy(final long accountId, final long dataCenterId, final GuestType type, final TrafficType trafficType) {
@@ -266,7 +266,7 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#listSourceNATEnabledNetworks(long, long, com.cloud.network.Network.GuestType)
+     * @see com.cloud.network.dao.NetworkDao#listSourceNATEnabledNetworks(long, long, com.cloud.legacymodel.network.Network.GuestType)
      */
     @Override
     public List<NetworkVO> listSourceNATEnabledNetworks(final long accountId, final long dataCenterId, final GuestType type) {
@@ -330,7 +330,7 @@ public class MockNetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implemen
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.dao.NetworkDao#listNetworksByAccount(long, long, com.cloud.network.Network.GuestType, boolean)
+     * @see com.cloud.network.dao.NetworkDao#listNetworksByAccount(long, long, com.cloud.legacymodel.network.Network.GuestType, boolean)
      */
     @Override
     public List<NetworkVO> listNetworksByAccount(final long accountId, final long zoneId, final GuestType type, final boolean isSystem) {

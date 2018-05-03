@@ -1,16 +1,17 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.PrepareOCFS2NodesCommand;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.PrepareOCFS2NodesCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.ResourceListener;
@@ -18,7 +19,6 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ServerResource;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;

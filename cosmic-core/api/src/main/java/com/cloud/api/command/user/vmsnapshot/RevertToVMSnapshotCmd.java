@@ -18,9 +18,9 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

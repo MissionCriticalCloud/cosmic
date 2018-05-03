@@ -1,11 +1,11 @@
 package com.cloud.agent;
 
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.ConnectionException;

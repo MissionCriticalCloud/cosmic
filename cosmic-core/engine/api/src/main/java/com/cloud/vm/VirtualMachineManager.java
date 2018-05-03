@@ -1,6 +1,5 @@
 package com.cloud.vm;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
@@ -13,14 +12,15 @@ import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;
-import com.cloud.network.Network;
 import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.template.VirtualMachineTemplate;

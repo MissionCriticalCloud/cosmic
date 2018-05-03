@@ -3,6 +3,11 @@ package com.cloud.network;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.IpAddresses;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
 import com.cloud.legacymodel.user.Account;
@@ -10,10 +15,6 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.IpAddresses;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkVO;
@@ -166,7 +167,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getUserDataUpdateProvider(com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#getUserDataUpdateProvider(com.cloud.legacymodel.network.Network)
      */
     @Override
     public UserDataServiceProvider getUserDataUpdateProvider(final Network network) {
@@ -175,7 +176,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getNetworkServiceCapabilities(long, com.cloud.network.Network.Service)
+     * @see com.cloud.network.NetworkModel#getNetworkServiceCapabilities(long, com.cloud.legacymodel.network.Network.Service)
      */
     @Override
     public Map<Capability, String> getNetworkServiceCapabilities(final long networkId, final Service service) {
@@ -189,7 +190,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#areServicesSupportedByNetworkOffering(long, com.cloud.network.Network.Service[])
+     * @see com.cloud.network.NetworkModel#areServicesSupportedByNetworkOffering(long, com.cloud.legacymodel.network.Network.Service[])
      */
     @Override
     public boolean areServicesSupportedByNetworkOffering(final long networkOfferingId, final Service... services) {
@@ -198,7 +199,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#listNetworksForAccount(long, long, com.cloud.network.Network.GuestType)
+     * @see com.cloud.network.NetworkModel#listNetworksForAccount(long, long, com.cloud.legacymodel.network.Network.GuestType)
      */
     @Override
     public List<NetworkVO> listNetworksForAccount(final long accountId, final long zoneId, final GuestType type) {
@@ -234,7 +235,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isProviderSupportServiceInNetwork(long, com.cloud.network.Network.Service, com.cloud.network.Network.Provider)
+     * @see com.cloud.network.NetworkModel#isProviderSupportServiceInNetwork(long, com.cloud.legacymodel.network.Network.Service, com.cloud.legacymodel.network.Network.Provider)
      */
     @Override
     public boolean isProviderSupportServiceInNetwork(final long networkId, final Service service, final Provider provider) {
@@ -252,7 +253,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getNetworkTag(com.cloud.hypervisor.Hypervisor.HypervisorType, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#getNetworkTag(com.cloud.hypervisor.Hypervisor.HypervisorType, com.cloud.legacymodel.network.Network)
      */
     @Override
     public String getNetworkTag(final HypervisorType hType, final Network network) {
@@ -261,7 +262,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getElementServices(com.cloud.network.Network.Provider)
+     * @see com.cloud.network.NetworkModel#getElementServices(com.cloud.legacymodel.network.Network.Provider)
      */
     @Override
     public List<Service> getElementServices(final Provider provider) {
@@ -270,7 +271,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#canElementEnableIndividualServices(com.cloud.network.Network.Provider)
+     * @see com.cloud.network.NetworkModel#canElementEnableIndividualServices(com.cloud.legacymodel.network.Network.Provider)
      */
     @Override
     public boolean canElementEnableIndividualServices(final Provider provider) {
@@ -279,7 +280,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#areServicesSupportedInNetwork(long, com.cloud.network.Network.Service[])
+     * @see com.cloud.network.NetworkModel#areServicesSupportedInNetwork(long, com.cloud.legacymodel.network.Network.Service[])
      */
     @Override
     public boolean areServicesSupportedInNetwork(final long networkId, final Service... services) {
@@ -288,7 +289,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isNetworkSystem(com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#isNetworkSystem(com.cloud.legacymodel.network.Network)
      */
     @Override
     public boolean isNetworkSystem(final Network network) {
@@ -297,7 +298,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getNetworkOfferingServiceCapabilities(com.cloud.offering.NetworkOffering, com.cloud.network.Network.Service)
+     * @see com.cloud.network.NetworkModel#getNetworkOfferingServiceCapabilities(com.cloud.offering.NetworkOffering, com.cloud.legacymodel.network.Network.Service)
      */
     @Override
     public Map<Capability, String> getNetworkOfferingServiceCapabilities(final NetworkOffering offering, final Service service) {
@@ -306,7 +307,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getPhysicalNetworkId(com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#getPhysicalNetworkId(com.cloud.legacymodel.network.Network)
      */
     @Override
     public Long getPhysicalNetworkId(final Network network) {
@@ -324,7 +325,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isProviderForNetwork(com.cloud.network.Network.Provider, long)
+     * @see com.cloud.network.NetworkModel#isProviderForNetwork(com.cloud.legacymodel.network.Network.Provider, long)
      */
     @Override
     public boolean isProviderForNetwork(final Provider provider, final long networkId) {
@@ -378,7 +379,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getProviderToIpList(com.cloud.network.Network, java.util.Map)
+     * @see com.cloud.network.NetworkModel#getProviderToIpList(com.cloud.legacymodel.network.Network, java.util.Map)
      */
     @Override
     public Map<Provider, ArrayList<PublicIpAddress>> getProviderToIpList(final Network network, final Map<PublicIpAddress, Set<Service>> ipToServices) {
@@ -387,7 +388,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#checkIpForService(com.cloud.network.IPAddressVO, com.cloud.network.Network.Service, java.lang.Long)
+     * @see com.cloud.network.NetworkModel#checkIpForService(com.cloud.network.IPAddressVO, com.cloud.legacymodel.network.Network.Service, java.lang.Long)
      */
     @Override
     public boolean checkIpForService(final IpAddress ip, final Service service, final Long networkId) {
@@ -396,7 +397,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#checkCapabilityForProvider(java.util.Set, com.cloud.network.Network.Service, com.cloud.network.Network.Capability, java.lang.String)
+     * @see com.cloud.network.NetworkModel#checkCapabilityForProvider(java.util.Set, com.cloud.legacymodel.network.Network.Service, com.cloud.legacymodel.network.Network.Capability, java.lang.String)
      */
     @Override
     public void checkCapabilityForProvider(final Set<Provider> providers, final Service service, final Capability cap, final String capValue) {
@@ -414,7 +415,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#checkNetworkPermissions(com.cloud.legacymodel.user.Account, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#checkNetworkPermissions(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.network.Network)
      */
     @Override
     public void checkNetworkPermissions(final Account owner, final Network network) {
@@ -531,7 +532,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#canUseForDeploy(com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#canUseForDeploy(com.cloud.legacymodel.network.Network)
      */
     @Override
     public boolean canUseForDeploy(final Network network) {
@@ -621,7 +622,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getAvailableIps(com.cloud.network.Network, java.lang.String)
+     * @see com.cloud.network.NetworkModel#getAvailableIps(com.cloud.legacymodel.network.Network, java.lang.String)
      */
     @Override
     public SortedSet<Long> getAvailableIps(final Network network, final String requestedIp) {
@@ -639,7 +640,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getSourceNatIpAddressForGuestNetwork(com.cloud.legacymodel.user.Account, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkModel#getSourceNatIpAddressForGuestNetwork(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.network.Network)
      */
     @Override
     public PublicIpAddress getSourceNatIpAddressForGuestNetwork(final Account owner, final Network guestNetwork) {

@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.xenserver;
 
-import com.cloud.agent.api.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.utils.Pair;

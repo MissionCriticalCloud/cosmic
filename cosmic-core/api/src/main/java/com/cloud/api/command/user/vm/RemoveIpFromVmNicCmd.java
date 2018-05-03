@@ -14,9 +14,9 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
 import com.cloud.vm.NicSecondaryIp;
 
 import org.slf4j.Logger;

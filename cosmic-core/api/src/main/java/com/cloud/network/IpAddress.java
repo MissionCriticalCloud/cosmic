@@ -4,7 +4,7 @@ import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
-import com.cloud.utils.net.Ip;
+import com.cloud.legacymodel.network.Ip;
 
 import java.util.Date;
 

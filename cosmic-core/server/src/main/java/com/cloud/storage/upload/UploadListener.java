@@ -1,8 +1,6 @@
 package com.cloud.storage.upload;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand;
@@ -23,13 +21,15 @@ import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.Upload.Status;
 import com.cloud.legacymodel.storage.Upload.Type;
 import com.cloud.managed.context.ManagedContextTimerTask;
-import com.cloud.storage.Storage;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.upload.UploadState.UploadEvent;
@@ -251,7 +251,7 @@ public class UploadListener implements Listener {
         final long agentId = agent.getId();
 
         final StartupStorageCommand storage = (StartupStorageCommand) cmd;
-        if (storage.getResourceType() == Storage.StorageResourceType.STORAGE_HOST || storage.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE) {
+        if (storage.getResourceType() == StorageResourceType.STORAGE_HOST || storage.getResourceType() == StorageResourceType.SECONDARY_STORAGE) {
             uploadMonitor.handleUploadSync(agentId);
         }
     }

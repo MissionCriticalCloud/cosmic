@@ -1,9 +1,6 @@
 package com.cloud.storage.motion;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.MigrateWithStorageAnswer;
-import com.cloud.agent.api.MigrateWithStorageCommand;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.DataMotionStrategy;
 import com.cloud.engine.subsystem.api.storage.DataObject;
@@ -13,12 +10,15 @@ import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MigrateWithStorageAnswer;
+import com.cloud.legacymodel.communication.command.MigrateWithStorageCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.legacymodel.utils.Pair;

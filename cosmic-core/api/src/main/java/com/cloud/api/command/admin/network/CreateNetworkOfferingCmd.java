@@ -10,9 +10,9 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.NetworkOfferingResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.Service;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 

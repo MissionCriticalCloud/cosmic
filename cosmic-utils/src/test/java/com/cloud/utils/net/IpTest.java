@@ -2,6 +2,8 @@ package com.cloud.utils.net;
 
 import static org.junit.Assert.assertEquals;
 
+import com.cloud.legacymodel.network.Ip;
+
 import com.google.common.testing.EqualsTester;
 import org.junit.Assert;
 import org.junit.Test;

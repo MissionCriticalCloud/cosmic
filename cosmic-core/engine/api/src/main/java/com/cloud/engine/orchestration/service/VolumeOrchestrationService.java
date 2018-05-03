@@ -1,6 +1,5 @@
 package com.cloud.engine.orchestration.service;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -17,6 +16,7 @@ import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;

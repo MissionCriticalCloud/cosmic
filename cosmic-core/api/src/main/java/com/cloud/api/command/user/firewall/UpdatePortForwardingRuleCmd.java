@@ -12,9 +12,9 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.PortForwardingRule;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 
 import org.slf4j.Logger;

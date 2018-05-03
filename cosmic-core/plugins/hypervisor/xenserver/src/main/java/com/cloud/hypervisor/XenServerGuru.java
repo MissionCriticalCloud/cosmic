@@ -1,6 +1,5 @@
 package com.cloud.hypervisor;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
@@ -17,7 +16,9 @@ import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.BootloaderType;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -30,7 +31,6 @@ import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;

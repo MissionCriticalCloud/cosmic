@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xcp;
 
-import com.cloud.agent.api.NetworkUsageAnswer;
-import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.hypervisor.xenserver.resource.XcpServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

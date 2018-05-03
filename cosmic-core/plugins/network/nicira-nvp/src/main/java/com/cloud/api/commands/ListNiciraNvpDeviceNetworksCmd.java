@@ -17,7 +17,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.network.element.NiciraNvpElementService;
 
 import javax.inject.Inject;

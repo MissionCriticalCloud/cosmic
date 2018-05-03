@@ -1,8 +1,8 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
+import com.cloud.legacymodel.to.VMSnapshotTO;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.QCOW2Processor;
@@ -82,11 +82,11 @@ public class LibvirtUtilitiesHelper {
     public String generateVMSnapshotXML(final VMSnapshotTO snapshot, final VMSnapshotTO parent, final String domainXmlDesc) {
         final String parentName = (parent == null) ? "" : ("  <parent><name>" + parent.getSnapshotName() + "</name></parent>\n");
         return "<domainsnapshot>\n"
-               + "  <name>" + snapshot.getSnapshotName() + "</name>\n"
-               + "  <state>running</state>\n"
-               + parentName
-               + "  <creationTime>" + (int) Math.rint(snapshot.getCreateTime()/1000) + "</creationTime>\n"
-               + domainXmlDesc
-               + "</domainsnapshot>";
+                + "  <name>" + snapshot.getSnapshotName() + "</name>\n"
+                + "  <state>running</state>\n"
+                + parentName
+                + "  <creationTime>" + (int) Math.rint(snapshot.getCreateTime() / 1000) + "</creationTime>\n"
+                + domainXmlDesc
+                + "</domainsnapshot>";
     }
 }

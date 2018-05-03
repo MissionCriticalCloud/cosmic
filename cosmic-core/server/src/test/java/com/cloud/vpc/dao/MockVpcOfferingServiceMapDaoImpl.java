@@ -1,6 +1,6 @@
 package com.cloud.vpc.dao;
 
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.network.vpc.VpcOfferingServiceMapVO;
 import com.cloud.network.vpc.dao.VpcOfferingServiceMapDao;
 import com.cloud.utils.db.DB;
@@ -21,7 +21,7 @@ public class MockVpcOfferingServiceMapDaoImpl extends GenericDaoBase<VpcOffering
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.vpc.Dao.VpcOfferingServiceMapDao#areServicesSupportedByNetworkOffering(long, com.cloud.network.Network.Service[])
+     * @see com.cloud.network.vpc.Dao.VpcOfferingServiceMapDao#areServicesSupportedByNetworkOffering(long, com.cloud.legacymodel.network.Network.Service[])
      */
     @Override
     public boolean areServicesSupportedByNetworkOffering(final long networkOfferingId, final Service[] services) {

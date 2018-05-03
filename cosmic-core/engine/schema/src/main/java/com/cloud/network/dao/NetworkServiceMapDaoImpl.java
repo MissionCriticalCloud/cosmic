@@ -1,8 +1,8 @@
 package com.cloud.network.dao;
 
 import com.cloud.legacymodel.exceptions.UnsupportedServiceException;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;

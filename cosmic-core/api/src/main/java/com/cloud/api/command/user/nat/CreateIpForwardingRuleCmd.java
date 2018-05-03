@@ -18,9 +18,9 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.StaticNatRule;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
-import com.cloud.network.rules.StaticNatRule;
 
 import java.util.List;
 

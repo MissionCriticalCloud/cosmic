@@ -1,7 +1,6 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
@@ -80,6 +79,8 @@ import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.legacymodel.storage.StorageStats;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.storage.Volume;

@@ -18,7 +18,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

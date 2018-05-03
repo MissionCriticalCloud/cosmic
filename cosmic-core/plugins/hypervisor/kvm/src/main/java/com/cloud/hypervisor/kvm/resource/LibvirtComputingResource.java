@@ -18,16 +18,7 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 
 import static java.util.UUID.randomUUID;
 
-import com.cloud.agent.api.HostVmStateReportEntry;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.PingRoutingCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.api.UpdateNetworkOverviewCommand;
-import com.cloud.agent.api.VmDiskStatsEntry;
-import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
@@ -65,38 +56,48 @@ import com.cloud.hypervisor.kvm.storage.KvmStorageProcessor;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.PingRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
-import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.legacymodel.storage.VmDiskStatsEntry;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.MetadataTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.HostVmStateReportEntry;
 import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.RouterPrivateIpStrategy;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.network.Networks.RouterPrivateIpStrategy;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.JavaStorageLayer;
-import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
-import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.hypervisor.HypervisorUtils;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
@@ -1792,7 +1793,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             final String localStoragePath = getLocalStoragePath();
             final KvmStoragePool localStoragePool = storagePoolMgr.createStoragePool(getLocalStorageUuid(), "localhost", -1,
                     localStoragePath, "", StoragePoolType.Filesystem);
-            final com.cloud.agent.api.StoragePoolInfo pi = new com.cloud.agent.api.StoragePoolInfo(localStoragePool.getUuid(),
+            final StoragePoolInfo pi = new StoragePoolInfo(localStoragePool.getUuid(),
                     cmd.getPrivateIpAddress(), localStoragePath, localStoragePath,
                     StoragePoolType.Filesystem, localStoragePool.getCapacity(), localStoragePool.getAvailable());
 
@@ -1800,7 +1801,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             sscmd.setPoolInfo(pi);
             sscmd.setGuid(pi.getUuid());
             sscmd.setDataCenter(getZone());
-            sscmd.setResourceType(Storage.StorageResourceType.STORAGE_POOL);
+            sscmd.setResourceType(StorageResourceType.STORAGE_POOL);
         } catch (final CloudRuntimeException e) {
             logger.debug("Unable to initialize local storage pool: " + e);
         }

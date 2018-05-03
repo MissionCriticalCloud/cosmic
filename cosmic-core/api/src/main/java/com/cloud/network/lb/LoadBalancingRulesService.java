@@ -10,13 +10,13 @@ import com.cloud.api.command.user.loadbalancer.UpdateLoadBalancerRuleCmd;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Ip;
 import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.rules.HealthCheckPolicy;
 import com.cloud.network.rules.StickinessPolicy;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.net.Ip;
 
 import java.util.List;
 import java.util.Map;

@@ -1,8 +1,8 @@
 package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.storage.Snapshot;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import java.util.Map;
 

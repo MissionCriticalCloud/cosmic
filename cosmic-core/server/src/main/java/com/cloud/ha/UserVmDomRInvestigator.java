@@ -1,8 +1,8 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.PingTestCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.PingTestCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.network.Nic;

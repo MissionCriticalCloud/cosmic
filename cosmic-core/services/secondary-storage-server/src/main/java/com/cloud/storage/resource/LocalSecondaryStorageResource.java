@@ -1,30 +1,30 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.PingStorageCommand;
-import com.cloud.agent.api.ReadyAnswer;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.SecStorageSetupCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.api.storage.ListTemplateAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.answer.ReadyAnswer;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.ComputeChecksumCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.PingStorageCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.SecStorageSetupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.resource.ServerResourceBase;
-import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.command.DownloadCommand;
 import com.cloud.storage.command.DownloadProgressCommand;
 import com.cloud.storage.template.DownloadManager;
 import com.cloud.storage.template.DownloadManagerImpl;
-import com.cloud.storage.template.TemplateProp;
 import com.cloud.utils.component.ComponentContext;
 
 import javax.naming.ConfigurationException;
@@ -68,7 +68,7 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
 
         final StartupStorageCommand cmd =
                 new StartupStorageCommand(_parent, StoragePoolType.Filesystem, 1024l * 1024l * 1024l * 1024l, _dlMgr.gatherTemplateInfo(_parent));
-        cmd.setResourceType(Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE);
+        cmd.setResourceType(StorageResourceType.LOCAL_SECONDARY_STORAGE);
         cmd.setIqn("local://");
         fillNetworkInformation(cmd);
         cmd.setDataCenter(_dc);

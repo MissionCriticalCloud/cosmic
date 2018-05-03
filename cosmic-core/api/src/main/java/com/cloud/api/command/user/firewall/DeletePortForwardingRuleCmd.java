@@ -16,7 +16,7 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
-import com.cloud.network.rules.PortForwardingRule;
+import com.cloud.legacymodel.network.PortForwardingRule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

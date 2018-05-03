@@ -1,17 +1,17 @@
 package com.cloud.capacity;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.ConnectionException;
-import com.cloud.storage.Storage;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.StorageManager;
 
 import java.math.BigDecimal;
@@ -50,7 +50,7 @@ public class StorageCapacityListener implements Listener {
         }
 
         final StartupStorageCommand ssCmd = (StartupStorageCommand) startup;
-        if (ssCmd.getResourceType() == Storage.StorageResourceType.STORAGE_HOST) {
+        if (ssCmd.getResourceType() == StorageResourceType.STORAGE_HOST) {
             final BigDecimal overProvFactor = BigDecimal.valueOf(CapacityManager.StorageOverprovisioningFactor.value());
             final CapacityVO capacity =
                     new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(

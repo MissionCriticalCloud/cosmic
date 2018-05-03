@@ -10,7 +10,7 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.utils.Ternary;
+import com.cloud.legacymodel.utils.Ternary;
 
 import java.util.ArrayList;
 import java.util.List;

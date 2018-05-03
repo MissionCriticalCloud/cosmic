@@ -1,10 +1,10 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.PingTestCommand;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.PingTestCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;

@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.NetworkOverviewTO;
 
 public class UpdateNetworkOverviewCommand extends NetworkElementCommand {
     private NetworkOverviewTO networkOverview;

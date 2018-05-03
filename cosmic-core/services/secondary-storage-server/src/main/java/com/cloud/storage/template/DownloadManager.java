@@ -1,6 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.agent.api.storage.DownloadAnswer;
+import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.command.DownloadCommand;

@@ -22,8 +22,8 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.model.enumeration.GuestType;
-import com.cloud.network.Network;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.net.NetUtils;
 

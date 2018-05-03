@@ -1,14 +1,14 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.ModifyStoragePoolAnswer;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ModifyStoragePoolAnswer;
 import com.cloud.legacymodel.communication.command.ModifyStoragePoolCommand;
+import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.template.TemplateProp;
 
 import java.util.HashMap;
 import java.util.Map;

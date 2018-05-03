@@ -1,17 +1,17 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.PoolType;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.to.PrimaryDataStoreTO;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.StorageLayer;
-import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.net.URI;

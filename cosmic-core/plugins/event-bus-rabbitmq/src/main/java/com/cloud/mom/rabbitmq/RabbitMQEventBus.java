@@ -6,8 +6,8 @@ import com.cloud.framework.events.EventBusException;
 import com.cloud.framework.events.EventSubscriber;
 import com.cloud.framework.events.EventTopic;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 
 import javax.naming.ConfigurationException;

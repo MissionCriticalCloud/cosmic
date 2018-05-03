@@ -3,8 +3,8 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.serializer.Param;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import java.util.Date;
 

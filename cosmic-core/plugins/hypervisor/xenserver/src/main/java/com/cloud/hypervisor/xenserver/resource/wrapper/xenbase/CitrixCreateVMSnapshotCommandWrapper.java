@@ -1,13 +1,13 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import com.cloud.agent.api.CreateVMSnapshotAnswer;
-import com.cloud.agent.api.CreateVMSnapshotCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CreateVMSnapshotAnswer;
+import com.cloud.legacymodel.communication.command.CreateVMSnapshotCommand;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.legacymodel.to.VolumeObjectTO;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import java.util.LinkedHashSet;
 import java.util.List;

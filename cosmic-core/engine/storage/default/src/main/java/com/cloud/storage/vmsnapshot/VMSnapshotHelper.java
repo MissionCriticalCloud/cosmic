@@ -1,9 +1,9 @@
 package com.cloud.storage.vmsnapshot;
 
-import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.to.VMSnapshotTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
-import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 
 import java.util.List;

@@ -1,15 +1,15 @@
 package com.cloud.network.dao;
 
 import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Event;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Network.State;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Event;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Network.State;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;

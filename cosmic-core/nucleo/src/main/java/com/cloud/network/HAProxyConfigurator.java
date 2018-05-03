@@ -1,12 +1,12 @@
 package com.cloud.network;
 
-import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.agent.api.to.LoadBalancerTO.DestinationTO;
-import com.cloud.agent.api.to.LoadBalancerTO.StickinessPolicyTO;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
-import com.cloud.network.rules.LbStickinessMethod.StickinessMethodType;
+import com.cloud.legacymodel.communication.command.LoadBalancerConfigCommand;
+import com.cloud.legacymodel.to.LoadBalancerTO;
+import com.cloud.legacymodel.to.LoadBalancerTO.DestinationTO;
+import com.cloud.legacymodel.to.LoadBalancerTO.StickinessPolicyTO;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.network.rules.LbStickinessMethod.StickinessMethodType;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;

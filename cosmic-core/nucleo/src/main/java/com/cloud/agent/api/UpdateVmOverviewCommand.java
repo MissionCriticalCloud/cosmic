@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.to.VMOverviewTO;
 
 public class UpdateVmOverviewCommand extends NetworkElementCommand {
     private VMOverviewTO vmOverview;

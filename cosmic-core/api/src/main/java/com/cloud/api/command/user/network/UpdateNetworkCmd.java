@@ -19,9 +19,9 @@ import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
-import com.cloud.network.Network;
 import com.cloud.offering.NetworkOffering;
 
 import org.apache.commons.lang.StringUtils;
