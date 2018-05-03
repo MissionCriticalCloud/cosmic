@@ -2,7 +2,7 @@ package com.cloud.vpc;
 
 import com.cloud.api.command.admin.router.UpgradeRouterCmd;
 import com.cloud.api.command.admin.router.UpgradeRouterTemplateCmd;
-import com.cloud.exception.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
@@ -14,7 +14,7 @@ import com.cloud.network.Network;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
-import com.cloud.network.router.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.vm.DomainRouterVO;
@@ -57,7 +57,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.router.VirtualNetworkApplianceManager#stop(com.cloud.network.router.VirtualRouter, boolean, com.cloud.legacymodel.user.User, com.cloud.legacymodel.user.Account)
+     * @see com.cloud.network.router.VirtualNetworkApplianceManager#stop(com.cloud.legacymodel.network.VirtualRouter, boolean, com.cloud.legacymodel.user.User, com.cloud.legacymodel.user.Account)
      */
     @Override
     public VirtualRouter stop(final VirtualRouter router, final boolean forced, final User callingUser, final Account callingAccount) throws ConcurrentOperationException {
@@ -183,7 +183,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.VpcVirtualNetworkApplianceService#addVpcRouterToGuestNetwork(com.cloud.network.router.VirtualRouter, com.cloud.network.Network, boolean)
+     * @see com.cloud.network.VpcVirtualNetworkApplianceService#addVpcRouterToGuestNetwork(com.cloud.legacymodel.network.VirtualRouter, com.cloud.network.Network, boolean)
      */
     @Override
     public boolean addVpcRouterToGuestNetwork(final VirtualRouter router, final Network network, final Map<VirtualMachineProfile.Param, Object> params)
@@ -193,7 +193,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.VpcVirtualNetworkApplianceService#removeVpcRouterFromGuestNetwork(com.cloud.network.router.VirtualRouter, com.cloud.network.Network, boolean)
+     * @see com.cloud.network.VpcVirtualNetworkApplianceService#removeVpcRouterFromGuestNetwork(com.cloud.legacymodel.network.VirtualRouter, com.cloud.network.Network, boolean)
      */
     @Override
     public boolean removeVpcRouterFromGuestNetwork(final VirtualRouter router, final Network network) throws ConcurrentOperationException {
@@ -202,7 +202,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#destroyPrivateGateway(com.cloud.legacymodel.network.vpc.PrivateGateway, com.cloud.network.router.VirtualRouter)
+     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#destroyPrivateGateway(com.cloud.legacymodel.network.vpc.PrivateGateway, com.cloud.legacymodel.network.VirtualRouter)
      */
     @Override
     public boolean destroyPrivateGateway(final PrivateGateway gateway, final VirtualRouter router) throws ConcurrentOperationException, ResourceUnavailableException {
@@ -211,7 +211,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#startSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection, com.cloud.network.router.VirtualRouter)
+     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#startSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection, com.cloud.legacymodel.network.VirtualRouter)
      */
     @Override
     public boolean startSite2SiteVpn(final Site2SiteVpnConnection conn, final VirtualRouter router) throws ResourceUnavailableException {
@@ -220,7 +220,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#refreshSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection, com.cloud.network.router.VirtualRouter)
+     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#refreshSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection, com.cloud.legacymodel.network.VirtualRouter)
      */
     @Override
     public boolean refreshSite2SiteVpn(final Site2SiteVpnConnection conn, final VirtualRouter router) throws ResourceUnavailableException {
@@ -229,7 +229,7 @@ public class MockVpcVirtualNetworkApplianceManager extends ManagerBase implement
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#stopSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection, com.cloud.network.router.VirtualRouter)
+     * @see com.cloud.network.router.VpcVirtualNetworkApplianceManager#stopSite2SiteVpn(com.cloud.network.Site2SiteVpnConnection, com.cloud.legacymodel.network.VirtualRouter)
      */
     @Override
     public boolean stopSite2SiteVpn(final Site2SiteVpnConnection conn, final VirtualRouter router) throws ResourceUnavailableException {

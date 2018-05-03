@@ -23,14 +23,15 @@ import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network.State;
-import com.cloud.model.enumeration.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.guru.ControlNetworkGuru;
@@ -45,7 +46,6 @@ import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.test.IPRangeConfig;
 import com.cloud.user.AccountVO;
@@ -203,14 +203,14 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             s_logger.debug("Configuration server excluded plaintext authenticator");
 
             // Save default service offerings
-            createServiceOffering(User.UID_SYSTEM, "Small Instance", 1, 512, "Small Instance", ProvisioningType.THIN, false, false, null);
-            createServiceOffering(User.UID_SYSTEM, "Medium Instance", 1, 1024, "Medium Instance", ProvisioningType.THIN, false, false, null);
+            createServiceOffering(User.UID_SYSTEM, "Small Instance", 1, 512, "Small Instance", StorageProvisioningType.THIN, false, false, null);
+            createServiceOffering(User.UID_SYSTEM, "Medium Instance", 1, 1024, "Medium Instance", StorageProvisioningType.THIN, false, false, null);
             // Save default disk offerings
-            createdefaultDiskOffering(null, "Small", "Small Disk, 5 GB", ProvisioningType.THIN, 5, null, false, false);
-            createdefaultDiskOffering(null, "Medium", "Medium Disk, 20 GB", ProvisioningType.THIN, 20, null, false, false);
-            createdefaultDiskOffering(null, "Large", "Large Disk, 100 GB", ProvisioningType.THIN, 100, null, false, false);
-            createdefaultDiskOffering(null, "Large", "Large Disk, 100 GB", ProvisioningType.THIN, 100, null, false, false);
-            createdefaultDiskOffering(null, "Custom", "Custom Disk", ProvisioningType.THIN, 0, null, true, false);
+            createdefaultDiskOffering(null, "Small", "Small Disk, 5 GB", StorageProvisioningType.THIN, 5, null, false, false);
+            createdefaultDiskOffering(null, "Medium", "Medium Disk, 20 GB", StorageProvisioningType.THIN, 20, null, false, false);
+            createdefaultDiskOffering(null, "Large", "Large Disk, 100 GB", StorageProvisioningType.THIN, 100, null, false, false);
+            createdefaultDiskOffering(null, "Large", "Large Disk, 100 GB", StorageProvisioningType.THIN, 100, null, false, false);
+            createdefaultDiskOffering(null, "Custom", "Custom Disk", StorageProvisioningType.THIN, 0, null, true, false);
 
             // Save the mount parent to the configuration table
             final String mountParent = getMountParent();
@@ -364,8 +364,9 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         });
     }
 
-    private ServiceOfferingVO createServiceOffering(final long userId, final String name, final int cpu, final int ramSize, final String displayText, final ProvisioningType provisioningType, final
-    boolean localStorageRequired, final boolean offerHA, String tags) {
+    private ServiceOfferingVO createServiceOffering(final long userId, final String name, final int cpu, final int ramSize, final String displayText, final StorageProvisioningType provisioningType,
+                                                    final
+                                                    boolean localStorageRequired, final boolean offerHA, String tags) {
         tags = cleanupTags(tags);
         ServiceOfferingVO offering =
                 new ServiceOfferingVO(name, cpu, ramSize, null, null, offerHA, displayText, provisioningType, localStorageRequired, false, tags, false, null, false);
@@ -374,7 +375,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         return offering;
     }
 
-    private DiskOfferingVO createdefaultDiskOffering(final Long domainId, final String name, final String description, final ProvisioningType provisioningType,
+    private DiskOfferingVO createdefaultDiskOffering(final Long domainId, final String name, final String description, final StorageProvisioningType provisioningType,
                                                      final int numGibibytes, String tags, final boolean isCustomized, final boolean isSystemUse) {
         long diskSize = numGibibytes;
         diskSize = diskSize * 1024 * 1024 * 1024;
@@ -425,7 +426,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 if (offering.isSystemOnly()) {
                     final long related = id;
                     final long networkOfferingId = offering.getId();
-                    final Mode mode = Mode.Static;
+                    final DHCPMode mode = DHCPMode.Static;
                     final String networkDomain = null;
 
                     BroadcastDomainType broadcastDomainType = null;

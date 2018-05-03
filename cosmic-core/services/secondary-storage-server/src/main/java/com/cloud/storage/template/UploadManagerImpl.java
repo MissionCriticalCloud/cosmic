@@ -1,16 +1,16 @@
 package com.cloud.storage.template;
 
-import com.cloud.agent.api.storage.CreateEntityDownloadURLAnswer;
-import com.cloud.agent.api.storage.CreateEntityDownloadURLCommand;
-import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CreateEntityDownloadURLAnswer;
+import com.cloud.legacymodel.communication.command.CreateEntityDownloadURLCommand;
+import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.Upload;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.Upload;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.storage.template.TemplateUploader.Status;

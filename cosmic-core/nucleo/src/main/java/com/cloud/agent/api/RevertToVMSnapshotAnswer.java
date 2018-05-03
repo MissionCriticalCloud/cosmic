@@ -1,8 +1,8 @@
 package com.cloud.agent.api;
 
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 

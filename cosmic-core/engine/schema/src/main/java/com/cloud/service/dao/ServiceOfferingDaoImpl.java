@@ -1,14 +1,14 @@
 package com.cloud.service.dao;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.vm.VirtualMachine;
 
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
@@ -191,8 +191,8 @@ public class ServiceOfferingDaoImpl extends GenericDaoBase<ServiceOfferingVO, Lo
     @Override
     public List<ServiceOfferingVO> createSystemServiceOfferings(final String name, final String uniqueName, final int cpuCount, final int ramSize,
                                                                 final Integer rateMbps, final Integer multicastRateMbps, final boolean offerHA, final String displayText, final
-                                                                ProvisioningType provisioningType,
-                                                                final boolean recreatable, final String tags, final boolean systemUse, final VirtualMachine.Type vmType, final
+                                                                StorageProvisioningType provisioningType,
+                                                                final boolean recreatable, final String tags, final boolean systemUse, final VirtualMachineType vmType, final
                                                                 boolean defaultUse) {
         final List<ServiceOfferingVO> list = new ArrayList<>();
         ServiceOfferingVO offering = new ServiceOfferingVO(name, cpuCount, ramSize, rateMbps, multicastRateMbps, offerHA, displayText,

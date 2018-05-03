@@ -8,7 +8,7 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 
 import java.util.List;
 import java.util.Map;

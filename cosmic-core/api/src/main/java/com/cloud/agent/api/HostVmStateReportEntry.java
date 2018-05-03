@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 
 //
 // TODO vmsync

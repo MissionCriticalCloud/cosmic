@@ -1,6 +1,6 @@
 package com.cloud.storage.datastore.db;
 
-import com.cloud.host.HostStatus;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolStatus;

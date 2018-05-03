@@ -1,10 +1,10 @@
 package com.cloud.storage.secondary;
 
-import static com.cloud.vm.VirtualMachine.State.Migrating;
-import static com.cloud.vm.VirtualMachine.State.Running;
-import static com.cloud.vm.VirtualMachine.State.Starting;
-import static com.cloud.vm.VirtualMachine.State.Stopped;
-import static com.cloud.vm.VirtualMachine.State.Stopping;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Migrating;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Running;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Starting;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopped;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopping;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.RebootCommand;
@@ -32,28 +32,33 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
-import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
 import com.cloud.legacymodel.communication.command.CheckSshCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managementserver.ManagementServerService;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.StorageNetworkManager;
@@ -68,10 +73,8 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.SnapshotDao;
@@ -98,8 +101,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.SystemVmLoadScanner;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineGuru;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineName;
@@ -269,7 +270,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final SecondaryStorageListener _listener = new SecondaryStorageListener(this);
         _agentMgr.registerForHostEvents(_listener, true, false, true);
 
-        _itMgr.registerGuru(VirtualMachine.Type.SecondaryStorageVm, this);
+        _itMgr.registerGuru(VirtualMachineType.SecondaryStorageVm, this);
 
         //check if there is a default service offering configured
         final String ssvmSrvcOffIdStr = configs.get(Config.SecondaryStorageServiceOffering.key());
@@ -291,7 +292,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             final int ramSize = NumbersUtil.parseInt(_configDao.getValue("ssvm.ram.size"), DEFAULT_SS_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = _offeringDao.createSystemServiceOfferings("System Offering For Secondary Storage VM",
                     ServiceOffering.ssvmDefaultOffUniqueName, 1, ramSize, null, null, false, null,
-                    Storage.ProvisioningType.THIN, true, null, true, VirtualMachine.Type.SecondaryStorageVm, true);
+                    StorageProvisioningType.THIN, true, null, true, VirtualMachineType.SecondaryStorageVm, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {
                 final String msg = "Data integrity problem : System Offering For Secondary Storage VM has been removed?";

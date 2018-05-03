@@ -21,8 +21,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.LBStickinessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
 
 import org.slf4j.Logger;

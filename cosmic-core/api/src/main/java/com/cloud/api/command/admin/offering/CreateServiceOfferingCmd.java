@@ -9,9 +9,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.storage.Storage;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class CreateServiceOfferingCmd extends BaseCmd {
     //////////////// API parameters /////////////////////
     /////////////////////////////////////////////////////
     @Parameter(name = ApiConstants.PROVISIONINGTYPE, type = CommandType.STRING, description = "provisioning type used to create volumes. Valid values are thin, sparse, fat.")
-    private final String provisioningType = Storage.ProvisioningType.THIN.toString();
+    private final String provisioningType = StorageProvisioningType.THIN.toString();
     @Parameter(name = ApiConstants.CPU_NUMBER, type = CommandType.INTEGER, required = false, description = "the CPU number of the service offering")
     private Integer cpuNumber;
     @Parameter(name = ApiConstants.DISPLAY_TEXT, type = CommandType.STRING, required = true, description = "the display text of the service offering")

@@ -9,10 +9,11 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.AdvancedVpnRules;
 import com.cloud.network.rules.DhcpEntryRules;
 import com.cloud.network.rules.DhcpPvlanRules;
@@ -29,7 +30,6 @@ import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.ArrayList;
@@ -167,7 +167,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
 
             final List<Ip> ipsToExclude = new ArrayList<>();
             if (!add) {
-                ipsToExclude.add(new Ip(ip.getIpAddress()));
+                ipsToExclude.add(new Ip(NetUtils.ip2Long(ip.getIpAddress())));
             }
 
             final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(

@@ -3,7 +3,9 @@ package com.cloud.vm;
 import com.cloud.dao.EntityManager;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.template.VirtualMachineTemplate;
@@ -32,7 +34,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     BootloaderType _bootloader;
     Float cpuOvercommitRatio = 1.0f;
     Float memoryOvercommitRatio = 1.0f;
-    VirtualMachine.Type _type;
+    VirtualMachineType _type;
     List<String[]> vmData = null;
     String configDriveLabel = null;
     String configDriveIsoBaseLocation = "/tmp/";
@@ -58,7 +60,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
         }
     }
 
-    public VirtualMachineProfileImpl(final VirtualMachine.Type type) {
+    public VirtualMachineProfileImpl(final VirtualMachineType type) {
         _type = type;
     }
 
@@ -236,7 +238,7 @@ public class VirtualMachineProfileImpl implements VirtualMachineProfile {
     }
 
     @Override
-    public VirtualMachine.Type getType() {
+    public VirtualMachineType getType() {
         return _type;
     }
 

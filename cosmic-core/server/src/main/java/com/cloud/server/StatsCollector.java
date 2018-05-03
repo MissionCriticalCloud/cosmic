@@ -15,15 +15,16 @@ import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
 import com.cloud.host.HostStats;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.StorageManager;
@@ -54,7 +55,6 @@ import com.cloud.utils.usage.UsageUtils;
 import com.cloud.vm.UserVmManager;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VmStats;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -527,7 +527,7 @@ public class StatsCollector extends ManagerBase implements ComponentMethodInterc
                             final List<Long> vmIds = new ArrayList<>();
 
                             for (final UserVmVO vm : vms) {
-                                if (vm.getType() == VirtualMachine.Type.User) // user vm
+                                if (vm.getType() == VirtualMachineType.User) // user vm
                                 {
                                     vmIds.add(vm.getId());
                                 }

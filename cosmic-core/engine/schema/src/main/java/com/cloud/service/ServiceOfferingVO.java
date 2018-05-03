@@ -1,9 +1,9 @@
 package com.cloud.service;
 
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.vm.VirtualMachine;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -54,8 +54,8 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
 
     public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA, final String displayText,
-                             final ProvisioningType provisioningType, final boolean useLocalStorage, final boolean recreatable, final String tags, final boolean systemUse, final
-                             VirtualMachine.Type vmType, final boolean
+                             final StorageProvisioningType provisioningType, final boolean useLocalStorage, final boolean recreatable, final String tags, final boolean systemUse, final
+                             VirtualMachineType vmType, final boolean
                                      defaultUse) {
         super(name, displayText, provisioningType, false, tags, recreatable, useLocalStorage, systemUse, true);
         this.cpu = cpu;
@@ -71,10 +71,10 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
 
     public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA,
-                             final boolean limitResourceUse, final boolean volatileVm, final String displayText, final ProvisioningType provisioningType, final boolean
+                             final boolean limitResourceUse, final boolean volatileVm, final String displayText, final StorageProvisioningType provisioningType, final boolean
                                      useLocalStorage, final boolean recreatable,
                              final String tags, final boolean systemUse,
-                             final VirtualMachine.Type vmType, final Long domainId, final String hostTag, final String deploymentPlanner) {
+                             final VirtualMachineType vmType, final Long domainId, final String hostTag, final String deploymentPlanner) {
         this(name,
                 cpu,
                 ramSize,
@@ -97,10 +97,10 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
 
     public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA,
-                             final boolean limitResourceUse, final boolean volatileVm, final String displayText, final ProvisioningType provisioningType, final boolean
+                             final boolean limitResourceUse, final boolean volatileVm, final String displayText, final StorageProvisioningType provisioningType, final boolean
                                      useLocalStorage, final boolean recreatable,
                              final String tags, final boolean systemUse,
-                             final VirtualMachine.Type vmType, final Long domainId, final String hostTag) {
+                             final VirtualMachineType vmType, final Long domainId, final String hostTag) {
         this(name,
                 cpu,
                 ramSize,
@@ -122,9 +122,9 @@ public class ServiceOfferingVO extends DiskOfferingVO implements ServiceOffering
 
     public ServiceOfferingVO(final String name, final Integer cpu, final Integer ramSize, final Integer rateMbps, final Integer multicastRateMbps, final
     boolean offerHA, final boolean limitCpuUse,
-                             final boolean volatileVm, final String displayText, final ProvisioningType provisioningType, final boolean useLocalStorage, final boolean
+                             final boolean volatileVm, final String displayText, final StorageProvisioningType provisioningType, final boolean useLocalStorage, final boolean
                                      recreatable, final String tags, final boolean
-                                     systemUse, final VirtualMachine.Type vmType, final Long domainId) {
+                                     systemUse, final VirtualMachineType vmType, final Long domainId) {
         super(name, displayText, provisioningType, false, tags, recreatable, useLocalStorage, systemUse, true, domainId);
         this.cpu = cpu;
         this.ramSize = ramSize;

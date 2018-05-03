@@ -3,15 +3,14 @@ package com.cloud.agent.api.to;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.MetadataTO;
 import com.cloud.legacymodel.to.NicTO;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 
 import java.util.List;
 import java.util.Map;
 
 public class VirtualMachineTO {
-    Type type;
+    VirtualMachineType type;
     int cpus;
     long minRam;
     long maxRam;
@@ -42,7 +41,7 @@ public class VirtualMachineTO {
     private String name;
     private BootloaderType bootloader;
 
-    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachine.Type type, final int cpus, final long minRam, final long maxRam,
+    public VirtualMachineTO(final long id, final String instanceName, final VirtualMachineType type, final int cpus, final long minRam, final long maxRam,
                             final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
         this.id = id;
         name = instanceName;
@@ -84,7 +83,7 @@ public class VirtualMachineTO {
         this.name = name;
     }
 
-    public Type getType() {
+    public VirtualMachineType getType() {
         return type;
     }
 

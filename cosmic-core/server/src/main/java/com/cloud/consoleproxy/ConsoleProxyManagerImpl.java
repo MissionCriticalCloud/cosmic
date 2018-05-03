@@ -1,7 +1,6 @@
 package com.cloud.consoleproxy;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.ConsoleProxyLoadReportCommand;
 import com.cloud.agent.api.RebootCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupProxyCommand;
@@ -19,13 +18,11 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.framework.security.keystore.KeystoreVO;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.info.ConsoleProxyLoadInfo;
@@ -33,19 +30,27 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.CheckSshCommand;
+import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managementserver.ManagementServerService;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.IPAddressDao;
@@ -61,8 +66,6 @@ import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -88,8 +91,6 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.SystemVmLoadScanner;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineGuru;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineName;
@@ -494,7 +495,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         _listener = new ConsoleProxyListener(new VmBasedAgentHook(_instanceDao, _hostDao, _configDao, _ksMgr, _agentMgr, _keysMgr));
         _agentMgr.registerForHostEvents(_listener, true, true, false);
 
-        _itMgr.registerGuru(VirtualMachine.Type.ConsoleProxy, this);
+        _itMgr.registerGuru(VirtualMachineType.ConsoleProxy, this);
 
         //check if there is a default service offering configured
         final String cpvmSrvcOffIdStr = configs.get(Config.ConsoleProxyServiceOffering.key());
@@ -516,7 +517,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             final int ramSize = NumbersUtil.parseInt(_configDao.getValue("console.ram.size"), DEFAULT_PROXY_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = _offeringDao.createSystemServiceOfferings("System Offering For Console Proxy",
                     ServiceOffering.consoleProxyDefaultOffUniqueName, 1, ramSize, 0, 0, false, null,
-                    Storage.ProvisioningType.THIN, true, null, true, VirtualMachine.Type.ConsoleProxy, true);
+                    StorageProvisioningType.THIN, true, null, true, VirtualMachineType.ConsoleProxy, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {
                 final String msg = "Data integrity problem : System Offering For Console Proxy has been removed?";

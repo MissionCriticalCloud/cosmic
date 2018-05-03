@@ -10,13 +10,14 @@ import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVirtualMachines", group = APICommandGroup.VirtualMachineService, description = "List the virtual machines owned by the account.", responseObject = UserVmResponse.class, responseView = ResponseView
-        .Full, entityType = {VirtualMachine.class},
+@APICommand(name = "listVirtualMachines", group = APICommandGroup.VirtualMachineService, description = "List the virtual machines owned by the account.", responseObject = UserVmResponse.class,
+        responseView = ResponseView
+                .Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class ListVMsCmdByAdmin extends ListVMsCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVMsCmdByAdmin.class.getName());

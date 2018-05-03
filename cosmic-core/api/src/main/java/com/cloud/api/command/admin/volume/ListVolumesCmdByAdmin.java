@@ -10,12 +10,13 @@ import com.cloud.api.command.user.volume.ListVolumesCmd;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVolumes", group = APICommandGroup.VolumeService, description = "Lists all volumes.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
+@APICommand(name = "listVolumes", group = APICommandGroup.VolumeService, description = "Lists all volumes.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType =
+        {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVolumesCmdByAdmin extends ListVolumesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVolumesCmdByAdmin.class.getName());

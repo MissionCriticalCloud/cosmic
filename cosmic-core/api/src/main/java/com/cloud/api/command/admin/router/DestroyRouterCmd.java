@@ -13,9 +13,9 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

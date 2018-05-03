@@ -1,5 +1,6 @@
 package com.cloud.agent.api.storage;
 
+import com.cloud.legacymodel.communication.command.StorageCommand;
 import com.cloud.legacymodel.to.DataStoreTO;
 
 public class ListVolumeCommand extends StorageCommand {

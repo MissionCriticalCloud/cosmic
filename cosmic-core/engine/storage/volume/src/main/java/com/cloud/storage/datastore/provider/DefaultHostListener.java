@@ -2,11 +2,11 @@ package com.cloud.storage.datastore.provider;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.ModifyStoragePoolAnswer;
-import com.cloud.agent.api.ModifyStoragePoolCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.ModifyStoragePoolCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.StorageConflictException;
 import com.cloud.legacymodel.storage.StoragePool;

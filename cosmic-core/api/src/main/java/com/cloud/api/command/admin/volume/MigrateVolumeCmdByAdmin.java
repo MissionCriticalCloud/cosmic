@@ -7,10 +7,11 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.volume.MigrateVolumeCmd;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 
-@APICommand(name = "migrateVolume", group = APICommandGroup.VolumeService, description = "Migrate volume", responseObject = VolumeResponse.class, since = "3.0.0", responseView = ResponseView.Full, entityType =
-        {Volume.class},
+@APICommand(name = "migrateVolume", group = APICommandGroup.VolumeService, description = "Migrate volume", responseObject = VolumeResponse.class, since = "3.0.0", responseView = ResponseView.Full,
+        entityType =
+                {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class MigrateVolumeCmdByAdmin extends MigrateVolumeCmd {
 

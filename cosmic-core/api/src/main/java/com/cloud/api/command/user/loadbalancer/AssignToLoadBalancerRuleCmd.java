@@ -14,11 +14,11 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.rules.LoadBalancer;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.Collection;

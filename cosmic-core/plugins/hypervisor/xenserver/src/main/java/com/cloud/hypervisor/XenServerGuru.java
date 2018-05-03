@@ -18,6 +18,7 @@ import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
@@ -31,7 +32,6 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 

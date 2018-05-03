@@ -1,10 +1,11 @@
 package com.cloud.storage;
 
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 
@@ -118,7 +119,7 @@ public class VolumeVO implements Volume {
     @Column(name = "format")
     private ImageFormat format;
     @Column(name = "provisioning_type")
-    private Storage.ProvisioningType provisioningType;
+    private StorageProvisioningType provisioningType;
     @Column(name = "iscsi_name")
     private String _iScsiName;
     @Column(name = "vm_snapshot_chain_size")
@@ -133,7 +134,7 @@ public class VolumeVO implements Volume {
 
     // Real Constructor
     public VolumeVO(final VolumeType type, final String name, final long dcId, final long domainId,
-                    final long accountId, final long diskOfferingId, final Storage.ProvisioningType provisioningType, final long size,
+                    final long accountId, final long diskOfferingId, final StorageProvisioningType provisioningType, final long size,
                     final Long minIops, final Long maxIops, final String iScsiName, final DiskControllerType diskControllerType) {
         this.volumeType = type;
         this.name = name;
@@ -152,7 +153,7 @@ public class VolumeVO implements Volume {
     }
 
     public VolumeVO(final String name, final long dcId, final long podId, final long accountId,
-                    final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
+                    final long domainId, final Long instanceId, final String folder, final String path, final StorageProvisioningType provisioningType,
                     final long size, final VolumeType vType, final DiskControllerType diskControllerType) {
         this.name = name;
         this.accountId = accountId;
@@ -210,7 +211,7 @@ public class VolumeVO implements Volume {
     }
 
     public VolumeVO(final String name, final long dcId, final Long podId, final long accountId,
-                    final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
+                    final long domainId, final Long instanceId, final String folder, final String path, final StorageProvisioningType provisioningType,
                     final long size, final Long minIops, final Long maxIops, final String iScsiName,
                     final VolumeType vType, DiskControllerType diskControllerType) {
         this.name = name;
@@ -407,11 +408,11 @@ public class VolumeVO implements Volume {
     }
 
     @Override
-    public ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 
-    public void setProvisioningType(final ProvisioningType provisioningType) {
+    public void setProvisioningType(final StorageProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 

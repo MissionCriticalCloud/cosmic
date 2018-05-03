@@ -1,6 +1,7 @@
 package com.cloud.vm;
 
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.uservm.UserVm;
 
 import javax.persistence.Basic;
@@ -32,7 +33,7 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
     public UserVmVO(final long id, final String instanceName, final String displayName, final long templateId, final HypervisorType hypervisorType, final long guestOsId,
                     final boolean haEnabled, final boolean limitCpuUse, final long domainId, final long accountId, final long userId, final long serviceOfferingId,
                     final String userData, final String name, final Long diskOfferingId) {
-        super(id, serviceOfferingId, name, instanceName, Type.User, templateId, hypervisorType, guestOsId, domainId, accountId, userId, haEnabled, limitCpuUse, diskOfferingId);
+        super(id, serviceOfferingId, name, instanceName, VirtualMachineType.User, templateId, hypervisorType, guestOsId, domainId, accountId, userId, haEnabled, limitCpuUse, diskOfferingId);
         this.userData = userData;
         this.displayName = displayName;
         this.details = new HashMap<>();

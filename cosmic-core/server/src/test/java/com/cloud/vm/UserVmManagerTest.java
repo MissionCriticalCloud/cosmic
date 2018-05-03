@@ -37,13 +37,17 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -57,7 +61,6 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -73,7 +76,6 @@ import com.cloud.user.ResourceLimitService;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -486,7 +488,7 @@ public class UserVmManagerTest {
         final boolean useLocalStorage = false;
 
         final ServiceOfferingVO serviceOffering =
-                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, Storage.ProvisioningType.THIN,
+                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, StorageProvisioningType.THIN,
                         useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }
@@ -671,7 +673,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -720,7 +722,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -768,7 +770,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -806,7 +808,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -853,7 +855,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);

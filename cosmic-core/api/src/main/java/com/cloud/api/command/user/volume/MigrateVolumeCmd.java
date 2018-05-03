@@ -11,8 +11,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.storage.Volume;
 
 @APICommand(name = "migrateVolume", group = APICommandGroup.VolumeService, description = "Migrate volume", responseObject = VolumeResponse.class, since = "3.0.0", responseView = ResponseView
         .Restricted, entityType =

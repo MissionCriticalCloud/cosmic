@@ -1,7 +1,9 @@
 package com.cloud.vm;
 
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.Mode;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.IpAddressFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -35,7 +37,7 @@ public class NicVO implements Nic {
     @Column(name = "isolation_uri")
     URI isolationUri;
     @Column(name = "ip_type")
-    AddressFormat addressFormat;
+    IpAddressFormat addressFormat;
     @Column(name = "broadcast_uri")
     URI broadcastUri;
     @Column(name = "gateway")
@@ -44,7 +46,7 @@ public class NicVO implements Nic {
     String macAddress;
     @Column(name = "mode")
     @Enumerated(value = EnumType.STRING)
-    Mode mode;
+    DHCPMode mode;
     @Column(name = "network_id")
     long networkId;
     @Column(name = "state")
@@ -67,7 +69,7 @@ public class NicVO implements Nic {
     ReservationStrategy reservationStrategy;
     @Enumerated(value = EnumType.STRING)
     @Column(name = "vm_type")
-    VirtualMachine.Type vmType;
+    VirtualMachineType vmType;
     @Column(name = GenericDao.REMOVED_COLUMN)
     Date removed;
     @Column(name = GenericDao.CREATED_COLUMN)
@@ -80,7 +82,7 @@ public class NicVO implements Nic {
     protected NicVO() {
     }
 
-    public NicVO(final String reserver, final Long instanceId, final long configurationId, final VirtualMachine.Type vmType) {
+    public NicVO(final String reserver, final Long instanceId, final long configurationId, final VirtualMachineType vmType) {
         this.reserver = reserver;
         this.instanceId = instanceId;
         this.networkId = configurationId;
@@ -163,7 +165,7 @@ public class NicVO implements Nic {
     }
 
     @Override
-    public Mode getMode() {
+    public DHCPMode getMode() {
         return mode;
     }
 
@@ -186,16 +188,16 @@ public class NicVO implements Nic {
     }
 
     @Override
-    public VirtualMachine.Type getVmType() {
+    public VirtualMachineType getVmType() {
         return vmType;
     }
 
     @Override
-    public AddressFormat getAddressFormat() {
+    public IpAddressFormat getAddressFormat() {
         return addressFormat;
     }
 
-    public void setAddressFormat(final AddressFormat format) {
+    public void setAddressFormat(final IpAddressFormat format) {
         this.addressFormat = format;
     }
 
@@ -262,11 +264,11 @@ public class NicVO implements Nic {
         this.secondaryIp = secondaryIp;
     }
 
-    public void setVmType(final VirtualMachine.Type vmType) {
+    public void setVmType(final VirtualMachineType vmType) {
         this.vmType = vmType;
     }
 
-    public void setMode(final Mode mode) {
+    public void setMode(final DHCPMode mode) {
         this.mode = mode;
     }
 

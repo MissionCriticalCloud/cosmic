@@ -6,19 +6,19 @@ import com.cloud.deploy.DeploymentPlan;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.model.enumeration.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.StorageNetworkManager;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
@@ -47,7 +47,7 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
         }
 
         final NetworkVO config =
-                new NetworkVO(offering.getTrafficType(), Mode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
+                new NetworkVO(offering.getTrafficType(), DHCPMode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
                         plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         return config;
     }
@@ -101,7 +101,7 @@ public class StorageNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
         vlan = ip.getVlan();
         nic.setIPv4Address(ip.getIpAddress());
         nic.setMacAddress(NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(ip.getMac())));
-        nic.setFormat(AddressFormat.Ip4);
+        nic.setFormat(IpAddressFormat.Ip4);
         nic.setIPv4Netmask(ip.getNetmask());
         nic.setBroadcastType(BroadcastDomainType.Storage);
         nic.setIPv4Gateway(ip.getGateway());

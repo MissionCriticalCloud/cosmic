@@ -2,8 +2,8 @@ package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.offering.DiskOffering.Type;
-import com.cloud.storage.Storage;
+import com.cloud.legacymodel.storage.DiskOffering.Type;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -17,7 +17,7 @@ import java.util.Date;
 public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
     @Column(name = "provisioning_type")
-    Storage.ProvisioningType provisioningType;
+    StorageProvisioningType provisioningType;
     @Column(name = "disk_size")
     long diskSize;
     @Column(name = "tags", length = 4096)
@@ -77,7 +77,7 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
     public DiskOfferingJoinVO() {
     }
 
-    public void setProvisioningType(final Storage.ProvisioningType provisioningType) {
+    public void setProvisioningType(final StorageProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 
@@ -203,7 +203,7 @@ public class DiskOfferingJoinVO extends BaseViewVO implements InternalIdentity, 
         return displayText;
     }
 
-    public Storage.ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 

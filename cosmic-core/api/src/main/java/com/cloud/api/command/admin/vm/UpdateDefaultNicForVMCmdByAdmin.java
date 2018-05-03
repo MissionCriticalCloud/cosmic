@@ -9,8 +9,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.UpdateDefaultNicForVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -18,7 +18,8 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateDefaultNicForVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Changes the default NIC on a VM", responseObject = UserVmResponse.class, responseView = ResponseView.Full,
+@APICommand(name = "updateDefaultNicForVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Changes the default NIC on a VM", responseObject = UserVmResponse.class,
+        responseView = ResponseView.Full,
         entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class UpdateDefaultNicForVMCmdByAdmin extends UpdateDefaultNicForVMCmd {

@@ -30,10 +30,10 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
 

@@ -4,12 +4,12 @@ import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.utils.fsm.StateMachine2;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -23,7 +23,7 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
     String getName();
 
-    Mode getMode();
+    DHCPMode getMode();
 
     BroadcastDomainType getBroadcastDomainType();
 

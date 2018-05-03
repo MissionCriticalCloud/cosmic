@@ -22,10 +22,14 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.UnsupportedServiceException;
 import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.IpAddresses;
@@ -77,12 +81,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -908,12 +909,12 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         boolean isSystemVmNetwork = false;
         if (vm != null) {
             final Nic nic = _nicDao.findByNtwkIdAndInstanceId(networkId, vmId);
-            if (vm.getType() == Type.User && nic != null && nic.isDefaultNic()) {
+            if (vm.getType() == VirtualMachineType.User && nic != null && nic.isDefaultNic()) {
                 isUserVmsDefaultNetwork = true;
-            } else if (vm.getType() == Type.DomainRouter && ntwkOff != null &&
+            } else if (vm.getType() == VirtualMachineType.DomainRouter && ntwkOff != null &&
                     (ntwkOff.getTrafficType() == TrafficType.Public || ntwkOff.getTrafficType() == TrafficType.Guest)) {
                 isDomRGuestOrPublicNetwork = true;
-            } else if (vm.getType() == Type.ConsoleProxy || vm.getType() == Type.SecondaryStorageVm) {
+            } else if (vm.getType() == VirtualMachineType.ConsoleProxy || vm.getType() == VirtualMachineType.SecondaryStorageVm) {
                 isSystemVmNetwork = true;
             }
         }
@@ -1840,7 +1841,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public NicVO getPlaceholderNicForRouter(final Network network, final Long podId) {
-        final List<NicVO> nics = _nicDao.listPlaceholderNicsByNetworkIdAndVmType(network.getId(), VirtualMachine.Type.DomainRouter);
+        final List<NicVO> nics = _nicDao.listPlaceholderNicsByNetworkIdAndVmType(network.getId(), VirtualMachineType.DomainRouter);
         for (final NicVO nic : nics) {
             if (nic.getReserver() == null && (nic.getIPv4Address() != null || nic.getIPv6Address() != null)) {
                 if (podId == null) {

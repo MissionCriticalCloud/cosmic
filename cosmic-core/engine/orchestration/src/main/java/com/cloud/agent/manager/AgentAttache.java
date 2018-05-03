@@ -1,10 +1,6 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.CheckHealthCommand;
-import com.cloud.agent.api.CheckNetworkCommand;
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
 import com.cloud.agent.api.MaintainCommand;
 import com.cloud.agent.api.MigrateCommand;
 import com.cloud.agent.api.PingTestCommand;
@@ -14,14 +10,18 @@ import com.cloud.agent.api.SetupCommand;
 import com.cloud.agent.api.ShutdownCommand;
 import com.cloud.agent.api.StartCommand;
 import com.cloud.agent.api.StopCommand;
-import com.cloud.agent.api.storage.CreateCommand;
 import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CreateCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 

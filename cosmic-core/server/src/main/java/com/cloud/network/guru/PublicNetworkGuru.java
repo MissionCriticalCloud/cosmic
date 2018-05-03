@@ -11,16 +11,18 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.State;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -31,10 +33,8 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -66,7 +66,7 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
 
         if (offering.getTrafficType() == TrafficType.Public) {
             final NetworkVO ntwk =
-                    new NetworkVO(offering.getTrafficType(), Mode.Static, network.getBroadcastDomainType(), offering.getId(), State.Setup, plan.getDataCenterId(),
+                    new NetworkVO(offering.getTrafficType(), DHCPMode.Static, network.getBroadcastDomainType(), offering.getId(), State.Setup, plan.getDataCenterId(),
                             plan.getPhysicalNetworkId(), offering.getRedundantRouter());
             return ntwk;
         } else {
@@ -102,7 +102,7 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
 
         if (nic.getIPv4Address() == null) {
             nic.setReservationStrategy(ReservationStrategy.Start);
-        } else if (vm.getVirtualMachine().getType() == VirtualMachine.Type.DomainRouter) {
+        } else if (vm.getVirtualMachine().getType() == VirtualMachineType.DomainRouter) {
             nic.setReservationStrategy(ReservationStrategy.Managed);
         } else {
             nic.setReservationStrategy(ReservationStrategy.Create);
@@ -127,7 +127,7 @@ public class PublicNetworkGuru extends AdapterBase implements NetworkGuru {
                 nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
                 nic.setBroadcastType(BroadcastDomainType.Vlan);
             }
-            nic.setFormat(AddressFormat.Ip4);
+            nic.setFormat(IpAddressFormat.Ip4);
             nic.setReservationId(String.valueOf(ip.getVlanTag()));
             nic.setMacAddress(ip.getMacAddress());
         }

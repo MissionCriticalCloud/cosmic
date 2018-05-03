@@ -2,6 +2,7 @@ package com.cloud.network.dao;
 
 import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
@@ -9,7 +10,6 @@ import com.cloud.network.Network.Event;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
-import com.cloud.network.Networks.Mode;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -228,7 +228,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         IdAndDomainSearch.done();
     }
 
-    public List<NetworkVO> findBy(final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastType, final long networkOfferingId, final long dataCenterId) {
+    public List<NetworkVO> findBy(final TrafficType trafficType, final DHCPMode mode, final BroadcastDomainType broadcastType, final long networkOfferingId, final long dataCenterId) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("trafficType", trafficType);
         sc.setParameters("broadcastType", broadcastType);

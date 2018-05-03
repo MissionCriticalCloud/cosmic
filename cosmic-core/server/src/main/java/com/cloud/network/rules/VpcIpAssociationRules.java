@@ -2,13 +2,13 @@ package com.cloud.network.rules;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
-import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.network.PublicIpAddress;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.topology.NetworkTopologyVisitor;
-import com.cloud.vm.Nic;
 import com.cloud.vm.dao.NicDao;
 
 import java.util.ArrayList;

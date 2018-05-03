@@ -1,8 +1,8 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.ItWorkVO.Step;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.List;
 

@@ -2,10 +2,10 @@ package com.cloud.network.dao;
 
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
-import com.cloud.network.Networks.Mode;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.NetUtils;
@@ -36,7 +36,7 @@ public class NetworkVO implements Network {
     long id;
     @Column(name = "mode")
     @Enumerated(value = EnumType.STRING)
-    Mode mode;
+    DHCPMode mode;
     @Column(name = "broadcast_domain_type")
     @Enumerated(value = EnumType.STRING)
     BroadcastDomainType broadcastDomainType;
@@ -162,7 +162,7 @@ public class NetworkVO implements Network {
      * @param vpcId               TODO
      * @param dataCenterId
      */
-    public NetworkVO(final long id, final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId,
+    public NetworkVO(final long id, final TrafficType trafficType, final DHCPMode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId,
                      final long domainId, final long accountId, final long related, final String name, final String displayText, final String networkDomain,
                      final GuestType guestType, final long dcId, final Long physicalNetworkId, final ACLType aclType, final boolean specifyIpRanges, final Long vpcId,
                      final boolean isRedundant, final String dns1, final String dns2, final String ipExclusionList) {
@@ -195,7 +195,7 @@ public class NetworkVO implements Network {
      * @param dataCenterId
      * @param physicalNetworkId   TODO
      */
-    public NetworkVO(final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId, final State state,
+    public NetworkVO(final TrafficType trafficType, final DHCPMode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId, final State state,
                      final long dataCenterId, final Long physicalNetworkId, final boolean isRedundant) {
         this.trafficType = trafficType;
         this.mode = mode;
@@ -295,11 +295,11 @@ public class NetworkVO implements Network {
     }
 
     @Override
-    public Mode getMode() {
+    public DHCPMode getMode() {
         return mode;
     }
 
-    public void setMode(final Mode mode) {
+    public void setMode(final DHCPMode mode) {
         this.mode = mode;
     }
 

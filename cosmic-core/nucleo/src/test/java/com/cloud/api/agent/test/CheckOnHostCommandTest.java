@@ -4,11 +4,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.agent.api.to.HostTO;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.to.HostTO;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 

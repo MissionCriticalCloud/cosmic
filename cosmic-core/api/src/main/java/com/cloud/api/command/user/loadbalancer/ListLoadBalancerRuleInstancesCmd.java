@@ -11,8 +11,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.LoadBalancerRuleVmMapResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.List;

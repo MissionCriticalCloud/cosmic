@@ -1,10 +1,10 @@
 package com.cloud.capacity;
 
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.vm.VirtualMachine;
 
 /**
  * Capacity Manager manages the different capacities

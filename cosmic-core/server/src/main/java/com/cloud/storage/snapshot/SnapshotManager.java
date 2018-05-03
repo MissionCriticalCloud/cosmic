@@ -5,9 +5,9 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Volume;
 
 /**
  *

@@ -8,10 +8,10 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NicTO;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
                 citrixResourceBase.createVGPU(conn, command, vm, gpuDevice);
             }
 
-            if (vmSpec.getType() != VirtualMachine.Type.User) {
+            if (vmSpec.getType() != VirtualMachineType.User) {
                 citrixResourceBase.createPatchVbd(conn, vmName, vm);
             }
             // put cdrom at the first place in the list

@@ -3,7 +3,7 @@ package com.cloud.agent.api;
 import com.cloud.legacymodel.communication.LogLevel;
 import com.cloud.legacymodel.communication.LogLevel.Level;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 
 @LogLevel(Level.Trace)
 public class GetFileStatsCommand extends Command {

@@ -84,6 +84,9 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
@@ -94,6 +97,7 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -112,9 +116,7 @@ import com.cloud.network.dao.PhysicalNetworkTrafficTypeDao;
 import com.cloud.network.dao.PhysicalNetworkTrafficTypeVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.element.NetworkElement;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.vpc.VpcManager;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.NetworkOffering.Detail;
@@ -133,7 +135,6 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -160,7 +161,6 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -751,19 +751,19 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final Boolean volatileVm = cmd.getVolatileVm();
 
         final String vmTypeString = cmd.getSystemVmType();
-        VirtualMachine.Type vmType = null;
+        VirtualMachineType vmType = null;
         boolean allowNetworkRate = false;
         if (cmd.getIsSystem()) {
-            if (vmTypeString == null || VirtualMachine.Type.DomainRouter.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.DomainRouter;
+            if (vmTypeString == null || VirtualMachineType.DomainRouter.toString().toLowerCase().equals(vmTypeString)) {
+                vmType = VirtualMachineType.DomainRouter;
                 allowNetworkRate = true;
-            } else if (VirtualMachine.Type.ConsoleProxy.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.ConsoleProxy;
-            } else if (VirtualMachine.Type.SecondaryStorageVm.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.SecondaryStorageVm;
+            } else if (VirtualMachineType.ConsoleProxy.toString().toLowerCase().equals(vmTypeString)) {
+                vmType = VirtualMachineType.ConsoleProxy;
+            } else if (VirtualMachineType.SecondaryStorageVm.toString().toLowerCase().equals(vmTypeString)) {
+                vmType = VirtualMachineType.SecondaryStorageVm;
             } else {
-                throw new InvalidParameterValueException("Invalid systemVmType. Supported types are: " + VirtualMachine.Type.DomainRouter + ", " + VirtualMachine.Type.ConsoleProxy
-                        + ", " + VirtualMachine.Type.SecondaryStorageVm);
+                throw new InvalidParameterValueException("Invalid systemVmType. Supported types are: " + VirtualMachineType.DomainRouter + ", " + VirtualMachineType.ConsoleProxy
+                        + ", " + VirtualMachineType.SecondaryStorageVm);
             }
         } else {
             allowNetworkRate = true;
@@ -795,7 +795,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 cmd.getBytesReadRate(), cmd.getBytesWriteRate(), cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getHypervisorSnapshotReserve());
     }
 
-    protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachine.Type vmType,
+    protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachineType vmType,
                                                       final String name, final Integer cpu, final Integer ramSize, final String displayText, final String
                                                               provisioningType, final boolean localStorageRequired,
                                                       final boolean offerHA, final boolean limitResourceUse, final boolean volatileVm, String tags, final Long domainId, final
@@ -824,7 +824,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new InvalidParameterValueException("Unable to create service offering by id " + userId + " because it is not root-admin or domain-admin");
         }
 
-        final ProvisioningType typedProvisioningType = ProvisioningType.getProvisioningType(provisioningType);
+        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.getProvisioningType(provisioningType);
 
         tags = StringUtils.cleanupTags(tags);
 
@@ -2592,7 +2592,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (offering == null) {
             throw new InvalidParameterValueException("Cannot find specified service offering: " + serviceOfferingId);
         }
-        if (!VirtualMachine.Type.DomainRouter.toString().equalsIgnoreCase(offering.getSystemVmType())) {
+        if (!VirtualMachineType.DomainRouter.toString().equalsIgnoreCase(offering.getSystemVmType())) {
             throw new InvalidParameterValueException("The specified service offering " + serviceOfferingId + " cannot be used by virtual router!");
         }
     }
@@ -3132,7 +3132,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             networkRate = offering.getRateMbps();
         } else {
             // for domain router service offering, get network rate from
-            if (offering.getSystemVmType() != null && offering.getSystemVmType().equalsIgnoreCase(VirtualMachine.Type.DomainRouter.toString())) {
+            if (offering.getSystemVmType() != null && offering.getSystemVmType().equalsIgnoreCase(VirtualMachineType.DomainRouter.toString())) {
                 networkRate = NetworkOrchestrationService.NetworkThrottlingRate.valueIn(dataCenterId);
             } else {
                 networkRate = Integer.parseInt(_configDao.getValue(Config.VmNetworkThrottlingRate.key()));
@@ -4712,7 +4712,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         } else if (numGibibytes != null && numGibibytes > _maxVolumeSizeInGb) {
             throw new InvalidParameterValueException("The maximum size for a disk is " + _maxVolumeSizeInGb + " Gb.");
         }
-        final ProvisioningType typedProvisioningType = ProvisioningType.getProvisioningType(provisioningType);
+        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.getProvisioningType(provisioningType);
 
         if (numGibibytes != null) {
             diskSize = numGibibytes * 1024 * 1024 * 1024;

@@ -10,8 +10,8 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 

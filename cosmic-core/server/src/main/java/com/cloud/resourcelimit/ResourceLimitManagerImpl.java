@@ -24,9 +24,12 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
@@ -38,7 +41,6 @@ import com.cloud.projects.dao.ProjectDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -68,8 +70,6 @@ import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -966,7 +966,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
 
         final SearchCriteria<SumCount> sc = cpuSearch.create();
         sc.setJoinParameters("offerings", "accountId", accountId);
-        sc.setJoinParameters("offerings", "type", VirtualMachine.Type.User);
+        sc.setJoinParameters("offerings", "type", VirtualMachineType.User);
         sc.setJoinParameters("offerings", "state", new Object[]{State.Destroyed, State.Error, State.Expunging});
         sc.setJoinParameters("offerings", "displayVm", 1);
         final List<SumCount> cpus = _serviceOfferingDao.customSearch(sc, null);
@@ -990,7 +990,7 @@ public class ResourceLimitManagerImpl extends ManagerBase implements ResourceLim
 
         final SearchCriteria<SumCount> sc = memorySearch.create();
         sc.setJoinParameters("offerings", "accountId", accountId);
-        sc.setJoinParameters("offerings", "type", VirtualMachine.Type.User);
+        sc.setJoinParameters("offerings", "type", VirtualMachineType.User);
         sc.setJoinParameters("offerings", "state", new Object[]{State.Destroyed, State.Error, State.Expunging});
         sc.setJoinParameters("offerings", "displayVm", 1);
         final List<SumCount> memory = _serviceOfferingDao.customSearch(sc, null);

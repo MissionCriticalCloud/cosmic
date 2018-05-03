@@ -11,9 +11,9 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.vm.VirtualMachine;
 
 import java.net.URISyntaxException;
 
@@ -65,7 +65,7 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
             libvirtComputingResource.startVm(conn, vmName, vm.toString());
 
             // system vms
-            if (vmSpec.getType() != VirtualMachine.Type.User) {
+            if (vmSpec.getType() != VirtualMachineType.User) {
 
                 // pass cmdline with config for the systemvm to configure itself
                 if (libvirtComputingResource.passCmdLine(vmName, vmSpec.getBootArgs())) {

@@ -5,7 +5,7 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;

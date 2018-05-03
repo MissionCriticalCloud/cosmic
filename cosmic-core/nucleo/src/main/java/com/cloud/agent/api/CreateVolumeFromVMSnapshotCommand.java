@@ -1,8 +1,8 @@
 package com.cloud.agent.api;
 
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.to.StorageFilerTO;
-import com.cloud.vm.DiskProfile;
 
 public class CreateVolumeFromVMSnapshotCommand extends Command {
 

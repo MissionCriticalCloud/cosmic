@@ -8,14 +8,15 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.volume.CreateVolumeCmd;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.Volume;
-import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createVolume", group = APICommandGroup.VolumeService, responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must still be attached to a" +
+@APICommand(name = "createVolume", group = APICommandGroup.VolumeService, responseObject = VolumeResponse.class, description = "Creates a disk volume from a disk offering. This disk volume must " +
+        "still be attached to a" +
         " virtual machine to make use of it.", responseView = ResponseView.Full, entityType = {
         Volume.class, VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

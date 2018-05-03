@@ -15,8 +15,8 @@ import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Map;
 

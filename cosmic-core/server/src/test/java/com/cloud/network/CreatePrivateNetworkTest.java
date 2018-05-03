@@ -18,10 +18,10 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
@@ -100,7 +100,7 @@ public class CreatePrivateNetworkTest {
         when(networkService._networksDao.getPrivateNetwork(anyString(), anyString(), eq(1L), eq(1L), anyLong())).thenReturn(null);
 
         final Network net =
-                new NetworkVO(1L, TrafficType.Guest, Mode.None, BroadcastDomainType.Vlan, 1L, 1L, 1L, 1L, "bla", "fake", "eet.net", GuestType.Isolated, 1L, 1L,
+                new NetworkVO(1L, TrafficType.Guest, DHCPMode.None, BroadcastDomainType.Vlan, 1L, 1L, 1L, 1L, "bla", "fake", "eet.net", GuestType.Isolated, 1L, 1L,
                         ACLType.Account, false, 1L, false, "1.2.3.4", null, null);
         when(
                 networkService._networkMgr.createGuestNetwork(eq(ntwkOff.getId()), eq("bla"), eq("fake"), eq("10.1.1.1"), eq("10.1.1.0/24"), anyString(), anyString(),

@@ -6,10 +6,10 @@ import com.cloud.api.command.admin.user.RegisterCmd;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.user.UserAccount;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 
 import java.util.Map;

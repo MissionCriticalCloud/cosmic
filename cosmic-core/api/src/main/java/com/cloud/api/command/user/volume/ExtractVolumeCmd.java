@@ -16,9 +16,9 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.storage.Upload;
-import com.cloud.storage.Volume;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

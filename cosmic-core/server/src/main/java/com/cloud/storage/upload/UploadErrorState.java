@@ -2,7 +2,7 @@ package com.cloud.storage.upload;
 
 import com.cloud.agent.api.storage.UploadAnswer;
 import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
-import com.cloud.storage.Upload.Status;
+import com.cloud.legacymodel.storage.Upload.Status;
 
 public class UploadErrorState extends UploadInactiveState {
 

@@ -2,9 +2,9 @@ package com.cloud.api.response;
 
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
-import com.cloud.network.Networks;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.serializer.Param;
-import com.cloud.vm.VirtualMachine;
 
 import java.net.URI;
 import java.util.Date;
@@ -59,7 +59,7 @@ public class WhoHasThisAddressResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.MODE)
     @Param(description = "Mode")
-    private Networks.Mode mode;
+    private DHCPMode mode;
 
     @SerializedName(ApiConstants.STATE)
     @Param(description = "State")
@@ -79,7 +79,7 @@ public class WhoHasThisAddressResponse extends BaseResponse {
 
     @SerializedName(ApiConstants.VIRTUAL_MACHINE_TYPE)
     @Param(description = "VM type")
-    private VirtualMachine.Type vmType;
+    private VirtualMachineType vmType;
 
     @SerializedName(ApiConstants.DOMAIN_NAME)
     @Param(description = "Domain name")
@@ -121,11 +121,11 @@ public class WhoHasThisAddressResponse extends BaseResponse {
         this.broadcastUri = broadcastUri;
     }
 
-    public Networks.Mode getMode() {
+    public DHCPMode getMode() {
         return mode;
     }
 
-    public void setMode(final Networks.Mode mode) {
+    public void setMode(final DHCPMode mode) {
         this.mode = mode;
     }
 
@@ -209,11 +209,11 @@ public class WhoHasThisAddressResponse extends BaseResponse {
         this.vmUuid = vmUuid;
     }
 
-    public void setVmType(final VirtualMachine.Type vmType) {
+    public void setVmType(final VirtualMachineType vmType) {
         this.vmType = vmType;
     }
 
-    public VirtualMachine.Type getVmType() {
+    public VirtualMachineType getVmType() {
         return vmType;
     }
 
@@ -240,5 +240,4 @@ public class WhoHasThisAddressResponse extends BaseResponse {
     public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
-
 }

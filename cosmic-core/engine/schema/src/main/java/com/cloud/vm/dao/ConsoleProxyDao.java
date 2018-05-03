@@ -2,9 +2,9 @@ package com.cloud.vm.dao;
 
 import com.cloud.info.ConsoleProxyLoadInfo;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.ConsoleProxyVO;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.Date;
 import java.util.List;

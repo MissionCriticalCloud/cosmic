@@ -1,8 +1,6 @@
 package com.cloud.storage.upload;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.storage.CreateEntityDownloadURLCommand;
-import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
 import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.api.ApiDBUtils;
@@ -12,19 +10,22 @@ import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.jobs.AsyncJobManager;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CreateEntityDownloadURLCommand;
+import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.Upload.Mode;
+import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.Upload.Type;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.resource.ResourceManager;
-import com.cloud.storage.Upload;
-import com.cloud.storage.Upload.Mode;
-import com.cloud.storage.Upload.Status;
-import com.cloud.storage.Upload.Type;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;
@@ -38,7 +39,6 @@ import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 
 import javax.inject.Inject;
@@ -406,7 +406,7 @@ public class UploadMonitorImpl extends ManagerBase implements UploadMonitor {
         return true;
     }
 
-    public void handleUploadEvent(final Long accountId, final String typeName, final Type type, final Long uploadId, final com.cloud.storage.Upload.Status reason, final long
+    public void handleUploadEvent(final Long accountId, final String typeName, final Type type, final Long uploadId, final Upload.Status reason, final long
             eventId) {
 
         if ((reason == Upload.Status.UPLOADED) || (reason == Upload.Status.ABANDONED)) {

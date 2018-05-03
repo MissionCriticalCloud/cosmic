@@ -17,17 +17,6 @@ public class Networks {
         public static final String DummyPrivateIp = "169.254.1.1";
     }
 
-    /**
-     * Different ways to assign ip address to this network.
-     */
-    public enum Mode {
-        None, Static, Dhcp, ExternalDhcp
-    }
-
-    public enum AddressFormat {
-        Ip4, Ip6, DualStack
-    }
-
     public enum IsolationType {
         None(null, null), Ec2("ec2", String.class), Vlan("vlan", Integer.class) {
             @Override

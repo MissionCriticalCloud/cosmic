@@ -51,7 +51,6 @@ import com.cloud.event.ActionEvent;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
 import com.cloud.event.EventVO;
-import com.cloud.exception.AgentUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.gpu.HostGpuGroupsVO;
@@ -61,9 +60,7 @@ import com.cloud.gpu.dao.VGPUTypesDao;
 import com.cloud.ha.HaWork;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.DetailVO;
-import com.cloud.host.Host;
 import com.cloud.host.HostStats;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
@@ -73,6 +70,9 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.UnsupportedAnswer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
@@ -82,6 +82,7 @@ import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.Zone;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.CapacityState;
@@ -130,7 +131,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.ssh.SSHCmdHelper;
 import com.cloud.utils.ssh.SshException;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -429,7 +429,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
-        if (serverPublicIP != null && !_publicIPAddressDao.mark(dc.getId(), new Ip(serverPublicIP))) {
+        if (serverPublicIP != null && !_publicIPAddressDao.mark(dc.getId(), new Ip(NetUtils.ip2Long(serverPublicIP)))) {
             // If the server's public IP address is already in the database,
             // return false
             final List<IPAddressVO> existingPublicIPs = _publicIPAddressDao.listByDcIdIpAddress(dc.getId(), serverPublicIP);

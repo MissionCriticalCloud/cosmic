@@ -2,8 +2,6 @@ package com.cloud.capacity;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.configuration.Config;
@@ -19,18 +17,26 @@ import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.CapacityState;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceListener;
 import com.cloud.resource.ResourceManager;
@@ -51,14 +57,9 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.Transition;
 import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -209,7 +210,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
         }
 
         if (newState == State.Stopped) {
-            if (vm.getType() == VirtualMachine.Type.User) {
+            if (vm.getType() == VirtualMachineType.User) {
 
                 final UserVmVO userVM = _userVMDao.findById(vm.getId());
                 _userVMDao.loadDetails(userVM);
@@ -574,7 +575,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                 if (messageSentFlag == null || !Boolean.valueOf(messageSentFlag.getValue())) {
                     _messageBus.publish(_name, "VM_ReservedCapacity_Free", PublishScope.LOCAL, vm);
 
-                    if (vm.getType() == VirtualMachine.Type.User) {
+                    if (vm.getType() == VirtualMachineType.User) {
                         final UserVmVO userVM = _userVMDao.findById(vm.getId());
                         _userVMDao.loadDetails(userVM);
                         userVM.setDetail(MESSAGE_RESERVED_CAPACITY_FREED_FLAG, "true");

@@ -66,17 +66,25 @@ import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.command.AttachAnswer;
@@ -114,13 +122,11 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VmWork;
 import com.cloud.vm.VmWorkAttachVolume;
 import com.cloud.vm.VmWorkConstants;
@@ -271,7 +277,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         Long zoneId = cmd.getZoneId();
         final Long diskOfferingId;
         final DiskOfferingVO diskOffering;
-        final Storage.ProvisioningType provisioningType;
+        final StorageProvisioningType provisioningType;
         Long size;
         Long minIops = null;
         Long maxIops = null;
@@ -399,7 +405,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (vmId != null) {
                 // Check that the virtual machine ID is valid and it's a user vm
                 final UserVmVO vm = _userVmDao.findById(vmId);
-                if (vm == null || vm.getType() != VirtualMachine.Type.User) {
+                if (vm == null || vm.getType() != VirtualMachineType.User) {
                     throw new InvalidParameterValueException("Please specify a valid User VM.");
                 }
 
@@ -487,7 +493,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     private VolumeVO commitVolume(final CreateVolumeCmd cmd, final Account caller, final Account owner, final Boolean displayVolume, final Long zoneId, final Long diskOfferingId,
-                                  final Storage.ProvisioningType provisioningType, final Long size, final Long minIops, final Long maxIops, final VolumeVO parentVolume,
+                                  final StorageProvisioningType provisioningType, final Long size, final Long minIops, final Long maxIops, final VolumeVO parentVolume,
                                   final String userSpecifiedName, final String uuid, final DiskControllerType diskController) {
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
@@ -626,7 +632,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         // Check that the virtual machine ID is valid and it's a user vm
         final UserVmVO vm = _userVmDao.findById(vmId);
-        if (vm == null || vm.getType() != VirtualMachine.Type.User) {
+        if (vm == null || vm.getType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("Please specify a valid User VM.");
         }
 
@@ -814,7 +820,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(0);
         workJob.setUserId(0);
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(instanceId);
         workJob.setInitMsid(ManagementServerNode.getManagementServerId());
 
@@ -923,7 +929,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1544,7 +1550,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1841,7 +1847,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 }
 
                 final VMInstanceVO vmInstance = _vmInstanceDao.findById(instanceId);
-                if (instanceId == null || vmInstance.getType().equals(VirtualMachine.Type.User)) {
+                if (instanceId == null || vmInstance.getType().equals(VirtualMachineType.User)) {
                     // Decrement the resource count for volumes and primary storage belonging user VM's only
                     _resourceLimitMgr.decrementResourceCount(volume.getAccountId(), ResourceType.volume, volume.isDisplayVolume());
                 }
@@ -1885,7 +1891,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     private boolean stateTransitTo(final Volume vol, final Volume.Event event) throws NoTransitionException {
-        return _volStateMachine.transitTo(vol, event, null, _volsDao);
+        return new StateMachine2Transitions(_volStateMachine).transitTo(vol, event, null, _volsDao);
     }
 
     @Override
@@ -2087,7 +2093,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -2207,7 +2213,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -2566,7 +2572,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -2673,7 +2679,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, Storage.ProvisioningType.THIN, 0, VolumeType.DATADISK, getDiskControllerType());
+                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, StorageProvisioningType.THIN, 0, VolumeType.DATADISK, getDiskControllerType());
                 volume.setPoolId(null);
                 volume.setDataCenterId(zoneId);
                 volume.setPodId(null);
@@ -2753,7 +2759,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 

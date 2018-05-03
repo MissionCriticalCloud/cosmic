@@ -9,12 +9,15 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.IllegalVirtualMachineException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
 import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.legacymodel.network.vpc.NetworkACLItem;
 import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.network.vpc.VpcGateway;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
@@ -30,8 +33,6 @@ import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
@@ -43,7 +44,6 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -474,7 +474,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return false;
         }
 
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             final Map<VirtualMachineProfile.Param, Object> params = new HashMap<>(1);
             params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 

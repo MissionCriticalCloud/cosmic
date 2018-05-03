@@ -1,6 +1,6 @@
 package com.cloud.resource;
 
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 
 import java.net.URI;
 import java.util.List;

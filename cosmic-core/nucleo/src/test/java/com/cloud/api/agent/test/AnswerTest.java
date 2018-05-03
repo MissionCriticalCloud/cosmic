@@ -3,9 +3,9 @@ package com.cloud.api.agent.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.UnsupportedAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 
 import org.junit.Test;
 

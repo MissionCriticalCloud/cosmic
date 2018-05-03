@@ -18,8 +18,8 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.vm.Nic;
 
 import java.util.ArrayList;
 import java.util.List;

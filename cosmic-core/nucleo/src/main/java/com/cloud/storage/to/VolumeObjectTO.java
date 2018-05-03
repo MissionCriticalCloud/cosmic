@@ -1,14 +1,14 @@
 package com.cloud.storage.to;
 
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
+import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.offering.DiskOffering.DiskCacheMode;
-import com.cloud.storage.Storage;
 
 public class VolumeObjectTO implements DataTO {
     private String uuid;
@@ -22,7 +22,7 @@ public class VolumeObjectTO implements DataTO {
     private long accountId;
     private String chainInfo;
     private ImageFormat format;
-    private Storage.ProvisioningType provisioningType;
+    private StorageProvisioningType provisioningType;
     private long id;
 
     private Long deviceId;
@@ -173,11 +173,11 @@ public class VolumeObjectTO implements DataTO {
         this.format = format;
     }
 
-    public Storage.ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 
-    public void setProvisioningType(final Storage.ProvisioningType provisioningType) {
+    public void setProvisioningType(final StorageProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 

@@ -1,6 +1,6 @@
 package com.cloud.network.lb;
 
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
 
 public interface LBHealthCheckManager {
 

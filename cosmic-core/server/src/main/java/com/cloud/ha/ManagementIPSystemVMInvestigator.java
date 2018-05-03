@@ -1,13 +1,13 @@
 package com.cloud.ha;
 
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.NetworkModel;
-import com.cloud.vm.Nic;
-import com.cloud.vm.VirtualMachine;
 
 import javax.inject.Inject;
 import java.util.List;

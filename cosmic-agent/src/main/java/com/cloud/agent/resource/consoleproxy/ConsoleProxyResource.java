@@ -1,21 +1,21 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.agent.api.CheckHealthAnswer;
-import com.cloud.agent.api.CheckHealthCommand;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.ReadyAnswer;
 import com.cloud.agent.api.ReadyCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.agent.service.Agent.ExitStatus;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.utils.NumbersUtil;

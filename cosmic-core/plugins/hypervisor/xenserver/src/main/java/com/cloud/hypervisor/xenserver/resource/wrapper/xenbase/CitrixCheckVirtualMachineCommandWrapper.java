@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import com.cloud.agent.api.CheckVirtualMachineAnswer;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.vm.VirtualMachine.PowerState;
 
 import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;

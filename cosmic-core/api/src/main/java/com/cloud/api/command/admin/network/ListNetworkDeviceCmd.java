@@ -9,7 +9,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkDeviceResponse;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;

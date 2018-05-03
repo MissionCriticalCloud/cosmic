@@ -23,11 +23,11 @@ import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.network.IpAddress;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 
@@ -386,7 +386,7 @@ public class CreatePortForwardingRuleCmd extends BaseAsyncCreateCmd implements P
         if (vmSecondaryIp == null || vmSecondaryIp.isEmpty()) {
             return null;
         }
-        return new Ip(vmSecondaryIp);
+        return new Ip(NetUtils.ip2Long(vmSecondaryIp));
     }
 
     @Override

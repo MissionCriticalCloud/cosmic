@@ -3,12 +3,12 @@ package com.cloud.template;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.statemachine.StateObject;
+import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.Storage.TemplateType;
-import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.fsm.Transition;
 
 import java.util.Date;
 import java.util.Map;

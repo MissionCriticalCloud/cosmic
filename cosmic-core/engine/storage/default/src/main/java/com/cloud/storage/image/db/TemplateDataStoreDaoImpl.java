@@ -9,9 +9,9 @@ import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Stat
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.Storage.TemplateType;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;

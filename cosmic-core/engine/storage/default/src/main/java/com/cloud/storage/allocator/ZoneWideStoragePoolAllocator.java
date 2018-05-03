@@ -3,13 +3,13 @@ package com.cloud.storage.allocator;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
+import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;

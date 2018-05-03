@@ -3,7 +3,7 @@ package com.cloud.api.agent.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CancelCommand;
+import com.cloud.legacymodel.communication.command.CancelCommand;
 
 import org.junit.Test;
 

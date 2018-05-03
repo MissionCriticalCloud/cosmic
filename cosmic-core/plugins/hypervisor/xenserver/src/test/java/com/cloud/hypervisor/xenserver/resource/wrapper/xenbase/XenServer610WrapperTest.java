@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.agent.api.MigrateWithStorageCommand;
 import com.cloud.agent.api.MigrateWithStorageCompleteCommand;
 import com.cloud.agent.api.MigrateWithStorageReceiveCommand;
@@ -21,13 +20,14 @@ import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.PhysicalNetworkSetupInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;

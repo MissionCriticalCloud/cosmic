@@ -9,9 +9,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainRouterResponse;
 import com.cloud.api.response.ServiceOfferingResponse;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

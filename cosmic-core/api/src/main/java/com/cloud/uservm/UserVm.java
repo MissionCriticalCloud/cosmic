@@ -1,7 +1,7 @@
 package com.cloud.uservm;
 
 import com.cloud.legacymodel.acl.ControlledEntity;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 /**
  * This represents one running virtual machine instance.

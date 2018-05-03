@@ -1,12 +1,13 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
@@ -29,7 +30,7 @@ public class KvmInvestigator extends AdapterBase implements Investigator {
     ResourceManager resourceMgr;
 
     @Override
-    public boolean isVmAlive(final com.cloud.vm.VirtualMachine vm, final Host host) throws UnknownVM {
+    public boolean isVmAlive(final VirtualMachine vm, final Host host) throws UnknownVM {
         final HostStatus status = isAgentAlive(host);
         if (status == null) {
             throw new UnknownVM();

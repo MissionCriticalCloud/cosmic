@@ -4,9 +4,9 @@ import com.cloud.db.model.Zone;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.utils.component.Adapter;
 

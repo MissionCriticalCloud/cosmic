@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CheckNetworkAnswer;
-import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.agent.api.storage.ResizeVolumeCommand;
+import com.cloud.legacymodel.communication.answer.CheckNetworkAnswer;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.model.enumeration.HypervisorType;

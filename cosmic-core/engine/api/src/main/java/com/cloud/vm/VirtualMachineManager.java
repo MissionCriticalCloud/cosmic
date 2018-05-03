@@ -4,19 +4,22 @@ import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.Network;
 import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.offering.ServiceOffering;
@@ -73,7 +76,7 @@ public interface VirtualMachineManager extends Manager {
 
     void expunge(String vmUuid) throws ResourceUnavailableException;
 
-    void registerGuru(VirtualMachine.Type type, VirtualMachineGuru guru);
+    void registerGuru(VirtualMachineType type, VirtualMachineGuru guru);
 
     boolean stateTransitTo(VirtualMachine vm, VirtualMachine.Event e, Long hostId) throws NoTransitionException;
 

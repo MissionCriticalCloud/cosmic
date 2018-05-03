@@ -12,10 +12,14 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
@@ -26,13 +30,9 @@ import com.cloud.network.element.LoadBalancingServiceProvider;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.LinkedHashMap;
@@ -213,7 +213,7 @@ public interface NetworkOrchestrationService {
 
     List<? extends Nic> listVmNics(long vmId, Long nicId, Long networkId);
 
-    Nic savePlaceholderNic(Network network, String ip4Address, String ip6Address, Type vmType);
+    Nic savePlaceholderNic(Network network, String ip4Address, String ip6Address, VirtualMachineType vmType);
 
     DhcpServiceProvider getDhcpServiceProvider(Network network);
 

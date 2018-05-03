@@ -3,6 +3,7 @@ package com.cloud.storage;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.utils.db.GenericDaoBase;
 
 import javax.persistence.Column;

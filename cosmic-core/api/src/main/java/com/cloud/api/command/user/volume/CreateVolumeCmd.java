@@ -21,9 +21,9 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.Volume;
-import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

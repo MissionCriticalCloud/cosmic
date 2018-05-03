@@ -11,7 +11,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.HostResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;

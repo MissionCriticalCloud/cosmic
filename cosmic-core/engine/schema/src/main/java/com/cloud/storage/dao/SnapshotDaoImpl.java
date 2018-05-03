@@ -1,5 +1,6 @@
 package com.cloud.storage.dao;
 
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.Snapshot;
@@ -7,7 +8,6 @@ import com.cloud.storage.Snapshot.Event;
 import com.cloud.storage.Snapshot.State;
 import com.cloud.storage.Snapshot.Type;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.db.DB;

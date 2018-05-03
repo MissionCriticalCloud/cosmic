@@ -9,13 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.AttachIsoCommand;
-import com.cloud.agent.api.CheckHealthCommand;
-import com.cloud.agent.api.CheckNetworkCommand;
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
-import com.cloud.agent.api.ClusterVMMetaDataSyncCommand;
-import com.cloud.agent.api.CreateStoragePoolCommand;
 import com.cloud.agent.api.CreateVMSnapshotCommand;
 import com.cloud.agent.api.DeleteStoragePoolCommand;
 import com.cloud.agent.api.DeleteVMSnapshotCommand;
@@ -28,7 +21,6 @@ import com.cloud.agent.api.GetVncPortCommand;
 import com.cloud.agent.api.MaintainCommand;
 import com.cloud.agent.api.MigrateCommand;
 import com.cloud.agent.api.ModifySshKeysCommand;
-import com.cloud.agent.api.ModifyStoragePoolCommand;
 import com.cloud.agent.api.PerformanceMonitorCommand;
 import com.cloud.agent.api.PingTestCommand;
 import com.cloud.agent.api.PlugNicCommand;
@@ -47,8 +39,6 @@ import com.cloud.agent.api.UnPlugNicCommand;
 import com.cloud.agent.api.UpdateHostPasswordCommand;
 import com.cloud.agent.api.UpgradeSnapshotCommand;
 import com.cloud.agent.api.VMSnapshotTO;
-import com.cloud.agent.api.storage.CreateAnswer;
-import com.cloud.agent.api.storage.CreateCommand;
 import com.cloud.agent.api.storage.DestroyCommand;
 import com.cloud.agent.api.storage.PrimaryStorageDownloadCommand;
 import com.cloud.agent.api.storage.ResizeVolumeCommand;
@@ -59,10 +49,23 @@ import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CreateAnswer;
+import com.cloud.legacymodel.communication.command.AttachIsoCommand;
 import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
 import com.cloud.legacymodel.communication.command.CheckSshCommand;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
+import com.cloud.legacymodel.communication.command.ClusterVMMetaDataSyncCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CreateCommand;
+import com.cloud.legacymodel.communication.command.CreateStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.ModifyStoragePoolCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.storage.DiskProfile;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NicTO;
@@ -70,15 +73,12 @@ import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.PhysicalNetworkSetupInfo;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.vm.DiskProfile;
-import com.cloud.vm.VirtualMachine;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -614,7 +614,7 @@ public class CitrixRequestWrapperTest {
 
     @Test
     public void testCheckOnHostCommand() {
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final com.cloud.legacymodel.dc.Host host = Mockito.mock(com.cloud.legacymodel.dc.Host.class);
         final CheckOnHostCommand onHostCommand = new CheckOnHostCommand(host);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
@@ -640,7 +640,7 @@ public class CitrixRequestWrapperTest {
     @Test
     public void testStartCommand() {
         final VirtualMachineTO vm = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final com.cloud.legacymodel.dc.Host host = Mockito.mock(com.cloud.legacymodel.dc.Host.class);
 
         final StartCommand startCommand = new StartCommand(vm, host, false);
 
@@ -885,7 +885,7 @@ public class CitrixRequestWrapperTest {
         final NicTO nicTO = Mockito.mock(NicTO.class);
         final Connection conn = Mockito.mock(Connection.class);
 
-        final PlugNicCommand plugNic = new PlugNicCommand(nicTO, "Test", VirtualMachine.Type.User);
+        final PlugNicCommand plugNic = new PlugNicCommand(nicTO, "Test", VirtualMachineType.User);
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);

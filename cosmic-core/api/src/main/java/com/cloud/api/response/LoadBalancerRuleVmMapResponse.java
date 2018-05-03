@@ -2,10 +2,10 @@ package com.cloud.api.response;
 
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.network.router.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 

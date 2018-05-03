@@ -1,8 +1,8 @@
 package com.cloud.storage.command;
 
-import com.cloud.agent.api.storage.AbstractDownloadCommand;
 import com.cloud.agent.api.storage.PasswordAuth;
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.communication.command.AbstractDownloadCommand;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.ImageFormat;

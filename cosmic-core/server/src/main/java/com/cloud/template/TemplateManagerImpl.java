@@ -2,7 +2,6 @@ package com.cloud.template;
 
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.ComputeChecksumCommand;
 import com.cloud.agent.api.storage.DestroyCommand;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
@@ -59,14 +58,15 @@ import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.ComputeChecksumCommand;
 import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
@@ -74,11 +74,15 @@ import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
@@ -97,11 +101,8 @@ import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.TemplateProfile;
-import com.cloud.storage.Upload;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.storage.VolumeVO;
@@ -147,7 +148,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -1812,7 +1812,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             for (final DataStore store : ssStores) {
                 tmpltStoreRef = _tmplStoreDao.findByStoreTemplate(store.getId(), templateId);
                 if (tmpltStoreRef != null) {
-                    if (tmpltStoreRef.getDownloadState() == com.cloud.storage.VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
+                    if (tmpltStoreRef.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
                         tmpltStore = (ImageStoreEntity) store;
                         break;
                     }

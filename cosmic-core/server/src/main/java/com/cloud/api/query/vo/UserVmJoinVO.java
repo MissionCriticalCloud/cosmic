@@ -1,15 +1,16 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +29,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Column(name = "vm_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
-    protected VirtualMachine.Type type;
+    protected VirtualMachineType type;
     @Column(name = "display_vm", updatable = true, nullable = false)
     protected boolean displayVm = true;
     transient String password;
@@ -296,7 +297,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.volumeDeviceId = volumeDeviceId;
     }
 
-    public void setType(final VirtualMachine.Type type) {
+    public void setType(final VirtualMachineType type) {
         this.type = type;
     }
 
@@ -804,7 +805,7 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         return instanceGroupName;
     }
 
-    public VirtualMachine.Type getType() {
+    public VirtualMachineType getType() {
         return type;
     }
 

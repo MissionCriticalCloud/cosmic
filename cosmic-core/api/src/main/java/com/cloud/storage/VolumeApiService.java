@@ -11,6 +11,7 @@ import com.cloud.api.command.user.volume.UploadVolumeCmd;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.DiskControllerType;
 

@@ -1,9 +1,9 @@
 package com.cloud.host.dao;
 
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.info.RunningHostCountInfo;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.model.enumeration.Event;
 import com.cloud.model.enumeration.HostType;

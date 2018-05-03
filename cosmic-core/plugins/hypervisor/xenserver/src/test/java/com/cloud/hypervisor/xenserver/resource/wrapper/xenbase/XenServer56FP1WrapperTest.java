@@ -7,9 +7,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.cloud.agent.api.FenceCommand;
-import com.cloud.host.Host;
 import com.cloud.hypervisor.xenserver.resource.XenServer56FP1Resource;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.vm.VMInstanceVO;
 
 import com.xensource.xenapi.Connection;

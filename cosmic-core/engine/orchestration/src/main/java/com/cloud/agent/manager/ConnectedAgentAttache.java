@@ -1,8 +1,8 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.transport.Request;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.host.HostStatus;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.utils.nio.Link;
 
 import java.nio.channels.ClosedChannelException;

@@ -6,10 +6,10 @@ import com.cloud.hypervisor.kvm.resource.LibvirtStoragePoolDef.PoolType;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.StorageLayer;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
@@ -93,7 +93,7 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
 
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String name, final KvmStoragePool pool, final PhysicalDiskFormat format,
-                                              final ProvisioningType provisioningType, final long size) {
+                                              final StorageProvisioningType provisioningType, final long size) {
         return null;
     }
 
@@ -279,7 +279,7 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
 
     @Override
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name, final PhysicalDiskFormat format,
-                                                  final ProvisioningType provisioningType, final long size, final KvmStoragePool destPool, final int timeout) {
+                                                  final StorageProvisioningType provisioningType, final long size, final KvmStoragePool destPool, final int timeout) {
         return null;
     }
 

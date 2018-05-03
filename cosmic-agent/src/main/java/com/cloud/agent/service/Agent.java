@@ -2,8 +2,6 @@ package com.cloud.agent.service;
 
 import com.cloud.agent.IAgentControl;
 import com.cloud.agent.IAgentControlListener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.agent.api.MaintainAnswer;
 import com.cloud.agent.api.MaintainCommand;
 import com.cloud.agent.api.PingCommand;
@@ -13,7 +11,9 @@ import com.cloud.agent.api.StartupAnswer;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.transport.Request;
 import com.cloud.agent.transport.Response;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.CronCommand;
 import com.cloud.legacymodel.exceptions.AgentControlChannelException;

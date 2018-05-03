@@ -2,6 +2,7 @@ package com.cloud.offering;
 
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.storage.DiskOffering;
 
 import java.util.Date;
 

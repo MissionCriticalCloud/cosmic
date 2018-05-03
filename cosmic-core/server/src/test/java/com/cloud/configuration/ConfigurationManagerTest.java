@@ -29,6 +29,7 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.NetworkType;
@@ -50,8 +51,8 @@ import com.cloud.user.ResourceLimitService;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.utils.net.Ip;
+import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -241,7 +242,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 
@@ -284,7 +285,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 
@@ -310,7 +311,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 
@@ -336,7 +337,7 @@ public class ConfigurationManagerTest {
 
         // one of the ip addresses of the range is allocated to different account
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddress.setAllocatedToAccountId(1L);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
@@ -413,7 +414,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._publicIpAddressDao.countIPs(anyLong(), anyLong(), anyBoolean())).thenReturn(1);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 

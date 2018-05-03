@@ -1,13 +1,13 @@
 package com.cloud.api.query.vo;
 
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.RedundantState;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

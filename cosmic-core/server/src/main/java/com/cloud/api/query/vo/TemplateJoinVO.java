@@ -1,12 +1,12 @@
 package com.cloud.api.query.vo;
 
 import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Storage;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.template.VirtualMachineTemplate.State;
 import com.cloud.utils.db.GenericDao;

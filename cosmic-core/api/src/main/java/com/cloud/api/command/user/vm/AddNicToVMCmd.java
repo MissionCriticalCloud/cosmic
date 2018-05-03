@@ -17,9 +17,9 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

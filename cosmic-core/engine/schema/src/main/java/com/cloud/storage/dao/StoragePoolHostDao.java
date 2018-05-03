@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import com.cloud.host.HostStatus;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.utils.db.GenericDao;

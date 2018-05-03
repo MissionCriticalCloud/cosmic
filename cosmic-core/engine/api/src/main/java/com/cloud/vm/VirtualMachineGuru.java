@@ -4,6 +4,7 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 /**
  * A VirtualMachineGuru knows how to process a certain type of virtual machine.

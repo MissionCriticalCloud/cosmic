@@ -31,14 +31,14 @@ public class IpTest {
     @Test
     public void testEquals() {
         new EqualsTester()
-                .addEqualityGroup(new Ip("0.0.0.1"), new Ip(1L))
-                .addEqualityGroup(new Ip("0.0.0.0"), new Ip(0L))
+                .addEqualityGroup(new Ip(NetUtils.ip2Long("0.0.0.1")), new Ip(1L))
+                .addEqualityGroup(new Ip(NetUtils.ip2Long("0.0.0.0")), new Ip(0L))
                 .testEquals();
     }
 
     @Test
     public void testIsSameAddressAs() {
-        Assert.assertTrue("1 and one should be considdered the same address", new Ip(1L).isSameAddressAs("0.0.0.1"));
-        Assert.assertTrue("zero and 0L should be considdered the same address", new Ip("0.0.0.0").isSameAddressAs(0L));
+        Assert.assertTrue("1 and one should be considdered the same address", new Ip(1L).isSameAddressAs(NetUtils.ip2Long("0.0.0.1")));
+        Assert.assertTrue("zero and 0L should be considdered the same address", new Ip(NetUtils.ip2Long("0.0.0.0")).isSameAddressAs(0L));
     }
 }

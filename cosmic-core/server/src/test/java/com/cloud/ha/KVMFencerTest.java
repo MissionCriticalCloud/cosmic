@@ -4,14 +4,14 @@ import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.FenceAnswer;
 import com.cloud.agent.api.FenceCommand;
 import com.cloud.alert.AlertManager;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Arrays;
 import java.util.Collections;

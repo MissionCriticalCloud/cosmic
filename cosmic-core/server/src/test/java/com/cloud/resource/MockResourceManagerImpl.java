@@ -15,13 +15,13 @@ import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
-import com.cloud.exception.AgentUnavailableException;
 import com.cloud.gpu.HostGpuGroupsVO;
-import com.cloud.host.Host;
 import com.cloud.host.HostStats;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
@@ -216,7 +216,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#addHost(long, com.cloud.resource.ServerResource, com.cloud.host.Host.Type, java.util.Map)
+     * @see com.cloud.resource.ResourceManager#addHost(long, com.cloud.resource.ServerResource, com.cloud.legacymodel.dc.Host.Type, java.util.Map)
      */
     @Override
     public Host addHost(final long zoneId, final ServerResource resource, final HostType hostType, final Map<String, String> hostDetails) {
@@ -272,7 +272,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#resourceStateTransitTo(com.cloud.host.Host, com.cloud.legacymodel.resource.ResourceState.Event, long)
+     * @see com.cloud.resource.ResourceManager#resourceStateTransitTo(com.cloud.legacymodel.dc.Host, com.cloud.legacymodel.resource.ResourceState.Event, long)
      */
     @Override
     public boolean resourceStateTransitTo(final Host host, final Event event, final long msId) throws NoTransitionException {
@@ -335,7 +335,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHosts(com.cloud.host.Host.Type, java.lang.Long, java.lang.Long, long)
+     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHosts(com.cloud.legacymodel.dc.Host.Type, java.lang.Long, java.lang.Long, long)
      */
     @Override
     public List<HostVO> listAllUpAndEnabledHosts(final HostType type, final Long clusterId, final Long podId, final long dcId) {
@@ -353,7 +353,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listHostsInClusterByStatus(long, com.cloud.host.HostStatus)
+     * @see com.cloud.resource.ResourceManager#listHostsInClusterByStatus(long, com.cloud.legacymodel.dc.HostStatus)
      */
     @Override
     public List<HostVO> listHostsInClusterByStatus(final long clusterId, final HostStatus status) {
@@ -362,7 +362,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHostsInOneZoneByType(com.cloud.host.Host.Type, long)
+     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHostsInOneZoneByType(com.cloud.legacymodel.dc.Host.Type, long)
      */
     @Override
     public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(final HostType type, final long dcId) {
@@ -383,7 +383,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllHostsInOneZoneByType(com.cloud.host.Host.Type, long)
+     * @see com.cloud.resource.ResourceManager#listAllHostsInOneZoneByType(com.cloud.legacymodel.dc.Host.Type, long)
      */
     @Override
     public List<HostVO> listAllHostsInOneZoneByType(final HostType type, final long dcId) {
@@ -392,7 +392,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllHostsInAllZonesByType(com.cloud.host.Host.Type)
+     * @see com.cloud.resource.ResourceManager#listAllHostsInAllZonesByType(com.cloud.legacymodel.dc.Host.Type)
      */
     @Override
     public List<HostVO> listAllHostsInAllZonesByType(final HostType type) {
@@ -464,7 +464,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllNotInMaintenanceHostsInOneZone(com.cloud.host.Host.Type, java.lang.Long)
+     * @see com.cloud.resource.ResourceManager#listAllNotInMaintenanceHostsInOneZone(com.cloud.legacymodel.dc.Host.Type, java.lang.Long)
      */
     @Override
     public List<HostVO> listAllNotInMaintenanceHostsInOneZone(final HostType type, final Long dcId) {
@@ -509,7 +509,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledNonHAHosts(com.cloud.host.Host.Type, java.lang.Long, java.lang.Long, long)
+     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledNonHAHosts(com.cloud.legacymodel.dc.Host.Type, java.lang.Long, java.lang.Long, long)
      */
     @Override
     public List<HostVO> listAllUpAndEnabledNonHAHosts(final HostType type, final Long clusterId, final Long podId, final long dcId) {

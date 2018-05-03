@@ -10,6 +10,8 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.VolumeVO;
@@ -22,8 +24,6 @@ import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -210,7 +210,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
 
                 final ServiceOffering so;
 
-                if (vm.getType() == VirtualMachine.Type.User) {
+                if (vm.getType() == VirtualMachineType.User) {
                     final UserVmVO userVm = _vmDao.findById(vm.getId());
                     if (userVm == null) {
                         continue;
@@ -246,7 +246,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
             return true;
         }
 
-        if (vm.getState() == State.Destroyed && vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getState() == State.Destroyed && vm.getType() != VirtualMachineType.User) {
             return true;
         }
 

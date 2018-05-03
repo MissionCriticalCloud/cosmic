@@ -3,12 +3,12 @@ package com.cloud.storage.template;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.VMTemplateHostVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.command.DownloadCommand;
 import com.cloud.storage.command.DownloadCommand.ResourceType;
 import com.cloud.storage.command.DownloadProgressCommand;
@@ -609,7 +609,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                 final DownloadCommand dcmd = new DownloadCommand(cmd);
                 return handleDownloadCommand(resource, dcmd);
             } else {
-                return new DownloadAnswer("Cannot find job", com.cloud.storage.VMTemplateStorageResourceAssoc.Status.UNKNOWN);
+                return new DownloadAnswer("Cannot find job", VMTemplateStorageResourceAssoc.Status.UNKNOWN);
             }
         }
         final TemplateDownloader td = dj.getTemplateDownloader();

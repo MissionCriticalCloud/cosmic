@@ -1,5 +1,6 @@
 package com.cloud.network.router;
 
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.vpc.VpcGateway;
 import com.cloud.network.Network;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;

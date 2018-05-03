@@ -25,6 +25,7 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceInUseException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.projects.dao.ProjectDao;
 import com.cloud.test.utils.SpringUtils;
@@ -37,7 +38,6 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;

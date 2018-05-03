@@ -32,12 +32,12 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -45,23 +45,28 @@ import com.cloud.legacymodel.exceptions.InsufficientStorageCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.dao.GuestOSDao;
@@ -83,11 +88,8 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.vm.DiskProfile;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfileImpl;
 import com.cloud.vm.VmWorkAttachVolume;
@@ -600,7 +602,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             vol.setIsoId(template.getId());
         }
         // display flag matters only for the User vms
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             final UserVmVO userVm = _userVmDao.findById(vm.getId());
             vol.setDisplayVolume(userVm.isDisplayVm());
         }
@@ -609,7 +611,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         vol = _volsDao.persist(vol);
 
         // Save usage event and update resource count for user vm volumes
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.volume, vol.isDisplayVolume());
             _resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));
         }
@@ -963,7 +965,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         }
 
         //if (vm.getType() == VirtualMachine.Type.User && vm.getTemplate().getFormat() == ImageFormat.ISO) {
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             _tmpltMgr.prepareIsoForVmProfile(vm);
             //DataTO dataTO = tmplFactory.getTemplate(vm.getTemplate().getId(), DataStoreRole.Image, vm.getVirtualMachine().getDataCenterId()).getTO();
             //DiskTO iso = new DiskTO(dataTO, 3L, null, Volume.Type.ISO);
@@ -1319,14 +1321,14 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         if (type.equals(VolumeType.ROOT)) {
             vol.setDeviceId(0l);
-            if (!vm.getType().equals(VirtualMachine.Type.User)) {
+            if (!vm.getType().equals(VirtualMachineType.User)) {
                 vol.setRecreatable(true);
             }
         } else {
             vol.setDeviceId(1l);
         }
 
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             final UserVmVO userVm = _userVmDao.findById(vm.getId());
             vol.setDisplayVolume(userVm.isDisplayVm());
         }
@@ -1334,7 +1336,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         vol = _volsDao.persist(vol);
 
         // Create event and update resource count for volumes if vm is a user vm
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
 
             Long offeringId = null;
 
@@ -1436,7 +1438,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     private boolean stateTransitTo(final Volume vol, final Volume.Event event) throws NoTransitionException {
-        return _volStateMachine.transitTo(vol, event, null, _volsDao);
+        return new StateMachine2Transitions(_volStateMachine).transitTo(vol, event, null, _volsDao);
     }
 
     public String getRandomVolumeName() {

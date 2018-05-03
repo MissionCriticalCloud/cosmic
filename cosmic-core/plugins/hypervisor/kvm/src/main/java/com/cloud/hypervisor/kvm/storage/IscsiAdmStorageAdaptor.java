@@ -1,11 +1,10 @@
 package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.OutputInterpreter;
@@ -73,7 +72,7 @@ public class IscsiAdmStorageAdaptor implements StorageAdaptor {
     // does not apply for iScsiAdmStorageAdaptor
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String volumeUuid, final KvmStoragePool pool, final PhysicalDiskFormat format,
-                                              final Storage.ProvisioningType provisioningType, final long size) {
+                                              final StorageProvisioningType provisioningType, final long size) {
         throw new UnsupportedOperationException("Creating a physical disk is not supported.");
     }
 
@@ -264,7 +263,7 @@ public class IscsiAdmStorageAdaptor implements StorageAdaptor {
 
     @Override
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name, final PhysicalDiskFormat format,
-                                                  final ProvisioningType provisioningType, final long size,
+                                                  final StorageProvisioningType provisioningType, final long size,
                                                   final KvmStoragePool destPool, final int timeout) {
         throw new UnsupportedOperationException(
                 "Creating a disk from a template is not yet supported for this configuration.");

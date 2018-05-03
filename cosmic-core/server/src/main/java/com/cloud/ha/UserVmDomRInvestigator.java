@@ -2,17 +2,18 @@ package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.PingTestCommand;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
-import com.cloud.vm.Nic;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
 
     @Override
     public boolean isVmAlive(final VirtualMachine vm, final Host host) throws UnknownVM {
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Not a User Vm, unable to determine state of " + vm + " returning null");
             }

@@ -3,8 +3,8 @@ package com.cloud.api.agent.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CheckNetworkCommand;
-import com.cloud.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
 
 import java.util.List;
 
@@ -17,8 +17,7 @@ public class CheckNetworkCommandTest {
 
     @Before
     public void setUp() {
-        final
-        List<PhysicalNetworkSetupInfo> net = Mockito.mock(List.class);
+        final List<PhysicalNetworkSetupInfo> net = Mockito.mock(List.class);
         cnc = new CheckNetworkCommand(net);
     }
 

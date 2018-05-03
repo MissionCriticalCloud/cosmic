@@ -9,7 +9,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.GuestOSCategoryResponse;
 import com.cloud.api.response.HostResponse;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.user.Account;
 
 import java.util.List;

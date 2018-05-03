@@ -1,8 +1,5 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.CheckHealthAnswer;
-import com.cloud.agent.api.CheckHealthCommand;
-import com.cloud.agent.api.ComputeChecksumCommand;
 import com.cloud.agent.api.PingCommand;
 import com.cloud.agent.api.PingStorageCommand;
 import com.cloud.agent.api.ReadyAnswer;
@@ -12,10 +9,13 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.api.storage.ListTemplateAnswer;
 import com.cloud.agent.api.storage.ListTemplateCommand;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.ComputeChecksumCommand;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.Storage;

@@ -2,12 +2,13 @@ package com.cloud.vm.dao;
 
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network;
 import com.cloud.network.dao.RouterNetworkDao;
 import com.cloud.network.dao.RouterNetworkVO;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.user.UserStatisticsVO;
@@ -22,7 +23,6 @@ import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

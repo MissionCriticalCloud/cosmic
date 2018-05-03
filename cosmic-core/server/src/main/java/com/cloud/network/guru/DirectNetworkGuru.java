@@ -14,18 +14,21 @@ import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Ipv6AddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.model.enumeration.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkVO;
@@ -40,12 +43,9 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.ExceptionUtil;
-import com.cloud.vm.Nic;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
@@ -104,7 +104,7 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
         }
 
         final NetworkVO config =
-                new NetworkVO(offering.getTrafficType(), Mode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), state, plan.getDataCenterId(),
+                new NetworkVO(offering.getTrafficType(), DHCPMode.Dhcp, BroadcastDomainType.Vlan, offering.getId(), state, plan.getDataCenterId(),
                         plan.getPhysicalNetworkId(), offering.getRedundantRouter());
 
         if (userSpecified != null) {
@@ -323,12 +323,12 @@ public class DirectNetworkGuru extends AdapterBase implements NetworkGuru {
                     } else {
                         _ipAddrMgr.allocateDirectIp(nic, zone, vm, network, requestedIp4Addr, requestedIp6Addr);
                         //save the placeholder nic if the vm is the Virtual router
-                        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
+                        if (vm.getType() == VirtualMachineType.DomainRouter) {
                             final Nic placeholderNic = _networkModel.getPlaceholderNicForRouter(network, null);
                             if (placeholderNic == null) {
                                 s_logger.debug("Saving placeholder nic with ip4 address " + nic.getIPv4Address() + " and ipv6 address " + nic.getIPv6Address() +
                                         " for the network " + network);
-                                _networkMgr.savePlaceholderNic(network, nic.getIPv4Address(), nic.getIPv6Address(), VirtualMachine.Type.DomainRouter);
+                                _networkMgr.savePlaceholderNic(network, nic.getIPv4Address(), nic.getIPv6Address(), VirtualMachineType.DomainRouter);
                             }
                         }
                     }

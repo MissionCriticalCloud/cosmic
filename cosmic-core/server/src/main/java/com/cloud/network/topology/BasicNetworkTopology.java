@@ -2,29 +2,31 @@ package com.cloud.network.topology;
 
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.host.HostStatus;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.legacymodel.network.vpc.NetworkACLItem;
 import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.router.NetworkHelper;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.BasicVpnRules;
 import com.cloud.network.rules.DhcpEntryRules;
 import com.cloud.network.rules.DhcpSubNetRules;
@@ -41,8 +43,6 @@ import com.cloud.network.rules.UserdataPwdRules;
 import com.cloud.network.rules.UserdataToRouterRules;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -141,7 +141,7 @@ public class BasicNetworkTopology implements NetworkTopology {
         // for user vm in Basic zone we should try to re-deploy vm in a diff pod
         // if it fails to deploy in original pod; so throwing exception with Pod
         // scope
-        if (podId != null && profile.getVirtualMachine().getType() == VirtualMachine.Type.User && network.getTrafficType() == TrafficType.Guest
+        if (podId != null && profile.getVirtualMachine().getType() == VirtualMachineType.User && network.getTrafficType() == TrafficType.Guest
                 && network.getGuestType() == GuestType.Shared) {
             isPodLevelException = true;
         }
@@ -163,7 +163,7 @@ public class BasicNetworkTopology implements NetworkTopology {
         final Long podId = dest.getPod().getId();
         boolean isPodLevelException = false;
 
-        if (podId != null && profile.getVirtualMachine().getType() == VirtualMachine.Type.User && network.getTrafficType() == TrafficType.Guest
+        if (podId != null && profile.getVirtualMachine().getType() == VirtualMachineType.User && network.getTrafficType() == TrafficType.Guest
                 && network.getGuestType() == GuestType.Shared) {
             isPodLevelException = true;
         }

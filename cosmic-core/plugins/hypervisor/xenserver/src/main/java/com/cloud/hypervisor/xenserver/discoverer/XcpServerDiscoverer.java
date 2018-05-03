@@ -2,8 +2,6 @@ package com.cloud.hypervisor.xenserver.discoverer;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.agent.api.SetupAnswer;
 import com.cloud.agent.api.SetupCommand;
 import com.cloud.agent.api.StartupCommand;
@@ -14,10 +12,7 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.HostPodDao;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostEnvironment;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
 import com.cloud.hypervisor.xenserver.resource.CitrixHelper;
@@ -34,13 +29,18 @@ import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServer650Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServerConnectionPool;
 import com.cloud.hypervisor.xenserver.resource.Xenserver625Resource;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.DiscoveredWithErrorException;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.HypervisorVersionChangedException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.Zone;
@@ -529,7 +529,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     }
 
     @Override
-    public void processConnect(final com.cloud.host.Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
+    public void processConnect(final com.cloud.legacymodel.dc.Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
         if (!(cmd instanceof StartupRoutingCommand)) {
             return;
         }

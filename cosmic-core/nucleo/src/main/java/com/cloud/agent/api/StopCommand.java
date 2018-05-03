@@ -1,7 +1,7 @@
 package com.cloud.agent.api;
 
 import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 public class StopCommand extends RebootCommand {
     boolean checkBeforeCleanup = false;

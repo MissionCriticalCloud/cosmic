@@ -9,18 +9,18 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -68,8 +68,8 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
         }
 
         s_logger.debug("First fit was unable to find a host");
-        final VirtualMachine.Type vmType = vm.getType();
-        if (vmType == VirtualMachine.Type.User) {
+        final VirtualMachineType vmType = vm.getType();
+        if (vmType == VirtualMachineType.User) {
             s_logger.debug("vm is not a system vm so let's just return empty list");
             return new ArrayList<>();
         }

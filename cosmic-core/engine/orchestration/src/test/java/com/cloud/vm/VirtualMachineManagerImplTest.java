@@ -10,8 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.CheckVirtualMachineAnswer;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
 import com.cloud.agent.api.MigrateWithStorageAnswer;
 import com.cloud.agent.api.MigrateWithStorageCommand;
 import com.cloud.agent.api.MigrateWithStorageCompleteAnswer;
@@ -36,26 +34,33 @@ import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.HypervisorGuru;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ManagementServerException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;
@@ -69,9 +74,6 @@ import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.PowerState;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -215,7 +217,7 @@ public class VirtualMachineManagerImplTest {
         when(_vmInstance.getServiceOfferingId()).thenReturn(2L);
         when(_vmInstance.getInstanceName()).thenReturn("myVm");
         when(_vmInstance.getHostId()).thenReturn(2L);
-        when(_vmInstance.getType()).thenReturn(VirtualMachine.Type.User);
+        when(_vmInstance.getType()).thenReturn(VirtualMachineType.User);
         when(_host.getId()).thenReturn(1L);
         when(_hostDao.findById(anyLong())).thenReturn(null);
         when(_entityMgr.findById(Matchers.eq(ServiceOffering.class), anyLong())).thenReturn(getSvcoffering(512));
@@ -240,7 +242,7 @@ public class VirtualMachineManagerImplTest {
         final boolean useLocalStorage = false;
 
         final ServiceOfferingVO serviceOffering =
-                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, ProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
+                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, StorageProvisioningType.THIN, useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }
 
@@ -320,7 +322,7 @@ public class VirtualMachineManagerImplTest {
         when(_vmInstance.getServiceOfferingId()).thenReturn(2L);
         when(_vmInstance.getInstanceName()).thenReturn("myVm");
         when(_vmInstance.getHostId()).thenReturn(5L);
-        when(_vmInstance.getType()).thenReturn(VirtualMachine.Type.User);
+        when(_vmInstance.getType()).thenReturn(VirtualMachineType.User);
         when(_vmInstance.getState()).thenReturn(State.Running).thenReturn(State.Running).thenReturn(State.Migrating).thenReturn(State.Migrating);
 
         // Mock the work item.

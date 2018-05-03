@@ -3,11 +3,13 @@ package com.cloud.storage.helper;
 import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
@@ -15,9 +17,8 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.storage.vmsnapshot.VMSnapshotHelper;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
@@ -51,7 +52,7 @@ public class VMSnapshotHelperImpl implements VMSnapshotHelper {
 
     @Override
     public boolean vmSnapshotStateTransitTo(final VMSnapshot vsnp, final VMSnapshot.Event event) throws NoTransitionException {
-        return _vmSnapshottateMachine.transitTo(vsnp, event, null, _vmSnapshotDao);
+        return new StateMachine2Transitions(_vmSnapshottateMachine).transitTo(vsnp, event, null, _vmSnapshotDao);
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.network.Network;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.List;
 

@@ -2,11 +2,11 @@ package com.cloud.agent.manager.allocator;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.utils.component.Adapter;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.List;

@@ -10,8 +10,6 @@ import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.agent.manager.allocator.HostAllocator;
@@ -39,23 +37,33 @@ import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageSubscriber;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.Transition;
+import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
@@ -64,7 +72,6 @@ import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
@@ -83,14 +90,8 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.Transition;
 import com.cloud.utils.identity.ManagementServerNode;
-import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -234,7 +235,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
             }
         }
 
-        if (vm.getType() == VirtualMachine.Type.User || vm.getType() == VirtualMachine.Type.DomainRouter) {
+        if (vm.getType() == VirtualMachineType.User || vm.getType() == VirtualMachineType.DomainRouter) {
             checkForNonDedicatedResources(vmProfile, zone, avoids);
         }
         s_logger.debug("Deployment will {}", avoids.toString());
@@ -432,7 +433,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
         allHostsInDc.retainAll(allDedicatedHosts);
 
         //Only when the type is instance VM and not explicitly dedicated.
-        if (vm.getType() == VirtualMachine.Type.User && !isExplicit) {
+        if (vm.getType() == VirtualMachineType.User && !isExplicit) {
             //add explicitly dedicated resources in avoidList
 
             avoids.addPodList(allPodsInDc);
@@ -442,7 +443,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
 
         //Handle the Virtual Router Case
         //No need to check the isExplicit. As both the cases are handled.
-        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
+        if (vm.getType() == VirtualMachineType.DomainRouter) {
             final long vmAccountId = vm.getAccountId();
             final long vmDomainId = vm.getDomainId();
 
@@ -627,7 +628,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
 
             final DiskProfile diskProfile = new DiskProfile(toBeCreated, diskOffering, vmProfile.getHypervisorType());
             boolean useLocalStorage = false;
-            if (vmProfile.getType() != VirtualMachine.Type.User) {
+            if (vmProfile.getType() != VirtualMachineType.User) {
                 final Zone zone = zoneRepository.findById(plan.getDataCenterId()).orElse(null);
                 assert (zone != null) : "Invalid zone in deployment plan";
                 final Boolean useLocalStorageForSystemVM = ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(zone.getId());

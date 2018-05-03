@@ -13,8 +13,8 @@ import com.cloud.api.response.LoadBalancerResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.network.rules.LoadBalancer;
 
 import java.util.ArrayList;
 import java.util.List;

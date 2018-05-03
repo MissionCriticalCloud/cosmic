@@ -118,7 +118,6 @@ import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.gpu.GPU;
-import com.cloud.host.Host;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
@@ -128,6 +127,7 @@ import com.cloud.legacymodel.configuration.ResourceCount;
 import com.cloud.legacymodel.configuration.ResourceLimit;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.dc.StorageNetworkIpRange;
 import com.cloud.legacymodel.dc.Vlan;
@@ -137,6 +137,9 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.LoadBalancer;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.legacymodel.network.vpc.NetworkACL;
 import com.cloud.legacymodel.network.vpc.NetworkACLItem;
@@ -144,15 +147,20 @@ import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.network.vpc.VpcOffering;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.GuestVlan;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
@@ -173,13 +181,10 @@ import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.HealthCheckPolicy;
-import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offering.ServiceOffering;
@@ -193,9 +198,7 @@ import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.Upload;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -209,13 +212,10 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.InstanceGroup;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicSecondaryIpVO;
 import com.cloud.vm.snapshot.VMSnapshot;
 
@@ -500,7 +500,7 @@ public class ApiResponseHelper implements ResponseGenerator {
     @Override
     public SystemVmResponse createSystemVmResponse(final VirtualMachine vm) {
         final SystemVmResponse vmResponse = new SystemVmResponse();
-        if (vm.getType() == Type.SecondaryStorageVm || vm.getType() == Type.ConsoleProxy || vm.getType() == Type.DomainRouter) {
+        if (vm.getType() == VirtualMachineType.SecondaryStorageVm || vm.getType() == VirtualMachineType.ConsoleProxy || vm.getType() == VirtualMachineType.DomainRouter) {
             // SystemVm vm = (SystemVm) systemVM;
             vmResponse.setId(vm.getUuid());
             // vmResponse.setObjectId(vm.getId());
@@ -533,7 +533,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             }
 
             // for console proxies, add the active sessions
-            if (vm.getType() == Type.ConsoleProxy) {
+            if (vm.getType() == VirtualMachineType.ConsoleProxy) {
                 final ConsoleProxyVO proxy = ApiDBUtils.findConsoleProxy(vm.getId());
                 // proxy can be already destroyed
                 if (proxy != null) {

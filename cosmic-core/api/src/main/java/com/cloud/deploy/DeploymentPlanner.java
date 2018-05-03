@@ -1,8 +1,8 @@
 package com.cloud.deploy;
 
 import com.cloud.db.model.Zone;
-import com.cloud.host.Host;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;

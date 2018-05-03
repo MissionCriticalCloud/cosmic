@@ -2,7 +2,7 @@ package com.cloud.agent.api.storage;
 
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.storage.Upload;
+import com.cloud.legacymodel.storage.Upload;
 
 import java.io.File;
 

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.SnapshotCommand;
+import com.cloud.legacymodel.communication.command.SnapshotCommand;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolStatus;

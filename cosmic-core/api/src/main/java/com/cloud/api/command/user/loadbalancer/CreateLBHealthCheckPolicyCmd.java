@@ -15,9 +15,9 @@ import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.HealthCheckPolicy;
-import com.cloud.network.rules.LoadBalancer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

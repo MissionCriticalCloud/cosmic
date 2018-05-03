@@ -20,11 +20,16 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
@@ -32,9 +37,6 @@ import com.cloud.network.Network.Service;
 import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.model.enumeration.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.PhysicalNetwork.IsolationMethod;
 import com.cloud.network.dao.IPAddressDao;
@@ -52,10 +54,8 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 
@@ -167,8 +167,8 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         final NetworkVO network = new NetworkVO(
                 offering.getTrafficType(),
                 GuestType.Sync.equals(offering.getGuestType())
-                        ? Mode.Static
-                        : Mode.Dhcp,
+                        ? DHCPMode.Static
+                        : DHCPMode.Dhcp,
                 BroadcastDomainType.Vlan,
                 offering.getId(),
                 State.Allocated,
@@ -291,7 +291,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             if (network.getSpecifyIpRanges()) {
                 _ipAddrMgr.allocateDirectIp(nic, zone, vm, network, nic.getRequestedIPv4(), null);
             } else {
-                final VirtualMachine.Type vmtype = vm.getVirtualMachine().getType();
+                final VirtualMachineType vmtype = vm.getVirtualMachine().getType();
 
                 switch (vmtype) {
                     case User:
@@ -331,7 +331,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                     nic.setIPv4Dns2(network.getDns2());
                 }
 
-                nic.setFormat(AddressFormat.Ip4);
+                nic.setFormat(IpAddressFormat.Ip4);
             }
         }
 

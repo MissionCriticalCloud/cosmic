@@ -20,11 +20,11 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.Network;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

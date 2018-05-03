@@ -1,5 +1,7 @@
 package com.cloud.agent.api.storage;
 
+import com.cloud.legacymodel.communication.command.StorageCommand;
+
 public class UpgradeDiskCommand extends StorageCommand {
 
     private String _imagePath;

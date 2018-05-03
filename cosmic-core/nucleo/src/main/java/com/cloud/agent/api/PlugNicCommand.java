@@ -2,7 +2,7 @@ package com.cloud.agent.api;
 
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.NicTO;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import java.util.Map;
 
@@ -10,19 +10,19 @@ public class PlugNicCommand extends Command {
 
     NicTO nic;
     String instanceName;
-    VirtualMachine.Type vmType;
+    VirtualMachineType vmType;
     Map<String, String> details;
 
     protected PlugNicCommand() {
     }
 
-    public PlugNicCommand(final NicTO nic, final String instanceName, final VirtualMachine.Type vmtype) {
+    public PlugNicCommand(final NicTO nic, final String instanceName, final VirtualMachineType vmtype) {
         this.nic = nic;
         this.instanceName = instanceName;
         this.vmType = vmtype;
     }
 
-    public PlugNicCommand(final NicTO nic, final String instanceName, final VirtualMachine.Type vmtype, final Map<String, String> details) {
+    public PlugNicCommand(final NicTO nic, final String instanceName, final VirtualMachineType vmtype, final Map<String, String> details) {
         this.nic = nic;
         this.instanceName = instanceName;
         this.vmType = vmtype;
@@ -42,7 +42,7 @@ public class PlugNicCommand extends Command {
         return instanceName;
     }
 
-    public VirtualMachine.Type getVMType() {
+    public VirtualMachineType getVMType() {
         return vmType;
     }
 

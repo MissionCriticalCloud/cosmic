@@ -13,6 +13,7 @@ import com.cloud.dc.dao.StorageNetworkIpRangeDao;
 import com.cloud.legacymodel.dc.StorageNetworkIpRange;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
@@ -27,7 +28,6 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.SecondaryStorageVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 
 import javax.inject.Inject;

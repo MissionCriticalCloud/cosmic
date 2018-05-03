@@ -16,12 +16,14 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HaWork.HaWorkStep;
 import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.dao.HighAvailabilityDao;
-import com.cloud.host.HostStatus;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.managed.context.ManagedContext;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -30,7 +32,6 @@ import com.cloud.storage.dao.GuestOSCategoryDao;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.user.AccountManager;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -155,13 +156,13 @@ public class HighAvailabilityManagerImplTest {
         final VMInstanceVO vm1 = Mockito.mock(VMInstanceVO.class);
         Mockito.when(vm1.getHostId()).thenReturn(1l);
         Mockito.when(vm1.getInstanceName()).thenReturn("i-2-3-VM");
-        Mockito.when(vm1.getType()).thenReturn(VirtualMachine.Type.User);
+        Mockito.when(vm1.getType()).thenReturn(VirtualMachineType.User);
         Mockito.when(vm1.isHaEnabled()).thenReturn(true);
         vms.add(vm1);
         final VMInstanceVO vm2 = Mockito.mock(VMInstanceVO.class);
         Mockito.when(vm2.getHostId()).thenReturn(1l);
         Mockito.when(vm2.getInstanceName()).thenReturn("r-2-VM");
-        Mockito.when(vm2.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        Mockito.when(vm2.getType()).thenReturn(VirtualMachineType.DomainRouter);
         Mockito.when(vm2.isHaEnabled()).thenReturn(true);
         vms.add(vm2);
         Mockito.when(_instanceDao.listByHostId(Mockito.anyLong())).thenReturn(vms);
@@ -209,7 +210,7 @@ public class HighAvailabilityManagerImplTest {
 
     private void processWorkWithRetryCount(final int count, final HaWorkStep expectedStep) {
         assertNotNull(processWorkMethod);
-        final HaWorkVO work = new HaWorkVO(1l, VirtualMachine.Type.User, HaWorkType.Migration, HaWork.HaWorkStep.Scheduled, 1l, VirtualMachine.State.Running, count, 12345678l);
+        final HaWorkVO work = new HaWorkVO(1l, VirtualMachineType.User, HaWorkType.Migration, HaWork.HaWorkStep.Scheduled, 1l, VirtualMachine.State.Running, count, 12345678l);
         Mockito.doReturn(12345678l).when(highAvailabilityManagerSpy).migrate(work);
         try {
             processWorkMethod.invoke(highAvailabilityManagerSpy, work);

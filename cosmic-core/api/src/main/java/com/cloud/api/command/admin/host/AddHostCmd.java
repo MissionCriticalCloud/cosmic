@@ -12,7 +12,7 @@ import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.user.Account;
 

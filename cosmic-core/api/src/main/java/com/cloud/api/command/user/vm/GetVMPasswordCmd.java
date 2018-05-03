@@ -10,8 +10,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.GetVMPasswordResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.security.InvalidParameterException;
 

@@ -2,8 +2,8 @@ package com.cloud.api.agent.test;
 
 import static org.junit.Assert.assertFalse;
 
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 
 import org.junit.Test;
 

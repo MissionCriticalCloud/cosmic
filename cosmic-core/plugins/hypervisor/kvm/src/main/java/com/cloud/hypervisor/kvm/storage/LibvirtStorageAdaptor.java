@@ -12,9 +12,9 @@ import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeDef.VolumeFormat;
 import com.cloud.hypervisor.kvm.resource.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
 import com.cloud.utils.qemu.QemuImg;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
@@ -567,7 +567,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
 
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String name, final KvmStoragePool pool,
-                                              final PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size) {
+                                              final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
 
         logger.info("Attempting to create volume " + name + " (" + pool.getType().toString() + ") in pool "
                 + pool.getUuid() + " with size " + size);
@@ -595,7 +595,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     private KvmPhysicalDisk createPhysicalDiskOnRbd(final String name, final KvmStoragePool pool,
-                                                    final PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size) {
+                                                    final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
         String volPath = null;
 
         try {
@@ -628,7 +628,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     private KvmPhysicalDisk createPhysicalDiskByQemuImg(final String name, final KvmStoragePool pool,
-                                                        final PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size) {
+                                                        final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
         final String volPath = pool.getLocalPath() + "/" + name;
         final String volName = name;
         long virtualSize = 0;
@@ -662,7 +662,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     private KvmPhysicalDisk createPhysicalDiskByLibVirt(final String name, final KvmStoragePool pool,
-                                                        final PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size) {
+                                                        final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
         final LibvirtStoragePool libvirtPool = (LibvirtStoragePool) pool;
         final StoragePool virtPool = libvirtPool.getPool();
         final LibvirtStorageVolumeDef.VolumeFormat libvirtformat = LibvirtStorageVolumeDef.VolumeFormat.getFormat(format);
@@ -840,7 +840,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
 
     @Override
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template,
-                                                  final String name, final PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size,
+                                                  final String name, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size,
                                                   final KvmStoragePool destPool, final int timeout) {
 
         logger.info(
@@ -909,7 +909,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     private KvmPhysicalDisk createDiskFromTemplateOnRbd(final KvmPhysicalDisk template,
-                                                        final String name, PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size,
+                                                        final String name, PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size,
                                                         final KvmStoragePool destPool, final int timeout) {
 
         /*
@@ -1125,10 +1125,10 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
                 + " format:" + disk.getFormat());
         if (destPool.getType() != StoragePoolType.RBD) {
             if (disk.getFormat() == PhysicalDiskFormat.TAR) {
-                newDisk = destPool.createPhysicalDisk(name, PhysicalDiskFormat.DIR, Storage.ProvisioningType.THIN,
+                newDisk = destPool.createPhysicalDisk(name, PhysicalDiskFormat.DIR, StorageProvisioningType.THIN,
                         disk.getVirtualSize());
             } else {
-                newDisk = destPool.createPhysicalDisk(name, Storage.ProvisioningType.THIN, disk.getVirtualSize());
+                newDisk = destPool.createPhysicalDisk(name, StorageProvisioningType.THIN, disk.getVirtualSize());
             }
         } else {
             newDisk = new KvmPhysicalDisk(destPool.getSourceDir() + "/" + name, name, destPool);

@@ -4,6 +4,10 @@ import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.DateUtil;
@@ -25,10 +29,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.State;
-import com.cloud.vm.VirtualMachine.Type;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -300,14 +300,14 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<VMInstanceVO> listByTypes(final Type... types) {
+    public List<VMInstanceVO> listByTypes(final VirtualMachineType... types) {
         final SearchCriteria<VMInstanceVO> sc = _typesSearch.create();
         sc.setParameters("types", (Object[]) types);
         return listBy(sc);
     }
 
     @Override
-    public VMInstanceVO findByIdTypes(final long id, final Type... types) {
+    public VMInstanceVO findByIdTypes(final long id, final VirtualMachineType... types) {
         final SearchCriteria<VMInstanceVO> sc = _idTypesSearch.create();
         sc.setParameters("id", id);
         sc.setParameters("types", (Object[]) types);
@@ -337,7 +337,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<VMInstanceVO> listByHostIdTypes(final long hostid, final Type... types) {
+    public List<VMInstanceVO> listByHostIdTypes(final long hostid, final VirtualMachineType... types) {
         final SearchCriteria<VMInstanceVO> sc = _hostIdTypesSearch.create();
         sc.setParameters("hostid", hostid);
         sc.setParameters("types", (Object[]) types);
@@ -345,7 +345,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<VMInstanceVO> listUpByHostIdTypes(final long hostid, final Type... types) {
+    public List<VMInstanceVO> listUpByHostIdTypes(final long hostid, final VirtualMachineType... types) {
         final SearchCriteria<VMInstanceVO> sc = _hostIdUpTypesSearch.create();
         sc.setParameters("hostid", hostid);
         sc.setParameters("types", (Object[]) types);
@@ -354,7 +354,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<VMInstanceVO> listByZoneIdAndType(final long zoneId, final VirtualMachine.Type type) {
+    public List<VMInstanceVO> listByZoneIdAndType(final long zoneId, final VirtualMachineType type) {
         final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("zone", zoneId);
         sc.setParameters("type", type.toString());
@@ -378,7 +378,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<VMInstanceVO> listByTypeAndState(final VirtualMachine.Type type, final State state) {
+    public List<VMInstanceVO> listByTypeAndState(final VirtualMachineType type, final State state) {
         final SearchCriteria<VMInstanceVO> sc = _allFieldsSearch.create();
         sc.setParameters("type", type);
         sc.setParameters("state", state);
@@ -396,7 +396,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     public List<Long> findIdsOfAllocatedVirtualRoutersForAccount(final long accountId) {
         final SearchCriteria<Long> sc = _findIdsOfVirtualRoutersByAccount.create();
         sc.setParameters("account", accountId);
-        sc.setParameters("type", VirtualMachine.Type.DomainRouter);
+        sc.setParameters("type", VirtualMachineType.DomainRouter);
         sc.setParameters("state", new Object[]{State.Destroyed, State.Error, State.Expunging});
         return customSearch(sc, null);
     }
@@ -555,7 +555,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<VMInstanceVO> listNonRemovedVmsByTypeAndNetwork(final long networkId, final VirtualMachine.Type... types) {
+    public List<VMInstanceVO> listNonRemovedVmsByTypeAndNetwork(final long networkId, final VirtualMachineType... types) {
         if (_networkTypeSearch == null) {
 
             final SearchBuilder<NicVO> nicSearch = _nicDao.createSearchBuilder();
@@ -578,7 +578,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
-    public List<String> listDistinctHostNames(final long networkId, final VirtualMachine.Type... types) {
+    public List<String> listDistinctHostNames(final long networkId, final VirtualMachineType... types) {
         final SearchCriteria<String> sc = _distinctHostNameSearch.create();
         if (types != null && types.length != 0) {
             sc.setParameters("types", (Object[]) types);
@@ -794,7 +794,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         txn.start();
         final VMInstanceVO vm = findById(id);
-        if (vm != null && vm.getType() == Type.User) {
+        if (vm != null && vm.getType() == VirtualMachineType.User) {
             _tagsDao.removeByIdAndType(id, ResourceObjectType.UserVm);
         }
         final boolean result = super.remove(id);

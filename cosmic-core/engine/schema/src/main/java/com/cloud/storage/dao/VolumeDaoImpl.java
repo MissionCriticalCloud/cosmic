@@ -2,6 +2,9 @@ package com.cloud.storage.dao;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.storage.Volume.Event;
+import com.cloud.legacymodel.storage.Volume.State;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -9,9 +12,6 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Event;
-import com.cloud.storage.Volume.State;
 import com.cloud.storage.VolumeVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.utils.db.DB;
@@ -597,7 +597,7 @@ public class VolumeDaoImpl extends GenericDaoBase<VolumeVO, Long> implements Vol
     }
 
     @Override
-    public boolean updateState(final com.cloud.storage.Volume.State currentState, final Event event, final com.cloud.storage.Volume.State nextState, final Volume vo, final
+    public boolean updateState(final Volume.State currentState, final Event event, final Volume.State nextState, final Volume vo, final
     Object data) {
 
         final Long oldUpdated = vo.getUpdatedCount();

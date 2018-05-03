@@ -40,9 +40,9 @@ import com.cloud.api.command.user.vm.GetVMPasswordCmd;
 import com.cloud.api.command.user.vmgroup.UpdateVMGroupCmd;
 import com.cloud.capacity.Capacity;
 import com.cloud.config.Configuration;
-import com.cloud.host.Host;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.domain.Domain;
@@ -53,15 +53,15 @@ import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.GuestOsCategory;
 import com.cloud.utils.Ternary;
 import com.cloud.vm.InstanceGroup;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -363,7 +363,7 @@ public interface ManagementService {
      */
     String getVMPassword(GetVMPasswordCmd cmd);
 
-    Type findSystemVMTypeById(long instanceId);
+    VirtualMachineType findSystemVMTypeById(long instanceId);
 
     /**
      * List hosts for migrating the given VM. The API returns list of all hosts in the VM's cluster minus the current

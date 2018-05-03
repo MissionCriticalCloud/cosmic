@@ -9,10 +9,10 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.DomainResponse;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.storage.Storage.ProvisioningType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class CreateDiskOfferingCmd extends BaseCmd {
     @Parameter(name = ApiConstants.PROVISIONINGTYPE,
             type = CommandType.STRING,
             description = "provisioning type used to create volumes. Valid values are thin, sparse, fat.")
-    private final String provisioningType = ProvisioningType.THIN.toString();
+    private final String provisioningType = StorageProvisioningType.THIN.toString();
     @Parameter(name = ApiConstants.DISK_SIZE, type = CommandType.LONG, required = false, description = "size of the disk offering in GB (1GB = 1,073,741,824 bytes)")
     private Long diskSize;
     @Parameter(name = ApiConstants.DISPLAY_TEXT, type = CommandType.STRING, required = true, description = "alternate display text of the disk offering", length = 4096)

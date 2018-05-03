@@ -1,7 +1,7 @@
 package com.cloud.cluster.agentlb;
 
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.QueryBuilder;

@@ -1,6 +1,6 @@
 package com.cloud.storage.upload;
 
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 
 public class UploadInProgressState extends UploadActiveState {
 

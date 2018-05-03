@@ -15,6 +15,7 @@ import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.utils.net.Ip;
+import com.cloud.utils.net.NetUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +119,7 @@ public class UpdatePortForwardingRuleCmd extends BaseAsyncCustomIdCmd {
         if (vmGuestIp == null) {
             return null;
         }
-        return new Ip(vmGuestIp);
+        return new Ip(NetUtils.ip2Long(vmGuestIp));
     }
 
     public Boolean getDisplay() {

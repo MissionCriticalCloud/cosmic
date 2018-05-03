@@ -12,7 +12,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

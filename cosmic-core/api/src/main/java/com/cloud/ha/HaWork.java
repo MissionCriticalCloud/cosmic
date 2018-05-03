@@ -1,6 +1,7 @@
 package com.cloud.ha;
 
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import java.util.Date;
 
@@ -14,7 +15,7 @@ public interface HaWork {
 
     Long getServerId();
 
-    VirtualMachine.Type getType();
+    VirtualMachineType getType();
 
     Date getCreated();
 

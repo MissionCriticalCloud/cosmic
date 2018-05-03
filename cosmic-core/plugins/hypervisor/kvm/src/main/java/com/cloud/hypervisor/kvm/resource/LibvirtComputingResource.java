@@ -31,7 +31,6 @@ import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ClockDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ConsoleDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.CpuModeDef;
@@ -75,11 +74,14 @@ import com.cloud.legacymodel.to.MetadataTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.Networks.RouterPrivateIpStrategy;
 import com.cloud.resource.ServerResource;
@@ -104,8 +106,6 @@ import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.OutputInterpreter.AllLinesParser;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SshHelper;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.PowerState;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
@@ -1432,7 +1432,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         cmd.setMode(getGuestCpuMode());
         cmd.setModel(getGuestCpuModel());
         cmd.setCpuflags(vmTo.getCpuflags());
-        if (vmTo.getType() == VirtualMachine.Type.User) {
+        if (vmTo.getType() == VirtualMachineType.User) {
             cmd.setFeatures(getCpuFeatures());
         }
         // multi cores per socket, for larger core configs
@@ -1446,7 +1446,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         vm.addComponent(cmd);
 
         final CpuTuneDef ctd = new CpuTuneDef();
-        if (VirtualMachine.Type.DomainRouter.equals(vmTo.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vmTo.getType())) {
             ctd.setShares(vmTo.getCpus() * libvirtComputingResourceProperties.getGuestCpuSharesRouter());
         } else {
             ctd.setShares(vmTo.getCpus() * libvirtComputingResourceProperties.getGuestCpuShares());
@@ -1460,7 +1460,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
-        if (VirtualMachine.Type.DomainRouter.equals(vmTo.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vmTo.getType())) {
             term.setCrashPolicy(getRouterTermpolicyCrash());
             term.setPowerOffPolicy(getRouterTermpolicyPowerOff());
             term.setRebootPolicy(getRouterTermpolicyReboot());
@@ -1474,7 +1474,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final ClockDef clock = new ClockDef();
         if (vmTo.getOs().startsWith("Windows")) {
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
-        } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestVirtIoCapable(vmTo.getOs())) {
+        } else if (vmTo.getType() != VirtualMachineType.User || isGuestVirtIoCapable(vmTo.getOs())) {
             if (hypervisorLibvirtVersion >= 9 * 1000 + 10) {
                 clock.addTimer("kvmclock", null, null, isKvmclockDisabled());
             }
@@ -1723,7 +1723,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             vm.getDevices().addDevice(disk);
         }
 
-        if (vmSpec.getType() != VirtualMachine.Type.User) {
+        if (vmSpec.getType() != VirtualMachineType.User) {
             final String sysvmIsoPath = getSysvmIsoPath();
             if (sysvmIsoPath != null) {
                 final LibvirtDiskDef iso = new LibvirtDiskDef();

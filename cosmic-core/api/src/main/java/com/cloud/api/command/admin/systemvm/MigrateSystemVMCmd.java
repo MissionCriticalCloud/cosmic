@@ -13,14 +13,14 @@ import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ManagementServerException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

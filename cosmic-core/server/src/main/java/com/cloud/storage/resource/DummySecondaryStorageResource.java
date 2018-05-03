@@ -1,7 +1,5 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.CheckHealthAnswer;
-import com.cloud.agent.api.CheckHealthCommand;
 import com.cloud.agent.api.GetStorageStatsAnswer;
 import com.cloud.agent.api.GetStorageStatsCommand;
 import com.cloud.agent.api.PingCommand;
@@ -11,9 +9,12 @@ import com.cloud.agent.api.ReadyCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupStorageCommand;
 import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.model.enumeration.HostType;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
@@ -98,9 +99,9 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
     @Override
     public Answer executeRequest(final Command cmd) {
         if (cmd instanceof DownloadProgressCommand) {
-            return new DownloadAnswer(null, 100, cmd, com.cloud.storage.VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
+            return new DownloadAnswer(null, 100, cmd, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
         } else if (cmd instanceof DownloadCommand) {
-            return new DownloadAnswer(null, 100, cmd, com.cloud.storage.VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
+            return new DownloadAnswer(null, 100, cmd, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
         } else if (cmd instanceof GetStorageStatsCommand) {
             return execute((GetStorageStatsCommand) cmd);
         } else if (cmd instanceof CheckHealthCommand) {

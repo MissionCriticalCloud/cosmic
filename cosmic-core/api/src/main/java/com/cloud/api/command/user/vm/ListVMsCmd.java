@@ -24,7 +24,7 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

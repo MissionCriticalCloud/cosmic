@@ -10,9 +10,9 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

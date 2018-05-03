@@ -2,11 +2,11 @@ package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.framework.async.AsyncCallFuture;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.offering.DiskOffering;
 import com.cloud.storage.command.CommandResult;
 
 import java.util.Map;

@@ -1,8 +1,9 @@
 package com.cloud.agent.api.storage;
 
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.communication.command.AbstractUploadCommand;
+import com.cloud.legacymodel.storage.Upload.Type;
 import com.cloud.legacymodel.to.TemplateTO;
-import com.cloud.storage.Upload.Type;
 import com.cloud.template.VirtualMachineTemplate;
 
 public class UploadCommand extends AbstractUploadCommand implements InternalIdentity {

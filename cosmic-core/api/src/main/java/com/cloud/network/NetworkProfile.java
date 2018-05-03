@@ -1,9 +1,9 @@
 package com.cloud.network;
 
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Networks.Mode;
 
 import java.net.URI;
 
@@ -15,7 +15,7 @@ public class NetworkProfile implements Network {
     private final long domainId;
     private final State state;
     private final String name;
-    private final Mode mode;
+    private final DHCPMode mode;
     private final BroadcastDomainType broadcastDomainType;
     private final String gateway;
     private final String cidr;
@@ -115,7 +115,7 @@ public class NetworkProfile implements Network {
     }
 
     @Override
-    public Mode getMode() {
+    public DHCPMode getMode() {
         return mode;
     }
 

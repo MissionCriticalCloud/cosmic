@@ -76,15 +76,11 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostTagsDao;
@@ -95,7 +91,10 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -105,19 +104,24 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ManagementServerException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
@@ -128,6 +132,7 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.Network;
@@ -175,7 +180,6 @@ import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeApiService;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.DettachCommand;
@@ -219,7 +223,6 @@ import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.InstanceGroupVMMapDao;
@@ -1128,7 +1131,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _dailyOrHourly = false;
         }
 
-        _itMgr.registerGuru(VirtualMachine.Type.User, this);
+        _itMgr.registerGuru(VirtualMachineType.User, this);
 
         VirtualMachine.State.getStateMachine().registerListener(new UserVmStateListener(_networkDao, _nicDao, _offeringDao, _vmDao, this, _configDao));
 
@@ -1826,7 +1829,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(caller, AccessType.UseEntry, false, network);
 
         // don't delete default NIC on a user VM
-        if (nic.isDefaultNic() && vmInstance.getType() == VirtualMachine.Type.User) {
+        if (nic.isDefaultNic() && vmInstance.getType() == VirtualMachineType.User) {
             throw new InvalidParameterValueException("Unable to remove nic from " + vmInstance + " in " + network + ", nic is default.");
         }
 
@@ -1961,7 +1964,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw new InvalidParameterValueException("There is no nic for the " + nicId);
         }
 
-        if (nicVO.getVmType() != VirtualMachine.Type.User) {
+        if (nicVO.getVmType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("The nic is not belongs to user vm");
         }
 
@@ -2478,7 +2481,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     + destinationHost.getResourceState());
         }
 
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             // for System VMs check that the destination host is within the same
             // cluster
             final HostVO srcHost = _hostDao.findById(srcHostId);
@@ -2532,7 +2535,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
         _itMgr.migrate(vm.getUuid(), srcHostId, dest);
         final VMInstanceVO vmInstance = _vmInstanceDao.findById(vmId);
-        if (vmInstance.getType().equals(VirtualMachine.Type.User)) {
+        if (vmInstance.getType().equals(VirtualMachineType.User)) {
             return _vmDao.findById(vmId);
         } else {
             return vmInstance;
@@ -3224,7 +3227,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw ex;
         }
 
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("can only do storage migration on user vm");
         }
 

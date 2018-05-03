@@ -9,17 +9,20 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
 import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.offering.DiskOffering.DiskCacheMode;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -28,11 +31,9 @@ import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
 import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.legacymodel.exceptions.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.storage.encoding.EncodingType;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
@@ -217,7 +218,7 @@ public class VolumeObject implements VolumeInfo {
         try {
             volumeVO = volumeDao.findById(volumeVO.getId());
             if (volumeVO != null) {
-                result = _volStateMachine.transitTo(volumeVO, event, null, volumeDao);
+                result = new StateMachine2Transitions(_volStateMachine).transitTo(volumeVO, event, null, volumeDao);
                 volumeVO = volumeDao.findById(volumeVO.getId());
             }
         } catch (final NoTransitionException e) {
@@ -639,7 +640,7 @@ public class VolumeObject implements VolumeInfo {
     }
 
     @Override
-    public ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return this.volumeVO.getProvisioningType();
     }
 

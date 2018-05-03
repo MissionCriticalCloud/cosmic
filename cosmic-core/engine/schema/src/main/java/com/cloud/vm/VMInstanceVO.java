@@ -1,11 +1,13 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.StateMachine;
 import com.cloud.utils.fsm.FiniteStateObject;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -95,7 +97,7 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
 
     @Column(name = "vm_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
-    protected Type type;
+    protected VirtualMachineType type;
 
     @Column(name = "ha_enabled", updatable = true, nullable = true)
     protected boolean haEnabled;
@@ -154,7 +156,7 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     @Column(name = "limit_cpu_use", updatable = true, nullable = true)
     private boolean limitCpuUse;
 
-    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
+    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId,
                         final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
                         final boolean limitResourceUse, final Long diskOfferingId) {
         this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
@@ -162,7 +164,7 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
         this.diskOfferingId = diskOfferingId;
     }
 
-    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId,
+    public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId,
                         final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled) {
         this.id = id;
         hostName = name != null ? name : uuid;
@@ -438,7 +440,7 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     }
 
     @Override
-    public Type getType() {
+    public VirtualMachineType getType() {
         return type;
     }
 

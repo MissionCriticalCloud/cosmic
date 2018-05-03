@@ -1,8 +1,8 @@
 package com.cloud.ha;
 
 import com.cloud.deploy.DeploymentPlanner;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.utils.component.Manager;
 import com.cloud.vm.VMInstanceVO;
 

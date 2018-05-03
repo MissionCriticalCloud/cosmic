@@ -1,7 +1,10 @@
 package com.cloud.utils.fsm;
 
 import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.statemachine.StateObject;
+import com.cloud.legacymodel.statemachine.Transition;
 
 public class StateMachine2Transitions<S, E, V extends StateObject<S>> {
     StateMachine2<S, E, V> stateMachine2;

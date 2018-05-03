@@ -1,9 +1,5 @@
 package com.cloud.agent.resource.virtualnetwork;
 
-import com.cloud.agent.api.CheckRouterAnswer;
-import com.cloud.agent.api.CheckRouterCommand;
-import com.cloud.agent.api.CheckS2SVpnConnectionsAnswer;
-import com.cloud.agent.api.CheckS2SVpnConnectionsCommand;
 import com.cloud.agent.api.GetDomRVersionAnswer;
 import com.cloud.agent.api.GetDomRVersionCmd;
 import com.cloud.agent.api.routing.AggregationControlCommand;
@@ -11,6 +7,10 @@ import com.cloud.agent.api.routing.AggregationControlCommand.Action;
 import com.cloud.agent.api.routing.GroupAnswer;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
+import com.cloud.legacymodel.communication.answer.CheckS2SVpnConnectionsAnswer;
+import com.cloud.legacymodel.communication.command.CheckRouterCommand;
+import com.cloud.legacymodel.communication.command.CheckS2SVpnConnectionsCommand;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.ExecutionResult;

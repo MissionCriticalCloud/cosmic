@@ -16,8 +16,8 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.rules.LoadBalancer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

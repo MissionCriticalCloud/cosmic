@@ -11,15 +11,15 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ManagementServerException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Collection;
 import java.util.HashMap;

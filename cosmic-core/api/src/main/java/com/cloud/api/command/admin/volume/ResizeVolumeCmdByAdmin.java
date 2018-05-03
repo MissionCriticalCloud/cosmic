@@ -10,7 +10,7 @@ import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 
 @APICommand(name = "resizeVolume", group = APICommandGroup.VolumeService, description = "Resizes a volume", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType =
         {Volume.class},

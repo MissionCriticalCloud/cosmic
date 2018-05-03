@@ -4,6 +4,7 @@ import com.cloud.dc.dao.VlanDao;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.HypervisorType;

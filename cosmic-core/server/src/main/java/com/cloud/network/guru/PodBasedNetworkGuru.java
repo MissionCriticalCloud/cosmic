@@ -9,20 +9,20 @@ import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.model.enumeration.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
 import com.cloud.network.StorageNetworkManager;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
@@ -55,7 +55,7 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
         }
 
         final NetworkVO config =
-                new NetworkVO(type, Mode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
+                new NetworkVO(type, DHCPMode.Static, BroadcastDomainType.Native, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
                         plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         return config;
     }
@@ -106,7 +106,7 @@ public class PodBasedNetworkGuru extends AdapterBase implements NetworkGuru {
         nic.setIPv4Address(ip.first());
         nic.setMacAddress(NetUtils.long2Mac(NetUtils.createSequenceBasedMacAddress(ip.second())));
         nic.setIPv4Gateway(pod.getGateway());
-        nic.setFormat(AddressFormat.Ip4);
+        nic.setFormat(IpAddressFormat.Ip4);
         final String netmask = NetUtils.getCidrNetmask(pod.getCidrSize());
         nic.setIPv4Netmask(netmask);
         nic.setBroadcastType(BroadcastDomainType.Native);

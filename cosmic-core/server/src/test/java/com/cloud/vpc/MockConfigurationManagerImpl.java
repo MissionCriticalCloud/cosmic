@@ -36,6 +36,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
@@ -45,7 +46,6 @@ import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.ServiceOffering;
@@ -366,7 +366,7 @@ public class MockConfigurationManagerImpl extends ManagerBase implements Configu
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.configuration.ConfigurationManager#checkDiskOfferingAccess(com.cloud.legacymodel.user.Account, com.cloud.offering.DiskOffering)
+     * @see com.cloud.configuration.ConfigurationManager#checkDiskOfferingAccess(com.cloud.legacymodel.user.Account, com.cloud.legacymodel.storage.DiskOffering)
      */
     @Override
     public void checkDiskOfferingAccess(final Account caller, final DiskOffering dof) {

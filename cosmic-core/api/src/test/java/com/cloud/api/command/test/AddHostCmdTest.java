@@ -5,10 +5,10 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.host.AddHostCmd;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
-import com.cloud.host.Host;
-import com.cloud.resource.ResourceService;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.resource.ResourceService;
 
 import java.util.Arrays;
 
@@ -107,8 +107,7 @@ public class AddHostCmdTest extends TestCase {
         Mockito.when(responseGenerator.createHostResponse(host)).thenReturn(responseHost);
         addHostCmd.execute();
         Mockito.verify(responseGenerator).createHostResponse(host);
-        final
-        ListResponse<HostResponse> actualResponse = ((ListResponse<HostResponse>) addHostCmd.getResponseObject());
+        final ListResponse<HostResponse> actualResponse = ((ListResponse<HostResponse>) addHostCmd.getResponseObject());
         Assert.assertEquals(responseHost, actualResponse.getResponses().get(0));
         Assert.assertEquals("addhostresponse", actualResponse.getResponseName());
     }

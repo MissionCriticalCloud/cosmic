@@ -33,18 +33,20 @@ import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.vpc.NetworkACL;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Provider;
 import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.AddressFormat;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.FirewallRulesDao;
@@ -88,10 +90,8 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 
@@ -1186,7 +1186,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     @Override
     public String acquireGuestIpAddressForVpcRouter(final Vpc vpc, final Network network, final String requestedIp) {
-        final List<NicVO> nics = _nicDao.listByNetworkIdAndVmType(network.getId(), VirtualMachine.Type.DomainRouter);
+        final List<NicVO> nics = _nicDao.listByNetworkIdAndVmType(network.getId(), VirtualMachineType.DomainRouter);
         if (vpc.isRedundant() && !nics.isEmpty()) {
             return nics.get(0).getIPv4Address();
         }
@@ -1360,7 +1360,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         PublicIp ip = null;
 
                         //Get ip address from the placeholder and don't allocate a new one
-                        if (requestedIpv4 != null && vm.getType() == VirtualMachine.Type.DomainRouter) {
+                        if (requestedIpv4 != null && vm.getType() == VirtualMachineType.DomainRouter) {
                             final Nic placeholderNic = _networkModel.getPlaceholderNicForRouter(network, null);
                             if (placeholderNic != null) {
                                 final IPAddressVO userIp = _ipAddressDao.findByIpAndSourceNetworkId(network.getId(), placeholderNic.getIPv4Address());
@@ -1385,7 +1385,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         } else {
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
                         }
-                        nic.setFormat(AddressFormat.Ip4);
+                        nic.setFormat(IpAddressFormat.Ip4);
                         nic.setReservationId(String.valueOf(ip.getVlanTag()));
                         nic.setMacAddress(ip.getMacAddress());
                     }
@@ -1402,12 +1402,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setIPv6Gateway(vlan.getIp6Gateway());
                         nic.setIPv6Cidr(vlan.getIp6Cidr());
                         if (ipv4) {
-                            nic.setFormat(AddressFormat.DualStack);
+                            nic.setFormat(IpAddressFormat.DualStack);
                         } else {
                             nic.setIsolationUri(IsolationType.Vlan.toUri(vlan.getVlanTag()));
                             nic.setBroadcastType(BroadcastDomainType.Vlan);
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(vlan.getVlanTag()));
-                            nic.setFormat(AddressFormat.Ip6);
+                            nic.setFormat(IpAddressFormat.Ip6);
                             nic.setReservationId(String.valueOf(vlan.getVlanTag()));
                             if (nic.getMacAddress() == null) {
                                 nic.setMacAddress(ip.getMacAddress());
@@ -1437,7 +1437,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         // PublicIp ip = null;
 
                         //Get ip address from the placeholder and don't allocate a new one
-                        if (requestedIpv4 != null && vm.getType() == VirtualMachine.Type.DomainRouter) {
+                        if (requestedIpv4 != null && vm.getType() == VirtualMachineType.DomainRouter) {
                             s_logger.debug("There won't be nic assignment for VR id " + vm.getId() + "  in this network " + network);
                         }
 
@@ -1456,7 +1456,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setBroadcastType(network.getBroadcastDomainType());
 
                         nic.setBroadcastUri(network.getBroadcastUri());
-                        nic.setFormat(AddressFormat.Ip4);
+                        nic.setFormat(IpAddressFormat.Ip4);
 
                         if (nic.getMacAddress() == null) {
                             nic.setMacAddress(_networkModel.getNextAvailableMacAddressInNetwork(network.getId()));
@@ -1476,12 +1476,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setIPv6Gateway(vlan.getIp6Gateway());
                         nic.setIPv6Cidr(vlan.getIp6Cidr());
                         if (ipv4) {
-                            nic.setFormat(AddressFormat.DualStack);
+                            nic.setFormat(IpAddressFormat.DualStack);
                         } else {
                             nic.setIsolationUri(IsolationType.Vlan.toUri(vlan.getVlanTag()));
                             nic.setBroadcastType(BroadcastDomainType.Vlan);
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(vlan.getVlanTag()));
-                            nic.setFormat(AddressFormat.Ip6);
+                            nic.setFormat(IpAddressFormat.Ip6);
                             nic.setReservationId(String.valueOf(vlan.getVlanTag()));
                             nic.setMacAddress(ip.getMacAddress());
                         }

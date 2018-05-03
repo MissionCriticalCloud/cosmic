@@ -6,9 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.model.enumeration.TrafficType;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.network.Network;
 import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
@@ -16,10 +18,7 @@ import com.cloud.network.dao.NetworkServiceMapDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.element.DhcpServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
@@ -78,11 +77,11 @@ public class NetworkOrchestratorTest extends TestCase {
         final NetworkVO network = mock(NetworkVO.class);
 
         // make sure that release dhcp will be called
-        when(vm.getType()).thenReturn(Type.User);
+        when(vm.getType()).thenReturn(VirtualMachineType.User);
         when(testOrchastrator._networkModel.areServicesSupportedInNetwork(network.getId(), Service.Dhcp)).thenReturn(true);
         when(network.getTrafficType()).thenReturn(TrafficType.Guest);
         when(network.getGuestType()).thenReturn(GuestType.Shared);
-        when(testOrchastrator._nicDao.listByNetworkIdTypeAndGatewayAndBroadcastUri(nic.getNetworkId(), VirtualMachine.Type.User, nic.getIPv4Gateway(), nic.getBroadcastUri()))
+        when(testOrchastrator._nicDao.listByNetworkIdTypeAndGatewayAndBroadcastUri(nic.getNetworkId(), VirtualMachineType.User, nic.getIPv4Gateway(), nic.getBroadcastUri()))
                 .thenReturn(new ArrayList<>());
 
         when(network.getGuruName()).thenReturn(guruName);
@@ -104,7 +103,7 @@ public class NetworkOrchestratorTest extends TestCase {
         final NetworkVO network = mock(NetworkVO.class);
 
         // make sure that release dhcp won't be called
-        when(vm.getType()).thenReturn(Type.DomainRouter);
+        when(vm.getType()).thenReturn(VirtualMachineType.DomainRouter);
 
         when(network.getGuruName()).thenReturn(guruName);
         when(testOrchastrator._networksDao.findById(nic.getNetworkId())).thenReturn(network);
@@ -125,7 +124,7 @@ public class NetworkOrchestratorTest extends TestCase {
         final NetworkVO network = mock(NetworkVO.class);
 
         // make sure that release dhcp will *not* be called
-        when(vm.getType()).thenReturn(Type.User);
+        when(vm.getType()).thenReturn(VirtualMachineType.User);
         when(testOrchastrator._networkModel.areServicesSupportedInNetwork(network.getId(), Service.Dhcp)).thenReturn(false);
 
         when(network.getGuruName()).thenReturn(guruName);

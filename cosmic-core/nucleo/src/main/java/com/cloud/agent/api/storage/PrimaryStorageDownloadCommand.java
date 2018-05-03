@@ -1,5 +1,6 @@
 package com.cloud.agent.api.storage;
 
+import com.cloud.legacymodel.communication.command.AbstractDownloadCommand;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.model.enumeration.ImageFormat;

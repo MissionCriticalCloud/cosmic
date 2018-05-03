@@ -15,8 +15,8 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.rules.LoadBalancer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

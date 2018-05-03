@@ -1,8 +1,8 @@
 package com.cloud.ha;
 
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.utils.component.Adapter;
-import com.cloud.vm.VirtualMachine;
 
 public interface FenceBuilder extends Adapter {
     /**

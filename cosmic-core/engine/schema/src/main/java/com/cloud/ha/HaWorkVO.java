@@ -1,8 +1,8 @@
 package com.cloud.ha;
 
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,14 +50,14 @@ public class HaWorkVO implements HaWork {
     private HaWorkStep step;
     @Column(name = "vm_type", updatable = false, nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private VirtualMachine.Type type;
+    private VirtualMachineType type;
     @Column(name = "tried")
     private int timesTried;
 
     protected HaWorkVO() {
     }
 
-    public HaWorkVO(final long instanceId, final VirtualMachine.Type type, final HaWorkType workType, final HaWorkStep step, final long hostId, final State previousState,
+    public HaWorkVO(final long instanceId, final VirtualMachineType type, final HaWorkType workType, final HaWorkStep step, final long hostId, final State previousState,
                     final int timesTried, final long updated) {
         this.workType = workType;
         this.type = type;
@@ -97,7 +97,7 @@ public class HaWorkVO implements HaWork {
     }
 
     @Override
-    public VirtualMachine.Type getType() {
+    public VirtualMachineType getType() {
         return type;
     }
 

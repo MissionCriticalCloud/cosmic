@@ -8,7 +8,7 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.HostForMigrationResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.Ternary;
 

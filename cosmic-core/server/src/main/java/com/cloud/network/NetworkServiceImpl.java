@@ -42,17 +42,20 @@ import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnsupportedServiceException;
 import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.vpc.NetworkACL;
 import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress.State;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
@@ -123,7 +126,6 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
@@ -131,7 +133,6 @@ import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.NicSecondaryIpVO;
@@ -3067,7 +3068,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             throw new InvalidParameterValueException("There is no nic for the " + nicId);
         }
 
-        if (nicVO.getVmType() != VirtualMachine.Type.User) {
+        if (nicVO.getVmType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("The nic is not belongs to user vm");
         }
 

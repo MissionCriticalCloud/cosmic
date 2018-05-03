@@ -36,12 +36,13 @@ import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.storage.command.CommandResult;
@@ -63,7 +64,7 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -322,7 +323,7 @@ public class TemplateServiceImpl implements TemplateService {
                                                 "failed");
                                         tmpltStore.setState(State.Failed);
                                         try {
-                                            stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
+                                            new StateMachine2Transitions(stateMachine).transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
                                         } catch (final NoTransitionException e) {
                                             s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                                         }
@@ -350,7 +351,7 @@ public class TemplateServiceImpl implements TemplateService {
 
                                     if (tmplt.getState() == VirtualMachineTemplate.State.NotUploaded || tmplt.getState() == VirtualMachineTemplate.State.UploadInProgress) {
                                         try {
-                                            stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationSucceeded, null, _templateDao);
+                                            new StateMachine2Transitions(stateMachine).transitTo(tmplt, VirtualMachineTemplate.Event.OperationSucceeded, null, _templateDao);
                                         } catch (final NoTransitionException e) {
                                             s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                                         }
@@ -397,7 +398,7 @@ public class TemplateServiceImpl implements TemplateService {
                             tmpltStore.setState(State.Failed);
                             _vmTemplateStoreDao.update(tmpltStore.getId(), tmpltStore);
                             try {
-                                stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
+                                new StateMachine2Transitions(stateMachine).transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
                             } catch (final NoTransitionException e) {
                                 s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                             }

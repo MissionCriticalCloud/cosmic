@@ -2,7 +2,9 @@ package com.cloud.vm;
 
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.template.VirtualMachineTemplate.BootloaderType;
@@ -102,7 +104,7 @@ public interface VirtualMachineProfile {
 
     void addDisk(DiskTO disk);
 
-    VirtualMachine.Type getType();
+    VirtualMachineType getType();
 
     void setParameter(Param name, Object value);
 

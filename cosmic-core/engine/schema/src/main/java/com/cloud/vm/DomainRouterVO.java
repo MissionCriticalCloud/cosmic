@@ -1,7 +1,8 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.network.router.VirtualRouter;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -51,7 +52,7 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
                           final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState, final boolean haEnabled, final boolean
                                   stopPending,
                           final Long vpcId) {
-        super(id, serviceOfferingId, name, name, Type.DomainRouter, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+        super(id, serviceOfferingId, name, name, VirtualMachineType.DomainRouter, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.elementId = elementId;
         this.isRedundantRouter = isRedundantRouter;
         this.redundantState = redundantState;
@@ -63,7 +64,7 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
     long guestOSId, final long domainId,
                           final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState, final boolean haEnabled, final boolean
                                   stopPending,
-                          final Type vmType, final Long vpcId) {
+                          final VirtualMachineType vmType, final Long vpcId) {
         super(id, serviceOfferingId, name, name, vmType, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.elementId = elementId;
         this.isRedundantRouter = isRedundantRouter;

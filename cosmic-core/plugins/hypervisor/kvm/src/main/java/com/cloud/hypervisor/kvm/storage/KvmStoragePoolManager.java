@@ -5,10 +5,10 @@ import com.cloud.hypervisor.kvm.resource.KvmHaBase;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.PoolType;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.storage.Storage;
 import com.cloud.storage.StorageLayer;
 import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.to.VolumeObjectTO;
@@ -309,13 +309,13 @@ public class KvmStoragePoolManager {
     }
 
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name,
-                                                  final Storage.ProvisioningType provisioningType,
+                                                  final StorageProvisioningType provisioningType,
                                                   final KvmStoragePool destPool, final int timeout) {
         return createDiskFromTemplate(template, name, provisioningType, destPool, template.getSize(), timeout);
     }
 
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name,
-                                                  final Storage.ProvisioningType provisioningType,
+                                                  final StorageProvisioningType provisioningType,
                                                   final KvmStoragePool destPool, final long size, final int timeout) {
         final StorageAdaptor adaptor = getStorageAdaptor(destPool.getType());
 

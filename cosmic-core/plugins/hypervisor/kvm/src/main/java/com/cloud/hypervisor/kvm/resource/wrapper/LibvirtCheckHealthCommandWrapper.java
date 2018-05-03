@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.CheckHealthAnswer;
-import com.cloud.agent.api.CheckHealthCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

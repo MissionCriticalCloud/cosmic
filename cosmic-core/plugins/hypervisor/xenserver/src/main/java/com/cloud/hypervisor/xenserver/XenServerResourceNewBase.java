@@ -4,7 +4,7 @@ import com.cloud.agent.api.StartupCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.HashMap;
 import java.util.HashSet;

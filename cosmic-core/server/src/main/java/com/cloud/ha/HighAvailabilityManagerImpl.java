@@ -11,31 +11,32 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.HAPlanner;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HaWork.HaWorkStep;
 import com.cloud.ha.Investigator.UnknownVM;
 import com.cloud.ha.dao.HighAvailabilityDao;
-import com.cloud.host.HostStatus;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContext;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -199,11 +200,11 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             }
 
             AlertManager.AlertType alertType = AlertManager.AlertType.ALERT_TYPE_USERVM;
-            if (VirtualMachine.Type.DomainRouter.equals(vm.getType())) {
+            if (VirtualMachineType.DomainRouter.equals(vm.getType())) {
                 alertType = AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER;
-            } else if (VirtualMachine.Type.ConsoleProxy.equals(vm.getType())) {
+            } else if (VirtualMachineType.ConsoleProxy.equals(vm.getType())) {
                 alertType = AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY;
-            } else if (VirtualMachine.Type.SecondaryStorageVm.equals(vm.getType())) {
+            } else if (VirtualMachineType.SecondaryStorageVm.equals(vm.getType())) {
                 alertType = AlertManager.AlertType.ALERT_TYPE_SSVM;
             }
 
@@ -293,7 +294,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             // collect list of vm names for the alert email
             for (int i = 0; i < vms.size(); i++) {
                 final VMInstanceVO vm = vms.get(i);
-                if (vm.getType() == VirtualMachine.Type.User) {
+                if (vm.getType() == VirtualMachineType.User) {
                     reorderedVMList.add(vm);
                 } else {
                     reorderedVMList.add(0, vm);
@@ -497,11 +498,11 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         }
 
         AlertManager.AlertType alertType = AlertManager.AlertType.ALERT_TYPE_USERVM;
-        if (VirtualMachine.Type.DomainRouter.equals(vm.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER;
-        } else if (VirtualMachine.Type.ConsoleProxy.equals(vm.getType())) {
+        } else if (VirtualMachineType.ConsoleProxy.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY;
-        } else if (VirtualMachine.Type.SecondaryStorageVm.equals(vm.getType())) {
+        } else if (VirtualMachineType.SecondaryStorageVm.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_SSVM;
         }
 

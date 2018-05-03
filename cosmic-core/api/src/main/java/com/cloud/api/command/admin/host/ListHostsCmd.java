@@ -13,7 +13,7 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.HypervisorType;

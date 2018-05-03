@@ -18,12 +18,18 @@ import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
 import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Provider;
@@ -44,15 +50,11 @@ import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.user.UserStatisticsVO;
-import com.cloud.utils.fsm.Transition;
 import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfile.Param;
 
@@ -86,7 +88,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _itMgr.registerGuru(VirtualMachine.Type.DomainRouter, this);
+        _itMgr.registerGuru(VirtualMachineType.DomainRouter, this);
         return super.configure(name, params);
     }
 
@@ -630,7 +632,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
             final List<Ip> ipsToExclude = new ArrayList<>();
             if (!add) {
-                ipsToExclude.add(new Ip(ip.getIpAddress()));
+                ipsToExclude.add(new Ip(NetUtils.ip2Long(ip.getIpAddress())));
             }
 
             final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(

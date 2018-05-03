@@ -1,16 +1,16 @@
 package com.cloud.consoleproxy;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.ConsoleAccessAuthenticationCommand;
-import com.cloud.agent.api.ConsoleProxyLoadReportCommand;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupProxyCommand;
-import com.cloud.host.Host;
-import com.cloud.host.HostStatus;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.ConsoleAccessAuthenticationCommand;
+import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 
 public class ConsoleProxyListener implements Listener {
     AgentHook _proxyMgr = null;

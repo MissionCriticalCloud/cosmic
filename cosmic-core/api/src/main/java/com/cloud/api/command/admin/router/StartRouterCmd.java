@@ -15,10 +15,10 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

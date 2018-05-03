@@ -2,9 +2,9 @@ package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.utils.component.Adapter;
-import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.List;

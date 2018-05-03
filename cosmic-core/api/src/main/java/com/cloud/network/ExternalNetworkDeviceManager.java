@@ -4,7 +4,7 @@ import com.cloud.api.command.admin.network.AddNetworkDeviceCmd;
 import com.cloud.api.command.admin.network.DeleteNetworkDeviceCmd;
 import com.cloud.api.command.admin.network.ListNetworkDeviceCmd;
 import com.cloud.api.response.NetworkDeviceResponse;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.utils.component.Manager;
 
 import java.util.ArrayList;

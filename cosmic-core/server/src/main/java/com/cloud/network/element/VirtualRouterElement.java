@@ -14,12 +14,17 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.LoadBalancerContainer;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
 import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.Network;
 import com.cloud.network.Network.Capability;
 import com.cloud.network.Network.Provider;
@@ -35,14 +40,11 @@ import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.network.lb.LoadBalancingRule;
 import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
 import com.cloud.network.rules.LbStickinessMethod;
 import com.cloud.network.rules.LbStickinessMethod.StickinessMethodType;
-import com.cloud.network.rules.LoadBalancerContainer;
 import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.topology.NetworkTopology;
@@ -61,8 +63,6 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.UserVmManager;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.UserVmDao;
@@ -491,7 +491,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
     public boolean prepare(final Network network, final NicProfile nic, final VirtualMachineProfile vm, final DeployDestination dest, final ReservationContext context)
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException, IllegalVirtualMachineException {
 
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             throw new IllegalVirtualMachineException("Illegal VM type informed. Expected USER VM, but got: " + vm.getType());
         }
 
@@ -793,7 +793,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
         boolean result = true;
         if (canHandle(network, Service.Dhcp)) {
-            if (vm.getType() != VirtualMachine.Type.User) {
+            if (vm.getType() != VirtualMachineType.User) {
                 return false;
             }
 
@@ -818,7 +818,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
     public boolean configDhcpSupportForSubnet(final Network network, final NicProfile nic, final VirtualMachineProfile vm, final DeployDestination dest,
                                               final ReservationContext context) throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
         if (canHandle(network, Service.Dhcp)) {
-            if (vm.getType() != VirtualMachine.Type.User) {
+            if (vm.getType() != VirtualMachineType.User) {
                 return false;
             }
 
@@ -879,7 +879,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
                                           final ReservationContext context) throws ConcurrentOperationException, InsufficientCapacityException, ResourceUnavailableException {
         boolean result = true;
         if (canHandle(network, Service.UserData)) {
-            if (vm.getType() != VirtualMachine.Type.User) {
+            if (vm.getType() != VirtualMachineType.User) {
                 return false;
             }
 
@@ -999,7 +999,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         if (nic.getBroadcastType() != BroadcastDomainType.Pvlan) {
             return true;
         }
-        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
+        if (vm.getType() == VirtualMachineType.DomainRouter) {
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
@@ -1011,7 +1011,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             } catch (final ResourceUnavailableException e) {
                 s_logger.warn("Timed Out", e);
             }
-        } else if (vm.getType() == VirtualMachine.Type.User) {
+        } else if (vm.getType() == VirtualMachineType.User) {
             assert vm instanceof UserVmVO;
             final UserVmVO userVm = (UserVmVO) vm.getVirtualMachine();
             _userVmMgr.setupVmForPvlan(false, userVm.getHostId(), nic);
@@ -1024,7 +1024,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         if (nic.getBroadcastType() != BroadcastDomainType.Pvlan) {
             return;
         }
-        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
+        if (vm.getType() == VirtualMachineType.DomainRouter) {
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
@@ -1036,7 +1036,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             } catch (final ResourceUnavailableException e) {
                 s_logger.warn("Timed Out", e);
             }
-        } else if (vm.getType() == VirtualMachine.Type.User) {
+        } else if (vm.getType() == VirtualMachineType.User) {
             assert vm instanceof UserVmVO;
             final UserVmVO userVm = (UserVmVO) vm.getVirtualMachine();
             _userVmMgr.setupVmForPvlan(true, userVm.getHostId(), nic);
@@ -1048,7 +1048,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
         if (nic.getBroadcastType() != BroadcastDomainType.Pvlan) {
             return;
         }
-        if (vm.getType() == VirtualMachine.Type.DomainRouter) {
+        if (vm.getType() == VirtualMachineType.DomainRouter) {
             assert vm instanceof DomainRouterVO;
             final DomainRouterVO router = (DomainRouterVO) vm.getVirtualMachine();
 
@@ -1060,7 +1060,7 @@ public class VirtualRouterElement extends AdapterBase implements VirtualRouterEl
             } catch (final ResourceUnavailableException e) {
                 s_logger.warn("Timed Out", e);
             }
-        } else if (vm.getType() == VirtualMachine.Type.User) {
+        } else if (vm.getType() == VirtualMachineType.User) {
             assert vm instanceof UserVmVO;
             final UserVmVO userVm = (UserVmVO) vm.getVirtualMachine();
             _userVmMgr.setupVmForPvlan(true, userVm.getHostId(), nic);

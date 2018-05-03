@@ -1,11 +1,12 @@
 package com.cloud.vm.dao;
 
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -60,9 +61,9 @@ public interface VMInstanceDao extends GenericDao<VMInstanceVO, Long>, StateDao<
 
     List<VMInstanceVO> listByHostAndState(long hostId, State... states);
 
-    List<VMInstanceVO> listByTypes(VirtualMachine.Type... types);
+    List<VMInstanceVO> listByTypes(VirtualMachineType... types);
 
-    VMInstanceVO findByIdTypes(long id, VirtualMachine.Type... types);
+    VMInstanceVO findByIdTypes(long id, VirtualMachineType... types);
 
     VMInstanceVO findVMByInstanceName(String name);
 
@@ -70,17 +71,17 @@ public interface VMInstanceDao extends GenericDao<VMInstanceVO, Long>, StateDao<
 
     void updateProxyId(long id, Long proxyId, Date time);
 
-    List<VMInstanceVO> listByHostIdTypes(long hostid, VirtualMachine.Type... types);
+    List<VMInstanceVO> listByHostIdTypes(long hostid, VirtualMachineType... types);
 
-    List<VMInstanceVO> listUpByHostIdTypes(long hostid, VirtualMachine.Type... types);
+    List<VMInstanceVO> listUpByHostIdTypes(long hostid, VirtualMachineType... types);
 
-    List<VMInstanceVO> listByZoneIdAndType(long zoneId, VirtualMachine.Type type);
+    List<VMInstanceVO> listByZoneIdAndType(long zoneId, VirtualMachineType type);
 
     List<VMInstanceVO> listUpByHostId(Long hostId);
 
     List<VMInstanceVO> listByLastHostId(Long hostId);
 
-    List<VMInstanceVO> listByTypeAndState(VirtualMachine.Type type, State state);
+    List<VMInstanceVO> listByTypeAndState(VirtualMachineType type, State state);
 
     List<VMInstanceVO> listByAccountId(long accountId);
 
@@ -104,14 +105,14 @@ public interface VMInstanceDao extends GenericDao<VMInstanceVO, Long>, StateDao<
 
     Long countStartingOrRunningByAccount(long accountId);
 
-    List<VMInstanceVO> listNonRemovedVmsByTypeAndNetwork(long networkId, VirtualMachine.Type... types);
+    List<VMInstanceVO> listNonRemovedVmsByTypeAndNetwork(long networkId, VirtualMachineType... types);
 
     /**
      * @param networkId
      * @param types
      * @return
      */
-    List<String> listDistinctHostNames(long networkId, VirtualMachine.Type... types);
+    List<String> listDistinctHostNames(long networkId, VirtualMachineType... types);
 
     List<VMInstanceVO> findByHostInStates(Long hostId, State... states);
 

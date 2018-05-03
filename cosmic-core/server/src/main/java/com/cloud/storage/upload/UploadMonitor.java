@@ -2,10 +2,10 @@ package com.cloud.storage.upload;
 
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.framework.jobs.AsyncJobManager;
+import com.cloud.legacymodel.storage.Upload.Mode;
+import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.Upload.Type;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.Upload.Mode;
-import com.cloud.storage.Upload.Status;
-import com.cloud.storage.Upload.Type;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VolumeVO;

@@ -1,8 +1,8 @@
 package com.cloud.hypervisor.kvm.storage;
 
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.storage.Storage;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.Map;
 
 public interface KvmStoragePool {
     public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, PhysicalDiskFormat format,
-                                              Storage.ProvisioningType provisioningType, long size);
+                                              StorageProvisioningType provisioningType, long size);
 
-    public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, Storage.ProvisioningType provisioningType, long size);
+    public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, StorageProvisioningType provisioningType, long size);
 
     public boolean connectPhysicalDisk(String volumeUuid, Map<String, String> details);
 

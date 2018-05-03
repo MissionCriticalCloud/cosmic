@@ -1,9 +1,9 @@
 package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.framework.async.AsyncCompletionCallback;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.storage.StoragePool;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.storage.command.CommandResult;
 
 public interface PrimaryDataStoreDriver extends DataStoreDriver {

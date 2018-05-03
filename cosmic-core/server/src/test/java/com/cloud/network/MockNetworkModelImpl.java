@@ -3,7 +3,10 @@ package com.cloud.network;
 import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.TrafficType;
@@ -20,9 +23,7 @@ import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.VirtualMachine;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
@@ -467,7 +468,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#isPrivateGateway(com.cloud.vm.Nic)
+     * @see com.cloud.network.NetworkModel#isPrivateGateway(com.cloud.legacymodel.network.Nic)
      */
     @Override
     public boolean isPrivateGateway(final long ntwkId) {
@@ -611,7 +612,7 @@ public class MockNetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkModel#getNicProfile(com.cloud.vm.VirtualMachine, long, java.lang.String)
+     * @see com.cloud.network.NetworkModel#getNicProfile(com.cloud.legacymodel.vm.VirtualMachine, long, java.lang.String)
      */
     @Override
     public NicProfile getNicProfile(final VirtualMachine vm, final long networkId, final String broadcastUri) {

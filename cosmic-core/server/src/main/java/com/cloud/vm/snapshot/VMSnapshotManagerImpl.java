@@ -32,18 +32,20 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -64,7 +66,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VmWork;
 import com.cloud.vm.VmWorkConstants;
@@ -483,7 +484,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -713,7 +714,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -750,7 +751,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(0);
         workJob.setUserId(0);
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(instanceId);
         workJob.setInitMsid(ManagementServerNode.getManagementServerId());
 
@@ -843,7 +844,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -980,7 +981,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 

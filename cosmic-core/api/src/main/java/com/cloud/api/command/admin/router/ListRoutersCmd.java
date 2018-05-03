@@ -15,8 +15,8 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

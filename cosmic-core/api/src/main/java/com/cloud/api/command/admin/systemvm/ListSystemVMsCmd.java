@@ -13,7 +13,7 @@ import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.List;

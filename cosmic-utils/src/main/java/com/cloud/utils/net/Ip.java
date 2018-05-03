@@ -2,18 +2,11 @@ package com.cloud.utils.net;
 
 import java.io.Serializable;
 
-/**
- * Simple Ip implementation class that works with both ip4 and ip6.
- */
 public class Ip implements Comparable<Ip>, Serializable {
     long ip;
 
     public Ip(final long ip) {
         this.ip = ip;
-    }
-
-    public Ip(final String ip) {
-        this.ip = NetUtils.ip2Long(ip);
     }
 
     protected Ip() {
@@ -56,8 +49,6 @@ public class Ip implements Comparable<Ip>, Serializable {
     public boolean isSameAddressAs(final Object obj) {
         if (this.equals(obj)) {
             return true;
-        } else if (obj instanceof String) {
-            return ip == NetUtils.ip2Long((String) obj);
         } else if (obj instanceof Long) {
             return ip == (Long) obj;
         } else {

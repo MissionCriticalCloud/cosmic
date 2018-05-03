@@ -1,12 +1,12 @@
 package com.cloud.storage.dao;
 
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;

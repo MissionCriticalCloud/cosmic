@@ -9,7 +9,7 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.framework.async.AsyncCompletionCallback;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.StringUtils;
 
