@@ -1,11 +1,11 @@
 package com.cloud.storage.dao;
 
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.storage.VMTemplateHostVO;

@@ -1,7 +1,7 @@
 package com.cloud.storage.datastore.db;
 
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;

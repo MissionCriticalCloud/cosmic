@@ -4,7 +4,7 @@ import static com.cloud.utils.StringUtils.join;
 
 import static java.util.Arrays.asList;
 
-import com.cloud.agent.api.DeleteSnapshotsDirCommand;
+import com.cloud.legacymodel.communication.command.DeleteSnapshotsDirCommand;
 import com.cloud.agent.api.GetStorageStatsAnswer;
 import com.cloud.agent.api.GetStorageStatsCommand;
 import com.cloud.agent.api.PingCommand;
@@ -69,7 +69,7 @@ import com.cloud.storage.template.UploadManagerImpl;
 import com.cloud.storage.template.VhdProcessor;
 import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.imagestore.ImageStoreUtil;

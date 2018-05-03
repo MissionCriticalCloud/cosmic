@@ -20,7 +20,7 @@ import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.test.utils.SpringUtils;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.NetUtils;

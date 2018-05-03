@@ -1,6 +1,5 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.command;
 
-import com.cloud.legacymodel.communication.command.SnapshotCommand;
 import com.cloud.legacymodel.storage.StoragePool;
 
 /**
@@ -29,8 +28,7 @@ public class CreateVolumeFromSnapshotCommand extends SnapshotCommand {
      */
 
     public CreateVolumeFromSnapshotCommand(final StoragePool pool, final String secondaryStoragePoolURL, final Long dcId, final Long accountId, final Long volumeId, final String
-            backedUpSnapshotUuid,
-                                           final String backedUpSnapshotName, final int wait) {
+            backedUpSnapshotUuid, final String backedUpSnapshotName, final int wait) {
         super(pool, secondaryStoragePoolURL, backedUpSnapshotUuid, backedUpSnapshotName, dcId, accountId, volumeId);
         setWait(wait);
     }

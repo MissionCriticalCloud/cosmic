@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.cloud.agent.api.CreateVMSnapshotCommand;
-import com.cloud.agent.api.DeleteStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.DeleteStoragePoolCommand;
 import com.cloud.agent.api.DeleteVMSnapshotCommand;
 import com.cloud.agent.api.GetHostStatsCommand;
 import com.cloud.agent.api.GetStorageStatsCommand;
@@ -78,7 +78,7 @@ import com.cloud.storage.command.AttachAnswer;
 import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 
 import java.net.URI;
 import java.util.ArrayList;

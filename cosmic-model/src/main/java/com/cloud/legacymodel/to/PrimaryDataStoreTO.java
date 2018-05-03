@@ -1,45 +1,44 @@
-package com.cloud.storage.to;
+package com.cloud.legacymodel.to;
 
-import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
-import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.StoragePoolType;
 
 import java.util.Map;
 
 public class PrimaryDataStoreTO implements DataStoreTO {
-    public static final String MANAGED = PrimaryDataStore.MANAGED;
-    public static final String STORAGE_HOST = PrimaryDataStore.STORAGE_HOST;
-    public static final String STORAGE_PORT = PrimaryDataStore.STORAGE_PORT;
-    public static final String MANAGED_STORE_TARGET = PrimaryDataStore.MANAGED_STORE_TARGET;
-    public static final String MANAGED_STORE_TARGET_ROOT_VOLUME = PrimaryDataStore.MANAGED_STORE_TARGET_ROOT_VOLUME;
-    public static final String CHAP_INITIATOR_USERNAME = PrimaryDataStore.CHAP_INITIATOR_USERNAME;
-    public static final String CHAP_INITIATOR_SECRET = PrimaryDataStore.CHAP_INITIATOR_SECRET;
-    public static final String CHAP_TARGET_USERNAME = PrimaryDataStore.CHAP_TARGET_USERNAME;
-    public static final String CHAP_TARGET_SECRET = PrimaryDataStore.CHAP_TARGET_SECRET;
-    public static final String VOLUME_SIZE = PrimaryDataStore.VOLUME_SIZE;
+    public static final String MANAGED = PrimaryDataStoreInfo.MANAGED;
+    public static final String STORAGE_HOST = PrimaryDataStoreInfo.STORAGE_HOST;
+    public static final String STORAGE_PORT = PrimaryDataStoreInfo.STORAGE_PORT;
+    public static final String MANAGED_STORE_TARGET = PrimaryDataStoreInfo.MANAGED_STORE_TARGET;
+    public static final String MANAGED_STORE_TARGET_ROOT_VOLUME = PrimaryDataStoreInfo.MANAGED_STORE_TARGET_ROOT_VOLUME;
+    public static final String CHAP_INITIATOR_USERNAME = PrimaryDataStoreInfo.CHAP_INITIATOR_USERNAME;
+    public static final String CHAP_INITIATOR_SECRET = PrimaryDataStoreInfo.CHAP_INITIATOR_SECRET;
+    public static final String CHAP_TARGET_USERNAME = PrimaryDataStoreInfo.CHAP_TARGET_USERNAME;
+    public static final String CHAP_TARGET_SECRET = PrimaryDataStoreInfo.CHAP_TARGET_SECRET;
+    public static final String VOLUME_SIZE = PrimaryDataStoreInfo.VOLUME_SIZE;
     private static final String pathSeparator = "/";
     private final String uuid;
     private final String name;
     private final long id;
     private final String url;
-    private String type;
     private StoragePoolType poolType;
     private String host;
     private String path;
     private int port;
     private final Map<String, String> details;
 
-    public PrimaryDataStoreTO(final PrimaryDataStore dataStore) {
-        this.uuid = dataStore.getUuid();
-        this.name = dataStore.getName();
-        this.id = dataStore.getId();
-        this.setPoolType(dataStore.getPoolType());
-        this.setHost(dataStore.getHostAddress());
-        this.setPath(dataStore.getPath());
-        this.setPort(dataStore.getPort());
-        this.url = dataStore.getUri();
-        this.details = dataStore.getDetails();
+    public PrimaryDataStoreTO(final String uuid, final String name, final long id, final String url, final StoragePoolType poolType, final String host, final String path, final int port, final
+    Map<String, String> details) {
+        this.uuid = uuid;
+        this.name = name;
+        this.id = id;
+        this.url = url;
+        this.poolType = poolType;
+        this.host = host;
+        this.path = path;
+        this.port = port;
+        this.details = details;
     }
 
     public long getId() {
@@ -52,10 +51,6 @@ public class PrimaryDataStoreTO implements DataStoreTO {
 
     public String getName() {
         return this.name;
-    }
-
-    public String getType() {
-        return this.type;
     }
 
     @Override

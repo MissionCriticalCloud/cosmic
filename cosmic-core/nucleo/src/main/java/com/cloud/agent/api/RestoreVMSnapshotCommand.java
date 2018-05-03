@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ public class RestoreVMSnapshotCommand extends VMSnapshotBaseCommand {
     }
 
     public List<VMSnapshotTO> getSnapshots() {
-            return snapshots;
+        return snapshots;
     }
 
     public void setSnapshots(final List<VMSnapshotTO> snapshots) {
@@ -29,5 +29,4 @@ public class RestoreVMSnapshotCommand extends VMSnapshotBaseCommand {
     public void setSnapshotAndParents(final Map<Long, VMSnapshotTO> snapshotAndParents) {
         this.snapshotAndParents = snapshotAndParents;
     }
-
 }

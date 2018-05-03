@@ -1,6 +1,7 @@
 package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 

@@ -2,9 +2,9 @@ package com.cloud.hypervisor.xenserver.resource;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ServerResource;
-import com.cloud.storage.to.VolumeObjectTO;
 
 import javax.ejb.Local;
 import java.util.ArrayList;

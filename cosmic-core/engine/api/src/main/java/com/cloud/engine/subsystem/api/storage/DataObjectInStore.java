@@ -1,6 +1,7 @@
 package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.legacymodel.statemachine.StateObject;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 
 public interface DataObjectInStore extends StateObject<ObjectInDataStoreStateMachine.State> {
     String getInstallPath();

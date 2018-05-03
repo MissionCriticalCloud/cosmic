@@ -1,10 +1,7 @@
-package com.cloud.storage.to;
+package com.cloud.legacymodel.to;
 
-import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
-import com.cloud.legacymodel.to.DataStoreTO;
-import com.cloud.legacymodel.to.DataTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
@@ -37,31 +34,29 @@ public class VolumeObjectTO implements DataTO {
 
     }
 
-    public VolumeObjectTO(final VolumeInfo volume) {
-        uuid = volume.getUuid();
-        path = volume.getPath();
-        accountId = volume.getAccountId();
-        if (volume.getDataStore() != null) {
-            dataStore = volume.getDataStore().getTO();
-        } else {
-            dataStore = null;
-        }
-        vmName = volume.getAttachedVmName();
-        size = volume.getSize();
-        setVolumeId(volume.getId());
-        chainInfo = volume.getChainInfo();
-        volumeType = volume.getVolumeType();
-        name = volume.getName();
-        setId(volume.getId());
-        format = volume.getFormat();
-        provisioningType = volume.getProvisioningType();
-        bytesReadRate = volume.getBytesReadRate();
-        bytesWriteRate = volume.getBytesWriteRate();
-        iopsReadRate = volume.getIopsReadRate();
-        iopsWriteRate = volume.getIopsWriteRate();
-        cacheMode = volume.getCacheMode();
-        hypervisorType = volume.getHypervisorType();
-        setDeviceId(volume.getDeviceId());
+    public VolumeObjectTO(final String uuid, final VolumeType volumeType, final DataStoreTO dataStore, final String name, final Long size, final String path, final Long volumeId, final String
+            vmName, final long accountId, final String chainInfo, final ImageFormat format, final StorageProvisioningType provisioningType, final long id, final Long deviceId, final Long
+                                  bytesReadRate, final Long bytesWriteRate, final Long iopsReadRate, final Long iopsWriteRate, final DiskCacheMode cacheMode, final HypervisorType hypervisorType) {
+        this.uuid = uuid;
+        this.volumeType = volumeType;
+        this.dataStore = dataStore;
+        this.name = name;
+        this.size = size;
+        this.path = path;
+        this.volumeId = volumeId;
+        this.vmName = vmName;
+        this.accountId = accountId;
+        this.chainInfo = chainInfo;
+        this.format = format;
+        this.provisioningType = provisioningType;
+        this.id = id;
+        this.deviceId = deviceId;
+        this.bytesReadRate = bytesReadRate;
+        this.bytesWriteRate = bytesWriteRate;
+        this.iopsReadRate = iopsReadRate;
+        this.iopsWriteRate = iopsWriteRate;
+        this.cacheMode = cacheMode;
+        this.hypervisorType = hypervisorType;
     }
 
     public String getUuid() {

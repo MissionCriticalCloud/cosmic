@@ -3,7 +3,6 @@ package com.cloud.storage.volume;
 import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
@@ -12,9 +11,12 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
@@ -29,7 +31,6 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
-import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.storage.encoding.EncodingType;
@@ -305,7 +306,13 @@ public class VolumeObject implements VolumeInfo {
     public DataTO getTO() {
         DataTO to = getDataStore().getDriver().getTO(this);
         if (to == null) {
-            to = new VolumeObjectTO(this);
+            DataStoreTO dataStoreTO = null;
+            if (null != this.getDataStore()) {
+                dataStoreTO = this.getDataStore().getTO();
+            }
+            to = new VolumeObjectTO(this.getUuid(), this.getVolumeType(), dataStoreTO, this.getName(), this.getSize(), this.getPath(), this.getVolumeId(), this
+                    .getAttachedVmName(), this.getAccountId(), this.getChainInfo(), this.getFormat(), this.getProvisioningType(), this.getId(), this.getDeviceId(), this.getBytesReadRate(), this
+                    .getBytesWriteRate(), this.getIopsReadRate(), this.getIopsWriteRate(), this.getCacheMode(), this.getHypervisorType());
         }
         return to;
     }

@@ -1,6 +1,6 @@
 package com.cloud.agent.api;
 
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 
 import java.util.List;
 

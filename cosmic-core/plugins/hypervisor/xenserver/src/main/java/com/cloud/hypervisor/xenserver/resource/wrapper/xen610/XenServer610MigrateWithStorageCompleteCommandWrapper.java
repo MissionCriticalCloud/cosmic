@@ -9,7 +9,7 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 
 import java.util.List;
 import java.util.Set;

@@ -15,7 +15,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 
 import java.util.HashMap;
 import java.util.List;

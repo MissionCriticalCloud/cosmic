@@ -1,6 +1,6 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CreateVolumeFromSnapshotCommand;
 
 public class CreateVolumeFromSnapshotAnswer extends Answer {
     private String vdiUUID;

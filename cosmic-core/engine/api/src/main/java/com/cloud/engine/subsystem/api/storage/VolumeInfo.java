@@ -2,6 +2,7 @@ package com.cloud.engine.subsystem.api.storage;
 
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;

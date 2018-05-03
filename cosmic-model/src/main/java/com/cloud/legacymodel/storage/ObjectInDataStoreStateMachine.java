@@ -1,4 +1,4 @@
-package com.cloud.engine.subsystem.api.storage;
+package com.cloud.legacymodel.storage;
 
 import com.cloud.legacymodel.statemachine.StateObject;
 

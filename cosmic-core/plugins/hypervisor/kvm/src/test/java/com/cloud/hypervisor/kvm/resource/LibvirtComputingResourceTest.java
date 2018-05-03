@@ -10,8 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.CreateVolumeFromSnapshotCommand;
-import com.cloud.agent.api.DeleteStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.DeleteStoragePoolCommand;
 import com.cloud.agent.api.FenceCommand;
 import com.cloud.agent.api.GetHostStatsCommand;
 import com.cloud.agent.api.GetStorageStatsCommand;
@@ -65,6 +64,7 @@ import com.cloud.legacymodel.communication.command.CreateCommand;
 import com.cloud.legacymodel.communication.command.CreatePrivateTemplateFromSnapshotCommand;
 import com.cloud.legacymodel.communication.command.CreatePrivateTemplateFromVolumeCommand;
 import com.cloud.legacymodel.communication.command.CreateStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.CreateVolumeFromSnapshotCommand;
 import com.cloud.legacymodel.communication.command.ModifyStoragePoolCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
 import com.cloud.legacymodel.dc.Host;

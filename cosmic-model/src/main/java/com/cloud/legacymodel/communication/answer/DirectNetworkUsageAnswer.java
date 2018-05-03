@@ -1,6 +1,5 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 
 import java.util.HashMap;

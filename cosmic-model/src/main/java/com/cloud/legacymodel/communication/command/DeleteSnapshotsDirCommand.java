@@ -1,6 +1,5 @@
-package com.cloud.agent.api;
+package com.cloud.legacymodel.communication.command;
 
-import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.DataStoreTO;
 
 /**

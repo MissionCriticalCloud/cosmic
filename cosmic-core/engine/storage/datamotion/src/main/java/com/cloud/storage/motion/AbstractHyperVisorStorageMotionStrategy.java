@@ -19,12 +19,12 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 
