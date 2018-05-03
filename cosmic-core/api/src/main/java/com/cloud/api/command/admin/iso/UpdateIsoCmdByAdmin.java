@@ -7,7 +7,7 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.iso.UpdateIsoCmd;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,5 @@
 package com.cloud.network.router;
 
-import com.cloud.agent.api.UpdateNetworkOverviewCommand;
-import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
 import com.cloud.deploy.DeployDestination;
@@ -12,6 +10,8 @@ import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.Command.OnError;
 import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
 import com.cloud.legacymodel.communication.command.PlugNicCommand;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
+import com.cloud.legacymodel.communication.command.UpdateVmOverviewCommand;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;

@@ -53,6 +53,8 @@ import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.jobs.JobInfo;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.DataCenter;
@@ -69,6 +71,7 @@ import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.storage.Volume;
@@ -88,8 +91,6 @@ import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.command.AttachAnswer;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -2265,7 +2266,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (volume.getTemplateId() != null) {
             final VMTemplateVO template = _templateDao.findById(volume.getTemplateId());
-            if (template != null && template.getTemplateType() == Storage.TemplateType.SYSTEM) {
+            if (template != null && template.getTemplateType() == TemplateType.SYSTEM) {
                 throw new InvalidParameterValueException("VolumeId: " + volumeId + " is for System VM , Creating snapshot against System VM volumes is not supported");
             }
         }
@@ -2312,7 +2313,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (volume.getTemplateId() != null) {
             final VMTemplateVO template = _templateDao.findById(volume.getTemplateId());
-            if (template != null && template.getTemplateType() == Storage.TemplateType.SYSTEM) {
+            if (template != null && template.getTemplateType() == TemplateType.SYSTEM) {
                 throw new InvalidParameterValueException("VolumeId: " + volumeId + " is for System VM , Creating snapshot against System VM volumes is not supported");
             }
         }
@@ -2444,7 +2445,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (template != null) { // For ISO based volumes template = null and
                 // we allow extraction of all ISO based
                 // volumes
-                final boolean isExtractable = template.isExtractable() && template.getTemplateType() != Storage.TemplateType.SYSTEM;
+                final boolean isExtractable = template.isExtractable() && template.getTemplateType() != TemplateType.SYSTEM;
                 if (!isExtractable && account != null && !_accountMgr.isRootAdmin(account.getId())) {
                     // Global admins are always allowed to extract
                     final PermissionDeniedException ex = new PermissionDeniedException("The volume with specified volumeId is not allowed to be extracted");

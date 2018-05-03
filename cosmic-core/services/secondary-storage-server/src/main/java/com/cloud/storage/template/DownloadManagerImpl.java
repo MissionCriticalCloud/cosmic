@@ -1,6 +1,6 @@
 package com.cloud.storage.template;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.storage.TemplateProp;

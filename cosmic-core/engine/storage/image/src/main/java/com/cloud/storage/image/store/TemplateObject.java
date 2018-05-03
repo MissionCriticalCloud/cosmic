@@ -10,13 +10,16 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -24,8 +27,6 @@ import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.ComponentContext;
 
 import javax.inject.Inject;
@@ -397,12 +398,18 @@ public class TemplateObject implements TemplateInfo {
     @Override
     public DataTO getTO() {
         DataTO to = null;
+        DataStoreTO dataStoreTO = null;
+        if (this.getDataStore() != null) {
+            dataStoreTO = this.getDataStore().getTO();
+        }
         if (dataStore == null) {
-            to = new TemplateObjectTO(this);
+            to = new TemplateObjectTO(this.getInstallPath(), this.getUrl(), this.getUuid(), this.getId(), this.getFormat(), this.getAccountId(), this.getChecksum(), this.getDisplayText(),
+                    dataStoreTO, this.getName(), null, null, null, this.getHypervisorType());
         } else {
             to = dataStore.getDriver().getTO(this);
             if (to == null) {
-                to = new TemplateObjectTO(this);
+                to = new TemplateObjectTO(this.getInstallPath(), this.getUrl(), this.getUuid(), this.getId(), this.getFormat(), this.getAccountId(), this.getChecksum(), this.getDisplayText(),
+                        dataStoreTO, this.getName(), null, null, null, this.getHypervisorType());
             }
         }
 

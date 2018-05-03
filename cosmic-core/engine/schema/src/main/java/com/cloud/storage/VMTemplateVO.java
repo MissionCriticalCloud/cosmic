@@ -1,9 +1,9 @@
 package com.cloud.storage;
 
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -49,7 +49,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     @Column(name = "featured")
     private boolean featured;
     @Column(name = "type")
-    private Storage.TemplateType templateType;
+    private TemplateType templateType;
     @Column(name = "url", length = 2048)
     private String url = null;
     @Column(name = "bits")

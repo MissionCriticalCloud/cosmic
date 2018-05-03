@@ -15,6 +15,7 @@ import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
 import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.vm.VirtualMachine;
@@ -23,7 +24,6 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.component.Manager;
 
 import java.net.URI;

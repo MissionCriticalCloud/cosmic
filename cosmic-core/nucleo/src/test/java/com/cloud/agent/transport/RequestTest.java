@@ -2,31 +2,22 @@ package com.cloud.agent.transport;
 
 import static org.junit.Assert.assertEquals;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.agent.api.storage.ListTemplateCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.GetHostStatsCommand;
+import com.cloud.legacymodel.communication.command.ListTemplateCommand;
 import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand;
 import com.cloud.legacymodel.communication.command.UpdateHostPasswordCommand;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.DataStoreRole;
-import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.serializer.GsonHelper;
-import com.cloud.storage.Storage.TemplateType;
-import com.cloud.storage.command.DownloadCommand;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.template.VirtualMachineTemplate;
 
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,31 +148,6 @@ public class RequestTest {
 
         compareRequest(creq, sreq);
         assertEquals("nfs://192.168.56.10/opt/storage/secondary", ((NfsTO) ((ListTemplateCommand) creq.getCommand()).getDataStore()).getUrl());
-    }
-
-    @Test
-    public void testDownload() {
-        s_logger.info("Testing Download answer");
-        final VirtualMachineTemplate template = Mockito.mock(VirtualMachineTemplate.class);
-        Mockito.when(template.getId()).thenReturn(1L);
-        Mockito.when(template.getFormat()).thenReturn(ImageFormat.QCOW2);
-        Mockito.when(template.getName()).thenReturn("templatename");
-        Mockito.when(template.getTemplateType()).thenReturn(TemplateType.USER);
-        Mockito.when(template.getDisplayText()).thenReturn("displayText");
-        Mockito.when(template.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(template.getUrl()).thenReturn("url");
-
-        final NfsTO nfs = new NfsTO("secUrl", DataStoreRole.Image);
-        final TemplateObjectTO to = new TemplateObjectTO(template);
-        to.setImageDataStore(nfs);
-        final DownloadCommand cmd = new DownloadCommand(to, 30000000l);
-        final Request req = new Request(1, 1, cmd, true);
-
-        req.logD("Debug for Download");
-
-        final DownloadAnswer answer = new DownloadAnswer("jobId", 50, "errorString", Status.ABANDONED, "filesystempath", "installpath", 10000000, 20000000, "chksum");
-        final Response resp = new Response(req, answer);
-        resp.logD("Debug for Download");
     }
 
     @Test

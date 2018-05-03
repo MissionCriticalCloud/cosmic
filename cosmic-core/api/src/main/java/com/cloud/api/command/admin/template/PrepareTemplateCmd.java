@@ -12,8 +12,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.template.VirtualMachineTemplate;
 
 import java.util.List;
 

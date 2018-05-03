@@ -21,11 +21,11 @@ import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
-import com.cloud.template.VirtualMachineTemplate;
 
 import java.util.Collection;
 import java.util.List;

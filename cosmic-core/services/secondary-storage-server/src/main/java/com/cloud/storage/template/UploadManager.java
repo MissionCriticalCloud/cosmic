@@ -1,11 +1,11 @@
 package com.cloud.storage.template;
 
-import com.cloud.agent.api.storage.UploadAnswer;
-import com.cloud.agent.api.storage.UploadCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CreateEntityDownloadURLAnswer;
+import com.cloud.legacymodel.communication.answer.UploadAnswer;
 import com.cloud.legacymodel.communication.command.CreateEntityDownloadURLCommand;
 import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLCommand;
+import com.cloud.legacymodel.communication.command.UploadCommand;
 import com.cloud.legacymodel.storage.Upload.Status;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.resource.SecondaryStorageResource;

@@ -1,6 +1,7 @@
 package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.vm.VirtualMachine;
@@ -10,7 +11,6 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.storage.Storage;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -166,7 +166,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "extractable")
     private boolean extractable;
     @Column(name = "template_type")
-    private Storage.TemplateType templateType;
+    private TemplateType templateType;
     @Column(name = "iso_id", updatable = true, nullable = true, length = 17)
     private long isoId;
     @Column(name = "iso_uuid")
@@ -458,7 +458,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.extractable = extractable;
     }
 
-    public void setTemplateType(final Storage.TemplateType templateType) {
+    public void setTemplateType(final TemplateType templateType) {
         this.templateType = templateType;
     }
 
@@ -758,7 +758,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return extractable;
     }
 
-    public Storage.TemplateType getTemplateType() {
+    public TemplateType getTemplateType() {
         return templateType;
     }
 

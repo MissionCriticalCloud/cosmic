@@ -1,9 +1,9 @@
 package com.cloud.network.topology;
 
-import com.cloud.agent.api.UpdateVmOverviewCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.UpdateVmOverviewCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.FirewallRule;

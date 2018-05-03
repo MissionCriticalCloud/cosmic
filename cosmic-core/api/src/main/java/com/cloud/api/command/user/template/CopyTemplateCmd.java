@@ -15,8 +15,8 @@ import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.template.VirtualMachineTemplate;
 
 import java.util.List;
 

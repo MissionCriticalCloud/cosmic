@@ -1,8 +1,6 @@
 package com.cloud.storage.upload;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.storage.UploadCommand;
-import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
@@ -15,6 +13,8 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CreateEntityDownloadURLCommand;
 import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLCommand;
+import com.cloud.legacymodel.communication.command.UploadCommand;
+import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.Upload.Mode;

@@ -4,8 +4,8 @@ import com.cloud.api.APICommand;
 import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseUpdateTemplateOrIsoPermissionsCmd;
 import com.cloud.api.response.SuccessResponse;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.template.VirtualMachineTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

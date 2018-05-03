@@ -79,7 +79,7 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.template.TemplateManager;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.component.ManagerBase;

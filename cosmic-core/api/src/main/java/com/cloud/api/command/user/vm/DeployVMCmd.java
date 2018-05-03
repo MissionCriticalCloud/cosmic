@@ -33,13 +33,13 @@ import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.Network.IpAddresses;
 import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
 

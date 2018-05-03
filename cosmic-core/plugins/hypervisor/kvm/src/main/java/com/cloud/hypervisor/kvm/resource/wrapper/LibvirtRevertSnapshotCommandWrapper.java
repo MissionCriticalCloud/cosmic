@@ -6,15 +6,15 @@ import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.to.PrimaryDataStoreTO;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.command.RevertSnapshotCommand;
-import com.cloud.storage.to.SnapshotObjectTO;
-import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.utils.script.Script;
 
 import java.io.File;

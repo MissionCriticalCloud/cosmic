@@ -1,7 +1,7 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.storage.ListTemplateAnswer;
-import com.cloud.agent.api.storage.ListTemplateCommand;
+import com.cloud.legacymodel.communication.answer.ListTemplateAnswer;
+import com.cloud.legacymodel.communication.command.ListTemplateCommand;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.ReadyAnswer;

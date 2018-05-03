@@ -1,7 +1,6 @@
 package com.cloud.storage.download;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
@@ -12,6 +11,7 @@ import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.StartupCommand;

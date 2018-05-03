@@ -2,7 +2,6 @@ package com.cloud.template;
 
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.storage.DestroyCommand;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
@@ -61,8 +60,11 @@ import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.ComputeChecksumCommand;
+import com.cloud.legacymodel.communication.command.DestroyCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.DataCenter;
@@ -74,12 +76,15 @@ import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.BootloaderType;
@@ -97,8 +102,6 @@ import com.cloud.storage.ImageStoreUploadMonitorImpl;
 import com.cloud.storage.LaunchPermissionVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.TemplateProfile;
@@ -107,9 +110,7 @@ import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.LaunchPermissionDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -126,7 +127,6 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
-import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.template.TemplateAdapter.TemplateAdapterType;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
@@ -1417,7 +1417,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         Long sourceTemplateId = null;
         if (volume != null) {
             final VMTemplateVO template = ApiDBUtils.findTemplateById(volume.getTemplateId());
-            isExtractable = template != null && template.isExtractable() && template.getTemplateType() != Storage.TemplateType.SYSTEM;
+            isExtractable = template != null && template.isExtractable() && template.getTemplateType() != TemplateType.SYSTEM;
             if (volume.getIsoId() != null && volume.getIsoId() != 0) {
                 sourceTemplateId = volume.getIsoId();
             } else if (volume.getTemplateId() != null) {
@@ -1778,9 +1778,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             throw new InvalidParameterValueException("Unable to find " + desc + " with id " + templateId);
         }
 
-        if (template.getTemplateType() == Storage.TemplateType.SYSTEM) {
+        if (template.getTemplateType() == TemplateType.SYSTEM) {
             throw new InvalidParameterValueException("Unable to extract the " + desc + " " + template.getName() + " as it is a default System template");
-        } else if (template.getTemplateType() == Storage.TemplateType.PERHOST) {
+        } else if (template.getTemplateType() == TemplateType.PERHOST) {
             throw new InvalidParameterValueException("Unable to extract the " + desc + " " + template.getName() + " as it resides on host and not on SSVM");
         }
 

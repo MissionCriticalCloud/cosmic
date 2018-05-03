@@ -1,7 +1,7 @@
 package com.cloud.storage.motion;
 
-import com.cloud.agent.api.storage.MigrateVolumeAnswer;
-import com.cloud.agent.api.storage.MigrateVolumeCommand;
+import com.cloud.legacymodel.communication.answer.MigrateVolumeAnswer;
+import com.cloud.legacymodel.communication.command.MigrateVolumeCommand;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;

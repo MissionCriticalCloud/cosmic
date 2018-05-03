@@ -18,6 +18,7 @@ import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
@@ -30,7 +31,6 @@ import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
-import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.DB;
 

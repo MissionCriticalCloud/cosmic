@@ -1,8 +1,8 @@
 package com.cloud.storage.dao;
 
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 

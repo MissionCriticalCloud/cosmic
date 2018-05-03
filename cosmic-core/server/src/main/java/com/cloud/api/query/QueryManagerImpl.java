@@ -144,6 +144,9 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.TemplateFilter;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
@@ -174,14 +177,10 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.template.VirtualMachineTemplate.State;
-import com.cloud.template.VirtualMachineTemplate.TemplateFilter;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.user.dao.AccountDao;
@@ -2901,7 +2900,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
             if (!showDomr) {
                 // excluding system template
-                sc.addAnd("templateType", SearchCriteria.Op.NEQ, Storage.TemplateType.SYSTEM);
+                sc.addAnd("templateType", SearchCriteria.Op.NEQ, TemplateType.SYSTEM);
             }
         }
 

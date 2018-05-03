@@ -1,6 +1,6 @@
 package com.cloud.storage.image;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.alert.AlertManager;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.CreateCmdResult;

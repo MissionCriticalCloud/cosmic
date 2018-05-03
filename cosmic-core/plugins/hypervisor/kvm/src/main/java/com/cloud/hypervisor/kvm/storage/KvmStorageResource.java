@@ -2,14 +2,14 @@ package com.cloud.hypervisor.kvm.storage;
 
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.legacymodel.communication.command.AttachPrimaryDataStoreCommand;
 import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.CreateObjectCommand;
 import com.cloud.legacymodel.communication.command.CreatePrimaryDataStoreCommand;
 import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.DettachCommand;
 
 public class KvmStorageResource {
 

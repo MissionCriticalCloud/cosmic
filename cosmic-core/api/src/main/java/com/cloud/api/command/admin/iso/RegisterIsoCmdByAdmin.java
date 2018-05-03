@@ -9,7 +9,7 @@ import com.cloud.api.command.user.iso.RegisterIsoCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 import java.util.List;
 

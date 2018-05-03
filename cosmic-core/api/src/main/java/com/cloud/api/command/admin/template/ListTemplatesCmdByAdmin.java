@@ -5,7 +5,7 @@ import com.cloud.api.APICommandGroup;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.command.user.template.ListTemplatesCmd;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 @APICommand(name = "listTemplates", group = APICommandGroup.TemplateService, description = "List all public, private, and privileged templates.", responseObject = TemplateResponse.class, entityType =
         {VirtualMachineTemplate.class}, responseView = ResponseView.Full,

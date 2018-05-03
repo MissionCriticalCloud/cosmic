@@ -1,11 +1,11 @@
 package com.cloud.agent.resource.virtualnetwork;
 
-import com.cloud.agent.api.routing.GroupAnswer;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
 import com.cloud.legacymodel.communication.answer.CheckS2SVpnConnectionsAnswer;
 import com.cloud.legacymodel.communication.answer.GetDomRVersionAnswer;
+import com.cloud.legacymodel.communication.answer.GroupAnswer;
 import com.cloud.legacymodel.communication.command.AggregationControlCommand;
 import com.cloud.legacymodel.communication.command.AggregationControlCommand.Action;
 import com.cloud.legacymodel.communication.command.CheckRouterCommand;

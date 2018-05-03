@@ -8,12 +8,12 @@ import com.cloud.api.query.vo.VolumeJoinVO;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
@@ -193,7 +193,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             if (volume.getTemplateId() > 0) { // For ISO based volumes template
                 // = null and we allow extraction
                 // of all ISO based volumes
-                isExtractable = volume.isExtractable() && volume.getTemplateType() != Storage.TemplateType.SYSTEM;
+                isExtractable = volume.isExtractable() && volume.getTemplateType() != TemplateType.SYSTEM;
             }
         }
 

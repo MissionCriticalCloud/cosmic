@@ -1,14 +1,14 @@
 package com.cloud.storage.resource;
 
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.CreateObjectCommand;
 import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.ForgetObjectCommand;
 import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
 import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.DettachCommand;
 
 public interface StorageProcessor {
     Answer copyTemplateToPrimaryStorage(CopyCommand cmd);

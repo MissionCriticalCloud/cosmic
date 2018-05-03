@@ -1,14 +1,14 @@
 package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.template.VirtualMachineTemplate.State;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -46,7 +46,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "featured")
     private boolean featured;
     @Column(name = "type")
-    private Storage.TemplateType templateType;
+    private TemplateType templateType;
     @Column(name = "url")
     private String url = null;
     @Column(name = "bits")
@@ -321,11 +321,11 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.extractable = extractable;
     }
 
-    public Storage.TemplateType getTemplateType() {
+    public TemplateType getTemplateType() {
         return templateType;
     }
 
-    public void setTemplateType(final Storage.TemplateType templateType) {
+    public void setTemplateType(final TemplateType templateType) {
         this.templateType = templateType;
     }
 

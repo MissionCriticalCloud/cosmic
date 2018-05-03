@@ -1,12 +1,5 @@
 package com.cloud.network.router;
 
-import com.cloud.agent.api.UpdateNetworkOverviewCommand;
-import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
-import com.cloud.agent.api.routing.SetPublicIpACLCommand;
-import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.db.model.Zone;
@@ -18,7 +11,14 @@ import com.cloud.legacymodel.communication.command.LoadBalancerConfigCommand;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.legacymodel.communication.command.SavePasswordCommand;
 import com.cloud.legacymodel.communication.command.SetFirewallRulesCommand;
+import com.cloud.legacymodel.communication.command.SetNetworkACLCommand;
+import com.cloud.legacymodel.communication.command.SetPortForwardingRulesCommand;
+import com.cloud.legacymodel.communication.command.SetPortForwardingRulesVpcCommand;
+import com.cloud.legacymodel.communication.command.SetPublicIpACLCommand;
+import com.cloud.legacymodel.communication.command.SetStaticNatRulesCommand;
 import com.cloud.legacymodel.communication.command.SetupVRCommand;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
+import com.cloud.legacymodel.communication.command.UpdateVmOverviewCommand;
 import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.network.FirewallRule.Purpose;
 import com.cloud.legacymodel.network.Ip;

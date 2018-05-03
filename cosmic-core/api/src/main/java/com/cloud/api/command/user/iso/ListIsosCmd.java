@@ -11,8 +11,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.TemplateFilter;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.template.VirtualMachineTemplate.TemplateFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

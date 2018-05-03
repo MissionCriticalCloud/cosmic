@@ -10,7 +10,7 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 import java.util.List;
 

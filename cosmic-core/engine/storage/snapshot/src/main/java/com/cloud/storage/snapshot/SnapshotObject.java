@@ -16,6 +16,8 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
@@ -27,14 +29,15 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
-import com.cloud.storage.to.SnapshotObjectTO;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,7 +184,34 @@ public class SnapshotObject implements SnapshotInfo {
     public DataTO getTO() {
         final DataTO to = store.getDriver().getTO(this);
         if (to == null) {
-            return new SnapshotObjectTO(this);
+            SnapshotObjectTO snapshotObjectTO = new SnapshotObjectTO();
+
+            snapshotObjectTO.setPath(this.getPath());
+            snapshotObjectTO.setId(this.getId());
+            final VolumeInfo vol = this.getBaseVolume();
+            if (vol != null) {
+                snapshotObjectTO.setVolume((VolumeObjectTO) vol.getTO());
+                snapshotObjectTO.setVmName(vol.getAttachedVmName());
+            }
+
+            SnapshotInfo parentSnapshot = this.getParent();
+            final ArrayList<String> parentsArry = new ArrayList<>();
+            if (parentSnapshot != null) {
+                snapshotObjectTO.setParentSnapshotPath(parentSnapshot.getPath());
+                while (parentSnapshot != null) {
+                    parentsArry.add(parentSnapshot.getPath());
+                    parentSnapshot = parentSnapshot.getParent();
+                }
+                snapshotObjectTO.setParents(parentsArry.toArray(new String[parentsArry.size()]));
+                ArrayUtils.reverse(snapshotObjectTO.getParents());
+            }
+
+            snapshotObjectTO.setDataStore(this.getDataStore().getTO());
+            snapshotObjectTO.setName(this.getName());
+            snapshotObjectTO.setHypervisorType(this.getHypervisorType());
+            snapshotObjectTO.setQuiescevm(false);
+
+            return snapshotObjectTO;
         }
         return to;
     }

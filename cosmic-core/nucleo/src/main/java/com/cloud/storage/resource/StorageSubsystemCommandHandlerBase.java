@@ -2,10 +2,12 @@ package com.cloud.storage.resource;
 
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.CreateObjectCommand;
 import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
 import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
@@ -15,8 +17,6 @@ import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.DettachCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

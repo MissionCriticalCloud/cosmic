@@ -1,8 +1,8 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.answer.GetStorageStatsAnswer;
 import com.cloud.legacymodel.communication.answer.ReadyAnswer;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;

@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 public interface TemplateInfo extends DataObject, VirtualMachineTemplate {
     @Override

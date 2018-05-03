@@ -1,6 +1,5 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.routing.SetPublicIpACLCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.AclRule;
@@ -11,6 +10,7 @@ import com.cloud.agent.resource.virtualnetwork.model.PublicIpACL;
 import com.cloud.agent.resource.virtualnetwork.model.TcpAclRule;
 import com.cloud.agent.resource.virtualnetwork.model.UdpAclRule;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.SetPublicIpACLCommand;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.utils.net.NetUtils;
 

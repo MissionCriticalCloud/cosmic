@@ -1,10 +1,6 @@
 package com.cloud.storage.upload;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.storage.UploadAnswer;
-import com.cloud.agent.api.storage.UploadCommand;
-import com.cloud.agent.api.storage.UploadProgressCommand;
-import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiSerializerHelper;
 import com.cloud.api.command.user.iso.ExtractIsoCmd;
@@ -19,10 +15,14 @@ import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.jobs.JobInfo;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.UploadAnswer;
 import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.UploadCommand;
+import com.cloud.legacymodel.communication.command.UploadProgressCommand;
+import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -310,7 +310,7 @@ public class UploadListener implements Listener {
         lastUpdated = new Date();
     }
 
-    public void scheduleStatusCheck(final com.cloud.agent.api.storage.UploadProgressCommand.RequestType getStatus) {
+    public void scheduleStatusCheck(final UploadProgressCommand.RequestType getStatus) {
         if (statusTask != null) {
             statusTask.cancel();
         }

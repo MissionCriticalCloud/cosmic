@@ -18,7 +18,6 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 
 import static java.util.UUID.randomUUID;
 
-import com.cloud.agent.api.UpdateNetworkOverviewCommand;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
@@ -61,6 +60,7 @@ import com.cloud.legacymodel.communication.command.PingRoutingCommand;
 import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.storage.StoragePoolInfo;

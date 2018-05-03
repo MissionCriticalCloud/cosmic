@@ -9,9 +9,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.storage.DestroyCommand;
-import com.cloud.agent.api.storage.PrimaryStorageDownloadCommand;
-import com.cloud.agent.api.storage.ResizeVolumeCommand;
+import com.cloud.legacymodel.communication.command.DestroyCommand;
+import com.cloud.legacymodel.communication.command.PrimaryStorageDownloadCommand;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
@@ -76,7 +76,7 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.storage.command.AttachAnswer;
-import com.cloud.storage.command.AttachCommand;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 

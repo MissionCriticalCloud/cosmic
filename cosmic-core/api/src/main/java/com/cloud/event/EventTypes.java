@@ -19,6 +19,7 @@ import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
@@ -42,7 +43,6 @@ import com.cloud.server.ResourceTag;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.Snapshot;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.vm.NicSecondaryIp;
 
 import java.util.HashMap;

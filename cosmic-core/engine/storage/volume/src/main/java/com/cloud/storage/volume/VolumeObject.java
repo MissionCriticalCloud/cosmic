@@ -1,12 +1,12 @@
 package com.cloud.storage.volume;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
 import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.statemachine.StateMachine2;

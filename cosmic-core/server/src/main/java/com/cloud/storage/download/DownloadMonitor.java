@@ -1,8 +1,8 @@
 package com.cloud.storage.download;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.framework.async.AsyncCompletionCallback;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.utils.component.Manager;
 
 /**
