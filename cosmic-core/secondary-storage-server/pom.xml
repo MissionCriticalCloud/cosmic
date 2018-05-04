@@ -6,7 +6,7 @@
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
         <version>6.0.16-SNAPSHOT</version>
-        <relativePath>../../</relativePath>
+        <relativePath>../</relativePath>
     </parent>
 
     <dependencies>

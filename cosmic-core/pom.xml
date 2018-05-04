@@ -68,7 +68,7 @@
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cosmic-utils</artifactId>
+            <artifactId>cosmic-common</artifactId>
             <version>6.0.16-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
