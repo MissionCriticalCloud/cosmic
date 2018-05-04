@@ -1,17 +1,17 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.StartAnswer;
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.StartAnswer;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.GPUDeviceTO;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Volume;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,14 +71,14 @@ public final class CitrixStartCommandWrapper extends CommandWrapper<StartCommand
                 citrixResourceBase.createVGPU(conn, command, vm, gpuDevice);
             }
 
-            if (vmSpec.getType() != VirtualMachine.Type.User) {
+            if (vmSpec.getType() != VirtualMachineType.User) {
                 citrixResourceBase.createPatchVbd(conn, vmName, vm);
             }
             // put cdrom at the first place in the list
             final List<DiskTO> disks = new ArrayList<>(vmSpec.getDisks().length);
             int index = 0;
             for (final DiskTO disk : vmSpec.getDisks()) {
-                if (Volume.Type.ISO.equals(disk.getType())) {
+                if (VolumeType.ISO.equals(disk.getType())) {
                     disks.add(0, disk);
                 } else {
                     disks.add(index, disk);

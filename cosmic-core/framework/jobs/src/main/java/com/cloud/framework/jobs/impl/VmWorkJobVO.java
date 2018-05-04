@@ -1,6 +1,6 @@
 package com.cloud.framework.jobs.impl;
 
-import com.cloud.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -20,7 +20,7 @@ public class VmWorkJobVO extends AsyncJobVO {
     Step step;
     @Column(name = "vm_type")
     @Enumerated(value = EnumType.STRING)
-    VirtualMachine.Type vmType;
+    VirtualMachineType vmType;
     @Column(name = "vm_instance_id")
     long vmInstanceId;
 
@@ -40,11 +40,11 @@ public class VmWorkJobVO extends AsyncJobVO {
         this.step = step;
     }
 
-    public VirtualMachine.Type getVmType() {
+    public VirtualMachineType getVmType() {
         return vmType;
     }
 
-    public void setVmType(final VirtualMachine.Type vmType) {
+    public void setVmType(final VirtualMachineType vmType) {
         this.vmType = vmType;
     }
 

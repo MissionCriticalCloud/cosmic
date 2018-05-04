@@ -17,9 +17,14 @@ import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnConnection.State;
@@ -36,19 +41,14 @@ import com.cloud.network.element.Site2SiteVpnServiceProvider;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 
@@ -440,7 +440,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
             for (final Site2SiteVpnServiceProvider element : _s2sProviders) {
                 result = result & element.stopSite2SiteVpn(conn);
             }
-
         } finally {
             _vpnConnectionDao.releaseFromLockTable(conn.getId());
         }
@@ -503,7 +502,7 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
         if (id != null) {
             sc.setParameters("id", id);
         }
-        if(keyword != null && !keyword.isEmpty()) {
+        if (keyword != null && !keyword.isEmpty()) {
             sc.setParameters("name", "%" + keyword + "%");
         }
 
@@ -691,7 +690,6 @@ public class Site2SiteVpnManagerImpl extends ManagerBase implements Site2SiteVpn
                     return;
                 }
             }
-
         });
 
         return gw;

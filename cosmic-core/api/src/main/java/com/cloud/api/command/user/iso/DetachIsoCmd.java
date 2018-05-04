@@ -11,14 +11,15 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.DeployVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "detachIso", group = APICommandGroup.ISOService, description = "Detaches any ISO file (if any) currently attached to a virtual machine.", responseObject = UserVmResponse.class, responseView =
-        ResponseView.Restricted,
+@APICommand(name = "detachIso", group = APICommandGroup.ISOService, description = "Detaches any ISO file (if any) currently attached to a virtual machine.", responseObject = UserVmResponse.class,
+        responseView =
+                ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DetachIsoCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DetachIsoCmd.class.getName());

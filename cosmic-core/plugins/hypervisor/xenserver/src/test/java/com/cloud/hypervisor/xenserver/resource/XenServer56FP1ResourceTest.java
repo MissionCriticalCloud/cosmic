@@ -15,7 +15,7 @@
  */
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.script.Script;
 
 import org.junit.Assert;

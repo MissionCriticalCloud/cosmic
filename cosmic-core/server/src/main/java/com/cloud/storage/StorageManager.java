@@ -1,22 +1,24 @@
 package com.cloud.storage;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.StorageConflictException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.StorageConflictException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.utils.Pair;
 import com.cloud.vm.VMInstanceVO;
 
 import java.math.BigDecimal;

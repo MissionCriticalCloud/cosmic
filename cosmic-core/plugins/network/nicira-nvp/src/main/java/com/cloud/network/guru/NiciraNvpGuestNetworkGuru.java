@@ -1,27 +1,30 @@
 package com.cloud.network.guru;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CreateLogicalSwitchAnswer;
 import com.cloud.agent.api.CreateLogicalSwitchCommand;
 import com.cloud.agent.api.DeleteLogicalSwitchAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchCommand;
 import com.cloud.agent.api.FindLogicalSwitchCommand;
-import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.PhysicalNetwork.IsolationMethod;
@@ -33,9 +36,7 @@ import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.resource.ResourceManager;
-import com.cloud.user.Account;
 import com.cloud.user.dao.AccountDao;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
@@ -85,7 +86,7 @@ public class NiciraNvpGuestNetworkGuru extends GuestNetworkGuru {
         // This guru handles only Guest Isolated network that supports Source nat service
         if (networkType == NetworkType.Advanced &&
                 isMyTrafficType(offering.getTrafficType()) &&
-                offering.getGuestType() != Network.GuestType.Shared &&
+                offering.getGuestType() != GuestType.Shared &&
                 isMyIsolationMethod(physicalNetwork) &&
                 ntwkOfferingSrvcDao.areServicesSupportedByNetworkOffering(offering.getId(), Network.Service.Connectivity)) {
             return true;

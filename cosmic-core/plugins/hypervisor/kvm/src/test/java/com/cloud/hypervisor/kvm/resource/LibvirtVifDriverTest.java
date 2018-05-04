@@ -8,7 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource.BridgeType;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;

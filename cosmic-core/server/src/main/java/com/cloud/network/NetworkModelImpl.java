@@ -1,32 +1,41 @@
 package com.cloud.network;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.UnsupportedServiceException;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.IpAddresses;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress.State;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.IpAddresses;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -47,7 +56,6 @@ import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.network.element.IpDeployingRequester;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.UserDataServiceProvider;
-import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.dao.PrivateIpDao;
@@ -60,7 +68,6 @@ import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.server.ConfigurationServer;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.DomainManager;
@@ -74,15 +81,10 @@ import com.cloud.utils.db.JoinBuilder.JoinType;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -865,13 +867,13 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     }
 
     @Override
-    public List<NetworkVO> listNetworksForAccount(final long accountId, final long zoneId, final Network.GuestType type) {
+    public List<NetworkVO> listNetworksForAccount(final long accountId, final long zoneId, final GuestType type) {
         final List<NetworkVO> accountNetworks = new ArrayList<>();
         final List<NetworkVO> zoneNetworks = _networksDao.listByZone(zoneId);
 
         for (final NetworkVO network : zoneNetworks) {
             if (!isNetworkSystem(network)) {
-                if (network.getGuestType() == Network.GuestType.Shared || !_networksDao.listBy(accountId, network.getId()).isEmpty()) {
+                if (network.getGuestType() == GuestType.Shared || !_networksDao.listBy(accountId, network.getId()).isEmpty()) {
                     if (type == null || type == network.getGuestType()) {
                         accountNetworks.add(network);
                     }
@@ -908,12 +910,12 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
         boolean isSystemVmNetwork = false;
         if (vm != null) {
             final Nic nic = _nicDao.findByNtwkIdAndInstanceId(networkId, vmId);
-            if (vm.getType() == Type.User && nic != null && nic.isDefaultNic()) {
+            if (vm.getType() == VirtualMachineType.User && nic != null && nic.isDefaultNic()) {
                 isUserVmsDefaultNetwork = true;
-            } else if (vm.getType() == Type.DomainRouter && ntwkOff != null &&
+            } else if (vm.getType() == VirtualMachineType.DomainRouter && ntwkOff != null &&
                     (ntwkOff.getTrafficType() == TrafficType.Public || ntwkOff.getTrafficType() == TrafficType.Guest)) {
                 isDomRGuestOrPublicNetwork = true;
-            } else if (vm.getType() == Type.ConsoleProxy || vm.getType() == Type.SecondaryStorageVm) {
+            } else if (vm.getType() == VirtualMachineType.ConsoleProxy || vm.getType() == VirtualMachineType.SecondaryStorageVm) {
                 isSystemVmNetwork = true;
             }
         }
@@ -1439,7 +1441,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
             throw new CloudRuntimeException("cannot check permissions on (Network) <null>");
         }
         // Perform account permission check
-        if (network.getGuestType() != Network.GuestType.Shared || network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Account) {
+        if (network.getGuestType() != GuestType.Shared || network.getGuestType() == GuestType.Shared && network.getAclType() == ACLType.Account) {
             final AccountVO networkOwner = _accountDao.findById(network.getAccountId());
             if (networkOwner == null) {
                 throw new PermissionDeniedException("Unable to use network with id= " + ((NetworkVO) network).getUuid() +
@@ -1497,7 +1499,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     public boolean isPrivateGateway(final long ntwkId) {
         final Network network = getNetwork(ntwkId);
         s_logger.debug("Network [" + network.getName() + "] is of type [" + network.getGuestType() + "].");
-        return Network.GuestType.Private.equals(network.getGuestType());
+        return GuestType.Private.equals(network.getGuestType());
     }
 
     @Override
@@ -1517,7 +1519,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
     public boolean isNetworkAvailableInDomain(final long networkId, final long domainId) {
         final Long networkDomainId;
         final Network network = getNetwork(networkId);
-        if (network.getGuestType() != Network.GuestType.Shared) {
+        if (network.getGuestType() != GuestType.Shared) {
             s_logger.trace("Network id=" + networkId + " is not shared");
             return false;
         }
@@ -1840,7 +1842,7 @@ public class NetworkModelImpl extends ManagerBase implements NetworkModel {
 
     @Override
     public NicVO getPlaceholderNicForRouter(final Network network, final Long podId) {
-        final List<NicVO> nics = _nicDao.listPlaceholderNicsByNetworkIdAndVmType(network.getId(), VirtualMachine.Type.DomainRouter);
+        final List<NicVO> nics = _nicDao.listPlaceholderNicsByNetworkIdAndVmType(network.getId(), VirtualMachineType.DomainRouter);
         for (final NicVO nic : nics) {
             if (nic.getReserver() == null && (nic.getIPv4Address() != null || nic.getIPv6Address() != null)) {
                 if (podId == null) {

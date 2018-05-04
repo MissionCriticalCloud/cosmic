@@ -1,6 +1,6 @@
 package com.cloud.framework.config;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import com.google.common.testing.EqualsTester;
 import org.junit.Assert;

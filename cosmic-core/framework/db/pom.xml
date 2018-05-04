@@ -26,8 +26,12 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-utils</artifactId>
+            <artifactId>cosmic-common</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -36,8 +40,9 @@
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
+            <groupId>cloud.cosmic</groupId>
+            <artifactId>cosmic-model</artifactId>
+            <version>6.0.16-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

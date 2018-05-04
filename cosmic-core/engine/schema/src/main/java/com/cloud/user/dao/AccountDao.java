@@ -1,9 +1,9 @@
 package com.cloud.user.dao;
 
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
 

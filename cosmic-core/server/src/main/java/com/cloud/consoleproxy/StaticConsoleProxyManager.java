@@ -1,15 +1,14 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
-import com.cloud.info.ConsoleProxyInfo;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.ConsoleProxyDao;
@@ -41,7 +40,7 @@ public class StaticConsoleProxyManager extends AgentBasedConsoleProxyManager imp
     @Override
     protected HostVO findHost(final VMInstanceVO vm) {
 
-        final List<HostVO> hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByType(Type.ConsoleProxy, vm.getDataCenterId());
+        final List<HostVO> hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByType(HostType.ConsoleProxy, vm.getDataCenterId());
 
         return hosts.isEmpty() ? null : hosts.get(0);
     }
@@ -75,7 +74,7 @@ public class StaticConsoleProxyManager extends AgentBasedConsoleProxyManager imp
             return null;
         }
 
-        host.setType(com.cloud.host.Host.Type.ConsoleProxy);
+        host.setType(HostType.ConsoleProxy);
         return host;
     }
 

@@ -9,16 +9,17 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.GetVMPasswordResponse;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.security.InvalidParameterException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getVMPassword", group = APICommandGroup.VirtualMachineService, responseObject = GetVMPasswordResponse.class, description = "Returns an encrypted password for the VM", entityType = {VirtualMachine.class},
+@APICommand(name = "getVMPassword", group = APICommandGroup.VirtualMachineService, responseObject = GetVMPasswordResponse.class, description = "Returns an encrypted password for the VM", entityType
+        = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GetVMPasswordCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetVMPasswordCmd.class.getName());

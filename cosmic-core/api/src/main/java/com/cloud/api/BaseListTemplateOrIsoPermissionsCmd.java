@@ -1,8 +1,8 @@
 package com.cloud.api;
 
 import com.cloud.api.response.TemplatePermissionsResponse;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
 package com.cloud.network;
 
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.utils.db.Encrypt;
 
 import javax.persistence.Column;

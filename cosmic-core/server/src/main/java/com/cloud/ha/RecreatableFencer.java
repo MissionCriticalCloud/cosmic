@@ -1,11 +1,12 @@
 package com.cloud.ha;
 
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.utils.component.AdapterBase;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -28,8 +29,8 @@ public class RecreatableFencer extends AdapterBase implements FenceBuilder {
 
     @Override
     public Boolean fenceOff(final VirtualMachine vm, final Host host) {
-        final VirtualMachine.Type type = vm.getType();
-        if (type != VirtualMachine.Type.ConsoleProxy && type != VirtualMachine.Type.DomainRouter && type != VirtualMachine.Type.SecondaryStorageVm) {
+        final VirtualMachineType type = vm.getType();
+        if (type != VirtualMachineType.ConsoleProxy && type != VirtualMachineType.DomainRouter && type != VirtualMachineType.SecondaryStorageVm) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Don't know how to fence off " + type);
             }

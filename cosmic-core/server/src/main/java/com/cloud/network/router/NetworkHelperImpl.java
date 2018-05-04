@@ -1,45 +1,52 @@
 package com.cloud.network.router;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.alert.AlertManager;
 import com.cloud.context.CallContext;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.CloudException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InsufficientServerCapacityException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.RedundantState;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.UserIpv6AddressDao;
-import com.cloud.network.router.VirtualRouter.RedundantState;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -47,22 +54,16 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.maint.Version;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineName;
 import com.cloud.vm.VirtualMachineProfile.Param;
@@ -260,7 +261,7 @@ public class NetworkHelperImpl implements NetworkHelper {
             final State state = router.getState();
             if (router.getHostId() != null && state != State.Running) {
                 final HostVO host = _hostDao.findById(router.getHostId());
-                if (host == null || host.getState() != Status.Up) {
+                if (host == null || host.getState() != HostStatus.Up) {
                     skip = true;
                 }
             }
@@ -411,7 +412,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         avoids[1] = new ExcludeList();
         avoids[1].addCluster(_hostDao.findById(routerToBeAvoid.getHostId()).getClusterId());
         avoids[2] = new ExcludeList();
-        final List<VolumeVO> volumes = _volumeDao.findByInstanceAndType(routerToBeAvoid.getId(), Volume.Type.ROOT);
+        final List<VolumeVO> volumes = _volumeDao.findByInstanceAndType(routerToBeAvoid.getId(), VolumeType.ROOT);
         if (volumes != null && volumes.size() != 0) {
             avoids[2].addPool(volumes.get(0).getPoolId());
         }

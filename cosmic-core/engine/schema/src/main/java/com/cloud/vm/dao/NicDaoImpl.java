@@ -1,5 +1,9 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.Nic.State;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.JoinBuilder;
@@ -7,11 +11,8 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.vm.Nic;
-import com.cloud.vm.Nic.State;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -91,18 +92,21 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
         sc.setParameters("instance", instanceId);
         return listBy(sc);
     }
+
     @Override
     public List<NicVO> listByIpAddress(final String ipAddress) {
         final SearchCriteria<NicVO> sc = IpFuzzySearch.create();
         sc.setParameters("address", "%" + ipAddress + "%");
         return listBy(sc);
     }
+
     @Override
     public List<NicVO> listByMacAddress(final String macAddress) {
         final SearchCriteria<NicVO> sc = IpFuzzySearch.create();
         sc.setParameters("mac", "%" + macAddress + "%");
         return listBy(sc);
     }
+
     @Override
     public List<String> listIpAddressInNetwork(final long networkId) {
         final SearchCriteria<String> sc = IpSearch.create();
@@ -141,7 +145,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     }
 
     @Override
-    public NicVO findByNetworkIdTypeAndGateway(final long networkId, final VirtualMachine.Type vmType, final String gateway) {
+    public NicVO findByNetworkIdTypeAndGateway(final long networkId, final VirtualMachineType vmType, final String gateway) {
         final SearchCriteria<NicVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("vmType", vmType);
@@ -157,7 +161,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     }
 
     @Override
-    public NicVO findByNetworkIdAndType(final long networkId, final VirtualMachine.Type vmType) {
+    public NicVO findByNetworkIdAndType(final long networkId, final VirtualMachineType vmType) {
         final SearchCriteria<NicVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("vmType", vmType);
@@ -251,7 +255,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     }
 
     @Override
-    public List<NicVO> listPlaceholderNicsByNetworkIdAndVmType(final long networkId, final VirtualMachine.Type vmType) {
+    public List<NicVO> listPlaceholderNicsByNetworkIdAndVmType(final long networkId, final VirtualMachineType vmType) {
         final SearchCriteria<NicVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("strategy", Nic.ReservationStrategy.PlaceHolder.toString());
@@ -260,7 +264,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     }
 
     @Override
-    public List<NicVO> listByNetworkIdAndVmType(final long networkId, final VirtualMachine.Type vmType) {
+    public List<NicVO> listByNetworkIdAndVmType(final long networkId, final VirtualMachineType vmType) {
         final SearchCriteria<NicVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("vmType", vmType);
@@ -268,7 +272,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     }
 
     @Override
-    public NicVO findByInstanceIdAndIpAddressAndVmtype(final long instanceId, final String ipaddress, final VirtualMachine.Type type) {
+    public NicVO findByInstanceIdAndIpAddressAndVmtype(final long instanceId, final String ipaddress, final VirtualMachineType type) {
         final SearchCriteria<NicVO> sc = AllFieldsSearch.create();
         sc.setParameters("instance", instanceId);
         sc.setParameters("address", ipaddress);
@@ -277,7 +281,7 @@ public class NicDaoImpl extends GenericDaoBase<NicVO, Long> implements NicDao {
     }
 
     @Override
-    public List<NicVO> listByNetworkIdTypeAndGatewayAndBroadcastUri(final long networkId, final VirtualMachine.Type vmType, final String gateway, final URI broadcasturi) {
+    public List<NicVO> listByNetworkIdTypeAndGatewayAndBroadcastUri(final long networkId, final VirtualMachineType vmType, final String gateway, final URI broadcasturi) {
         final SearchCriteria<NicVO> sc = AllFieldsSearch.create();
         sc.setParameters("network", networkId);
         sc.setParameters("vmType", vmType);

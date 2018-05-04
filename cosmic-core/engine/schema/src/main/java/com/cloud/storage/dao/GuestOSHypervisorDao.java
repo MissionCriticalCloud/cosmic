@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.utils.db.GenericDao;
 

@@ -2,9 +2,9 @@ package com.cloud.api.command.test;
 
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vpn.AddVpnUserCmd;
-import com.cloud.network.VpnUser;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.network.vpn.RemoteAccessVpnService;
-import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 
 import junit.framework.Assert;

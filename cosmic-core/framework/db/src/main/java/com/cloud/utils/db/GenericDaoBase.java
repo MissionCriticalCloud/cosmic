@@ -1,16 +1,16 @@
 package com.cloud.utils.db;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ComponentLifecycle;
 import com.cloud.utils.component.ComponentLifecycleBase;
 import com.cloud.utils.component.ComponentMethodInterceptable;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.SearchCriteria.SelectType;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 
 import javax.naming.ConfigurationException;

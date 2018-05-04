@@ -19,7 +19,6 @@
         <module>apidoc</module>
         <module>cosmic-db</module>
         <module>cosmic-flyway</module>
-        <module>cosmic-model</module>
         <module>engine/api</module>
         <module>engine/components-api</module>
         <module>engine/orchestration</module>
@@ -62,15 +61,14 @@
         <module>plugins/storage/image-default</module>
         <module>plugins/storage/volume-default</module>
         <module>scripts</module>
+        <module>secondary-storage-server</module>
         <module>server</module>
-        <module>services/console-proxy-server</module>
-        <module>services/secondary-storage-server</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-utils</artifactId>
+            <artifactId>cosmic-common</artifactId>
             <version>6.0.16-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>

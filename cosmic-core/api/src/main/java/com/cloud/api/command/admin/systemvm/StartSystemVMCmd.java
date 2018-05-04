@@ -13,13 +13,15 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "startSystemVm", group = APICommandGroup.SystemVMService, responseObject = SystemVmResponse.class, description = "Starts a system virtual machine.", entityType = {VirtualMachine.class},
+@APICommand(name = "startSystemVm", group = APICommandGroup.SystemVMService, responseObject = SystemVmResponse.class, description = "Starts a system virtual machine.", entityType = {VirtualMachine
+        .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class StartSystemVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(StartSystemVMCmd.class.getName());
@@ -51,8 +53,8 @@ public class StartSystemVMCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventType() {
-        final VirtualMachine.Type type = _mgr.findSystemVMTypeById(getId());
-        if (type == VirtualMachine.Type.ConsoleProxy) {
+        final VirtualMachineType type = _mgr.findSystemVMTypeById(getId());
+        if (type == VirtualMachineType.ConsoleProxy) {
             return EventTypes.EVENT_PROXY_START;
         } else {
             return EventTypes.EVENT_SSVM_START;

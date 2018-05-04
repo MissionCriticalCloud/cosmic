@@ -1,7 +1,8 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.time.InaccurateClock;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,12 +37,12 @@ public class ItWorkVO {
     ResourceType resourceType;
     @Column(name = "vm_type")
     @Enumerated(value = EnumType.STRING)
-    VirtualMachine.Type vmType;
+    VirtualMachineType vmType;
 
     protected ItWorkVO() {
     }
 
-    protected ItWorkVO(final String id, final long managementServerId, final State type, final VirtualMachine.Type vmType, final long instanceId) {
+    protected ItWorkVO(final String id, final long managementServerId, final State type, final VirtualMachineType vmType, final long instanceId) {
         this.id = id;
         this.managementServerId = managementServerId;
         this.type = type;
@@ -58,7 +59,7 @@ public class ItWorkVO {
         return instanceId;
     }
 
-    public VirtualMachine.Type getVmType() {
+    public VirtualMachineType getVmType() {
         return vmType;
     }
 

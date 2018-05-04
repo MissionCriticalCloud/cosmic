@@ -10,8 +10,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ResourceLimitResponse;
-import com.cloud.configuration.ResourceLimit;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.configuration.ResourceLimit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

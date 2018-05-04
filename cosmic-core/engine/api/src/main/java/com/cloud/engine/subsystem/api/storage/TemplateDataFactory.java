@@ -1,6 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 
 import java.util.List;
 

@@ -1,15 +1,6 @@
 package com.cloud.storage.download;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StartupSecondaryStorageCommand;
-import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
@@ -17,21 +8,31 @@ import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeService;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.exception.ConnectionException;
 import com.cloud.framework.async.AsyncCompletionCallback;
-import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.DownloadCommand;
+import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupSecondaryStorageCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.VMTemplateHostVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.storage.command.DownloadCommand;
-import com.cloud.storage.command.DownloadCommand.ResourceType;
-import com.cloud.storage.command.DownloadProgressCommand;
-import com.cloud.storage.command.DownloadProgressCommand.RequestType;
 import com.cloud.storage.download.DownloadState.DownloadEvent;
 import com.cloud.storage.upload.UploadListener;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.Date;
@@ -268,7 +269,7 @@ public class DownloadListener implements Listener {
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final com.cloud.host.Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         setDisconnected();
         return true;
     }

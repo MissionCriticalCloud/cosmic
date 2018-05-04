@@ -4,7 +4,7 @@ import com.cloud.acl.RoleType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.network.rules.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.serializer.Param;
 
 import java.util.List;

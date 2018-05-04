@@ -1,6 +1,7 @@
 package com.cloud.storage;
 
-import com.cloud.offering.DiskOffering;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -52,7 +53,7 @@ public class DiskOfferingVO implements DiskOffering {
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
     @Column(name = "provisioning_type")
-    Storage.ProvisioningType provisioningType;
+    StorageProvisioningType provisioningType;
     @Column(name = "display_offering")
     boolean displayOffering = true;
     @Enumerated(EnumType.STRING)
@@ -95,7 +96,7 @@ public class DiskOfferingVO implements DiskOffering {
         uuid = UUID.randomUUID().toString();
     }
 
-    public DiskOfferingVO(final Long domainId, final String name, final String displayText, final Storage.ProvisioningType provisioningType, final long diskSize, final String
+    public DiskOfferingVO(final Long domainId, final String name, final String displayText, final StorageProvisioningType provisioningType, final long diskSize, final String
             tags, final boolean isCustomized,
                           final Boolean isCustomizedIops, final Long minIops, final Long maxIops, final DiskCacheMode cacheMode) {
         this.domainId = domainId;
@@ -115,7 +116,7 @@ public class DiskOfferingVO implements DiskOffering {
         this.cacheMode = cacheMode;
     }
 
-    public DiskOfferingVO(final Long domainId, final String name, final String displayText, final Storage.ProvisioningType provisioningType, final long diskSize, final String
+    public DiskOfferingVO(final Long domainId, final String name, final String displayText, final StorageProvisioningType provisioningType, final long diskSize, final String
             tags, final boolean isCustomized,
                           final Boolean isCustomizedIops, final Long minIops, final Long maxIops) {
         this.domainId = domainId;
@@ -135,7 +136,7 @@ public class DiskOfferingVO implements DiskOffering {
         state = State.Active;
     }
 
-    public DiskOfferingVO(final String name, final String displayText, final Storage.ProvisioningType provisioningType, final boolean mirrored, final String tags, final boolean
+    public DiskOfferingVO(final String name, final String displayText, final StorageProvisioningType provisioningType, final boolean mirrored, final String tags, final boolean
             recreatable,
                           final boolean useLocalStorage, final boolean systemUse, final boolean customized) {
         domainId = null;
@@ -154,7 +155,7 @@ public class DiskOfferingVO implements DiskOffering {
 
     // domain specific offerings constructor (null domainId implies public
     // offering)
-    public DiskOfferingVO(final String name, final String displayText, final Storage.ProvisioningType provisioningType, final boolean mirrored, final String tags, final boolean
+    public DiskOfferingVO(final String name, final String displayText, final StorageProvisioningType provisioningType, final boolean mirrored, final String tags, final boolean
             recreatable,
                           final boolean useLocalStorage, final boolean systemUse, final boolean customized, final Long domainId) {
         type = Type.Service;
@@ -171,7 +172,7 @@ public class DiskOfferingVO implements DiskOffering {
         state = State.Active;
     }
 
-    public DiskOfferingVO(final long id, final String name, final String displayText, final Storage.ProvisioningType provisioningType, final boolean mirrored, final String tags,
+    public DiskOfferingVO(final long id, final String name, final String displayText, final StorageProvisioningType provisioningType, final boolean mirrored, final String tags,
                           final boolean recreatable,
                           final boolean useLocalStorage, final boolean systemUse, final boolean customized, final boolean customizedIops, final Long domainId, final Long
                                   minIops, final Long maxIops) {
@@ -249,7 +250,7 @@ public class DiskOfferingVO implements DiskOffering {
     }
 
     @Override
-    public Storage.ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 

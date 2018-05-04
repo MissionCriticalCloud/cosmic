@@ -1,8 +1,8 @@
 package com.cloud.storage.datastore.db;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

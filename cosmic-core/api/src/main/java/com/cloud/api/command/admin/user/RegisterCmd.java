@@ -7,8 +7,8 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.RegisterResponse;
 import com.cloud.api.response.UserResponse;
-import com.cloud.user.Account;
-import com.cloud.user.User;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

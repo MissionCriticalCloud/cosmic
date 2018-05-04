@@ -1,20 +1,21 @@
 package com.cloud.network.router;
 
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.dao.NicDao;
 
@@ -82,7 +83,7 @@ public class NicProfileHelperImpl implements NicProfileHelper {
             // can we solve this in setBroadcastUri()???
             // or more plugable construct is desirable
             privateNicProfile.setBroadcastType(BroadcastDomainType.getSchemeValue(netUri));
-            privateNicProfile.setFormat(AddressFormat.Ip4);
+            privateNicProfile.setFormat(IpAddressFormat.Ip4);
             privateNicProfile.setReservationId(String.valueOf(ip.getBroadcastUri()));
             privateNicProfile.setMacAddress(ip.getMacAddress());
         }

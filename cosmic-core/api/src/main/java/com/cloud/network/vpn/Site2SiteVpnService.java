@@ -11,12 +11,12 @@ import com.cloud.api.command.user.vpn.ListVpnCustomerGatewaysCmd;
 import com.cloud.api.command.user.vpn.ListVpnGatewaysCmd;
 import com.cloud.api.command.user.vpn.ResetVpnConnectionCmd;
 import com.cloud.api.command.user.vpn.UpdateVpnCustomerGatewayCmd;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.Site2SiteCustomerGateway;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
-import com.cloud.utils.Pair;
 
 import java.util.List;
 

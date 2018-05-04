@@ -13,13 +13,14 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.VMSnapshotResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
-import com.cloud.vm.snapshot.VMSnapshot;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteVMSnapshot", group = APICommandGroup.SnapshotService, description = "Deletes a vmsnapshot.", responseObject = SuccessResponse.class, since = "4.2.0", entityType = {VMSnapshot.class},
+@APICommand(name = "deleteVMSnapshot", group = APICommandGroup.SnapshotService, description = "Deletes a vmsnapshot.", responseObject = SuccessResponse.class, since = "4.2.0", entityType =
+        {VMSnapshot.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteVMSnapshotCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteVMSnapshotCmd.class.getName());

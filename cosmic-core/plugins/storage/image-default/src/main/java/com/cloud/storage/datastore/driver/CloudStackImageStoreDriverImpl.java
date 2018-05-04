@@ -1,10 +1,5 @@
 package com.cloud.storage.datastore.driver;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.storage.CreateEntityDownloadURLCommand;
-import com.cloud.agent.api.storage.DeleteEntityDownloadURLCommand;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.NfsTO;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -12,12 +7,17 @@ import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Upload;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CreateEntityDownloadURLCommand;
+import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.image.BaseImageStoreDriverImpl;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.image.store.ImageStoreImpl;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.UUID;

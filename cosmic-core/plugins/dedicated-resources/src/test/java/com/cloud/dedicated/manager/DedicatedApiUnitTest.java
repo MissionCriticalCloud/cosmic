@@ -19,16 +19,16 @@ import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.test.utils.SpringUtils;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
@@ -176,7 +176,7 @@ public class DedicatedApiUnitTest {
         public void runDedicateHostTest() {
             HostVO host = new HostVO(10L, "Host-1", Host.Type.Routing, null,
                     "10.0.0.0", null, null, null, null, null, null, null, null,
-                    Status.Up, null, null, null, 10L, 10L, 30L, 10233, null, null,
+                    HostStatus.Up, null, null, null, 10L, 10L, 30L, 10233, null, null,
                     null, 0, null);
             when(_hostDao.findById(10L)).thenReturn(host);
             try {

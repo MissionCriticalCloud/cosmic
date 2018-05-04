@@ -1,5 +1,8 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
+
 public class PrivateGatewayProfile implements PrivateGateway {
 
     private final VpcGateway vpcGateway;

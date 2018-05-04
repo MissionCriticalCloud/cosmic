@@ -1,7 +1,7 @@
 package com.cloud.affinity.dao;
 
 import com.cloud.affinity.AffinityGroupVMMapVO;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDao;
 

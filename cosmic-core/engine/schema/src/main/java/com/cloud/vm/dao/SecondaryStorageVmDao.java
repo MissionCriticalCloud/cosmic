@@ -1,9 +1,9 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.List;
 

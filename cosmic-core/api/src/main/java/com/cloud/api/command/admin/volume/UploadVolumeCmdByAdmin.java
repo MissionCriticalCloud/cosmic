@@ -7,17 +7,18 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.volume.UploadVolumeCmd;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.Volume;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "uploadVolume", group = APICommandGroup.VolumeService, description = "Uploads a data disk.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType = {Volume.class},
+@APICommand(name = "uploadVolume", group = APICommandGroup.VolumeService, description = "Uploads a data disk.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType =
+        {Volume.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UploadVolumeCmdByAdmin extends UploadVolumeCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UploadVolumeCmdByAdmin.class.getName());

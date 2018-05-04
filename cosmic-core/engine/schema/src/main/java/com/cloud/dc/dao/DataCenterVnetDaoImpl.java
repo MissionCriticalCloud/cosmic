@@ -1,6 +1,7 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.DataCenterVnetVO;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
 import com.cloud.utils.db.DB;
@@ -12,7 +13,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;

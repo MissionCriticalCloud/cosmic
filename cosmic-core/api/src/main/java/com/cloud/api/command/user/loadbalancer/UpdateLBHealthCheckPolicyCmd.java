@@ -21,15 +21,16 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.LBHealthCheckResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.network.LoadBalancer;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.HealthCheckPolicy;
-import com.cloud.network.rules.LoadBalancer;
 import com.cloud.network.rules.StickinessPolicy;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateLBHealthCheckPolicy", group = APICommandGroup.LoadBalancerService, description = "Updates load balancer health check policy", responseObject = LBHealthCheckResponse.class, since = "4.4",
+@APICommand(name = "updateLBHealthCheckPolicy", group = APICommandGroup.LoadBalancerService, description = "Updates load balancer health check policy", responseObject = LBHealthCheckResponse.class,
+        since = "4.4",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateLBHealthCheckPolicyCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateLBHealthCheckPolicyCmd.class.getName());

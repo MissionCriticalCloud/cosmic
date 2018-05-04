@@ -1,7 +1,7 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.StorageLayer;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.io.File;
 import java.net.URI;

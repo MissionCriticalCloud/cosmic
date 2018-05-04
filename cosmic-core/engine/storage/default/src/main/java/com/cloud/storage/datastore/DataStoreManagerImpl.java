@@ -4,10 +4,10 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.image.datastore.ImageStoreProviderManager;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.List;

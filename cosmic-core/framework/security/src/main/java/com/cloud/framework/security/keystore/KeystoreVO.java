@@ -1,6 +1,6 @@
 package com.cloud.framework.security.keystore;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.utils.db.Encrypt;
 
 import javax.persistence.Column;

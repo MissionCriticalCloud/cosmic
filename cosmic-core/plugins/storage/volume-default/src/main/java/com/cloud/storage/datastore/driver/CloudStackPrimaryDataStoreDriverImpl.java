@@ -1,12 +1,5 @@
 package com.cloud.storage.datastore.driver;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.storage.ResizeVolumeAnswer;
-import com.cloud.agent.api.storage.ResizeVolumeCommand;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
@@ -21,24 +14,34 @@ import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.StorageAction;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.answer.ResizeVolumeAnswer;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CreateObjectCommand;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.CreateSnapshotPayload;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.ResizeVolumePayload;
-import com.cloud.storage.Storage;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.CreateObjectCommand;
-import com.cloud.storage.command.DeleteCommand;
-import com.cloud.storage.command.RevertSnapshotCommand;
+import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -46,8 +49,6 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.snapshot.SnapshotManager;
-import com.cloud.storage.to.SnapshotObjectTO;
-import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.storage.volume.VolumeObject;
 import com.cloud.template.TemplateManager;
 import com.cloud.utils.NumbersUtil;
@@ -195,7 +196,7 @@ public class CloudStackPrimaryDataStoreDriverImpl implements PrimaryDataStoreDri
                 templateObjectTO.setPath(UUID.randomUUID().toString());
                 templateObjectTO.setSize(srcdata.getSize());
                 templateObjectTO.setPhysicalSize(srcdata.getSize());
-                templateObjectTO.setFormat(Storage.ImageFormat.RAW);
+                templateObjectTO.setFormat(ImageFormat.RAW);
                 final CopyCmdAnswer answer = new CopyCmdAnswer(templateObjectTO);
                 final CopyCommandResult result = new CopyCommandResult("", answer);
                 callback.complete(result);
@@ -230,7 +231,7 @@ public class CloudStackPrimaryDataStoreDriverImpl implements PrimaryDataStoreDri
         if (store.getRole() == DataStoreRole.Primary && srcData.getType() == DataObjectType.TEMPLATE
                 && (destData.getType() == DataObjectType.TEMPLATE || destData.getType() == DataObjectType.VOLUME)) {
             final StoragePoolVO storagePoolVO = primaryStoreDao.findById(store.getId());
-            if (storagePoolVO != null && storagePoolVO.getPoolType() == Storage.StoragePoolType.CLVM) {
+            if (storagePoolVO != null && storagePoolVO.getPoolType() == StoragePoolType.CLVM) {
                 return true;
             }
         }

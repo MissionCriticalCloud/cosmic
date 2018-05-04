@@ -1,7 +1,7 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
 
 import java.util.Map;
 

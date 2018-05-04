@@ -33,13 +33,13 @@ import com.cloud.agent.api.DeleteLogicalSwitchPortAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
 import com.cloud.agent.api.FindLogicalSwitchPortAnswer;
 import com.cloud.agent.api.FindLogicalSwitchPortCommand;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.UpdateLogicalSwitchPortAnswer;
 import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
-import com.cloud.agent.api.to.StaticNatRuleTO;
-import com.cloud.host.Host.Type;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
+import com.cloud.legacymodel.to.StaticNatRuleTO;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.network.nicira.Attachment;
 import com.cloud.network.nicira.ControlClusterStatus;
 import com.cloud.network.nicira.DestinationNatRule;
@@ -121,7 +121,7 @@ public class NiciraNvpResourceTest {
         final PingCommand ping = resource.getCurrentStatus(42);
         assertTrue(ping != null);
         assertTrue(ping.getHostId() == 42);
-        assertTrue(ping.getHostType() == Type.L2Networking);
+        assertTrue(ping.getHostType() == HostType.L2Networking);
     }
 
     @Test

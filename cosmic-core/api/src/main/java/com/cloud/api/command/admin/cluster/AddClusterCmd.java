@@ -11,10 +11,10 @@ import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.ResourceInUseException;
-import com.cloud.org.Cluster;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 import java.util.List;

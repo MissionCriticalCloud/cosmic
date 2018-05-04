@@ -10,9 +10,9 @@ import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.vpc.NetworkACL;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.NetworkACL;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

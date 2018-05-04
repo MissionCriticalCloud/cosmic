@@ -8,9 +8,9 @@ import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.RegionResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.region.Region;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 

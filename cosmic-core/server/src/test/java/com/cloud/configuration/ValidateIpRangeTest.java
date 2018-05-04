@@ -3,9 +3,9 @@ package com.cloud.configuration;
 import static org.mockito.Mockito.when;
 
 import com.cloud.dc.VlanVO;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.NetworkModel;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

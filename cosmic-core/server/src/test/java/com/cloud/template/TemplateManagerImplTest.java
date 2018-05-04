@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 import com.cloud.agent.AgentManager;
 import com.cloud.api.command.user.template.CreateTemplateCmd;
 import com.cloud.api.query.dao.UserVmJoinDao;
-import com.cloud.configuration.Resource;
 import com.cloud.context.CallContext;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
@@ -28,21 +27,26 @@ import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
-import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.VMTemplateStoragePoolVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.LaunchPermissionDao;
@@ -60,17 +64,13 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.test.utils.SpringUtils;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -233,7 +233,7 @@ public class TemplateManagerImplTest {
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
         when(vmTemplatePoolDao.findByPoolTemplate(anyLong(), anyLong())).thenReturn(null);
         when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStorageResourceAssoc.Status.DOWNLOADED)).thenReturn(mockTemplateDataStore);
-        when(storagePoolHostDao.listByHostStatus(2l, Status.Up)).thenReturn(null);
+        when(storagePoolHostDao.listByHostStatus(2l, HostStatus.Up)).thenReturn(null);
 
         templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
     }
@@ -371,7 +371,7 @@ public class TemplateManagerImplTest {
 
         when(mockSnapshot.getVolumeId()).thenReturn(1L);
         when(mockSnapshot.getState()).thenReturn(Snapshot.State.BackedUp);
-        when(mockSnapshot.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.XenServer);
+        when(mockSnapshot.getHypervisorType()).thenReturn(HypervisorType.XenServer);
 
         doNothing().when(resourceLimitMgr).checkResourceLimit(any(Account.class), eq(Resource.ResourceType.template));
         doNothing().when(resourceLimitMgr).checkResourceLimit(any(Account.class), eq(Resource.ResourceType.secondary_storage), anyLong());

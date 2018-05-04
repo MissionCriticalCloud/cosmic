@@ -9,19 +9,20 @@ import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.Storage;
+import com.cloud.legacymodel.storage.DiskProfile;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.user.Account;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.DiskProfile;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -231,7 +232,7 @@ public abstract class AbstractStoragePoolAllocator extends AdapterBase implement
     /*
     Check StoragePool and Volume type compatibility for the hypervisor
      */
-    private boolean checkHypervisorCompatibility(final HypervisorType hyperType, final Volume.Type volType, final Storage.StoragePoolType poolType) {
+    private boolean checkHypervisorCompatibility(final HypervisorType hyperType, final VolumeType volType, final StoragePoolType poolType) {
         return true;
     }
 }

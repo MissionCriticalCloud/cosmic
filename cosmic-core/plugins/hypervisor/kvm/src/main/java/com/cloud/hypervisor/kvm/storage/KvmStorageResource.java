@@ -1,15 +1,15 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.AttachPrimaryDataStoreCmd;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.CreateObjectCommand;
-import com.cloud.storage.command.CreatePrimaryDataStoreCmd;
-import com.cloud.storage.command.DeleteCommand;
-import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.StorageSubSystemCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
+import com.cloud.legacymodel.communication.command.AttachPrimaryDataStoreCommand;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CreateObjectCommand;
+import com.cloud.legacymodel.communication.command.CreatePrimaryDataStoreCommand;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
+import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
 
 public class KvmStorageResource {
 
@@ -22,10 +22,10 @@ public class KvmStorageResource {
     public Answer handleStorageCommands(final StorageSubSystemCommand command) {
         if (command instanceof CopyCommand) {
             return this.execute((CopyCommand) command);
-        } else if (command instanceof AttachPrimaryDataStoreCmd) {
-            return this.execute((AttachPrimaryDataStoreCmd) command);
-        } else if (command instanceof CreatePrimaryDataStoreCmd) {
-            return execute((CreatePrimaryDataStoreCmd) command);
+        } else if (command instanceof AttachPrimaryDataStoreCommand) {
+            return this.execute((AttachPrimaryDataStoreCommand) command);
+        } else if (command instanceof CreatePrimaryDataStoreCommand) {
+            return execute((CreatePrimaryDataStoreCommand) command);
         } else if (command instanceof CreateObjectCommand) {
             return execute((CreateObjectCommand) command);
         } else if (command instanceof DeleteCommand) {
@@ -42,11 +42,11 @@ public class KvmStorageResource {
         return new Answer(cmd, false, "not implemented yet");
     }
 
-    protected Answer execute(final AttachPrimaryDataStoreCmd cmd) {
+    protected Answer execute(final AttachPrimaryDataStoreCommand cmd) {
         return new Answer(cmd, false, "not implemented yet");
     }
 
-    protected Answer execute(final CreatePrimaryDataStoreCmd cmd) {
+    protected Answer execute(final CreatePrimaryDataStoreCommand cmd) {
         return new Answer(cmd, false, "not implemented yet");
     }
 

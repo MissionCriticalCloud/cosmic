@@ -3,8 +3,8 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.serializer.Param;
 
 import com.google.gson.annotations.SerializedName;

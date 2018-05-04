@@ -10,8 +10,8 @@ import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.org.Cluster;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

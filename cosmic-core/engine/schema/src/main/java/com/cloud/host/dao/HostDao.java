@@ -1,11 +1,12 @@
 package com.cloud.host.dao;
 
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.info.RunningHostCountInfo;
-import com.cloud.resource.ResourceState;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.model.enumeration.Event;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Data Access Object for server
  */
-public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Status.Event, Host> {
+public interface HostDao extends GenericDao<HostVO, Long>, StateDao<HostStatus, Event, Host> {
     long countBy(long clusterId, ResourceState... states);
 
     /**
@@ -40,7 +41,7 @@ public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Stat
 
     void loadHostTags(HostVO host);
 
-    List<HostVO> listByHostTag(Host.Type type, Long clusterId, Long podId, long dcId, String hostTag);
+    List<HostVO> listByHostTag(HostType type, Long clusterId, Long podId, long dcId, String hostTag);
 
     long countRoutingHostsByDataCenter(long dcId);
 
@@ -50,7 +51,7 @@ public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Stat
 
     HostVO findByGuid(String guid);
 
-    HostVO findByTypeNameAndZoneId(long zoneId, String name, Host.Type type);
+    HostVO findByTypeNameAndZoneId(long zoneId, String name, HostType type);
 
     List<HostVO> findHypervisorHostInCluster(long clusterId);
 
@@ -62,7 +63,7 @@ public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Stat
      * @param haTag     TODO
      * @return
      */
-    List<HostVO> listAllUpAndEnabledNonHAHosts(Type type, Long clusterId, Long podId, long dcId, String haTag);
+    List<HostVO> listAllUpAndEnabledNonHAHosts(HostType type, Long clusterId, Long podId, long dcId, String haTag);
 
     List<HostVO> findByPodId(Long podId);
 
@@ -74,5 +75,5 @@ public interface HostDao extends GenericDao<HostVO, Long>, StateDao<Status, Stat
 
     HostVO findByPublicIp(String publicIp);
 
-    List<HostVO> listByType(Type type);
+    List<HostVO> listByType(HostType type);
 }

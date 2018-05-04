@@ -1,9 +1,10 @@
 package com.cloud.storage.volume;
 
 import com.cloud.engine.subsystem.api.storage.DataStore;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Volume;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -45,7 +46,7 @@ public class VolumeObjectTest {
     public void setUp() throws Exception {
         volumeObject.configure(
                 Mockito.mock(DataStore.class),
-                new VolumeVO("name", 1L, 1L, 1L, 1L, 1L, "folder", "path", Storage.ProvisioningType.THIN, 1L, Volume.Type.DATADISK, DiskControllerType.SCSI),
+                new VolumeVO("name", 1L, 1L, 1L, 1L, 1L, "folder", "path", StorageProvisioningType.THIN, 1L, VolumeType.DATADISK, DiskControllerType.SCSI),
                 false
         );
     }

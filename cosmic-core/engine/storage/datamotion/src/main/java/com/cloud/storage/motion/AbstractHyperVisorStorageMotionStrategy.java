@@ -1,12 +1,6 @@
 package com.cloud.storage.motion;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.MigrateWithStorageAnswer;
-import com.cloud.agent.api.MigrateWithStorageCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.DataMotionStrategy;
 import com.cloud.engine.subsystem.api.storage.DataObject;
@@ -14,17 +8,23 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.async.AsyncCompletionCallback;
-import com.cloud.host.Host;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MigrateWithStorageAnswer;
+import com.cloud.legacymodel.communication.command.MigrateWithStorageCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeTO;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -145,7 +145,9 @@ public abstract class AbstractHyperVisorStorageMotionStrategy implements DataMot
 
         for (final Map.Entry<VolumeInfo, DataStore> entry : volumeToPool.entrySet()) {
             final VolumeInfo volume = entry.getKey();
-            final VolumeTO volumeTo = new VolumeTO(volume, storagePoolDao.findById(volume.getPoolId()));
+            final StoragePool storagePool = storagePoolDao.findById(volume.getPoolId());
+            final VolumeTO volumeTo = new VolumeTO(volume.getId(), volume.getVolumeType(), storagePool.getPoolType(), storagePool.getUuid(), volume.getName(), volume.getFolder(), volume.getPath(),
+                    volume.getSize(), volume.getChainInfo());
             final StorageFilerTO filerTo = new StorageFilerTO((StoragePool) entry.getValue());
             volumeToFilerto.add(new Pair<>(volumeTo, filerTo));
         }

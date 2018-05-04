@@ -8,15 +8,16 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.iso.RegisterIsoCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerIso", group = APICommandGroup.ISOService, responseObject = TemplateResponse.class, description = "Registers an existing ISO into the CloudStack Cloud.", responseView = ResponseView.Full,
+@APICommand(name = "registerIso", group = APICommandGroup.ISOService, responseObject = TemplateResponse.class, description = "Registers an existing ISO into the CloudStack Cloud.", responseView =
+        ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RegisterIsoCmdByAdmin extends RegisterIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RegisterIsoCmdByAdmin.class.getName());

@@ -11,8 +11,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.context.CallContext;
-import com.cloud.user.Account;
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.UserAccount;
 
 import java.util.Collection;
 import java.util.Map;

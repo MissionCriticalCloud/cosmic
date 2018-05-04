@@ -1,7 +1,7 @@
 package com.cloud.alert;
 
 import com.cloud.capacity.Capacity;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import java.util.HashSet;
 import java.util.Set;

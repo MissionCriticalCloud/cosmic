@@ -11,11 +11,11 @@ import com.cloud.api.command.admin.user.DisableUserCmd;
 import com.cloud.api.command.admin.user.EnableUserCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.command.user.region.ListRegionsCmd;
-import com.cloud.domain.Domain;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.UserAccount;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public interface RegionService {
      * @param endPoint
      * @return Return added Region object
      */
-    public Region addRegion(int id, String name, String endPoint);
+    Region addRegion(int id, String name, String endPoint);
 
     /**
      * Update details of the Region with specified Id
@@ -38,13 +38,13 @@ public interface RegionService {
      * @param endPoint
      * @return Return updated Region object
      */
-    public Region updateRegion(int id, String name, String endPoint);
+    Region updateRegion(int id, String name, String endPoint);
 
     /**
      * @param id
      * @return True if region is successfully removed
      */
-    public boolean removeRegion(int id);
+    boolean removeRegion(int id);
 
     /**
      * List all Regions or by Id/Name
@@ -53,7 +53,7 @@ public interface RegionService {
      * @param name
      * @return List of Regions
      */
-    public List<? extends Region> listRegions(ListRegionsCmd cmd);
+    List<? extends Region> listRegions(ListRegionsCmd cmd);
 
     /**
      * Deletes a user by userId
@@ -105,7 +105,7 @@ public interface RegionService {
      * @param cmd - the command containing domainId and new domainName
      * @return Domain object if the command succeeded
      */
-    public Domain updateDomain(UpdateDomainCmd updateDomainCmd);
+    Domain updateDomain(UpdateDomainCmd updateDomainCmd);
 
     /**
      * Deletes domain
@@ -113,7 +113,7 @@ public interface RegionService {
      * @param cmd
      * @return true if delete was successful, false otherwise
      */
-    public boolean deleteDomain(DeleteDomainCmd cmd);
+    boolean deleteDomain(DeleteDomainCmd cmd);
 
     /**
      * Update a user by userId
@@ -121,7 +121,7 @@ public interface RegionService {
      * @param userId
      * @return UserAccount object
      */
-    public UserAccount updateUser(UpdateUserCmd updateUserCmd);
+    UserAccount updateUser(UpdateUserCmd updateUserCmd);
 
     /**
      * Disables a user by userId
@@ -129,7 +129,7 @@ public interface RegionService {
      * @param cmd
      * @return UserAccount object
      */
-    public UserAccount disableUser(DisableUserCmd cmd);
+    UserAccount disableUser(DisableUserCmd cmd);
 
     /**
      * Enables a user
@@ -137,5 +137,5 @@ public interface RegionService {
      * @param cmd
      * @return UserAccount object
      */
-    public UserAccount enableUser(EnableUserCmd cmd);
+    UserAccount enableUser(EnableUserCmd cmd);
 }

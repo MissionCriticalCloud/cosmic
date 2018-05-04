@@ -13,15 +13,15 @@ import com.cloud.api.command.admin.network.ReleaseDedicatedGuestVlanRangeCmd;
 import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.dao.DataCenterVnetDao;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.network.dao.AccountGuestVlanMapDao;
 import com.cloud.network.dao.AccountGuestVlanMapVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.projects.ProjectManager;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
@@ -123,8 +123,8 @@ public class DedicateGuestVlanRangesTest {
         runDedicateGuestVlanRangePostiveTest();
 
         /*
-        * TEST 2: given invalid format for vlan range DedicateGuestVlanRange should fail
-        */
+         * TEST 2: given invalid format for vlan range DedicateGuestVlanRange should fail
+         */
         runDedicateGuestVlanRangeInvalidFormat();
 
         /*

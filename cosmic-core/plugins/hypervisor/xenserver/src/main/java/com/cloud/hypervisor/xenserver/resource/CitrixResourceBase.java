@@ -1,66 +1,65 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.IAgentControl;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.GetHostStatsCommand;
-import com.cloud.agent.api.GetVmStatsCommand;
-import com.cloud.agent.api.HostStatsEntry;
-import com.cloud.agent.api.HostVmStateReportEntry;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.PingRoutingCommand;
-import com.cloud.agent.api.PingRoutingWithNwGroupsCommand;
-import com.cloud.agent.api.RebootAnswer;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.StartAnswer;
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.agent.api.StopAnswer;
-import com.cloud.agent.api.StopCommand;
-import com.cloud.agent.api.StoragePoolInfo;
-import com.cloud.agent.api.VgpuTypesInfo;
-import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.host.Host.Type;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.common.agent.IAgentControl;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.CitrixRequestWrapper;
 import com.cloud.hypervisor.xenserver.resource.wrapper.xenbase.XenServerUtilitiesHelper;
-import com.cloud.network.Networks;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.RebootAnswer;
+import com.cloud.legacymodel.communication.answer.StartAnswer;
+import com.cloud.legacymodel.communication.answer.StopAnswer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.GetHostStatsCommand;
+import com.cloud.legacymodel.communication.command.GetVmStatsCommand;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.PingRoutingCommand;
+import com.cloud.legacymodel.communication.command.PingRoutingWithNwGroupsCommand;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.SetNetworkACLCommand;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.StopCommand;
+import com.cloud.legacymodel.dc.HostStatsEntry;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.GPUDeviceTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.legacymodel.vm.HostVmStateReportEntry;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VmStatsEntry;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageResourceType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.hypervisor.HypervisorResource;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.Volume;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.template.VirtualMachineTemplate.BootloaderType;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SSHCmdHelper;
 import com.cloud.utils.ssh.SshHelper;
-import com.cloud.vm.VirtualMachine.PowerState;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
@@ -950,7 +949,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     public VBD createVbd(final Connection conn, final DiskTO volume, final String vmName, final VM vm,
                          final BootloaderType bootLoaderType, VDI vdi) throws XmlRpcException,
             XenAPIException {
-        final Volume.Type type = volume.getType();
+        final VolumeType type = volume.getType();
 
         if (vdi == null) {
             vdi = mount(conn, vmName, volume);
@@ -976,20 +975,20 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         } else {
             vbdr.empty = true;
         }
-        if (type == Volume.Type.ROOT && bootLoaderType == BootloaderType.PyGrub) {
+        if (type == VolumeType.ROOT && bootLoaderType == BootloaderType.PyGrub) {
             vbdr.bootable = true;
-        } else if (type == Volume.Type.ISO && bootLoaderType == BootloaderType.CD) {
+        } else if (type == VolumeType.ISO && bootLoaderType == BootloaderType.CD) {
             vbdr.bootable = true;
         }
 
-        if (volume.getType() == Volume.Type.ISO) {
+        if (volume.getType() == VolumeType.ISO) {
             vbdr.mode = Types.VbdMode.RO;
             vbdr.type = Types.VbdType.CD;
             vbdr.userdevice = "3";
         } else {
             vbdr.mode = Types.VbdMode.RW;
             vbdr.type = Types.VbdType.DISK;
-            vbdr.unpluggable = volume.getType() == Volume.Type.ROOT ? false : true;
+            vbdr.unpluggable = volume.getType() == VolumeType.ROOT ? false : true;
             vbdr.userdevice = "autodetect";
             final Long deviceId = volume.getDiskSeq();
             if (deviceId != null && !isDeviceUsed(conn, vm, deviceId) || deviceId > 3) {
@@ -1008,8 +1007,8 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     protected VDI mount(final Connection conn, final String vmName, final DiskTO volume)
             throws XmlRpcException, XenAPIException {
         final DataTO data = volume.getData();
-        final Volume.Type type = volume.getType();
-        if (type == Volume.Type.ISO) {
+        final VolumeType type = volume.getType();
+        if (type == VolumeType.ISO) {
             final TemplateObjectTO iso = (TemplateObjectTO) data;
             final DataStoreTO store = iso.getDataStore();
 
@@ -1168,7 +1167,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         // Nuage Vsp needs Virtual Router IP to be passed in the otherconfig
         // get the virtual router IP information from broadcast uri
         final URI broadcastUri = nic.getBroadcastUri();
-        if (broadcastUri != null && broadcastUri.getScheme().equalsIgnoreCase(Networks.BroadcastDomainType.Vsp.scheme())) {
+        if (broadcastUri != null && broadcastUri.getScheme().equalsIgnoreCase(BroadcastDomainType.Vsp.scheme())) {
             final String path = broadcastUri.getPath();
             vifr.otherConfig.put("vsp-vr-ip", path.substring(1));
         }
@@ -1271,7 +1270,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             if (vmSpec.getBootloader() == BootloaderType.CD) {
                 final DiskTO[] disks = vmSpec.getDisks();
                 for (final DiskTO disk : disks) {
-                    if (disk.getType() == Volume.Type.ISO) {
+                    if (disk.getType() == VolumeType.ISO) {
                         final TemplateObjectTO iso = (TemplateObjectTO) disk.getData();
                         final String osType = iso.getGuestOsType();
                         if (osType != null) {
@@ -1421,7 +1420,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
             final VBD.Record vbdr = new VBD.Record();
             vbdr.VM = vm;
             vbdr.VDI = vdi;
-            if (volumeTO.getVolumeType() == Volume.Type.ROOT) {
+            if (volumeTO.getVolumeType() == VolumeType.ROOT) {
                 vbdr.bootable = true;
                 vbdr.unpluggable = false;
             } else {
@@ -2252,8 +2251,8 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
     }
 
     @Override
-    public Type getType() {
-        return com.cloud.host.Host.Type.Routing;
+    public HostType getType() {
+        return HostType.Routing;
     }
 
     @Override
@@ -2571,7 +2570,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     cmd.setPoolInfo(pInfo);
                     cmd.setGuid(_host.getUuid());
                     cmd.setDataCenter(Long.toString(_dcId));
-                    cmd.setResourceType(Storage.StorageResourceType.STORAGE_POOL);
+                    cmd.setResourceType(StorageResourceType.STORAGE_POOL);
                     return cmd;
                 }
             } catch (final XenAPIException e) {
@@ -2602,7 +2601,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     cmd.setPoolInfo(pInfo);
                     cmd.setGuid(_host.getUuid());
                     cmd.setDataCenter(Long.toString(_dcId));
-                    cmd.setResourceType(Storage.StorageResourceType.STORAGE_POOL);
+                    cmd.setResourceType(StorageResourceType.STORAGE_POOL);
                     return cmd;
                 }
             } catch (final XenAPIException e) {
@@ -2852,7 +2851,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
     public long getVMSnapshotChainSize(final Connection conn, final VolumeObjectTO volumeTo, final String vmName)
             throws BadServerResponse, XenAPIException, XmlRpcException {
-        if (volumeTo.getVolumeType() == Volume.Type.DATADISK) {
+        if (volumeTo.getVolumeType() == VolumeType.DATADISK) {
             final VDI dataDisk = VDI.getByUuid(conn, volumeTo.getPath());
             if (dataDisk != null) {
                 final String dataDiskName = dataDisk.getNameLabel(conn);
@@ -2881,7 +2880,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                 continue;
             }
         }
-        if (volumeTo.getVolumeType() == Volume.Type.ROOT) {
+        if (volumeTo.getVolumeType() == VolumeType.ROOT) {
             final Map<VM, VM.Record> allVMs = VM.getAllRecords(conn);
             // add size of memory snapshot vdi
             if (allVMs != null && allVMs.size() > 0) {

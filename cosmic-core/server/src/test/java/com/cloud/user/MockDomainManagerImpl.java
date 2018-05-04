@@ -3,10 +3,10 @@ package com.cloud.user;
 import com.cloud.api.command.admin.domain.ListDomainChildrenCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
 import com.cloud.api.command.admin.domain.UpdateDomainCmd;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
 
 import javax.naming.ConfigurationException;

@@ -1,6 +1,6 @@
 package com.cloud.vm;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 public interface SystemVmLoadScanHandler<T> {
     String getScanHandlerName();

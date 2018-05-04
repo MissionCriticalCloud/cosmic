@@ -5,7 +5,7 @@ import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.response.EventTypeResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 

@@ -1,9 +1,6 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
@@ -17,7 +14,6 @@ import com.cloud.api.query.dao.TemplateJoinDao;
 import com.cloud.api.query.vo.TemplateJoinVO;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
-import com.cloud.capacity.CapacityState;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.cluster.ClusterManagerListener;
@@ -25,7 +21,6 @@ import com.cloud.cluster.ManagementServerHost;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.configuration.ConfigurationManagerImpl;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
@@ -44,7 +39,6 @@ import com.cloud.engine.subsystem.api.storage.HostScope;
 import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
 import com.cloud.engine.subsystem.api.storage.ImageStoreProvider;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
-import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
@@ -58,36 +52,56 @@ import com.cloud.engine.subsystem.api.storage.VolumeService.VolumeApiResult;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceInUseException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.StorageConflictException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.StorageConflictException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.legacymodel.storage.StorageStats;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
-import com.cloud.resource.ResourceState;
+import com.cloud.model.enumeration.CapacityState;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.StatsCollector;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -112,14 +126,11 @@ import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.listener.StoragePoolMonitor;
 import com.cloud.storage.listener.VolumeStateListener;
 import com.cloud.template.TemplateManager;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.component.ComponentContext;
@@ -137,10 +148,7 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
@@ -285,7 +293,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     public boolean share(final VMInstanceVO vm, final List<VolumeVO> vols, final HostVO host, final boolean cancelPreviousShare) throws StorageUnavailableException {
 
         // if pool is in maintenance and it is the ONLY pool available; reject
-        final List<VolumeVO> rootVolForGivenVm = _volsDao.findByInstanceAndType(vm.getId(), Type.ROOT);
+        final List<VolumeVO> rootVolForGivenVm = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.ROOT);
         if (rootVolForGivenVm != null && rootVolForGivenVm.size() > 0) {
             final boolean isPoolAvailable = isPoolAvailable(rootVolForGivenVm.get(0).getPoolId());
             if (!isPoolAvailable) {
@@ -332,13 +340,13 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
                     }
                 }
             }
-      /*
-       * Can't find the vm where host resides on(vm is destroyed? or
-       * volume is detached from vm), randomly choose a host to send the
-       * cmd
-       */
+            /*
+             * Can't find the vm where host resides on(vm is destroyed? or
+             * volume is detached from vm), randomly choose a host to send the
+             * cmd
+             */
         }
-        final List<StoragePoolHostVO> poolHosts = _storagePoolHostDao.listByHostStatus(poolVO.getId(), Status.Up);
+        final List<StoragePoolHostVO> poolHosts = _storagePoolHostDao.listByHostStatus(poolVO.getId(), HostStatus.Up);
         Collections.shuffle(poolHosts);
         if (poolHosts != null && poolHosts.size() > 0) {
             for (final StoragePoolHostVO sphvo : poolHosts) {
@@ -805,7 +813,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @DB
     public List<VMInstanceVO> listByStoragePool(final long storagePoolId) {
         final SearchCriteria<VMInstanceVO> sc = StoragePoolSearch.create();
-        sc.setJoinParameters("vmVolume", "volumeType", Volume.Type.ROOT);
+        sc.setJoinParameters("vmVolume", "volumeType", VolumeType.ROOT);
         sc.setJoinParameters("vmVolume", "poolId", storagePoolId);
         sc.setJoinParameters("vmVolume", "state", Volume.State.Ready);
         return _vmInstanceDao.search(sc, null);
@@ -832,7 +840,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             throw new InvalidParameterValueException("Can not find out the secondary storage id: " + secStorageId);
         }
 
-        if (secHost.getType() != Host.Type.SecondaryStorage) {
+        if (secHost.getType() != HostType.SecondaryStorage) {
             throw new InvalidParameterValueException("host: " + secStorageId + " is not a secondary storage");
         }
 
@@ -861,7 +869,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     public List<Long> getUpHostsInPool(final long poolId) {
         final SearchCriteria<Long> sc = UpHostsInPoolSearch.create();
         sc.setParameters("pool", poolId);
-        sc.setJoinParameters("hosts", "status", Status.Up);
+        sc.setJoinParameters("hosts", "status", HostStatus.Up);
         sc.setJoinParameters("hosts", "resourceState", ResourceState.Enabled);
         return _storagePoolHostDao.customSearch(sc, null);
     }

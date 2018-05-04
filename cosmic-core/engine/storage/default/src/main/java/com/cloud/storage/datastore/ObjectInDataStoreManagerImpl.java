@@ -1,19 +1,22 @@
 package com.cloud.storage.datastore;
 
-import com.cloud.agent.api.to.DataObjectType;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.engine.subsystem.api.storage.SnapshotDataFactory;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.dao.SnapshotDao;
@@ -27,9 +30,7 @@ import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
 import com.cloud.storage.template.TemplateConstants;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 
 import javax.inject.Inject;
 
@@ -277,20 +278,20 @@ public class ObjectInDataStoreManagerImpl implements ObjectInDataStoreManager {
         if (data.getDataStore().getRole() == DataStoreRole.Image || data.getDataStore().getRole() == DataStoreRole.ImageCache) {
             switch (data.getType()) {
                 case TEMPLATE:
-                    result = this.stateMachines.transitTo(obj, event, null, templateDataStoreDao);
+                    result = new StateMachine2Transitions(this.stateMachines).transitTo(obj, event, null, templateDataStoreDao);
                     break;
                 case SNAPSHOT:
-                    result = this.stateMachines.transitTo(obj, event, null, snapshotDataStoreDao);
+                    result = new StateMachine2Transitions(this.stateMachines).transitTo(obj, event, null, snapshotDataStoreDao);
                     break;
                 case VOLUME:
-                    result = this.stateMachines.transitTo(obj, event, null, volumeDataStoreDao);
+                    result = new StateMachine2Transitions(this.stateMachines).transitTo(obj, event, null, volumeDataStoreDao);
                     break;
             }
         } else if (data.getType() == DataObjectType.TEMPLATE && data.getDataStore().getRole() == DataStoreRole.Primary) {
 
-            result = this.stateMachines.transitTo(obj, event, null, templatePoolDao);
+            result = new StateMachine2Transitions(this.stateMachines).transitTo(obj, event, null, templatePoolDao);
         } else if (data.getType() == DataObjectType.SNAPSHOT && data.getDataStore().getRole() == DataStoreRole.Primary) {
-            result = this.stateMachines.transitTo(obj, event, null, snapshotDataStoreDao);
+            result = new StateMachine2Transitions(this.stateMachines).transitTo(obj, event, null, snapshotDataStoreDao);
         } else {
             throw new CloudRuntimeException("Invalid data or store type: " + data.getType() + " " + data.getDataStore().getRole());
         }

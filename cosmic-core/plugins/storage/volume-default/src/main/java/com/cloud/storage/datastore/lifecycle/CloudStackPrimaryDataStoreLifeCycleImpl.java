@@ -1,30 +1,32 @@
 package com.cloud.storage.datastore.lifecycle;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CreateStoragePoolCommand;
-import com.cloud.agent.api.DeleteStoragePoolCommand;
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.alert.AlertManager;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.HostScope;
-import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreParameters;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.exception.StorageConflictException;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CreateStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.DeleteStoragePoolCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.StorageConflictException;
+import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.OCFS2Manager;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolAutomation;
 import com.cloud.storage.StoragePoolHostVO;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -37,8 +39,6 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.db.DB;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.ConsoleProxyDao;
 import com.cloud.vm.dao.DomainRouterDao;
@@ -331,7 +331,7 @@ public class CloudStackPrimaryDataStoreLifeCycleImpl implements PrimaryDataStore
         final PrimaryDataStoreInfo primarystore = (PrimaryDataStoreInfo) store;
         // Check if there is host up in this cluster
         final List<HostVO> allHosts =
-                _resourceMgr.listAllUpAndEnabledHosts(Host.Type.Routing, primarystore.getClusterId(), primarystore.getPodId(), primarystore.getDataCenterId());
+                _resourceMgr.listAllUpAndEnabledHosts(HostType.Routing, primarystore.getClusterId(), primarystore.getPodId(), primarystore.getDataCenterId());
         if (allHosts.isEmpty()) {
             primaryDataStoreDao.expunge(primarystore.getId());
             throw new CloudRuntimeException("No host up to associate a storage pool with in cluster " + primarystore.getClusterId());

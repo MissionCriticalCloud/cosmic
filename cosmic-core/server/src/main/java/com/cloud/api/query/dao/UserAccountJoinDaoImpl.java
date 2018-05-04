@@ -2,8 +2,8 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.UserAccountJoinVO;
 import com.cloud.api.response.UserResponse;
-import com.cloud.user.User;
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;

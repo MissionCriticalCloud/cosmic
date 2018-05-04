@@ -1,19 +1,19 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.FenceAnswer;
-import com.cloud.agent.api.FenceCommand;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.FenceAnswer;
+import com.cloud.legacymodel.communication.command.FenceCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.VirtualMachine;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -49,7 +49,7 @@ public class XenServerFencer extends AdapterBase implements FenceBuilder {
 
         for (final HostVO h : hosts) {
             if (h.getHypervisorType() == HypervisorType.XenServer) {
-                if (h.getStatus() != Status.Up) {
+                if (h.getStatus() != HostStatus.Up) {
                     continue;
                 }
                 if (h.getId() == host.getId()) {

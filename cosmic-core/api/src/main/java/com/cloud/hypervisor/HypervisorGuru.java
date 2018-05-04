@@ -1,13 +1,13 @@
 package com.cloud.hypervisor;
 
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.component.Adapter;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.List;

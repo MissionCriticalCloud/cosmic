@@ -1,6 +1,7 @@
 package com.cloud.storage;
 
-import com.cloud.exception.DiscoveryException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.utils.component.Adapter;
 
 import java.net.URI;

@@ -1,10 +1,10 @@
 package com.cloud.vm;
 
-import com.cloud.exception.CloudException;
+import com.cloud.common.transport.GsonHelper;
 import com.cloud.framework.jobs.impl.JobSerializerHelper;
 import com.cloud.jobs.JobInfo;
-import com.cloud.serializer.GsonHelper;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

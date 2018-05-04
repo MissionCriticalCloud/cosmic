@@ -1,18 +1,11 @@
 package com.cloud.consoleproxy;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.ConsoleProxyLoadReportCommand;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
-import com.cloud.agent.api.check.CheckSshAnswer;
-import com.cloud.agent.api.check.CheckSshCommand;
-import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
 import com.cloud.agent.manager.Commands;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
+import com.cloud.consoleproxy.RunningHostInfoAgregator.ZoneHostInfo;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenterVO;
@@ -22,31 +15,44 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.framework.security.keystore.KeystoreVO;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.info.ConsoleProxyConnectionInfo;
-import com.cloud.info.ConsoleProxyInfo;
 import com.cloud.info.ConsoleProxyLoadInfo;
-import com.cloud.info.ConsoleProxyStatus;
-import com.cloud.info.RunningHostInfoAgregator;
-import com.cloud.info.RunningHostInfoAgregator.ZoneHostInfo;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
+import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
+import com.cloud.legacymodel.communication.command.CheckSshCommand;
+import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managementserver.ManagementServerService;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
@@ -58,12 +64,8 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage;
-import com.cloud.storage.StoragePoolStatus;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
@@ -71,11 +73,9 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.systemvm.SystemVmManagerBase;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.QueryBuilder;
@@ -84,7 +84,6 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.events.SubscriptionMgr;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.ConsoleProxyVO;
@@ -92,8 +91,6 @@ import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.SystemVmLoadScanner;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineGuru;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineName;
@@ -498,7 +495,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         _listener = new ConsoleProxyListener(new VmBasedAgentHook(_instanceDao, _hostDao, _configDao, _ksMgr, _agentMgr, _keysMgr));
         _agentMgr.registerForHostEvents(_listener, true, true, false);
 
-        _itMgr.registerGuru(VirtualMachine.Type.ConsoleProxy, this);
+        _itMgr.registerGuru(VirtualMachineType.ConsoleProxy, this);
 
         //check if there is a default service offering configured
         final String cpvmSrvcOffIdStr = configs.get(Config.ConsoleProxyServiceOffering.key());
@@ -520,7 +517,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             final int ramSize = NumbersUtil.parseInt(_configDao.getValue("console.ram.size"), DEFAULT_PROXY_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = _offeringDao.createSystemServiceOfferings("System Offering For Console Proxy",
                     ServiceOffering.consoleProxyDefaultOffUniqueName, 1, ramSize, 0, 0, false, null,
-                    Storage.ProvisioningType.THIN, true, null, true, VirtualMachine.Type.ConsoleProxy, true);
+                    StorageProvisioningType.THIN, true, null, true, VirtualMachineType.ConsoleProxy, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {
                 final String msg = "Data integrity problem : System Offering For Console Proxy has been removed?";
@@ -1267,7 +1264,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             proxy.setPrivateIpAddress(null);
             _consoleProxyDao.update(proxy.getId(), proxy);
             _consoleProxyDao.remove(vmId);
-            final HostVO host = _hostDao.findByTypeNameAndZoneId(proxy.getDataCenterId(), proxy.getHostName(), Host.Type.ConsoleProxy);
+            final HostVO host = _hostDao.findByTypeNameAndZoneId(proxy.getDataCenterId(), proxy.getHostName(), HostType.ConsoleProxy);
             if (host != null) {
                 logger.debug("Removing host entry for proxy id=" + vmId);
                 return _hostDao.remove(host.getId());
@@ -1318,7 +1315,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             return null;
         }
 
-        host.setType(com.cloud.host.Host.Type.ConsoleProxy);
+        host.setType(HostType.ConsoleProxy);
         return host;
     }
 
@@ -1335,7 +1332,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
 
     protected HostVO findConsoleProxyHostByName(final String name) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.ConsoleProxy);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.ConsoleProxy);
         sc.and(sc.entity().getName(), Op.EQ, name);
         return sc.find();
     }
@@ -1383,16 +1380,16 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         }
 
         @Override
-        public void onAgentDisconnect(final long agentId, final com.cloud.host.Status state) {
+        public void onAgentDisconnect(final long agentId, final HostStatus state) {
 
-            if (state == com.cloud.host.Status.Alert || state == com.cloud.host.Status.Disconnected) {
+            if (state == HostStatus.Alert || state == HostStatus.Disconnected) {
                 // be it either in alert or in disconnected state, the agent
                 // process
                 // may be gone in the VM,
                 // we will be reacting to stop the corresponding VM and let the
                 // scan
                 final HostVO host = _hostDao.findById(agentId);
-                if (host.getType() == Type.ConsoleProxy) {
+                if (host.getType() == HostType.ConsoleProxy) {
                     final String name = host.getName();
                     logger.info("Console proxy agent disconnected, proxy: " + name);
                     if (name != null && name.startsWith("v-")) {

@@ -1,9 +1,9 @@
 package com.cloud.storage.volume.db;
 
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.statemachine.StateObject;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.utils.db.GenericDaoBase;
-import com.cloud.utils.fsm.StateObject;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

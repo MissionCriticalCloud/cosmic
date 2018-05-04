@@ -1,26 +1,26 @@
 package com.cloud.network.guru;
 
 import com.cloud.configuration.Config;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.IpAddressFormat;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
@@ -76,7 +76,7 @@ public class ControlNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
         }
 
         final NetworkVO config =
-                new NetworkVO(offering.getTrafficType(), Mode.Static, BroadcastDomainType.LinkLocal, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
+                new NetworkVO(offering.getTrafficType(), DHCPMode.Static, BroadcastDomainType.LinkLocal, offering.getId(), Network.State.Setup, plan.getDataCenterId(),
                         plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         config.setCidr(_cidr);
         config.setGateway(_gateway);
@@ -123,7 +123,7 @@ public class ControlNetworkGuru extends PodBasedNetworkGuru implements NetworkGu
         nic.setIPv4Address(ip);
         nic.setMacAddress(NetUtils.long2Mac(NetUtils.ip2Long(ip) | 14l << 40));
         nic.setIPv4Netmask("255.255.0.0");
-        nic.setFormat(AddressFormat.Ip4);
+        nic.setFormat(IpAddressFormat.Ip4);
         nic.setIPv4Gateway(NetUtils.getLinkLocalGateway());
     }
 

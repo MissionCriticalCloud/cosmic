@@ -1,8 +1,9 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.io.File;
@@ -50,12 +51,12 @@ public class LibvirtStoragePool implements KvmStoragePool {
 
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String name,
-                                              final PhysicalDiskFormat format, final Storage.ProvisioningType provisioningType, final long size) {
+                                              final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
         return storageAdaptor.createPhysicalDisk(name, this, format, provisioningType, size);
     }
 
     @Override
-    public KvmPhysicalDisk createPhysicalDisk(final String name, final Storage.ProvisioningType provisioningType, final long size) {
+    public KvmPhysicalDisk createPhysicalDisk(final String name, final StorageProvisioningType provisioningType, final long size) {
         return storageAdaptor.createPhysicalDisk(name, this,
                 getDefaultFormat(), provisioningType, size);
     }
@@ -111,7 +112,7 @@ public class LibvirtStoragePool implements KvmStoragePool {
     }
 
     @Override
-    public boolean deletePhysicalDisk(final String uuid, final Storage.ImageFormat format) {
+    public boolean deletePhysicalDisk(final String uuid, final ImageFormat format) {
         return storageAdaptor.deletePhysicalDisk(uuid, this, format);
     }
 

@@ -1,7 +1,8 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class IscsiAdmStoragePool implements KvmStoragePool {
     // does not apply for iScsiAdmStoragePool
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String name, final PhysicalDiskFormat format,
-                                              final Storage.ProvisioningType provisioningType, final long size) {
+                                              final StorageProvisioningType provisioningType, final long size) {
         throw new UnsupportedOperationException("Creating a physical disk is not supported.");
     }
 
@@ -41,7 +42,7 @@ public class IscsiAdmStoragePool implements KvmStoragePool {
     // from KVMStorageProcessor.createVolume(CreateObjectCommand)
     // does not apply for iScsiAdmStoragePool
     @Override
-    public KvmPhysicalDisk createPhysicalDisk(final String name, final Storage.ProvisioningType provisioningType, final long size) {
+    public KvmPhysicalDisk createPhysicalDisk(final String name, final StorageProvisioningType provisioningType, final long size) {
         throw new UnsupportedOperationException("Creating a physical disk is not supported.");
     }
 
@@ -61,7 +62,7 @@ public class IscsiAdmStoragePool implements KvmStoragePool {
     }
 
     @Override
-    public boolean deletePhysicalDisk(final String volumeUuid, final Storage.ImageFormat format) {
+    public boolean deletePhysicalDisk(final String volumeUuid, final ImageFormat format) {
         return storageAdaptor.deletePhysicalDisk(volumeUuid, this, format);
     }
 

@@ -1,6 +1,6 @@
 package com.cloud.storage.download;
 
-import com.cloud.agent.api.storage.DownloadAnswer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 
 public abstract class DownloadInactiveState extends DownloadState {
 

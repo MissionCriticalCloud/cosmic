@@ -1,7 +1,7 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.ClusterVO;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

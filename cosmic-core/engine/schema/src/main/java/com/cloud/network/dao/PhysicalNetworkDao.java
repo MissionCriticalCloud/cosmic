@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.PhysicalNetwork.IsolationMethod;
 import com.cloud.utils.db.GenericDao;
 

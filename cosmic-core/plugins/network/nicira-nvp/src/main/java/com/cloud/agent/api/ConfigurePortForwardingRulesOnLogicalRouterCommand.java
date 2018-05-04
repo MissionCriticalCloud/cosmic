@@ -1,6 +1,7 @@
 package com.cloud.agent.api;
 
-import com.cloud.agent.api.to.PortForwardingRuleTO;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ConfigurePortForwardingRulesOnLogicalRouterCommand extends Command 
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.agent.api.Command#executeInSequence()
+     * @see com.cloud.legacymodel.communication.command.Command#executeInSequence()
      */
     @Override
     public boolean executeInSequence() {

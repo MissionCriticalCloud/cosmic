@@ -4,9 +4,9 @@ import com.cloud.api.command.LdapListConfigurationCmd;
 import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.LdapUserResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.component.PluggableService;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public interface LdapManager extends PluggableService {
 
     LinkDomainToLdapResponse linkDomainToLdap(Long domainId, String type, String name, short accountType);
 
-    LinkDomainToLdapResponse listLinkDomainToLdap (Long domainId);
+    LinkDomainToLdapResponse listLinkDomainToLdap(Long domainId);
 
     public LdapTrustMapVO getDomainLinkedToLdap(long domainId);
 

@@ -7,7 +7,7 @@ import com.cloud.api.BaseListProjectAndAccountResourcesCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ResourceLimitResponse;
-import com.cloud.configuration.ResourceLimit;
+import com.cloud.legacymodel.configuration.ResourceLimit;
 
 import java.util.ArrayList;
 import java.util.List;

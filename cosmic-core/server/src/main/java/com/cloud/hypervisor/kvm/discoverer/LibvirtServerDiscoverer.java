@@ -2,30 +2,30 @@ package com.cloud.hypervisor.kvm.discoverer;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.ShutdownCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.DiscoveredWithErrorException;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.ShutdownCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.DiscoveredWithErrorException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.utils.ssh.SSHCmdHelper;
 
 import javax.inject.Inject;
@@ -76,7 +76,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -128,7 +128,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             agentIp = ia.getHostAddress();
             final String guid = UUID.nameUUIDFromBytes(agentIp.getBytes()).toString();
 
-            final List<HostVO> existingHosts = _resourceMgr.listAllHostsInOneZoneByType(Host.Type.Routing, dcId);
+            final List<HostVO> existingHosts = _resourceMgr.listAllHostsInOneZoneByType(HostType.Routing, dcId);
             if (existingHosts != null) {
                 for (final HostVO existingHost : existingHosts) {
                     if (existingHost.getGuid().toLowerCase().startsWith(guid.toLowerCase())) {
@@ -259,7 +259,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
 
     private HostVO waitForHostConnect(final long dcId, final long podId, final long clusterId, final String guid) {
         for (int i = 0; i < _waitTime * 2; i++) {
-            final List<HostVO> hosts = _resourceMgr.listAllUpAndEnabledHosts(Host.Type.Routing, clusterId, podId, dcId);
+            final List<HostVO> hosts = _resourceMgr.listAllUpAndEnabledHosts(HostType.Routing, clusterId, podId, dcId);
             for (final HostVO host : hosts) {
                 if (host.getGuid().toLowerCase().startsWith(guid.toLowerCase())) {
                     return host;
@@ -296,7 +296,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     }
 
     @Override
-    public abstract Hypervisor.HypervisorType getHypervisorType();
+    public abstract HypervisorType getHypervisorType();
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
@@ -380,7 +380,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
 
     @Override
     public DeleteHostAnswer deleteHost(final HostVO host, final boolean isForced, final boolean isForceDeleteStorage) throws UnableDeleteHostException {
-        if (host.getType() != Host.Type.Routing || host.getHypervisorType() != HypervisorType.KVM) {
+        if (host.getType() != HostType.Routing || host.getHypervisorType() != HypervisorType.KVM) {
             return null;
         }
 

@@ -1,5 +1,6 @@
 package com.cloud.user;
 
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -112,11 +113,6 @@ public class AccountVO implements Account {
     @Override
     public String getNetworkDomain() {
         return networkDomain;
-    }
-
-    @Override
-    public Long getDefaultZoneId() {
-        return defaultZoneId;
     }
 
     public void setDefaultZoneId(final Long defaultZoneId) {

@@ -1,16 +1,6 @@
 package com.cloud.storage.upload;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.agent.api.storage.UploadAnswer;
-import com.cloud.agent.api.storage.UploadCommand;
-import com.cloud.agent.api.storage.UploadProgressCommand;
-import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiSerializerHelper;
 import com.cloud.api.command.user.iso.ExtractIsoCmd;
@@ -22,16 +12,27 @@ import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.jobs.AsyncJobManager;
-import com.cloud.host.Host;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.UploadAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.UploadCommand;
+import com.cloud.legacymodel.communication.command.UploadProgressCommand;
+import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.Upload.Type;
 import com.cloud.managed.context.ManagedContextTimerTask;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Upload.Status;
-import com.cloud.storage.Upload.Type;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.dao.UploadDao;
 import com.cloud.storage.upload.UploadState.UploadEvent;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -250,13 +251,13 @@ public class UploadListener implements Listener {
         final long agentId = agent.getId();
 
         final StartupStorageCommand storage = (StartupStorageCommand) cmd;
-        if (storage.getResourceType() == Storage.StorageResourceType.STORAGE_HOST || storage.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE) {
+        if (storage.getResourceType() == StorageResourceType.STORAGE_HOST || storage.getResourceType() == StorageResourceType.SECONDARY_STORAGE) {
             uploadMonitor.handleUploadSync(agentId);
         }
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final com.cloud.host.Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         setDisconnected();
         return true;
     }
@@ -309,7 +310,7 @@ public class UploadListener implements Listener {
         lastUpdated = new Date();
     }
 
-    public void scheduleStatusCheck(final com.cloud.agent.api.storage.UploadProgressCommand.RequestType getStatus) {
+    public void scheduleStatusCheck(final UploadProgressCommand.RequestType getStatus) {
         if (statusTask != null) {
             statusTask.cancel();
         }

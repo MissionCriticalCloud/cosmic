@@ -18,31 +18,9 @@ import static com.cloud.hypervisor.kvm.resource.LibvirtComputingResourceProperti
 
 import static java.util.UUID.randomUUID;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.HostVmStateReportEntry;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.PingRoutingCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.agent.api.UpdateNetworkOverviewCommand;
-import com.cloud.agent.api.VmDiskStatsEntry;
-import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.MetadataTO;
-import com.cloud.agent.api.to.NfsTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.VirtualRouterDeployer;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.exception.InternalErrorException;
-import com.cloud.host.Host.Type;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ClockDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ConsoleDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.CpuModeDef;
@@ -74,28 +52,52 @@ import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.hypervisor.kvm.storage.KvmStorageProcessor;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.PingRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.legacymodel.storage.VmDiskStatsEntry;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.MetadataTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.HostVmStateReportEntry;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VmStatsEntry;
+import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.RouterPrivateIpStrategy;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.RouterPrivateIpStrategy;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageResourceType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.JavaStorageLayer;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.Volume;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
-import com.cloud.storage.to.PrimaryDataStoreTO;
-import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.PropertiesUtil;
-import com.cloud.utils.StringUtils;
-import com.cloud.utils.Ternary;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.hypervisor.HypervisorUtils;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
@@ -105,9 +107,6 @@ import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.OutputInterpreter.AllLinesParser;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SshHelper;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.PowerState;
-import com.cloud.vm.VmDetailConstants;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
@@ -132,7 +131,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -1435,7 +1433,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         cmd.setMode(getGuestCpuMode());
         cmd.setModel(getGuestCpuModel());
         cmd.setCpuflags(vmTo.getCpuflags());
-        if (vmTo.getType() == VirtualMachine.Type.User) {
+        if (vmTo.getType() == VirtualMachineType.User) {
             cmd.setFeatures(getCpuFeatures());
         }
         // multi cores per socket, for larger core configs
@@ -1449,7 +1447,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         vm.addComponent(cmd);
 
         final CpuTuneDef ctd = new CpuTuneDef();
-        if (VirtualMachine.Type.DomainRouter.equals(vmTo.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vmTo.getType())) {
             ctd.setShares(vmTo.getCpus() * libvirtComputingResourceProperties.getGuestCpuSharesRouter());
         } else {
             ctd.setShares(vmTo.getCpus() * libvirtComputingResourceProperties.getGuestCpuShares());
@@ -1463,7 +1461,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
-        if (VirtualMachine.Type.DomainRouter.equals(vmTo.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vmTo.getType())) {
             term.setCrashPolicy(getRouterTermpolicyCrash());
             term.setPowerOffPolicy(getRouterTermpolicyPowerOff());
             term.setRebootPolicy(getRouterTermpolicyReboot());
@@ -1477,7 +1475,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final ClockDef clock = new ClockDef();
         if (vmTo.getOs().startsWith("Windows")) {
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
-        } else if (vmTo.getType() != VirtualMachine.Type.User || isGuestVirtIoCapable(vmTo.getOs())) {
+        } else if (vmTo.getType() != VirtualMachineType.User || isGuestVirtIoCapable(vmTo.getOs())) {
             if (hypervisorLibvirtVersion >= 9 * 1000 + 10) {
                 clock.addTimer("kvmclock", null, null, isKvmclockDisabled());
             }
@@ -1599,7 +1597,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         final DataTO data = volume.getData();
         final DataStoreTO store = data.getDataStore();
 
-        if (volume.getType() == Volume.Type.ISO && data.getPath() != null) {
+        if (volume.getType() == VolumeType.ISO && data.getPath() != null) {
             final NfsTO nfsStore = (NfsTO) store;
             final String isoPath = nfsStore.getUrl() + File.separator + data.getPath();
             final int index = isoPath.lastIndexOf("/");
@@ -1615,7 +1613,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingRoutingCommand(com.cloud.host.Host.Type.Routing, id, this.getHostVmStateReport());
+        return new PingRoutingCommand(HostType.Routing, id, this.getHostVmStateReport());
     }
 
     public void createVbd(final Connect conn, final VirtualMachineTO vmSpec, final String vmName, final LibvirtVmDef vm)
@@ -1632,7 +1630,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             KvmPhysicalDisk physicalDisk = null;
             KvmStoragePool pool = null;
             final DataTO data = volume.getData();
-            if (volume.getType() == Volume.Type.ISO && data.getPath() != null) {
+            if (volume.getType() == VolumeType.ISO && data.getPath() != null) {
                 final NfsTO nfsStore = (NfsTO) data.getDataStore();
                 final String volPath = nfsStore.getUrl() + File.separator + data.getPath();
                 final int index = volPath.lastIndexOf("/");
@@ -1640,7 +1638,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 final String volName = volPath.substring(index + 1);
                 final KvmStoragePool secondaryStorage = storagePoolMgr.getStoragePoolByUri(volDir);
                 physicalDisk = secondaryStorage.getPhysicalDisk(volName);
-            } else if (volume.getType() != Volume.Type.ISO) {
+            } else if (volume.getType() != VolumeType.ISO) {
                 final PrimaryDataStoreTO store = (PrimaryDataStoreTO) data.getDataStore();
                 physicalDisk = storagePoolMgr.getPhysicalDisk(store.getPoolType(), store.getUuid(), data.getPath());
                 pool = physicalDisk.getPool();
@@ -1665,7 +1663,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             }
 
             final LibvirtDiskDef disk = new LibvirtDiskDef();
-            if (volume.getType() == Volume.Type.ISO) {
+            if (volume.getType() == VolumeType.ISO) {
                 if (volPath == null) {
                     /* Add iso as placeholder */
                     disk.defIsoDisk(null);
@@ -1726,7 +1724,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             vm.getDevices().addDevice(disk);
         }
 
-        if (vmSpec.getType() != VirtualMachine.Type.User) {
+        if (vmSpec.getType() != VirtualMachineType.User) {
             final String sysvmIsoPath = getSysvmIsoPath();
             if (sysvmIsoPath != null) {
                 final LibvirtDiskDef iso = new LibvirtDiskDef();
@@ -1741,8 +1739,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     @Override
-    public Type getType() {
-        return Type.Routing;
+    public HostType getType() {
+        return HostType.Routing;
     }
 
     private DiskControllerType getGuestDiskModel(final String platformEmulator) {
@@ -1795,7 +1793,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             final String localStoragePath = getLocalStoragePath();
             final KvmStoragePool localStoragePool = storagePoolMgr.createStoragePool(getLocalStorageUuid(), "localhost", -1,
                     localStoragePath, "", StoragePoolType.Filesystem);
-            final com.cloud.agent.api.StoragePoolInfo pi = new com.cloud.agent.api.StoragePoolInfo(localStoragePool.getUuid(),
+            final StoragePoolInfo pi = new StoragePoolInfo(localStoragePool.getUuid(),
                     cmd.getPrivateIpAddress(), localStoragePath, localStoragePath,
                     StoragePoolType.Filesystem, localStoragePool.getCapacity(), localStoragePool.getAvailable());
 
@@ -1803,7 +1801,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
             sscmd.setPoolInfo(pi);
             sscmd.setGuid(pi.getUuid());
             sscmd.setDataCenter(getZone());
-            sscmd.setResourceType(Storage.StorageResourceType.STORAGE_POOL);
+            sscmd.setResourceType(StorageResourceType.STORAGE_POOL);
         } catch (final CloudRuntimeException e) {
             logger.debug("Unable to initialize local storage pool: " + e);
         }

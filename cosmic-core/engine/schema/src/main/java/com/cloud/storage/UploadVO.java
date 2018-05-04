@@ -1,5 +1,6 @@
 package com.cloud.storage;
 
+import com.cloud.legacymodel.storage.Upload;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDaoBase;
 

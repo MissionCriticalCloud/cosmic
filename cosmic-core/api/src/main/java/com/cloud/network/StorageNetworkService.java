@@ -4,7 +4,7 @@ import com.cloud.api.command.admin.network.CreateStorageNetworkIpRangeCmd;
 import com.cloud.api.command.admin.network.DeleteStorageNetworkIpRangeCmd;
 import com.cloud.api.command.admin.network.ListStorageNetworkIpRangeCmd;
 import com.cloud.api.command.admin.network.UpdateStorageNetworkIpRangeCmd;
-import com.cloud.dc.StorageNetworkIpRange;
+import com.cloud.legacymodel.dc.StorageNetworkIpRange;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -9,10 +9,20 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.vpc.NetworkACL;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
@@ -24,18 +34,13 @@ import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
 import javax.inject.Inject;
@@ -230,8 +235,8 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
             throw new InvalidParameterValueException("Network is not part of a VPC: " + network.getUuid());
         }
 
-        if (network.getTrafficType() != Networks.TrafficType.Guest) {
-            throw new InvalidParameterValueException("Network ACL can be created just for networks of type " + Networks.TrafficType.Guest);
+        if (network.getTrafficType() != TrafficType.Guest) {
+            throw new InvalidParameterValueException("Network ACL can be created just for networks of type " + TrafficType.Guest);
         }
 
         if (aclId != NetworkACL.DEFAULT_DENY && aclId != NetworkACL.DEFAULT_ALLOW) {

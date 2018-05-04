@@ -14,18 +14,19 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "destroyVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Destroys a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "destroyVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Destroys a virtual machine.", responseObject = UserVmResponse.class, responseView =
+        ResponseView.Restricted,
         entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = true)

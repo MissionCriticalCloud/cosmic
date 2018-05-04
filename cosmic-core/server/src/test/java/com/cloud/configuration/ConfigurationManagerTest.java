@@ -10,13 +10,11 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.api.command.admin.vlan.DedicatePublicIpRangeCmd;
 import com.cloud.api.command.admin.vlan.ReleasePublicIpRangeCmd;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Vlan;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.AccountVlanMapDao;
 import com.cloud.dc.dao.ClusterDao;
@@ -28,10 +26,17 @@ import com.cloud.dc.dao.VlanDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Capability;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -41,17 +46,13 @@ import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.net.Ip;
+import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
 
@@ -241,7 +242,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 
@@ -284,7 +285,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 
@@ -310,7 +311,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 
@@ -336,7 +337,7 @@ public class ConfigurationManagerTest {
 
         // one of the ip addresses of the range is allocated to different account
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddress.setAllocatedToAccountId(1L);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
@@ -413,7 +414,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._publicIpAddressDao.countIPs(anyLong(), anyLong(), anyBoolean())).thenReturn(1);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
-        final IPAddressVO ipAddress = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO ipAddress = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         ipAddressList.add(ipAddress);
         when(configurationMgr._publicIpAddressDao.listByVlanId(anyLong())).thenReturn(ipAddressList);
 

@@ -11,9 +11,9 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.ResourceCountResponse;
-import com.cloud.configuration.ResourceCount;
 import com.cloud.context.CallContext;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.configuration.ResourceCount;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateResourceCount", group = APICommandGroup.LimitService, description = "Recalculate and update resource count for an account or domain.", responseObject = ResourceCountResponse.class,
+@APICommand(name = "updateResourceCount", group = APICommandGroup.LimitService, description = "Recalculate and update resource count for an account or domain.", responseObject =
+        ResourceCountResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateResourceCountCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateResourceCountCmd.class.getName());

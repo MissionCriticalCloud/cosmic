@@ -1,5 +1,6 @@
 package com.cloud.vm.snapshot;
 
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.vm.VmWork;
 
 public class VmWorkDeleteAllVMSnapshots extends VmWork {

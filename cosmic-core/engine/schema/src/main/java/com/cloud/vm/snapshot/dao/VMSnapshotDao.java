@@ -1,8 +1,8 @@
 package com.cloud.vm.snapshot.dao;
 
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
-import com.cloud.vm.snapshot.VMSnapshot;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 
 import java.util.List;

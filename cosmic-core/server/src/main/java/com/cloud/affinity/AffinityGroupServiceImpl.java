@@ -1,7 +1,5 @@
 package com.cloud.affinity;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupDomainMapDao;
@@ -15,14 +13,22 @@ import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.Transition;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
@@ -32,13 +38,7 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
@@ -178,7 +178,7 @@ public class AffinityGroupServiceImpl extends ManagerBase implements AffinityGro
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
+    public boolean postStateTransitionEvent(final Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
         if (!status) {
             return false;
         }

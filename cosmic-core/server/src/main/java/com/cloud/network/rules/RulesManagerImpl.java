@@ -6,22 +6,34 @@ import com.cloud.dao.EntityManager;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.FirewallRuleType;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.FirewallRule.State;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.PortForwardingRule;
+import com.cloud.legacymodel.network.StaticNatRule;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerVMMapDao;
 import com.cloud.network.dao.LoadBalancerVMMapVO;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
-import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.offering.NetworkOffering;
@@ -29,11 +41,8 @@ import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
@@ -46,16 +55,10 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.NicSecondaryIpVO;
@@ -470,7 +473,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             if (guestNic == null || guestNic.getIPv4Address() == null) {
                 throw new InvalidParameterValueException("Vm doesn't belong to network associated with ipAddress");
             } else {
-                dstIp = new Ip(guestNic.getIPv4Address());
+                dstIp = new Ip(NetUtils.ip2Long(guestNic.getIPv4Address()));
             }
 
             if (vmIp != null) {
@@ -985,7 +988,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             if (guestNic == null || guestNic.getIPv4Address() == null) {
                 throw new InvalidParameterValueException("Vm doesn't belong to network associated with ipAddress");
             } else {
-                dstIp = new Ip(guestNic.getIPv4Address());
+                dstIp = new Ip(NetUtils.ip2Long(guestNic.getIPv4Address()));
             }
 
             if (vmGuestIp != null) {
@@ -1424,7 +1427,7 @@ public class RulesManagerImpl extends ManagerBase implements RulesManager, Rules
             final Network guestNetwork = _networkModel.getNetwork(nic.getNetworkId());
             final NetworkOffering offering = _entityMgr.findById(NetworkOffering.class, guestNetwork.getNetworkOfferingId());
             if (offering.getElasticIp()) {
-                final boolean isSystemVM = (vm.getType() == Type.ConsoleProxy || vm.getType() == Type.SecondaryStorageVm);
+                final boolean isSystemVM = (vm.getType() == VirtualMachineType.ConsoleProxy || vm.getType() == VirtualMachineType.SecondaryStorageVm);
                 // for user VM's associate public IP only if offering is marked to associate a public IP by default on start of VM
                 if (!isSystemVM && !offering.getAssociatePublicIP()) {
                     continue;

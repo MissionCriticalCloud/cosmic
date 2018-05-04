@@ -9,9 +9,9 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.ProviderResponse;
 import com.cloud.api.response.TrafficTypeResponse;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.PhysicalNetworkTrafficType;
-import com.cloud.user.Account;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

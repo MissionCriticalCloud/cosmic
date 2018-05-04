@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.rules.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.utils.db.GenericDao;
 

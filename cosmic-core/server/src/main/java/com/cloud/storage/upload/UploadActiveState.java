@@ -1,8 +1,8 @@
 package com.cloud.storage.upload;
 
-import com.cloud.agent.api.storage.UploadAnswer;
-import com.cloud.agent.api.storage.UploadProgressCommand.RequestType;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.communication.answer.UploadAnswer;
+import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 
 public abstract class UploadActiveState extends UploadState {
 

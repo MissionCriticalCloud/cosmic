@@ -3,7 +3,7 @@ package com.cloud.hypervisor.kvm.resource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.ScsiDef;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import junit.framework.TestCase;
 

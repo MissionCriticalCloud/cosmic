@@ -56,8 +56,8 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.WhoHasThisAddressResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 
 import java.util.List;
 

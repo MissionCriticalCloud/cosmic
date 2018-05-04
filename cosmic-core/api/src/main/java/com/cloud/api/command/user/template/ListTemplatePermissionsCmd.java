@@ -21,14 +21,15 @@ import com.cloud.api.APICommandGroup;
 import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.TemplatePermissionsResponse;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.model.enumeration.ImageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listTemplatePermissions", group = APICommandGroup.TemplateService, description = "List template visibility and all accounts that have permissions to view this template.", responseObject =
-        TemplatePermissionsResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "listTemplatePermissions", group = APICommandGroup.TemplateService, description = "List template visibility and all accounts that have permissions to view this template.",
+        responseObject =
+                TemplatePermissionsResponse.class, responseView = ResponseView.Restricted,
         requestHasSensitiveInfo = false,
         responseHasSensitiveInfo = false)
 public class ListTemplatePermissionsCmd extends BaseListTemplateOrIsoPermissionsCmd {

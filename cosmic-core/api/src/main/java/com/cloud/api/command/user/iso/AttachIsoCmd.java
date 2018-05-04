@@ -13,13 +13,14 @@ import com.cloud.api.response.TemplateResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "attachIso", group = APICommandGroup.ISOService, description = "Attaches an ISO to a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "attachIso", group = APICommandGroup.ISOService, description = "Attaches an ISO to a virtual machine.", responseObject = UserVmResponse.class, responseView = ResponseView
+        .Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class AttachIsoCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AttachIsoCmd.class.getName());

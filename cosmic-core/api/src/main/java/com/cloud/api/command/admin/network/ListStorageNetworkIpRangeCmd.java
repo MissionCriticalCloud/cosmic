@@ -11,12 +11,12 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.StorageNetworkIpRangeResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.dc.StorageNetworkIpRange;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.StorageNetworkIpRange;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listStorageNetworkIpRange", group = APICommandGroup.NetworkService, description = "List a storage network IP range.", responseObject = StorageNetworkIpRangeResponse.class, since = "3.0.0",
+@APICommand(name = "listStorageNetworkIpRange", group = APICommandGroup.NetworkService, description = "List a storage network IP range.", responseObject = StorageNetworkIpRangeResponse.class, since
+        = "3.0.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListStorageNetworkIpRangeCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListStorageNetworkIpRangeCmd.class);

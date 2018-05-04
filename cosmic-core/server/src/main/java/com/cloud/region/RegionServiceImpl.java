@@ -11,11 +11,11 @@ import com.cloud.api.command.admin.user.DisableUserCmd;
 import com.cloud.api.command.admin.user.EnableUserCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.command.user.region.ListRegionsCmd;
-import com.cloud.domain.Domain;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 

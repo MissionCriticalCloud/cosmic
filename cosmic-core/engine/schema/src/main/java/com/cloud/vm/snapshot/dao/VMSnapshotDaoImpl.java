@@ -1,13 +1,13 @@
 package com.cloud.vm.snapshot.dao;
 
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.storage.VMSnapshot.Event;
+import com.cloud.legacymodel.storage.VMSnapshot.State;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.UpdateBuilder;
-import com.cloud.vm.snapshot.VMSnapshot;
-import com.cloud.vm.snapshot.VMSnapshot.Event;
-import com.cloud.vm.snapshot.VMSnapshot.State;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 
 import java.util.Date;

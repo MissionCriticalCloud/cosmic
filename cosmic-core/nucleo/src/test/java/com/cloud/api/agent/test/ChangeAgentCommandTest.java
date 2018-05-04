@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.ChangeAgentCommand;
-import com.cloud.host.Status.Event;
+import com.cloud.legacymodel.communication.command.ChangeAgentCommand;
+import com.cloud.model.enumeration.Event;
 
 import org.junit.Test;
 

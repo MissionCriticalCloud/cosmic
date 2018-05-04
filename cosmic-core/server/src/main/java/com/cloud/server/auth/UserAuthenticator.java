@@ -1,6 +1,6 @@
 package com.cloud.server.auth;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.component.Adapter;
 
 import java.util.Map;

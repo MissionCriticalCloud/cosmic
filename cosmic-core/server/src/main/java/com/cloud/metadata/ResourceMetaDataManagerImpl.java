@@ -32,7 +32,7 @@ import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.vm.dao.NicDetailsDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 

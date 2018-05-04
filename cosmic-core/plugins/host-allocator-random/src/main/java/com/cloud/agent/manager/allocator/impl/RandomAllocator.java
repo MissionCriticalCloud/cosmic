@@ -3,14 +3,14 @@ package com.cloud.agent.manager.allocator.impl;
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -38,12 +38,12 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo) {
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo) {
         return allocateTo(vmProfile, plan, type, avoid, returnUpTo, true);
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo, final boolean
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo, final boolean
             considerReservedCapacity) {
 
         final long dcId = plan.getDataCenterId();
@@ -53,7 +53,7 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
 
         final List<Host> suitableHosts = new ArrayList<>();
 
-        if (type == Host.Type.Storage) {
+        if (type == HostType.Storage) {
             return suitableHosts;
         }
 
@@ -99,7 +99,7 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final List<? extends Host> hosts,
+    public List<Host> allocateTo(final VirtualMachineProfile vmProfile, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final List<? extends Host> hosts,
                                  final int returnUpTo,
                                  final boolean considerReservedCapacity) {
         final long dcId = plan.getDataCenterId();
@@ -109,7 +109,7 @@ public class RandomAllocator extends AdapterBase implements HostAllocator {
         final List<Host> suitableHosts = new ArrayList<>();
         final List<Host> hostsCopy = new ArrayList<>(hosts);
 
-        if (type == Host.Type.Storage) {
+        if (type == HostType.Storage) {
             return suitableHosts;
         }
 

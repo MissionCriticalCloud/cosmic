@@ -3,37 +3,6 @@ package com.cloud.vm;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.AttachOrDettachConfigDriveCommand;
-import com.cloud.agent.api.CheckVirtualMachineAnswer;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
-import com.cloud.agent.api.ClusterVMMetaDataSyncAnswer;
-import com.cloud.agent.api.ClusterVMMetaDataSyncCommand;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.MigrateCommand;
-import com.cloud.agent.api.PingRoutingCommand;
-import com.cloud.agent.api.PlugNicAnswer;
-import com.cloud.agent.api.PlugNicCommand;
-import com.cloud.agent.api.PrepareForMigrationCommand;
-import com.cloud.agent.api.RebootAnswer;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.RestoreVMSnapshotAnswer;
-import com.cloud.agent.api.RestoreVMSnapshotCommand;
-import com.cloud.agent.api.ScaleVmCommand;
-import com.cloud.agent.api.StartAnswer;
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StopAnswer;
-import com.cloud.agent.api.StopCommand;
-import com.cloud.agent.api.UnPlugNicAnswer;
-import com.cloud.agent.api.UnPlugNicCommand;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.GPUDeviceTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.alert.AlertManager;
@@ -45,9 +14,7 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
@@ -61,20 +28,7 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
-import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.CloudException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InsufficientServerCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.StorageUnavailableException;
-import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
@@ -91,36 +45,101 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDispatcher;
 import com.cloud.framework.messagebus.MessageHandler;
 import com.cloud.gpu.dao.VGPUTypesDao;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork;
+import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.HighAvailabilityManager;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorGuru;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
+import com.cloud.legacymodel.communication.answer.ClusterVMMetaDataSyncAnswer;
+import com.cloud.legacymodel.communication.answer.PlugNicAnswer;
+import com.cloud.legacymodel.communication.answer.RebootAnswer;
+import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
+import com.cloud.legacymodel.communication.answer.StartAnswer;
+import com.cloud.legacymodel.communication.answer.StopAnswer;
+import com.cloud.legacymodel.communication.answer.UnPlugNicAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.AttachOrDettachConfigDriveCommand;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
+import com.cloud.legacymodel.communication.command.ClusterVMMetaDataSyncCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.MigrateCommand;
+import com.cloud.legacymodel.communication.command.PingRoutingCommand;
+import com.cloud.legacymodel.communication.command.PlugNicCommand;
+import com.cloud.legacymodel.communication.command.PrepareForMigrationCommand;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.RestoreVMSnapshotCommand;
+import com.cloud.legacymodel.communication.command.ScaleVmCommand;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StopCommand;
+import com.cloud.legacymodel.communication.command.UnPlugNicCommand;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.ExecutionException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.DiskProfile;
+import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.GPUDeviceTO;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.network.Network;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.org.Cluster;
 import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
@@ -130,16 +149,10 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Journal;
-import com.cloud.utils.Pair;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.ReflectionUse;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.DB;
@@ -149,16 +162,9 @@ import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.ExecutionException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.vm.ItWorkVO.Step;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.PowerState;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
@@ -326,7 +332,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     ZoneRepository _zoneRepository;
 
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
-    Map<VirtualMachine.Type, VirtualMachineGuru> _vmGurus = new HashMap<>();
+    Map<VirtualMachineType, VirtualMachineGuru> _vmGurus = new HashMap<>();
     ScheduledExecutorService _executor = null;
 
     protected VirtualMachineManagerImpl() {
@@ -346,7 +352,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public void registerGuru(final VirtualMachine.Type type, final VirtualMachineGuru guru) {
+    public void registerGuru(final VirtualMachineType type, final VirtualMachineGuru guru) {
         synchronized (_vmGurus) {
             _vmGurus.put(type, guru);
         }
@@ -416,16 +422,16 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 s_logger.debug("Allocating disks for " + vmFinal);
 
                 if (template.getFormat() == ImageFormat.ISO) {
-                    volumeMgr.allocateRawVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
+                    volumeMgr.allocateRawVolume(VolumeType.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
                             rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
                 } else {
-                    volumeMgr.allocateTemplatedVolume(Type.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
+                    volumeMgr.allocateTemplatedVolume(VolumeType.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
                             rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner, diskControllerType);
                 }
 
                 if (dataDiskOfferings != null) {
                     for (final DiskOfferingInfo dataDiskOfferingInfo : dataDiskOfferings) {
-                        volumeMgr.allocateRawVolume(Type.DATADISK, "DATA-" + vmFinal.getId(), dataDiskOfferingInfo.getDiskOffering(), dataDiskOfferingInfo.getSize(),
+                        volumeMgr.allocateRawVolume(VolumeType.DATADISK, "DATA-" + vmFinal.getId(), dataDiskOfferingInfo.getDiskOffering(), dataDiskOfferingInfo.getSize(),
                                 dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, dataDiskOfferingInfo.getDiskControllerType());
                     }
                 }
@@ -458,7 +464,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                                     work.setStep(Step.Done);
                                     _workDao.update(work.getId(), work);
                                 } else if (work.getType() == State.Stopping) {
-                                    _haMgr.scheduleStop(vm, vm.getHostId(), WorkType.CheckStop);
+                                    _haMgr.scheduleStop(vm, vm.getHostId(), HaWork.HaWorkType.CheckStop);
                                     work.setManagementServerId(_nodeId);
                                     work.setStep(Step.Done);
                                     _workDao.update(work.getId(), work);
@@ -623,9 +629,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         AlertManager.AlertType alertType = AlertManager.AlertType.ALERT_TYPE_USERVM_MIGRATE;
-        if (VirtualMachine.Type.DomainRouter.equals(vm.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER_MIGRATE;
-        } else if (VirtualMachine.Type.ConsoleProxy.equals(vm.getType())) {
+        } else if (VirtualMachineType.ConsoleProxy.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY_MIGRATE;
         }
 
@@ -977,7 +983,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return true;
     }
 
@@ -1421,7 +1427,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final Long vmId = (Long) args;
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vmId);
+                VirtualMachineType.Instance, vmId);
         if (pendingWorkJobs.size() == 0 && !_haMgr.hasPendingHaWork(vmId)) {
             // there is no pending operation job
             final VMInstanceVO vm = _vmDao.findById(vmId);
@@ -1528,7 +1534,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkMigrateAway.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -1543,7 +1549,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1570,7 +1576,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkMigrateWithStorage.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -1586,7 +1592,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1656,7 +1662,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final Account account = context.getCallingAccount();
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkRemoveVmFromNetwork.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -1672,7 +1678,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1908,7 +1914,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                             final Answer answer = _agentMgr.easySend(destHostId, cmd);
                             if (answer != null && answer instanceof StopAnswer) {
                                 final StopAnswer stopAns = (StopAnswer) answer;
-                                if (vm.getType() == VirtualMachine.Type.User) {
+                                if (vm.getType() == VirtualMachineType.User) {
                                     final String platform = stopAns.getPlatform();
                                     if (platform != null) {
                                         final Map<String, String> vmmetadata = new HashMap<>();
@@ -1920,7 +1926,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                             if (answer == null || !answer.getResult()) {
                                 s_logger.warn("Unable to stop " + vm + " due to " + (answer != null ? answer.getDetails() : "no answers"));
-                                _haMgr.scheduleStop(vm, destHostId, WorkType.ForceStop);
+                                _haMgr.scheduleStop(vm, destHostId, HaWork.HaWorkType.ForceStop);
                                 throw new ExecutionException("Unable to stop this VM, " + vm.getUuid() + " so we are unable to retry the start operation");
                             }
                             throw new ExecutionException("Unable to start  VM:" + vm.getUuid() + " due to error in finalizeStart, not retrying");
@@ -1933,7 +1939,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 } catch (final OperationTimedoutException e) {
                     s_logger.debug("Unable to send the start command to host " + dest.getHost() + " failed to start VM: " + vm.getUuid());
                     if (e.isActive()) {
-                        _haMgr.scheduleStop(vm, destHostId, WorkType.CheckStop);
+                        _haMgr.scheduleStop(vm, destHostId, HaWork.HaWorkType.CheckStop);
                     }
                     canRetry = false;
                     throw new AgentUnavailableException("Unable to start " + vm.getHostName(), destHostId, e);
@@ -2073,9 +2079,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         AlertManager.AlertType alertType = AlertManager.AlertType.ALERT_TYPE_USERVM_MIGRATE;
-        if (VirtualMachine.Type.DomainRouter.equals(vm.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER_MIGRATE;
-        } else if (VirtualMachine.Type.ConsoleProxy.equals(vm.getType())) {
+        } else if (VirtualMachineType.ConsoleProxy.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY_MIGRATE;
         }
 
@@ -2321,7 +2327,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VirtualMachineTO vmSpec = answer.getVirtualMachine();
 
         for (final DiskTO disk : vmSpec.getDisks()) {
-            if (disk.getType() != Volume.Type.ISO) {
+            if (disk.getType() != VolumeType.ISO) {
                 final VolumeObjectTO vol = (VolumeObjectTO) disk.getData();
                 final VolumeVO volume = _volsDao.findById(vol.getId());
 
@@ -2385,9 +2391,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         AlertManager.AlertType alertType = AlertManager.AlertType.ALERT_TYPE_USERVM_MIGRATE;
-        if (VirtualMachine.Type.DomainRouter.equals(vm.getType())) {
+        if (VirtualMachineType.DomainRouter.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_DOMAIN_ROUTER_MIGRATE;
-        } else if (VirtualMachine.Type.ConsoleProxy.equals(vm.getType())) {
+        } else if (VirtualMachineType.ConsoleProxy.equals(vm.getType())) {
             alertType = AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY_MIGRATE;
         }
 
@@ -2610,7 +2616,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             final Answer answer = _agentMgr.send(vm.getHostId(), stop);
             if (answer != null && answer instanceof StopAnswer) {
                 final StopAnswer stopAns = (StopAnswer) answer;
-                if (vm.getType() == VirtualMachine.Type.User) {
+                if (vm.getType() == VirtualMachineType.User) {
                     final String platform = stopAns.getPlatform();
                     if (platform != null) {
                         final UserVmVO userVm = _userVmDao.findById(vm.getId());
@@ -2996,7 +3002,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         // don't delete default NIC on a user VM
-        if (nic.isDefaultNic() && vm.getType() == VirtualMachine.Type.User) {
+        if (nic.isDefaultNic() && vm.getType() == VirtualMachineType.User) {
             s_logger.warn("Failed to remove nic from " + vm + " in " + network + ", nic is default.");
             throw new CloudRuntimeException("Failed to remove nic from " + vm + " in " + network + ", nic is default.");
         }
@@ -3151,7 +3157,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             if (answer != null) {
                 if (answer instanceof StopAnswer) {
                     final StopAnswer stopAns = (StopAnswer) answer;
-                    if (vm.getType() == VirtualMachine.Type.User) {
+                    if (vm.getType() == VirtualMachineType.User) {
                         final String platform = stopAns.getPlatform();
                         if (platform != null) {
                             final UserVmVO userVm = _userVmDao.findById(vm.getId());
@@ -3286,7 +3292,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkReconfigure.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -3302,7 +3308,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -3343,7 +3349,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
          */
         vm.setReservationId(reservationId);
-        return _stateMachine.transitTo(vm, e, new Pair<>(vm.getHostId(), hostId), _vmDao);
+        return new StateMachine2Transitions(_stateMachine).transitTo(vm, e, new Pair<>(vm.getHostId(), hostId), _vmDao);
     }
 
     @Override
@@ -3381,7 +3387,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 vm.setLastHostId(null);
             }
         }
-        return _stateMachine.transitTo(vm, e, new Pair<>(vm.getHostId(), hostId), _vmDao);
+        return new StateMachine2Transitions(_stateMachine).transitTo(vm, e, new Pair<>(vm.getHostId(), hostId), _vmDao);
     }
 
     protected class TransitionTask extends ManagedContextRunnable {
@@ -3404,7 +3410,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 for (final VMInstanceVO instance : instances) {
                     final State state = instance.getState();
                     if (state == State.Stopping) {
-                        _haMgr.scheduleStop(instance, instance.getHostId(), WorkType.CheckStop);
+                        _haMgr.scheduleStop(instance, instance.getHostId(), HaWorkType.CheckStop);
                     } else if (state == State.Starting) {
                         _haMgr.scheduleRestart(instance, true);
                     }
@@ -3804,7 +3810,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         if (vmMetadatum == null || vmMetadatum.isEmpty()) {
             return;
         }
-        final List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> vmDetails = _userVmDao.getVmsDetailByNames(vmMetadatum.keySet(), "platform");
+        final List<Pair<Pair<String, VirtualMachineType>, Pair<Long, String>>> vmDetails = _userVmDao.getVmsDetailByNames(vmMetadatum.keySet(), "platform");
         for (final Map.Entry<String, String> entry : vmMetadatum.entrySet()) {
             final String name = entry.getKey();
             final String platform = entry.getValue();
@@ -3813,11 +3819,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
 
             boolean found = false;
-            for (final Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>> vmDetail : vmDetails) {
-                final Pair<String, VirtualMachine.Type> vmNameTypePair = vmDetail.first();
+            for (final Pair<Pair<String, VirtualMachineType>, Pair<Long, String>> vmDetail : vmDetails) {
+                final Pair<String, VirtualMachineType> vmNameTypePair = vmDetail.first();
                 if (vmNameTypePair.first().equals(name)) {
                     found = true;
-                    if (vmNameTypePair.second() == VirtualMachine.Type.User) {
+                    if (vmNameTypePair.second() == VirtualMachineType.User) {
                         final Pair<Long, String> detailPair = vmDetail.second();
                         final String platformDetail = detailPair.second();
 
@@ -3832,7 +3838,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             if (!found) {
                 final VMInstanceVO vm = _vmDao.findVMByInstanceName(name);
-                if (vm.getType() == VirtualMachine.Type.User) {
+                if (vm.getType() == VirtualMachineType.User) {
                     updateVmMetaData(vm.getId(), platform);
                 }
             }
@@ -4184,7 +4190,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         VmWorkJobVO workJob = null;
-        final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(VirtualMachine.Type.Instance,
+        final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(VirtualMachineType.Instance,
                 vm.getId(), VmWorkStart.class.getName());
 
         if (pendingWorkJobs.size() > 0) {
@@ -4199,7 +4205,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             workJob.setAccountId(callingAccount.getId());
             workJob.setUserId(callingUser.getId());
             workJob.setStep(VmWorkJobVO.Step.Starting);
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4245,7 +4251,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
             workJob.setStep(VmWorkJobVO.Step.Prepare);
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4272,7 +4278,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkReboot.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -4288,7 +4294,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
             workJob.setStep(VmWorkJobVO.Step.Prepare);
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4313,7 +4319,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkMigrate.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -4329,7 +4335,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4356,7 +4362,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkMigrateForScale.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -4372,7 +4378,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4398,7 +4404,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VMInstanceVO vm = _vmDao.findByUuid(vmUuid);
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkStorageMigration.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -4414,7 +4420,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4445,7 +4451,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     private VmWorkJobVO fetchOrCreateVmWorkJob(final VirtualMachine vm, final Network network, final NicProfile requested, final CallContext context, final User user, final
     Account account) {
-        final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(VirtualMachine.Type.Instance, vm.getId(), VmWorkAddVmToNetwork.class.getName());
+        final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(VirtualMachineType.Instance, vm.getId(), VmWorkAddVmToNetwork.class.getName());
 
         VmWorkJobVO workJob = null;
         if (pendingWorkJobs != null && pendingWorkJobs.size() > 0) {
@@ -4473,7 +4479,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         workJob.setAccountId(account.getId());
         workJob.setUserId(user.getId());
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4495,7 +4501,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final Account account = context.getCallingAccount();
 
         final List<VmWorkJobVO> pendingWorkJobs = _workJobDao.listPendingWorkJobs(
-                VirtualMachine.Type.Instance, vm.getId(),
+                VirtualMachineType.Instance, vm.getId(),
                 VmWorkRemoveNicFromVm.class.getName());
 
         VmWorkJobVO workJob = null;
@@ -4511,7 +4517,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             workJob.setAccountId(account.getId());
             workJob.setUserId(user.getId());
-            workJob.setVmType(VirtualMachine.Type.Instance);
+            workJob.setVmType(VirtualMachineType.Instance);
             workJob.setVmInstanceId(vm.getId());
             workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -4537,7 +4543,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         workJob.setAccountId(0);
         workJob.setUserId(0);
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(instanceId);
         workJob.setInitMsid(ManagementServerNode.getManagementServerId());
 

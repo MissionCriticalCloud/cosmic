@@ -6,15 +6,15 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.ConfigurePublicIpsOnLogicalRouterCommand;
 import com.cloud.agent.api.CreateLogicalSwitchCommand;
 import com.cloud.agent.api.DeleteLogicalRouterCommand;
 import com.cloud.agent.api.DeleteLogicalSwitchCommand;
 import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
-import com.cloud.agent.api.MaintainCommand;
-import com.cloud.agent.api.ReadyCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.MaintainCommand;
 import com.cloud.network.nicira.LogicalRouterPort;
 import com.cloud.network.nicira.LogicalSwitch;
 import com.cloud.network.nicira.NiciraNvpApi;

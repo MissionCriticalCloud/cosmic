@@ -1,10 +1,10 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.FirewallRuleType;
-import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRule.State;
-import com.cloud.network.rules.FirewallRule.TrafficType;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.FirewallRuleType;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.FirewallRule.State;
+import com.cloud.legacymodel.network.FirewallRule.TrafficType;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;

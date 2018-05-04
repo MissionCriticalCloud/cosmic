@@ -1,30 +1,30 @@
 package com.cloud.engine.orchestration.service;
 
-import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientStorageCapacityException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientStorageCapacityException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.DiskProfile;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.offering.DiskOffering;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.Snapshot;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Type;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.vm.DiskProfile;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.Map;
@@ -73,7 +73,7 @@ public interface VolumeOrchestrationService {
 
     void destroyVolume(Volume volume);
 
-    DiskProfile allocateRawVolume(Type type, String name, DiskOffering offering, Long size, Long minIops, Long maxIops, VirtualMachine vm, VirtualMachineTemplate template,
+    DiskProfile allocateRawVolume(VolumeType type, String name, DiskOffering offering, Long size, Long minIops, Long maxIops, VirtualMachine vm, VirtualMachineTemplate template,
                                   Account owner, DiskControllerType diskControllerType);
 
     VolumeInfo createVolumeOnPrimaryStorage(VirtualMachine vm, VolumeInfo volume, HypervisorType rootDiskHyperType, StoragePool storagePool) throws NoTransitionException;
@@ -96,7 +96,7 @@ public interface VolumeOrchestrationService {
 
     boolean canVmRestartOnAnotherServer(long vmId);
 
-    DiskProfile allocateTemplatedVolume(Type type, String name, DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, VirtualMachineTemplate template,
+    DiskProfile allocateTemplatedVolume(VolumeType type, String name, DiskOffering offering, Long rootDisksize, Long minIops, Long maxIops, VirtualMachineTemplate template,
                                         VirtualMachine vm, Account owner, DiskControllerType diskControllerType);
 
     String getVmNameFromVolumeId(long volumeId);

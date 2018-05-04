@@ -1,20 +1,20 @@
 package com.cloud.network.rules;
 
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.LoadBalancingRule;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbDestination;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbHealthCheckPolicy;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbSslCert;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbStickinessPolicy;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.LoadBalancerVO;
-import com.cloud.network.lb.LoadBalancingRule;
-import com.cloud.network.lb.LoadBalancingRule.LbDestination;
-import com.cloud.network.lb.LoadBalancingRule.LbHealthCheckPolicy;
-import com.cloud.network.lb.LoadBalancingRule.LbSslCert;
-import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
 import com.cloud.network.lb.LoadBalancingRulesManager;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.topology.NetworkTopologyVisitor;
-import com.cloud.utils.net.Ip;
 
 import java.util.List;
 

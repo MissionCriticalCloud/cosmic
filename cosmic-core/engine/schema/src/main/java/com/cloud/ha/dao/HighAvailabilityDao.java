@@ -1,6 +1,6 @@
 package com.cloud.ha.dao;
 
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.HaWorkVO;
 import com.cloud.utils.db.GenericDao;
 
@@ -24,7 +24,7 @@ public interface HighAvailabilityDao extends GenericDao<HaWorkVO, Long> {
      */
     List<HaWorkVO> findPreviousHA(long instanceId);
 
-    boolean delete(long instanceId, WorkType type);
+    boolean delete(long instanceId, HaWorkType type);
 
     /**
      * Finds all the work items that were successful and is now ready to be purged.
@@ -34,9 +34,9 @@ public interface HighAvailabilityDao extends GenericDao<HaWorkVO, Long> {
      */
     void cleanup(long time);
 
-    void deleteMigrationWorkItems(final long hostId, final WorkType type, final long serverId);
+    void deleteMigrationWorkItems(final long hostId, final HaWorkType type, final long serverId);
 
-    List<HaWorkVO> findTakenWorkItems(WorkType type);
+    List<HaWorkVO> findTakenWorkItems(HaWorkType type);
 
     /**
      * finds out if a work item has been scheduled for this work type but has not been taken yet.
@@ -45,7 +45,7 @@ public interface HighAvailabilityDao extends GenericDao<HaWorkVO, Long> {
      * @param type       type of work scheduled for it.
      * @return true if it has been scheduled and false if it hasn't.
      */
-    boolean hasBeenScheduled(long instanceId, WorkType type);
+    boolean hasBeenScheduled(long instanceId, HaWorkType type);
 
     int releaseWorkItems(long nodeId);
 

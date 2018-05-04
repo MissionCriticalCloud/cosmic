@@ -2,48 +2,48 @@ package com.cloud.network.element;
 
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
-import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.IllegalVirtualMachineException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.IllegalVirtualMachineException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Network.State;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.network.VpnUser;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Network.State;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
 import com.cloud.network.VirtualRouterProvider.Type;
-import com.cloud.network.VpnUser;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.Site2SiteVpnGatewayDao;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.Role;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
 import com.cloud.network.router.deployment.RouterDeploymentDefinitionBuilder;
 import com.cloud.network.topology.NetworkTopology;
-import com.cloud.network.vpc.NetworkACLItem;
 import com.cloud.network.vpc.NetworkACLItemDao;
 import com.cloud.network.vpc.NetworkACLItemVO;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.network.vpc.Vpc;
-import com.cloud.network.vpc.VpcGateway;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -474,7 +474,7 @@ public class VpcVirtualRouterElement extends VirtualRouterElement implements Vpc
             return false;
         }
 
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             final Map<VirtualMachineProfile.Param, Object> params = new HashMap<>(1);
             params.put(VirtualMachineProfile.Param.ReProgramGuestNetworks, true);
 

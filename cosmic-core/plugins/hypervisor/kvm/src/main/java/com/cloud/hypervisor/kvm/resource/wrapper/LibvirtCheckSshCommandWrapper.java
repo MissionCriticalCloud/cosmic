@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.check.CheckSshAnswer;
-import com.cloud.agent.api.check.CheckSshCommand;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
+import com.cloud.legacymodel.communication.command.CheckSshCommand;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

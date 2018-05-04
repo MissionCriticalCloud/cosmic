@@ -1,8 +1,8 @@
 package com.cloud.framework.messagebus;
 
 import com.cloud.framework.serializer.MessageSerializer;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.util.ArrayList;
 import java.util.Arrays;

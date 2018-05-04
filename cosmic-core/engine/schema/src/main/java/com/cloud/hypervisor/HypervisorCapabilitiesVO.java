@@ -1,6 +1,6 @@
 package com.cloud.hypervisor;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.NumbersUtil;
 
 import javax.persistence.Column;

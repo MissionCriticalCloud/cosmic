@@ -152,8 +152,9 @@
     <modules>
         <module>cosmic-agent</module>
         <module>cosmic-client</module>
+        <module>cosmic-common</module>
         <module>cosmic-core</module>
-        <module>cosmic-core/utils</module>
+        <module>cosmic-model</module>
     </modules>
 
     <repositories>

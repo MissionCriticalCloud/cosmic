@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.GetVmStatsAnswer;
-import com.cloud.agent.api.GetVmStatsCommand;
-import com.cloud.agent.api.VmStatsEntry;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.GetVmStatsAnswer;
+import com.cloud.legacymodel.communication.command.GetVmStatsCommand;
+import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

@@ -1,12 +1,13 @@
 package com.cloud.vm;
 
-import com.cloud.api.InternalIdentity;
-import com.cloud.network.Network;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.vm.Nic.ReservationStrategy;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.IpAddressFormat;
+import com.cloud.model.enumeration.TrafficType;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -22,8 +23,8 @@ public class NicProfile implements InternalIdentity, Serializable {
 
     String macAddress;
     BroadcastDomainType broadcastType;
-    Mode mode;
-    AddressFormat format;
+    DHCPMode mode;
+    IpAddressFormat format;
     TrafficType trafficType;
     URI isolationUri;
     URI broadcastUri;
@@ -97,7 +98,7 @@ public class NicProfile implements InternalIdentity, Serializable {
     }
 
     public NicProfile(final ReservationStrategy strategy, final String iPv4Address, final String macAddress, final String iPv4gateway, final String iPv4netmask) {
-        format = AddressFormat.Ip4;
+        format = IpAddressFormat.Ip4;
         this.iPv4Address = iPv4Address;
         this.iPv4Gateway = iPv4gateway;
         this.iPv4Netmask = iPv4netmask;
@@ -174,19 +175,19 @@ public class NicProfile implements InternalIdentity, Serializable {
         this.broadcastType = broadcastType;
     }
 
-    public Mode getMode() {
+    public DHCPMode getMode() {
         return mode;
     }
 
-    public void setMode(final Mode mode) {
+    public void setMode(final DHCPMode mode) {
         this.mode = mode;
     }
 
-    public AddressFormat getFormat() {
+    public IpAddressFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final AddressFormat format) {
+    public void setFormat(final IpAddressFormat format) {
         this.format = format;
     }
 

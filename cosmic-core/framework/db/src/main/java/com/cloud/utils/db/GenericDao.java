@@ -1,6 +1,6 @@
 package com.cloud.utils.db;
 
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.naming.ConfigurationException;
 import java.io.Serializable;

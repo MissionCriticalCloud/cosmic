@@ -1,30 +1,30 @@
 package com.cloud.storage.resource;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckHealthAnswer;
-import com.cloud.agent.api.CheckHealthCommand;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.GetStorageStatsAnswer;
-import com.cloud.agent.api.GetStorageStatsCommand;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.PingStorageCommand;
-import com.cloud.agent.api.ReadyAnswer;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.agent.api.storage.DownloadAnswer;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.answer.DownloadAnswer;
+import com.cloud.legacymodel.communication.answer.GetStorageStatsAnswer;
+import com.cloud.legacymodel.communication.answer.ReadyAnswer;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.DownloadCommand;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand;
+import com.cloud.legacymodel.communication.command.GetStorageStatsCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.PingStorageCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.storage.TemplateProp;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.command.DownloadCommand;
-import com.cloud.storage.command.DownloadProgressCommand;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.template.TemplateConstants;
-import com.cloud.storage.template.TemplateProp;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -60,8 +60,8 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
     }
 
     @Override
-    public Type getType() {
-        return Host.Type.SecondaryStorage;
+    public HostType getType() {
+        return HostType.SecondaryStorage;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
         final StartupStorageCommand cmd =
                 new StartupStorageCommand("dummy", StoragePoolType.NetworkFilesystem, 1024 * 1024 * 1024 * 100L, new HashMap<>());
 
-        cmd.setResourceType(Storage.StorageResourceType.SECONDARY_STORAGE);
+        cmd.setResourceType(StorageResourceType.SECONDARY_STORAGE);
         cmd.setIqn(null);
         cmd.setNfsShare(_guid);
 
@@ -93,15 +93,15 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingStorageCommand(Host.Type.Storage, id, new HashMap<>());
+        return new PingStorageCommand(HostType.Storage, id, new HashMap<>());
     }
 
     @Override
     public Answer executeRequest(final Command cmd) {
         if (cmd instanceof DownloadProgressCommand) {
-            return new DownloadAnswer(null, 100, cmd, com.cloud.storage.VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
+            return new DownloadAnswer(null, 100, cmd, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
         } else if (cmd instanceof DownloadCommand) {
-            return new DownloadAnswer(null, 100, cmd, com.cloud.storage.VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
+            return new DownloadAnswer(null, 100, cmd, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
         } else if (cmd instanceof GetStorageStatsCommand) {
             return execute((GetStorageStatsCommand) cmd);
         } else if (cmd instanceof CheckHealthCommand) {

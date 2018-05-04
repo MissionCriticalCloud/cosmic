@@ -1,6 +1,6 @@
 package com.cloud.cluster.agentlb;
 
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

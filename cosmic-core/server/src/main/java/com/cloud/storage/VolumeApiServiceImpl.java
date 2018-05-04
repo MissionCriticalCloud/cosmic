@@ -1,9 +1,6 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.DiskTO;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.user.volume.AttachVolumeCmd;
 import com.cloud.api.command.user.volume.CreateVolumeCmd;
@@ -16,16 +13,13 @@ import com.cloud.api.command.user.volume.UploadVolumeCmd;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
-import com.cloud.domain.Domain;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.DataObject;
@@ -33,7 +27,6 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.HostScope;
-import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreInfo;
 import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
@@ -42,11 +35,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeService;
 import com.cloud.engine.subsystem.api.storage.VolumeService.VolumeApiResult;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.CloudException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.dao.ConfigurationDao;
@@ -61,18 +49,48 @@ import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.gpu.GPU;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.AttachAnswer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
+import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.command.AttachAnswer;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -86,10 +104,8 @@ import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.snapshot.SnapshotApiService;
 import com.cloud.storage.snapshot.SnapshotManager;
 import com.cloud.template.TemplateManager;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.VmDiskStatisticsDao;
@@ -97,7 +113,6 @@ import com.cloud.utils.DateUtil;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.EnumUtils;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.ReflectionUse;
 import com.cloud.utils.StringUtils;
@@ -108,16 +123,11 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VmWork;
 import com.cloud.vm.VmWorkAttachVolume;
 import com.cloud.vm.VmWorkConstants;
@@ -268,7 +278,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         Long zoneId = cmd.getZoneId();
         final Long diskOfferingId;
         final DiskOfferingVO diskOffering;
-        final Storage.ProvisioningType provisioningType;
+        final StorageProvisioningType provisioningType;
         Long size;
         Long minIops = null;
         Long maxIops = null;
@@ -396,7 +406,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (vmId != null) {
                 // Check that the virtual machine ID is valid and it's a user vm
                 final UserVmVO vm = _userVmDao.findById(vmId);
-                if (vm == null || vm.getType() != VirtualMachine.Type.User) {
+                if (vm == null || vm.getType() != VirtualMachineType.User) {
                     throw new InvalidParameterValueException("Please specify a valid User VM.");
                 }
 
@@ -484,12 +494,12 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     private VolumeVO commitVolume(final CreateVolumeCmd cmd, final Account caller, final Account owner, final Boolean displayVolume, final Long zoneId, final Long diskOfferingId,
-                                  final Storage.ProvisioningType provisioningType, final Long size, final Long minIops, final Long maxIops, final VolumeVO parentVolume,
+                                  final StorageProvisioningType provisioningType, final Long size, final Long minIops, final Long maxIops, final VolumeVO parentVolume,
                                   final String userSpecifiedName, final String uuid, final DiskControllerType diskController) {
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(userSpecifiedName, -1, -1, -1, -1, new Long(-1), null, null, provisioningType, 0, Volume.Type.DATADISK, diskController);
+                VolumeVO volume = new VolumeVO(userSpecifiedName, -1, -1, -1, -1, new Long(-1), null, null, provisioningType, 0, VolumeType.DATADISK, diskController);
                 volume.setPoolId(null);
                 volume.setUuid(uuid);
                 volume.setDataCenterId(zoneId);
@@ -607,8 +617,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         // Check that the volume ID is valid
         final VolumeInfo volumeToAttach = volFactory.getVolume(volumeId);
         // Check that the volume is a data volume
-        if (volumeToAttach == null || !(volumeToAttach.getVolumeType() == Volume.Type.DATADISK || volumeToAttach.getVolumeType() == Volume.Type.ROOT)) {
-            throw new InvalidParameterValueException("Please specify a volume with the valid type: " + Volume.Type.ROOT.toString() + " or " + Volume.Type.DATADISK.toString());
+        if (volumeToAttach == null || !(volumeToAttach.getVolumeType() == VolumeType.DATADISK || volumeToAttach.getVolumeType() == VolumeType.ROOT)) {
+            throw new InvalidParameterValueException("Please specify a volume with the valid type: " + VolumeType.ROOT.toString() + " or " + VolumeType.DATADISK.toString());
         }
 
         // Check that the volume is not currently attached to any VM
@@ -623,7 +633,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         // Check that the virtual machine ID is valid and it's a user vm
         final UserVmVO vm = _userVmDao.findById(vmId);
-        if (vm == null || vm.getType() != VirtualMachine.Type.User) {
+        if (vm == null || vm.getType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("Please specify a valid User VM.");
         }
 
@@ -656,7 +666,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         // Check that the number of data volumes attached to VM is less than
         // that supported by hypervisor
         if (deviceId == null || deviceId.longValue() != 0) {
-            final List<VolumeVO> existingDataVolumes = _volsDao.findByInstanceAndType(vmId, Volume.Type.DATADISK);
+            final List<VolumeVO> existingDataVolumes = _volsDao.findByInstanceAndType(vmId, VolumeType.DATADISK);
             final int maxDataVolumesSupported = getMaxDataVolumesSupported(vm);
             if (existingDataVolumes.size() >= maxDataVolumesSupported) {
                 throw new InvalidParameterValueException("The specified VM already has the maximum number of data disks (" + maxDataVolumesSupported + "). Please specify another" +
@@ -811,7 +821,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(0);
         workJob.setUserId(0);
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(instanceId);
         workJob.setInitMsid(ManagementServerNode.getManagementServerId());
 
@@ -829,7 +839,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         UserVmVO vm = _userVmDao.findById(vmId);
         VolumeVO exstingVolumeOfVm = null;
-        final List<VolumeVO> rootVolumesOfVm = _volsDao.findByInstanceAndType(vmId, Volume.Type.ROOT);
+        final List<VolumeVO> rootVolumesOfVm = _volsDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (rootVolumesOfVm.size() > 1) {
             throw new CloudRuntimeException("The VM " + vm.getHostName() + " has more than one ROOT volume and is in an invalid state.");
         } else {
@@ -837,7 +847,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 exstingVolumeOfVm = rootVolumesOfVm.get(0);
             } else {
                 // locate data volume of the vm
-                final List<VolumeVO> diskVolumesOfVm = _volsDao.findByInstanceAndType(vmId, Volume.Type.DATADISK);
+                final List<VolumeVO> diskVolumesOfVm = _volsDao.findByInstanceAndType(vmId, VolumeType.DATADISK);
                 for (final VolumeVO diskVolume : diskVolumesOfVm) {
                     if (diskVolume.getState() != Volume.State.Allocated) {
                         exstingVolumeOfVm = diskVolume;
@@ -920,7 +930,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1202,7 +1212,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
             // if the caller is looking to change the size of the volume
             if (newSize != null) {
-                if (!diskOffering.isCustomized() && !volume.getVolumeType().equals(Volume.Type.ROOT)) {
+                if (!diskOffering.isCustomized() && !volume.getVolumeType().equals(VolumeType.ROOT)) {
                     throw new InvalidParameterValueException("To change a volume's size without providing a new disk offering, its current disk offering must be " +
                             "customizable or it must be a root volume (if providing a disk offering, make sure it is different from the current disk offering).");
                 }
@@ -1276,7 +1286,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 newSize = newDiskOffering.getDiskSize();
             }
 
-            if (!volume.getSize().equals(newSize) && !volume.getVolumeType().equals(Volume.Type.DATADISK)) {
+            if (!volume.getSize().equals(newSize) && !volume.getVolumeType().equals(VolumeType.DATADISK)) {
                 throw new InvalidParameterValueException("Only data volumes can be resized via a new disk offering.");
             }
 
@@ -1541,7 +1551,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -1838,7 +1848,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 }
 
                 final VMInstanceVO vmInstance = _vmInstanceDao.findById(instanceId);
-                if (instanceId == null || vmInstance.getType().equals(VirtualMachine.Type.User)) {
+                if (instanceId == null || vmInstance.getType().equals(VirtualMachineType.User)) {
                     // Decrement the resource count for volumes and primary storage belonging user VM's only
                     _resourceLimitMgr.decrementResourceCount(volume.getAccountId(), ResourceType.volume, volume.isDisplayVolume());
                 }
@@ -1882,7 +1892,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     private boolean stateTransitTo(final Volume vol, final Volume.Event event) throws NoTransitionException {
-        return _volStateMachine.transitTo(vol, event, null, _volsDao);
+        return new StateMachine2Transitions(_volStateMachine).transitTo(vol, event, null, _volsDao);
     }
 
     @Override
@@ -1938,12 +1948,12 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
 
         // Check that the volume is a data/root volume
-        if (!(volume.getVolumeType() == Volume.Type.ROOT || volume.getVolumeType() == Volume.Type.DATADISK)) {
-            throw new InvalidParameterValueException("Please specify volume of type " + Volume.Type.DATADISK.toString() + " or " + Volume.Type.ROOT.toString());
+        if (!(volume.getVolumeType() == VolumeType.ROOT || volume.getVolumeType() == VolumeType.DATADISK)) {
+            throw new InvalidParameterValueException("Please specify volume of type " + VolumeType.DATADISK.toString() + " or " + VolumeType.ROOT.toString());
         }
 
         // Root volume detach is allowed for following hypervisors: Xen/KVM/VmWare
-        if (volume.getVolumeType() == Volume.Type.ROOT) {
+        if (volume.getVolumeType() == VolumeType.ROOT) {
             validateRootVolumeDetachAttach(volume, vm);
         }
 
@@ -2084,7 +2094,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -2204,7 +2214,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -2256,7 +2266,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (volume.getTemplateId() != null) {
             final VMTemplateVO template = _templateDao.findById(volume.getTemplateId());
-            if (template != null && template.getTemplateType() == Storage.TemplateType.SYSTEM) {
+            if (template != null && template.getTemplateType() == TemplateType.SYSTEM) {
                 throw new InvalidParameterValueException("VolumeId: " + volumeId + " is for System VM , Creating snapshot against System VM volumes is not supported");
             }
         }
@@ -2303,7 +2313,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (volume.getTemplateId() != null) {
             final VMTemplateVO template = _templateDao.findById(volume.getTemplateId());
-            if (template != null && template.getTemplateType() == Storage.TemplateType.SYSTEM) {
+            if (template != null && template.getTemplateType() == TemplateType.SYSTEM) {
                 throw new InvalidParameterValueException("VolumeId: " + volumeId + " is for System VM , Creating snapshot against System VM volumes is not supported");
             }
         }
@@ -2428,14 +2438,14 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             throw ex;
         }
 
-        if (volume.getVolumeType() != Volume.Type.DATADISK) {
+        if (volume.getVolumeType() != VolumeType.DATADISK) {
             // Datadisk dont have any template dependence.
 
             final VMTemplateVO template = ApiDBUtils.findTemplateById(volume.getTemplateId());
             if (template != null) { // For ISO based volumes template = null and
                 // we allow extraction of all ISO based
                 // volumes
-                final boolean isExtractable = template.isExtractable() && template.getTemplateType() != Storage.TemplateType.SYSTEM;
+                final boolean isExtractable = template.isExtractable() && template.getTemplateType() != TemplateType.SYSTEM;
                 if (!isExtractable && account != null && !_accountMgr.isRootAdmin(account.getId())) {
                     // Global admins are always allowed to extract
                     final PermissionDeniedException ex = new PermissionDeniedException("The volume with specified volumeId is not allowed to be extracted");
@@ -2563,7 +2573,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -2670,7 +2680,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, Storage.ProvisioningType.THIN, 0, Volume.Type.DATADISK, getDiskControllerType());
+                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, StorageProvisioningType.THIN, 0, VolumeType.DATADISK, getDiskControllerType());
                 volume.setPoolId(null);
                 volume.setDataCenterId(zoneId);
                 volume.setPodId(null);
@@ -2750,7 +2760,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 

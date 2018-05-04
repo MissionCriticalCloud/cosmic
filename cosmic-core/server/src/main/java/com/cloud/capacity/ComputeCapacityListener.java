@@ -1,16 +1,16 @@
 package com.cloud.capacity;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.capacity.dao.CapacityDao;
-import com.cloud.exception.ConnectionException;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.ConnectionException;
 
 public class ComputeCapacityListener implements Listener {
     CapacityDao _capacityDao;
@@ -48,7 +48,7 @@ public class ComputeCapacityListener implements Listener {
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 

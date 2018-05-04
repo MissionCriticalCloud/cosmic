@@ -10,8 +10,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.SnapshotResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.Snapshot;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listSnapshots", group = APICommandGroup.SnapshotService, description = "Lists all available snapshots for the account.", responseObject = SnapshotResponse.class, entityType = {Snapshot.class},
+@APICommand(name = "listSnapshots", group = APICommandGroup.SnapshotService, description = "Lists all available snapshots for the account.", responseObject = SnapshotResponse.class, entityType =
+        {Snapshot.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListSnapshotsCmd extends BaseListTaggedResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListSnapshotsCmd.class.getName());

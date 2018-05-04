@@ -12,8 +12,8 @@ import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.network.Network;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listNetworks", group = APICommandGroup.NetworkService, description = "Lists all available networks.", responseObject = NetworkResponse.class, responseView = ResponseView.Restricted, entityType =
+@APICommand(name = "listNetworks", group = APICommandGroup.NetworkService, description = "Lists all available networks.", responseObject = NetworkResponse.class, responseView = ResponseView
+        .Restricted, entityType =
         {Network.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListNetworksCmd extends BaseListTaggedResourcesCmd {

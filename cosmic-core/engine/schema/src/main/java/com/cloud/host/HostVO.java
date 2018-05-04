@@ -1,9 +1,12 @@
 package com.cloud.host;
 
-import com.cloud.agent.api.VgpuTypesInfo;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.resource.ResourceState;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 
@@ -61,10 +64,10 @@ public class HostVO implements Host {
      * Note: There is no setter for status because it has to be set in the dao code.
      */
     @Column(name = "status", nullable = false)
-    private Status status = null;
+    private HostStatus status = null;
     @Column(name = "type", updatable = true, nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private Type type;
+    private HostType type;
     @Column(name = "private_ip_address", nullable = false)
     private String privateIpAddress;
     @Column(name = "private_mac_address", nullable = false)
@@ -146,7 +149,7 @@ public class HostVO implements Host {
 
     public HostVO(final String guid) {
         this.guid = guid;
-        this.status = Status.Creating;
+        this.status = HostStatus.Creating;
         this.totalMemory = 0;
         this.dom0MinMemory = 0;
         this.resourceState = ResourceState.Creating;
@@ -157,10 +160,10 @@ public class HostVO implements Host {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public HostVO(final long id, final String name, final Type type, final String privateIpAddress, final String privateNetmask, final String privateMacAddress, final String
+    public HostVO(final long id, final String name, final HostType type, final String privateIpAddress, final String privateNetmask, final String privateMacAddress, final String
             publicIpAddress,
                   final String publicNetmask, final String publicMacAddress, final String storageIpAddress, final String storageNetmask, final String storageMacAddress, final
-                  String deuxStorageIpAddress, final String duxStorageNetmask, final String deuxStorageMacAddress, final String guid, final Status status, final String version, final String iqn,
+                  String deuxStorageIpAddress, final String duxStorageNetmask, final String deuxStorageMacAddress, final String guid, final HostStatus status, final String version, final String iqn,
                   final Date disconnectedOn, final long dcId, final Long podId,
                   final long serverId, final long ping, final String parent, final long totalSize, final StoragePoolType fsType) {
         this(id,
@@ -194,9 +197,9 @@ public class HostVO implements Host {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public HostVO(final long id, final String name, final Type type, final String privateIpAddress, final String privateNetmask, final String privateMacAddress, final String
+    public HostVO(final long id, final String name, final HostType type, final String privateIpAddress, final String privateNetmask, final String privateMacAddress, final String
             publicIpAddress, final String publicNetmask, final String publicMacAddress, final String storageIpAddress, final String storageNetmask, final String storageMacAddress, final String
-                          guid, final Status status, final String version, final String url, final Date disconnectedOn, final long dcId, final Long podId, final long serverId, final long ping,
+                          guid, final HostStatus status, final String version, final String url, final Date disconnectedOn, final long dcId, final Long podId, final long serverId, final long ping,
                   final Integer
                           cpus, final Long totalMemory, final long dom0MinMemory, final String caps) {
         this.id = id;
@@ -302,7 +305,7 @@ public class HostVO implements Host {
     }
 
     @Override
-    public Type getType() {
+    public HostType getType() {
         return type;
     }
 
@@ -312,7 +315,7 @@ public class HostVO implements Host {
     }
 
     @Override
-    public Status getStatus() {
+    public HostStatus getStatus() {
         return status;
     }
 
@@ -602,7 +605,7 @@ public class HostVO implements Host {
         this.privateIpAddress = ipAddress;
     }
 
-    public void setType(final Type type) {
+    public void setType(final HostType type) {
         this.type = type;
     }
 
@@ -636,7 +639,7 @@ public class HostVO implements Host {
 
     @Override
     @Transient
-    public Status getState() {
+    public HostStatus getState() {
         return status;
     }
 

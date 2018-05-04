@@ -1,28 +1,11 @@
 package com.cloud.vm;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.affinity.AffinityGroupVO;
 import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.GetVmDiskStatsAnswer;
-import com.cloud.agent.api.GetVmDiskStatsCommand;
-import com.cloud.agent.api.GetVmIpAddressCommand;
-import com.cloud.agent.api.GetVmStatsAnswer;
-import com.cloud.agent.api.GetVmStatsCommand;
-import com.cloud.agent.api.PvlanSetupCommand;
-import com.cloud.agent.api.RestoreVMSnapshotAnswer;
-import com.cloud.agent.api.RestoreVMSnapshotCommand;
-import com.cloud.agent.api.StartAnswer;
-import com.cloud.agent.api.VmDiskStatsEntry;
-import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.alert.AlertManager;
 import com.cloud.api.ApiConstants;
@@ -50,7 +33,6 @@ import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.dao.UUIDManager;
@@ -68,7 +50,6 @@ import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.deploy.DeploymentPlanningManager;
 import com.cloud.deploy.PlannerHostReservationVO;
 import com.cloud.deploy.dao.PlannerHostReservationDao;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.cloud.entity.api.VirtualMachineEntity;
@@ -83,40 +64,84 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.CloudException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ManagementServerException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.StorageUnavailableException;
-import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostTagsDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.GetVmDiskStatsAnswer;
+import com.cloud.legacymodel.communication.answer.GetVmStatsAnswer;
+import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
+import com.cloud.legacymodel.communication.answer.StartAnswer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.DettachCommand;
+import com.cloud.legacymodel.communication.command.GetVmDiskStatsCommand;
+import com.cloud.legacymodel.communication.command.GetVmIpAddressCommand;
+import com.cloud.legacymodel.communication.command.GetVmStatsCommand;
+import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
+import com.cloud.legacymodel.communication.command.RestoreVMSnapshotCommand;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ExecutionException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ManagementServerException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.IpAddresses;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VmDiskStatsEntry;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.SSHKeyPair;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.IpAddresses;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -143,32 +168,22 @@ import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
-import com.cloud.org.Cluster;
 import com.cloud.projects.ProjectManager;
 import com.cloud.resource.ResourceManager;
-import com.cloud.resource.ResourceState;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.ManagementService;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeApiService;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.command.DettachCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
 import com.cloud.storage.dao.GuestOSDao;
@@ -181,14 +196,10 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.template.TemplateManager;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.SSHKeyPair;
 import com.cloud.user.SSHKeyPairVO;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.user.dao.AccountDao;
@@ -199,7 +210,6 @@ import com.cloud.uservm.UserVm;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Journal;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.crypt.DBEncryptionUtil;
@@ -212,12 +222,7 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.ExecutionException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.InstanceGroupDao;
 import com.cloud.vm.dao.InstanceGroupVMMapDao;
@@ -654,7 +659,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             return false;
         }
         try {
-            final List<VolumeVO> rootVol = _volsDao.findByInstanceAndType(vm.getId(), Volume.Type.ROOT);
+            final List<VolumeVO> rootVol = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.ROOT);
             // expunge the vm
             _itMgr.advanceExpunge(vm.getUuid());
             // Update Resource count
@@ -1126,7 +1131,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _dailyOrHourly = false;
         }
 
-        _itMgr.registerGuru(VirtualMachine.Type.User, this);
+        _itMgr.registerGuru(VirtualMachineType.User, this);
 
         VirtualMachine.State.getStateMachine().registerListener(new UserVmStateListener(_networkDao, _nicDao, _offeringDao, _vmDao, this, _configDao));
 
@@ -1149,7 +1154,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     private void loadVmDetailsInMapForExternalDhcpIp() {
 
-        final List<NetworkVO> networks = _networkDao.listByGuestType(Network.GuestType.Shared);
+        final List<NetworkVO> networks = _networkDao.listByGuestType(GuestType.Shared);
 
         for (final NetworkVO network : networks) {
             if (_networkModel.isSharedNetworkWithoutServices(network.getId())) {
@@ -1640,13 +1645,13 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _resourceLimitMgr.changeResourceCount(vmInstance.getAccountId(), ResourceType.memory, isDisplayVm, new Long(offering.getRamSize()));
 
             // take care of the root volume as well.
-            final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(id, Volume.Type.ROOT);
+            final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(id, VolumeType.ROOT);
             if (!rootVols.isEmpty()) {
                 _volumeService.updateDisplay(rootVols.get(0), isDisplayVm);
             }
 
             // take care of the data volumes as well.
-            final List<VolumeVO> dataVols = _volsDao.findByInstanceAndType(id, Volume.Type.DATADISK);
+            final List<VolumeVO> dataVols = _volsDao.findByInstanceAndType(id, VolumeType.DATADISK);
             for (final Volume dataVol : dataVols) {
                 _volumeService.updateDisplay(dataVol, isDisplayVm);
             }
@@ -1693,7 +1698,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         // Root admin may plug anything, Domain admin is allowed to plug into the public network
         if (caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
-            if (!(network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Domain)
+            if (!(network.getGuestType() == GuestType.Shared && network.getAclType() == ACLType.Domain)
                     && !(network.getAclType() == ACLType.Account && network.getAccountId() == vmInstance.getAccountId())
                     && !(caller.getType() == Account.ACCOUNT_TYPE_DOMAIN_ADMIN && TrafficType.Public.equals(network.getTrafficType()))) {
                 throw new InvalidParameterValueException("only shared network or isolated network with the same account_id can be added to vmId: " + vmId);
@@ -1824,7 +1829,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(caller, AccessType.UseEntry, false, network);
 
         // don't delete default NIC on a user VM
-        if (nic.isDefaultNic() && vmInstance.getType() == VirtualMachine.Type.User) {
+        if (nic.isDefaultNic() && vmInstance.getType() == VirtualMachineType.User) {
             throw new InvalidParameterValueException("Unable to remove nic from " + vmInstance + " in " + network + ", nic is default.");
         }
 
@@ -1959,7 +1964,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw new InvalidParameterValueException("There is no nic for the " + nicId);
         }
 
-        if (nicVO.getVmType() != VirtualMachine.Type.User) {
+        if (nicVO.getVmType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("The nic is not belongs to user vm");
         }
 
@@ -2000,7 +2005,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (zone == null) {
             throw new InvalidParameterValueException("There is no dc with the nic");
         }
-        if (zone.getNetworkType() == NetworkType.Advanced && (network.getGuestType() == Network.GuestType.Isolated || network.getGuestType() == Network.GuestType.Private)) {
+        if (zone.getNetworkType() == NetworkType.Advanced && (network.getGuestType() == GuestType.Isolated || network.getGuestType() == GuestType.Private)) {
             try {
                 ipaddr = _ipAddrMgr.allocateGuestIP(network, ipaddr);
             } catch (final InsufficientAddressCapacityException e) {
@@ -2043,7 +2048,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     throw e;
                 }
             }
-        } else if (zone.getNetworkType() == NetworkType.Basic || network.getGuestType() == Network.GuestType.Shared) {
+        } else if (zone.getNetworkType() == NetworkType.Basic || network.getGuestType() == GuestType.Shared) {
             //handle the basic networks here
             //for basic zone, need to provide the podId to ensure proper ip alloation
             Long podId = null;
@@ -2155,7 +2160,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 // Recover the VM's disks
                 final List<VolumeVO> volumes = _volsDao.findByInstance(vmId);
                 for (final VolumeVO volume : volumes) {
-                    if (volume.getVolumeType().equals(Volume.Type.ROOT)) {
+                    if (volume.getVolumeType().equals(VolumeType.ROOT)) {
                         // Create an event
                         final Long templateId = volume.getTemplateId();
                         final Long diskOfferingId = volume.getDiskOfferingId();
@@ -2221,8 +2226,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (network == null) {
                 throw new InvalidParameterValueException("Unable to find network by id " + networkIdList.get(0));
             }
-            if (Network.GuestType.Private.equals(network.getGuestType())) {
-                throw new InvalidParameterValueException("Deploying VMs in a network of type " + Network.GuestType.Private + " is not possible.");
+            if (GuestType.Private.equals(network.getGuestType())) {
+                throw new InvalidParameterValueException("Deploying VMs in a network of type " + GuestType.Private + " is not possible.");
             }
             if (network.getVpcId() != null) {
                 // Only ISOs, XenServer, KVM and template types are
@@ -2471,12 +2476,12 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         // check if host is UP
-        if (destinationHost.getState() != com.cloud.host.Status.Up || destinationHost.getResourceState() != ResourceState.Enabled) {
+        if (destinationHost.getState() != HostStatus.Up || destinationHost.getResourceState() != ResourceState.Enabled) {
             throw new InvalidParameterValueException("Cannot migrate VM, destination host is not in correct state, has status: " + destinationHost.getState() + ", state: "
                     + destinationHost.getResourceState());
         }
 
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             // for System VMs check that the destination host is within the same
             // cluster
             final HostVO srcHost = _hostDao.findById(srcHostId);
@@ -2530,7 +2535,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
         _itMgr.migrate(vm.getUuid(), srcHostId, dest);
         final VMInstanceVO vmInstance = _vmInstanceDao.findById(vmId);
-        if (vmInstance.getType().equals(VirtualMachine.Type.User)) {
+        if (vmInstance.getType().equals(VirtualMachineType.User)) {
             return _vmDao.findById(vmId);
         } else {
             return vmInstance;
@@ -2543,7 +2548,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (svcOffering.getUseLocalStorage()) {
             usesLocalStorage = true;
         } else {
-            final List<VolumeVO> volumes = _volsDao.findByInstanceAndType(vm.getId(), Volume.Type.DATADISK);
+            final List<VolumeVO> volumes = _volsDao.findByInstanceAndType(vm.getId(), VolumeType.DATADISK);
             for (final VolumeVO vol : volumes) {
                 final DiskOfferingVO diskOffering = _diskOfferingDao.findById(vol.getDiskOfferingId());
                 if (diskOffering.getUseLocalStorage()) {
@@ -2847,7 +2852,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         // Check if destination host is up.
-        if (destinationHost.getState() != com.cloud.host.Status.Up || destinationHost.getResourceState() != ResourceState.Enabled) {
+        if (destinationHost.getState() != HostStatus.Up || destinationHost.getResourceState() != ResourceState.Enabled) {
             throw new CloudRuntimeException("Cannot migrate VM, destination host is not in correct state, has " + "status: " + destinationHost.getState() + ", state: "
                     + destinationHost.getResourceState());
         }
@@ -3127,7 +3132,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 }
                 if (requiredOfferings.get(0).getState() == NetworkOffering.State.Enabled) {
                     // get Virtual networks
-                    final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), Network.GuestType.Isolated);
+                    final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), GuestType.Isolated);
                     if (virtualNetworks.isEmpty()) {
                         final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zone.getId(), requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
                                                                                                                                                               .getTrafficType
@@ -3222,7 +3227,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             throw ex;
         }
 
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             throw new InvalidParameterValueException("can only do storage migration on user vm");
         }
 
@@ -3550,7 +3555,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             needRestart = true;
         }
 
-        final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(vmId, Volume.Type.ROOT);
+        final List<VolumeVO> rootVols = _volsDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (rootVols.isEmpty()) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("Can not find root volume for VM " + vm.getUuid());
             ex.addProxyObject(vm.getUuid(), "vmId");
@@ -3877,7 +3882,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         ServiceOfferingVO offering = _serviceOfferingDao.findById(serviceOffering.getId());
 
         // check if account/domain is with in resource limits to create a new vm
-        final boolean isIso = Storage.ImageFormat.ISO == template.getFormat();
+        final boolean isIso = ImageFormat.ISO == template.getFormat();
         long size = 0;
 
         // custom root disk size, resizes base template to larger size
@@ -4025,7 +4030,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
             //relax the check if the caller is admin account
             if (caller.getType() != Account.ACCOUNT_TYPE_ADMIN) {
-                if (!(network.getGuestType() == Network.GuestType.Shared && network.getAclType() == ACLType.Domain)
+                if (!(network.getGuestType() == GuestType.Shared && network.getAclType() == ACLType.Domain)
                         && !(network.getAclType() == ACLType.Account && network.getAccountId() == accountId)) {
                     throw new InvalidParameterValueException("only shared network or isolated network with the same account_id can be added to vm");
                 }

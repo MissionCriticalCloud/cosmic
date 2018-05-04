@@ -1,20 +1,20 @@
 package com.cloud.agent.resource.virtualnetwork;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckRouterAnswer;
-import com.cloud.agent.api.CheckRouterCommand;
-import com.cloud.agent.api.CheckS2SVpnConnectionsAnswer;
-import com.cloud.agent.api.CheckS2SVpnConnectionsCommand;
-import com.cloud.agent.api.GetDomRVersionAnswer;
-import com.cloud.agent.api.GetDomRVersionCmd;
-import com.cloud.agent.api.routing.AggregationControlCommand;
-import com.cloud.agent.api.routing.AggregationControlCommand.Action;
-import com.cloud.agent.api.routing.GroupAnswer;
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.resource.virtualnetwork.facade.AbstractConfigItemFacade;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
+import com.cloud.legacymodel.communication.answer.CheckS2SVpnConnectionsAnswer;
+import com.cloud.legacymodel.communication.answer.GetDomRVersionAnswer;
+import com.cloud.legacymodel.communication.answer.GroupAnswer;
+import com.cloud.legacymodel.communication.command.AggregationControlCommand;
+import com.cloud.legacymodel.communication.command.AggregationControlCommand.Action;
+import com.cloud.legacymodel.communication.command.CheckRouterCommand;
+import com.cloud.legacymodel.communication.command.CheckS2SVpnConnectionsCommand;
+import com.cloud.legacymodel.communication.command.GetDomRVersionCommand;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.ExecutionResult;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -112,8 +112,8 @@ public class VirtualRoutingResource {
     private Answer executeQueryCommand(final NetworkElementCommand cmd) {
         if (cmd instanceof CheckRouterCommand) {
             return execute((CheckRouterCommand) cmd);
-        } else if (cmd instanceof GetDomRVersionCmd) {
-            return execute((GetDomRVersionCmd) cmd);
+        } else if (cmd instanceof GetDomRVersionCommand) {
+            return execute((GetDomRVersionCommand) cmd);
         } else if (cmd instanceof CheckS2SVpnConnectionsCommand) {
             return execute((CheckS2SVpnConnectionsCommand) cmd);
         } else {
@@ -192,10 +192,10 @@ public class VirtualRoutingResource {
         return new CheckRouterAnswer(cmd, result.getDetails(), true);
     }
 
-    private Answer execute(final GetDomRVersionCmd cmd) {
+    private Answer execute(final GetDomRVersionCommand cmd) {
         final ExecutionResult result = _vrDeployer.executeInVR(cmd.getRouterAccessIp(), VRScripts.VERSION, null);
         if (!result.isSuccess()) {
-            return new GetDomRVersionAnswer(cmd, "GetDomRVersionCmd failed");
+            return new GetDomRVersionAnswer(cmd, "GetDomRVersionCommand failed");
         }
         final String[] lines = result.getDetails().split("&");
         if (lines.length != 2) {
@@ -285,7 +285,6 @@ public class VirtualRoutingResource {
             assert (!_vrAggregateCommandsSet.containsKey(routerName));
             _vrAggregateCommandsSet.put(routerName, new LinkedBlockingQueue<>());
             return new Answer(aggregationCommand, true, "Command aggregation started");
-
         } else if (Action.Finish.equals(action)) {
             final Queue<NetworkElementCommand> queue = _vrAggregateCommandsSet.get(routerName);
             try {

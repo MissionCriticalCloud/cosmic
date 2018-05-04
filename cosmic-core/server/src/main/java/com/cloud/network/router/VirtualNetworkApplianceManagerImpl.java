@@ -2,23 +2,6 @@ package com.cloud.network.router;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckRouterAnswer;
-import com.cloud.agent.api.CheckRouterCommand;
-import com.cloud.agent.api.CheckS2SVpnConnectionsAnswer;
-import com.cloud.agent.api.CheckS2SVpnConnectionsCommand;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.GetDomRVersionAnswer;
-import com.cloud.agent.api.GetDomRVersionCmd;
-import com.cloud.agent.api.NetworkUsageAnswer;
-import com.cloud.agent.api.NetworkUsageCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.check.CheckSshCommand;
-import com.cloud.agent.api.routing.AggregationControlCommand;
-import com.cloud.agent.api.routing.AggregationControlCommand.Action;
-import com.cloud.agent.api.routing.NetworkElementCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.alert.AlertManager;
 import com.cloud.alert.AlertService;
@@ -35,7 +18,6 @@ import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.DataCenterDao;
@@ -45,29 +27,73 @@ import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.jobs.impl.AsyncJobVO;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
+import com.cloud.legacymodel.communication.answer.CheckS2SVpnConnectionsAnswer;
+import com.cloud.legacymodel.communication.answer.GetDomRVersionAnswer;
+import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.AggregationControlCommand;
+import com.cloud.legacymodel.communication.command.AggregationControlCommand.Action;
+import com.cloud.legacymodel.communication.command.CheckRouterCommand;
+import com.cloud.legacymodel.communication.command.CheckS2SVpnConnectionsCommand;
+import com.cloud.legacymodel.communication.command.CheckSshCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.GetDomRVersionCommand;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.LoadBalancingRule;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbDestination;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbHealthCheckPolicy;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbSslCert;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbStickinessPolicy;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.PortForwardingRule;
+import com.cloud.legacymodel.network.StaticNatRule;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.RedundantState;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.Transition;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteCustomerGateway;
@@ -88,27 +114,14 @@ import com.cloud.network.dao.Site2SiteCustomerGatewayDao;
 import com.cloud.network.dao.Site2SiteVpnConnectionDao;
 import com.cloud.network.dao.Site2SiteVpnConnectionVO;
 import com.cloud.network.dao.VirtualRouterProviderDao;
-import com.cloud.network.lb.LoadBalancingRule;
-import com.cloud.network.lb.LoadBalancingRule.LbDestination;
-import com.cloud.network.lb.LoadBalancingRule.LbHealthCheckPolicy;
-import com.cloud.network.lb.LoadBalancingRule.LbSslCert;
-import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
 import com.cloud.network.lb.LoadBalancingRulesManager;
-import com.cloud.network.router.VirtualRouter.RedundantState;
-import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
-import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.network.rules.StaticNatImpl;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.topology.NetworkTopology;
 import com.cloud.network.topology.NetworkTopologyContext;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.offering.ServiceOffering;
@@ -116,10 +129,7 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.User;
 import com.cloud.user.UserStatisticsVO;
 import com.cloud.user.UserStatsLogVO;
 import com.cloud.user.UserVO;
@@ -127,7 +137,6 @@ import com.cloud.user.dao.UserDao;
 import com.cloud.user.dao.UserStatisticsDao;
 import com.cloud.user.dao.UserStatsLogDao;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -137,22 +146,15 @@ import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.identity.ManagementServerNode;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.MacAddress;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.usage.UsageUtils;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineGuru;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
@@ -370,11 +372,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         final List<ServiceOfferingVO> offerings = _serviceOfferingDao.createSystemServiceOfferings("System Offering For Software Router",
                 ServiceOffering.routerDefaultOffUniqueName, 1, _routerRamSize, null,
-                null, true, null, ProvisioningType.THIN, true, null, true, VirtualMachine.Type.DomainRouter, true);
+                null, true, null, StorageProvisioningType.THIN, true, null, true, VirtualMachineType.DomainRouter, true);
 
         final List<ServiceOfferingVO> SecondaryOfferings = _serviceOfferingDao.createSystemServiceOfferings("System Offering For Secundary Software Router",
                 ServiceOffering.routerDefaultSecondaryOffUniqueName, 1, _routerRamSize, null,
-                null, true, null, ProvisioningType.THIN, true, null, true, VirtualMachine.Type.DomainRouter, true);
+                null, true, null, StorageProvisioningType.THIN, true, null, true, VirtualMachineType.DomainRouter, true);
 
         // this can sometimes happen, if DB is manually or programmatically manipulated
         if (offerings == null || offerings.size() < 2) {
@@ -501,7 +503,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             }
             final String privateIP = router.getPrivateIpAddress();
             final HostVO host = _hostDao.findById(router.getHostId());
-            if (host == null || host.getState() != Status.Up) {
+            if (host == null || host.getState() != HostStatus.Up) {
                 continue;
             } else if (host.getManagementServerId() != ManagementServerNode.getManagementServerId()) {
                 /* Only cover hosts managed by this management server */
@@ -568,7 +570,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         } else {
             final String privateIP = router.getPrivateIpAddress();
             final HostVO host = _hostDao.findById(router.getHostId());
-            if (host == null || host.getState() != Status.Up) {
+            if (host == null || host.getState() != HostStatus.Up) {
                 router.setRedundantState(RedundantState.UNKNOWN);
                 updated = true;
             } else if (privateIP != null) {
@@ -1179,7 +1181,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         cmds.addCommand("checkSsh", new CheckSshCommand(profile.getInstanceName(), controlNic.getIPv4Address(), 3922));
 
         // Update router template/scripts version
-        final GetDomRVersionCmd command = new GetDomRVersionCmd();
+        final GetDomRVersionCommand command = new GetDomRVersionCommand();
         command.setAccessDetail(NetworkElementCommand.ROUTER_IP, controlNic.getIPv4Address());
         command.setAccessDetail(NetworkElementCommand.ROUTER_NAME, router.getInstanceName());
         cmds.addCommand("getDomRVersion", command);
@@ -1536,7 +1538,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                     continue;
                 }
                 if (forVpc && network.getTrafficType() == TrafficType.Public || !forVpc && network.getTrafficType() == TrafficType.Guest
-                        && network.getGuestType() == Network.GuestType.Isolated) {
+                        && network.getGuestType() == GuestType.Isolated) {
                     final NetworkUsageCommand usageCmd = new NetworkUsageCommand(privateIP, router.getHostName(), forVpc, routerNic.getIPv4Address());
                     final String routerType = router.getType().toString();
                     final UserStatisticsVO previousStats = _userStatsDao.findBy(router.getAccountId(), router.getDataCenterId(), network.getId(),
@@ -1731,7 +1733,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 
@@ -1768,11 +1770,11 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<VirtualMachine.State, VirtualMachine.Event> transition, final VirtualMachine vo, final boolean status,
+    public boolean postStateTransitionEvent(final Transition<VirtualMachine.State, VirtualMachine.Event> transition, final VirtualMachine vo, final boolean status,
                                             final Object opaque) {
         final VirtualMachine.State newState = transition.getToState();
         final VirtualMachine.Event event = transition.getEvent();
-        if (vo.getType() == VirtualMachine.Type.DomainRouter &&
+        if (vo.getType() == VirtualMachineType.DomainRouter &&
                 event == VirtualMachine.Event.FollowAgentPowerOnReport &&
                 newState == VirtualMachine.State.Running &&
                 isOutOfBandMigrated(opaque)) {
@@ -1834,7 +1836,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
                                 continue;
                             }
                             if (forVpc && network.getTrafficType() == TrafficType.Public || !forVpc && network.getTrafficType() == TrafficType.Guest
-                                    && network.getGuestType() == Network.GuestType.Isolated) {
+                                    && network.getGuestType() == GuestType.Isolated) {
                                 final NetworkUsageCommand usageCmd = new NetworkUsageCommand(privateIP, router.getHostName(), forVpc, routerNic.getIPv4Address());
                                 final String routerType = router.getType().toString();
                                 final UserStatisticsVO previousStats = _userStatsDao.findBy(router.getAccountId(), router.getDataCenterId(), network.getId(),

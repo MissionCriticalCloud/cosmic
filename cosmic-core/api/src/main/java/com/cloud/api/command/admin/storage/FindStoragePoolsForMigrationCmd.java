@@ -9,8 +9,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.VolumeResponse;
-import com.cloud.storage.StoragePool;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "findStoragePoolsForMigration", group = APICommandGroup.StoragePoolService, description = "Lists storage pools available for migration of a volume.", responseObject = StoragePoolResponse.class,
+@APICommand(name = "findStoragePoolsForMigration", group = APICommandGroup.StoragePoolService, description = "Lists storage pools available for migration of a volume.", responseObject =
+        StoragePoolResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class FindStoragePoolsForMigrationCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(FindStoragePoolsForMigrationCmd.class.getName());

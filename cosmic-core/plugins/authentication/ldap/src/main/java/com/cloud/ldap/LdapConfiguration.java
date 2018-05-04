@@ -4,7 +4,7 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ldap.dao.LdapConfigurationDao;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.inject.Inject;
 import javax.naming.directory.SearchControls;

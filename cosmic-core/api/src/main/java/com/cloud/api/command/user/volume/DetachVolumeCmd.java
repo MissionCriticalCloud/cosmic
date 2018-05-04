@@ -15,15 +15,16 @@ import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.storage.Volume;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "detachVolume", group = APICommandGroup.VolumeService, description = "Detaches a disk volume from a virtual machine.", responseObject = VolumeResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "detachVolume", group = APICommandGroup.VolumeService, description = "Detaches a disk volume from a virtual machine.", responseObject = VolumeResponse.class, responseView =
+        ResponseView.Restricted,
         entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DetachVolumeCmd extends BaseAsyncCmd {

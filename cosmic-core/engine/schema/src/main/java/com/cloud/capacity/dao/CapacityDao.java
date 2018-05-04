@@ -2,7 +2,7 @@ package com.cloud.capacity.dao;
 
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDaoImpl.SummedCapacity;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

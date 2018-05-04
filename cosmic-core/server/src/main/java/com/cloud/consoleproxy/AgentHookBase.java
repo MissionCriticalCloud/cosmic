@@ -1,30 +1,30 @@
 package com.cloud.consoleproxy;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.ConsoleAccessAuthenticationAnswer;
-import com.cloud.agent.api.ConsoleAccessAuthenticationCommand;
-import com.cloud.agent.api.ConsoleProxyLoadReportCommand;
-import com.cloud.agent.api.GetVncPortAnswer;
-import com.cloud.agent.api.GetVncPortCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
-import com.cloud.agent.api.proxy.StartConsoleProxyAgentHttpHandlerCommand;
 import com.cloud.configuration.Config;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.framework.security.keystore.KeystoreManager;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ConsoleAccessAuthenticationAnswer;
+import com.cloud.legacymodel.communication.answer.GetVncPortAnswer;
+import com.cloud.legacymodel.communication.command.ConsoleAccessAuthenticationCommand;
+import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.GetVncPortCommand;
+import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.servlet.ConsoleProxyPasswordBasedEncryptor;
 import com.cloud.servlet.ConsoleProxyServlet;
-import com.cloud.utils.Ternary;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import java.security.NoSuchAlgorithmException;
@@ -180,7 +180,7 @@ public abstract class AgentHookBase implements AgentHook {
     }
 
     @Override
-    public void onAgentDisconnect(final long agentId, final Status state) {
+    public void onAgentDisconnect(final long agentId, final HostStatus state) {
         // no-op
     }
 

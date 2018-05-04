@@ -1,6 +1,6 @@
 package com.cloud.affinity;
 
-import com.cloud.acl.ControlledEntity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

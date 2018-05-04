@@ -1,8 +1,5 @@
 package com.cloud.storage.image;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.storage.ListTemplateAnswer;
-import com.cloud.agent.api.storage.ListTemplateCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
 import com.cloud.db.model.Zone;
@@ -16,9 +13,6 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.StorageCacheManager;
 import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
@@ -26,21 +20,35 @@ import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.TemplateService;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.async.AsyncCallbackDispatcher;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ListTemplateAnswer;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.ListTemplateCommand;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.TemplateProp;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.DeleteCommand;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
@@ -51,18 +59,12 @@ import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.image.store.TemplateObject;
 import com.cloud.storage.template.TemplateConstants;
-import com.cloud.storage.template.TemplateProp;
-import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.template.TemplateManager;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -321,7 +323,7 @@ public class TemplateServiceImpl implements TemplateService {
                                                 "failed");
                                         tmpltStore.setState(State.Failed);
                                         try {
-                                            stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
+                                            new StateMachine2Transitions(stateMachine).transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
                                         } catch (final NoTransitionException e) {
                                             s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                                         }
@@ -349,7 +351,7 @@ public class TemplateServiceImpl implements TemplateService {
 
                                     if (tmplt.getState() == VirtualMachineTemplate.State.NotUploaded || tmplt.getState() == VirtualMachineTemplate.State.UploadInProgress) {
                                         try {
-                                            stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationSucceeded, null, _templateDao);
+                                            new StateMachine2Transitions(stateMachine).transitTo(tmplt, VirtualMachineTemplate.Event.OperationSucceeded, null, _templateDao);
                                         } catch (final NoTransitionException e) {
                                             s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                                         }
@@ -361,14 +363,14 @@ public class TemplateServiceImpl implements TemplateService {
                                         final long accountId = tmplt.getAccountId();
                                         try {
                                             _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(accountId),
-                                                    com.cloud.configuration.Resource.ResourceType.secondary_storage,
+                                                    Resource.ResourceType.secondary_storage,
                                                     tmpltInfo.getSize() - UriUtils.getRemoteSize(tmplt.getUrl()));
                                         } catch (final ResourceAllocationException e) {
                                             s_logger.warn(e.getMessage());
                                             _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_RESOURCE_LIMIT_EXCEEDED, zoneId, null, e.getMessage(), e.getMessage());
                                         } finally {
                                             _resourceLimitMgr.recalculateResourceCount(accountId, _accountMgr.getAccount(accountId).getDomainId(),
-                                                    com.cloud.configuration.Resource.ResourceType.secondary_storage.getOrdinal());
+                                                    Resource.ResourceType.secondary_storage.getOrdinal());
                                         }
                                     }
                                 }
@@ -396,7 +398,7 @@ public class TemplateServiceImpl implements TemplateService {
                             tmpltStore.setState(State.Failed);
                             _vmTemplateStoreDao.update(tmpltStore.getId(), tmpltStore);
                             try {
-                                stateMachine.transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
+                                new StateMachine2Transitions(stateMachine).transitTo(tmplt, VirtualMachineTemplate.Event.OperationFailed, null, _templateDao);
                             } catch (final NoTransitionException e) {
                                 s_logger.error("Unexpected state transition exception for template " + tmplt.getName() + ". Details: " + e.getMessage());
                             }

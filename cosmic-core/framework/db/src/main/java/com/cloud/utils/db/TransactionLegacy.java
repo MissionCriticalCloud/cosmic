@@ -2,8 +2,8 @@ package com.cloud.utils.db;
 
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;

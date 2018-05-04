@@ -1,22 +1,22 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.SetupVRCommand;
-import com.cloud.agent.api.UpdateNetworkOverviewCommand;
-import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.LoadBalancerConfigCommand;
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SavePasswordCommand;
-import com.cloud.agent.api.routing.SetFirewallRulesCommand;
-import com.cloud.agent.api.routing.SetNetworkACLCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesCommand;
-import com.cloud.agent.api.routing.SetPortForwardingRulesVpcCommand;
-import com.cloud.agent.api.routing.SetPublicIpACLCommand;
-import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.FileConfigItem;
 import com.cloud.agent.resource.virtualnetwork.ScriptConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.communication.command.LoadBalancerConfigCommand;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.SavePasswordCommand;
+import com.cloud.legacymodel.communication.command.SetFirewallRulesCommand;
+import com.cloud.legacymodel.communication.command.SetNetworkACLCommand;
+import com.cloud.legacymodel.communication.command.SetPortForwardingRulesCommand;
+import com.cloud.legacymodel.communication.command.SetPortForwardingRulesVpcCommand;
+import com.cloud.legacymodel.communication.command.SetPublicIpACLCommand;
+import com.cloud.legacymodel.communication.command.SetStaticNatRulesCommand;
+import com.cloud.legacymodel.communication.command.SetupVRCommand;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
+import com.cloud.legacymodel.communication.command.UpdateVmOverviewCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.Hashtable;
 import java.util.LinkedList;

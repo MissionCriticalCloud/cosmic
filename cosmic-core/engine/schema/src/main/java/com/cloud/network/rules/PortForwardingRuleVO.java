@@ -1,6 +1,7 @@
 package com.cloud.network.rules;
 
-import com.cloud.utils.net.Ip;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.PortForwardingRule;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;

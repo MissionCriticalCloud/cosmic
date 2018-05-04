@@ -1,12 +1,12 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.time.InaccurateClock;
 import com.cloud.vm.ItWorkVO.Step;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.List;
 

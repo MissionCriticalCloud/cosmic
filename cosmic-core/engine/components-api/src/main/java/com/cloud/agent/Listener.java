@@ -1,13 +1,13 @@
 package com.cloud.agent;
 
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.exception.ConnectionException;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.ConnectionException;
 
 /**
  * There are several types of events that the AgentManager forwards
@@ -69,7 +69,7 @@ public interface Listener {
      * @param agentId id of the agent
      * @param state   the current state of the agent.
      */
-    boolean processDisconnect(long agentId, Status state);
+    boolean processDisconnect(long agentId, HostStatus state);
 
     /**
      * If this Listener is passed to the send() method, this method

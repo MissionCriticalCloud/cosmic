@@ -7,7 +7,7 @@ import com.cloud.api.BaseListAccountResourcesCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProjectResponse;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import java.util.Collection;
 import java.util.HashMap;

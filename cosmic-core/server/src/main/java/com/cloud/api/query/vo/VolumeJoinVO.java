@@ -1,13 +1,17 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.storage.Volume;
 import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.VirtualMachine;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +32,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     protected VirtualMachine.State vmState = null;
     @Column(name = "vm_type")
     @Enumerated(value = EnumType.STRING)
-    protected VirtualMachine.Type vmType;
+    protected VirtualMachineType vmType;
     @Column(name = "display_volume", updatable = true, nullable = false)
     protected boolean displayVolume;
     @Column(name = "path")
@@ -37,10 +41,10 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     Long deviceId = null;
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
-    Volume.Type volumeType;
+    VolumeType volumeType;
     @Column(name = "provisioning_type")
     @Enumerated(EnumType.STRING)
-    Storage.ProvisioningType provisioningType;
+    StorageProvisioningType provisioningType;
     @Column(name = "size")
     long size;
     @Column(name = "min_iops")
@@ -122,7 +126,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "created_on_store")
     private Date createdOnStore;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "download_pct")
     private int downloadPercent;
     @Column(name = "download_state")
@@ -162,7 +166,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "extractable")
     private boolean extractable;
     @Column(name = "template_type")
-    private Storage.TemplateType templateType;
+    private TemplateType templateType;
     @Column(name = "iso_id", updatable = true, nullable = true, length = 17)
     private long isoId;
     @Column(name = "iso_uuid")
@@ -206,7 +210,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.vmState = vmState;
     }
 
-    public void setVmType(final VirtualMachine.Type vmType) {
+    public void setVmType(final VirtualMachineType vmType) {
         this.vmType = vmType;
     }
 
@@ -222,11 +226,11 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.deviceId = deviceId;
     }
 
-    public void setVolumeType(final Volume.Type volumeType) {
+    public void setVolumeType(final VolumeType volumeType) {
         this.volumeType = volumeType;
     }
 
-    public void setProvisioningType(final Storage.ProvisioningType provisioningType) {
+    public void setProvisioningType(final StorageProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 
@@ -378,7 +382,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.createdOnStore = createdOnStore;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 
@@ -454,7 +458,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.extractable = extractable;
     }
 
-    public void setTemplateType(final Storage.TemplateType templateType) {
+    public void setTemplateType(final TemplateType templateType) {
         this.templateType = templateType;
     }
 
@@ -544,11 +548,11 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return deviceId;
     }
 
-    public Volume.Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeType;
     }
 
-    public Storage.ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 
@@ -658,7 +662,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return vmState;
     }
 
-    public VirtualMachine.Type getVmType() {
+    public VirtualMachineType getVmType() {
         return vmType;
     }
 
@@ -670,7 +674,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return createdOnStore;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
@@ -754,7 +758,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         return extractable;
     }
 
-    public Storage.TemplateType getTemplateType() {
+    public TemplateType getTemplateType() {
         return templateType;
     }
 

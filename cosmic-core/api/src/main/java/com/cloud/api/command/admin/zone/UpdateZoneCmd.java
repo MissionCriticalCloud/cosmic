@@ -10,8 +10,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
-import com.cloud.dc.DataCenter;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.List;
 import java.util.Map;

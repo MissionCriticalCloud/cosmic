@@ -9,8 +9,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ImageStoreResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.ImageStore;
-import com.cloud.user.Account;
 
 import java.util.HashMap;
 import java.util.Map;

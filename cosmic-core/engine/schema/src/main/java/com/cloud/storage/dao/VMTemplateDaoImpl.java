@@ -2,21 +2,23 @@ package com.cloud.storage.dao;
 
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateDetailVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
+import com.cloud.storage.datastore.db.TemplateDataStoreDao;
+import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.template.VirtualMachineTemplate;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -27,9 +29,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.storage.datastore.db.TemplateDataStoreDao;
-import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -109,7 +108,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     @Override
     public List<VMTemplateVO> listAllSystemVMTemplates() {
         final SearchCriteria<VMTemplateVO> sc = tmpltTypeSearch.create();
-        sc.setParameters("templateType", Storage.TemplateType.SYSTEM);
+        sc.setParameters("templateType", TemplateType.SYSTEM);
 
         final Filter filter = new Filter(VMTemplateVO.class, "id", false, null, null);
         return listBy(sc, filter);
@@ -118,7 +117,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     @Override
     public List<VMTemplateVO> listDefaultBuiltinTemplates() {
         final SearchCriteria<VMTemplateVO> sc = tmpltTypeSearch.create();
-        sc.setParameters("templateType", Storage.TemplateType.BUILTIN);
+        sc.setParameters("templateType", TemplateType.BUILTIN);
         sc.setParameters("state", VirtualMachineTemplate.State.Active);
         return listBy(sc);
     }
@@ -148,7 +147,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     public List<VMTemplateVO> listReadyTemplates() {
         final SearchCriteria<VMTemplateVO> sc = createSearchCriteria();
         sc.addAnd("ready", SearchCriteria.Op.EQ, true);
-        sc.addAnd("format", SearchCriteria.Op.NEQ, Storage.ImageFormat.ISO);
+        sc.addAnd("format", SearchCriteria.Op.NEQ, ImageFormat.ISO);
         return listIncludingRemovedBy(sc);
     }
 
@@ -292,7 +291,7 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
         sb = UserIsoSearch;
         final SearchCriteria<VMTemplateVO> sc = sb.create();
 
-        sc.setParameters("format", Storage.ImageFormat.ISO);
+        sc.setParameters("format", ImageFormat.ISO);
         sc.setParameters("type", TemplateType.USER.toString());
 
         if (!listRemoved) {
@@ -305,8 +304,8 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     @Override
     public VMTemplateVO findSystemVMTemplate(final long zoneId) {
         final SearchCriteria<VMTemplateVO> sc = tmpltTypeHyperSearch.create();
-        sc.setParameters("templateType", Storage.TemplateType.SYSTEM);
-        sc.setJoinParameters("tmplHyper", "type", Host.Type.Routing);
+        sc.setParameters("templateType", TemplateType.SYSTEM);
+        sc.setJoinParameters("tmplHyper", "type", HostType.Routing);
         sc.setJoinParameters("tmplHyper", "zoneId", zoneId);
 
         // order by descending order of id and select the first (this is going
@@ -323,9 +322,9 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
     @Override
     public VMTemplateVO findSystemVMReadyTemplate(final long zoneId, final HypervisorType hypervisorType) {
         final SearchCriteria<VMTemplateVO> sc = readySystemTemplateSearch.create();
-        sc.setParameters("templateType", Storage.TemplateType.SYSTEM);
+        sc.setParameters("templateType", TemplateType.SYSTEM);
         sc.setParameters("state", VirtualMachineTemplate.State.Active);
-        sc.setJoinParameters("tmplHyper", "type", Host.Type.Routing);
+        sc.setJoinParameters("tmplHyper", "type", HostType.Routing);
         sc.setJoinParameters("tmplHyper", "zoneId", zoneId);
         sc.setJoinParameters("vmTemplateJoinTemplateStoreRef", "downloadState", VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
 
@@ -588,9 +587,9 @@ public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implem
 
     @Override
     public boolean updateState(
-            final com.cloud.template.VirtualMachineTemplate.State currentState,
-            final com.cloud.template.VirtualMachineTemplate.Event event,
-            final com.cloud.template.VirtualMachineTemplate.State nextState,
+            final VirtualMachineTemplate.State currentState,
+            final VirtualMachineTemplate.Event event,
+            final VirtualMachineTemplate.State nextState,
             final VirtualMachineTemplate vo, final Object data) {
 
         final Long oldUpdated = vo.getUpdatedCount();

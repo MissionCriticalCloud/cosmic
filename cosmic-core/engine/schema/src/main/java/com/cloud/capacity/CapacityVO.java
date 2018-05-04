@@ -1,5 +1,6 @@
 package com.cloud.capacity;
 
+import com.cloud.model.enumeration.CapacityState;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

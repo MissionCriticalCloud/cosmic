@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.AttachIsoCommand;
+import com.cloud.legacymodel.communication.command.AttachIsoCommand;
 
 import org.junit.Test;
 

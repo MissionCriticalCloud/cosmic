@@ -1,14 +1,14 @@
 package com.cloud.network.rules;
 
-import com.cloud.dc.DataCenter;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VpnUser;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.VpnUser;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.topology.NetworkTopologyVisitor;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.List;
 

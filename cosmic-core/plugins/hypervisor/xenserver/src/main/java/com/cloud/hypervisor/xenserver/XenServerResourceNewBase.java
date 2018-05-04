@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.xenserver;
 
-import com.cloud.agent.api.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,8 +89,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
         while (true) {
             final EventBatch map = Event.from(c, classes, token, t);
             token = map.token;
-            final
-            Set<Event.Record> events = map.events;
+            final Set<Event.Record> events = map.events;
             if (events.size() == 0) {
                 final String msg = "No event for task " + task.toWireString();
                 s_logger.warn(msg);
@@ -172,8 +171,7 @@ public class XenServerResourceNewBase extends XenServer620SP1Resource {
                 }
 
                 _token = results.token;
-                final
-                Set<Event.Record> events = results.events;
+                final Set<Event.Record> events = results.events;
                 for (final Event.Record event : events) {
                     try {
                         if (!(event.snapshot instanceof VM.Record)) {

@@ -1,12 +1,12 @@
 package com.cloud.host.dao;
 
 import com.cloud.host.DetailVO;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.crypt.DBEncryptionUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

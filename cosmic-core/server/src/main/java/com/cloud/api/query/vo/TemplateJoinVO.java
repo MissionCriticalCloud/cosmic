@@ -1,13 +1,14 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.template.VirtualMachineTemplate.State;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -39,13 +40,13 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     @Column(name = "name")
     private String name;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "public")
     private boolean publicTemplate = true;
     @Column(name = "featured")
     private boolean featured;
     @Column(name = "type")
-    private Storage.TemplateType templateType;
+    private TemplateType templateType;
     @Column(name = "url")
     private String url = null;
     @Column(name = "bits")
@@ -320,11 +321,11 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.extractable = extractable;
     }
 
-    public Storage.TemplateType getTemplateType() {
+    public TemplateType getTemplateType() {
         return templateType;
     }
 
-    public void setTemplateType(final Storage.TemplateType templateType) {
+    public void setTemplateType(final TemplateType templateType) {
         this.templateType = templateType;
     }
 
@@ -656,11 +657,11 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.createdOnStore = createdOnStore;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 

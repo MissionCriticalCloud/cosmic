@@ -1,9 +1,9 @@
 package com.cloud.hypervisor;
 
-import com.cloud.agent.api.Command;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.component.ManagerBase;
 
 import javax.annotation.PostConstruct;

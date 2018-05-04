@@ -8,17 +8,22 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
@@ -28,15 +33,10 @@ import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.NoTransitionException;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -118,7 +118,7 @@ public class VMSnapshotManagerTest {
         when(_userVMDao.findById(anyLong())).thenReturn(vmMock);
         when(_vmSnapshotDao.findByName(anyLong(), anyString())).thenReturn(null);
         when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(new ArrayList<>());
-        when(_hypervisorCapabilitiesDao.isVmSnapshotEnabled(Hypervisor.HypervisorType.XenServer, "default")).thenReturn(true);
+        when(_hypervisorCapabilitiesDao.isVmSnapshotEnabled(HypervisorType.XenServer, "default")).thenReturn(true);
         when(_serviceOfferingDetailsDao.findDetail(anyLong(), anyString())).thenReturn(null);
 
         final List<VolumeVO> mockVolumeList = new ArrayList<>();
@@ -128,7 +128,7 @@ public class VMSnapshotManagerTest {
 
         when(vmMock.getInstanceName()).thenReturn("i-3-VM-TEST");
         when(vmMock.getState()).thenReturn(State.Running);
-        when(vmMock.getHypervisorType()).thenReturn(Hypervisor.HypervisorType.XenServer);
+        when(vmMock.getHypervisorType()).thenReturn(HypervisorType.XenServer);
         when(_guestOSDao.findById(anyLong())).thenReturn(mock(GuestOSVO.class));
     }
 

@@ -11,8 +11,8 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkResponse;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listEgressFirewallRules", group = APICommandGroup.FirewallService, description = "Lists all egress firewall rules for network ID.", responseObject = FirewallResponse.class, entityType =
-        {FirewallRule.class},
+@APICommand(name = "listEgressFirewallRules", group = APICommandGroup.FirewallService, description = "Lists all egress firewall rules for network ID.", responseObject = FirewallResponse.class,
+        entityType =
+                {FirewallRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListEgressFirewallRulesCmd extends BaseListTaggedResourcesCmd implements IListFirewallRulesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListEgressFirewallRulesCmd.class.getName());

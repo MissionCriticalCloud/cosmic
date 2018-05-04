@@ -1,10 +1,10 @@
 package com.cloud.server.auth;
 
-import com.cloud.user.UserAccount;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.user.UserAccount;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.user.dao.UserAccountDao;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;

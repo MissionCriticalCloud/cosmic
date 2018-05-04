@@ -8,9 +8,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.VpcResponse;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.VpcGateway;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.VpcGateway;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

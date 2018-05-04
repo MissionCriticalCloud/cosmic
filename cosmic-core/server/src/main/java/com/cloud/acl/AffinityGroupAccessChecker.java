@@ -1,16 +1,17 @@
 package com.cloud.acl;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.affinity.AffinityGroup;
 import com.cloud.affinity.AffinityGroupService;
 import com.cloud.domain.DomainVO;
-import com.cloud.exception.PermissionDeniedException;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.ProjectVO;
 import com.cloud.projects.dao.ProjectAccountDao;
 import com.cloud.projects.dao.ProjectDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 

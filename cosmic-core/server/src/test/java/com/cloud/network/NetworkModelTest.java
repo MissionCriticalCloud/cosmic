@@ -7,14 +7,16 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkVO;
-import com.cloud.user.Account;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.net.Ip;
+import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 
@@ -39,7 +41,7 @@ public class NetworkModelTest {
         final IPAddressDao ipAddressDao = mock(IPAddressDao.class);
         modelImpl._ipAddressDao = ipAddressDao;
         final List<IPAddressVO> fakeList = new ArrayList<>();
-        final IPAddressVO fakeIp = new IPAddressVO(new Ip("75.75.75.75"), 1, 0xaabbccddeeffL, 10, false);
+        final IPAddressVO fakeIp = new IPAddressVO(new Ip(NetUtils.ip2Long("75.75.75.75")), 1, 0xaabbccddeeffL, 10, false);
         fakeList.add(fakeIp);
         final SearchBuilder<IPAddressVO> fakeSearch = mock(SearchBuilder.class);
         modelImpl.IpAddressSearch = fakeSearch;
@@ -55,7 +57,7 @@ public class NetworkModelTest {
         when(fakeNetwork.getId()).thenReturn(1L);
         PublicIpAddress answer = modelImpl.getSourceNatIpAddressForGuestNetwork(fakeAccount, fakeNetwork);
         Assert.assertNull(answer);
-        final IPAddressVO fakeIp2 = new IPAddressVO(new Ip("76.75.75.75"), 1, 0xaabb10ddeeffL, 10, true);
+        final IPAddressVO fakeIp2 = new IPAddressVO(new Ip(NetUtils.ip2Long("76.75.75.75")), 1, 0xaabb10ddeeffL, 10, true);
         fakeList.add(fakeIp2);
         when(ipAddressDao.findById(anyLong())).thenReturn(fakeIp2);
         answer = modelImpl.getSourceNatIpAddressForGuestNetwork(fakeAccount, fakeNetwork);

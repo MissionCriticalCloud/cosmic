@@ -1,5 +1,6 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.net.NetUtils;
 

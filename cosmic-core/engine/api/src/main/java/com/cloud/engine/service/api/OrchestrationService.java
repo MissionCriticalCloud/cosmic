@@ -2,7 +2,7 @@ package com.cloud.engine.service.api;
 
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.engine.cloud.entity.api.VirtualMachineEntity;
-import com.cloud.exception.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.vm.NicProfile;
 

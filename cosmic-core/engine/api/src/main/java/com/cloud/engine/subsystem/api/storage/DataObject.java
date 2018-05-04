@@ -1,8 +1,9 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataTO;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.model.enumeration.DataObjectType;
 
 public interface DataObject {
     long getId();

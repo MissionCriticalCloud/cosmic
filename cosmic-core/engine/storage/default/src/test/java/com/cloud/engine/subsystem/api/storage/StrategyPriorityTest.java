@@ -5,7 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.helper.StorageStrategyFactoryImpl;
 

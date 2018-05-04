@@ -4,7 +4,7 @@ import com.cloud.api.command.LdapListConfigurationCmd
 import com.cloud.api.response.LdapConfigurationResponse
 import com.cloud.ldap.LdapConfigurationVO
 import com.cloud.ldap.LdapManager
-import com.cloud.utils.Pair
+import com.cloud.legacymodel.utils.Pair
 
 class LdapListConfigurationCmdSpec extends spock.lang.Specification {
 

@@ -1,45 +1,45 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.storage.PrimaryStorageDownloadAnswer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NfsTO;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.AttachAnswer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.answer.CreateObjectAnswer;
+import com.cloud.legacymodel.communication.answer.DettachAnswer;
+import com.cloud.legacymodel.communication.answer.PrimaryStorageDownloadAnswer;
+import com.cloud.legacymodel.communication.answer.SnapshotAndCopyAnswer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.communication.command.CreateObjectCommand;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
+import com.cloud.legacymodel.communication.command.ForgetObjectCommand;
+import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
+import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.JavaStorageLayer;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.command.AttachAnswer;
-import com.cloud.storage.command.AttachCommand;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.command.CreateObjectAnswer;
-import com.cloud.storage.command.CreateObjectCommand;
-import com.cloud.storage.command.DeleteCommand;
-import com.cloud.storage.command.DettachAnswer;
-import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.ForgetObjectCmd;
-import com.cloud.storage.command.IntroduceObjectCmd;
-import com.cloud.storage.command.SnapshotAndCopyAnswer;
-import com.cloud.storage.command.SnapshotAndCopyCommand;
 import com.cloud.storage.resource.StorageProcessor;
 import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.QCOW2Processor;
 import com.cloud.storage.template.TemplateLocation;
-import com.cloud.storage.to.PrimaryDataStoreTO;
-import com.cloud.storage.to.SnapshotObjectTO;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.qemu.QemuImg;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.qemu.QemuImgException;
@@ -1089,12 +1089,12 @@ public class KvmStorageProcessor implements StorageProcessor {
     }
 
     @Override
-    public Answer introduceObject(final IntroduceObjectCmd cmd) {
+    public Answer introduceObject(final IntroduceObjectCommand cmd) {
         return new Answer(cmd, false, "not implememented yet");
     }
 
     @Override
-    public Answer forgetObject(final ForgetObjectCmd cmd) {
+    public Answer forgetObject(final ForgetObjectCommand cmd) {
         return new Answer(cmd, false, "not implememented yet");
     }
 

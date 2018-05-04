@@ -1,9 +1,6 @@
 package com.cloud.resource;
 
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.VgpuTypesInfo;
-import com.cloud.agent.api.to.GPUDeviceTO;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
@@ -15,22 +12,26 @@ import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.ResourceInUseException;
 import com.cloud.gpu.HostGpuGroupsVO;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
-import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStats;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.ResourceInUseException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.resource.ResourceState.Event;
+import com.cloud.legacymodel.to.GPUDeviceTO;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.model.Zone;
-import com.cloud.org.Cluster;
-import com.cloud.resource.ResourceState.Event;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.NoTransitionException;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceService#updateCluster(com.cloud.org.Cluster, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     * @see com.cloud.resource.ResourceService#updateCluster(com.cloud.legacymodel.dc.Cluster, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public Cluster updateCluster(final Cluster cluster, final String clusterType, final String hypervisor, final String allocationState, final String managedstate) {
@@ -215,16 +216,16 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#addHost(long, com.cloud.resource.ServerResource, com.cloud.host.Host.Type, java.util.Map)
+     * @see com.cloud.resource.ResourceManager#addHost(long, com.cloud.resource.ServerResource, com.cloud.legacymodel.dc.Host.Type, java.util.Map)
      */
     @Override
-    public Host addHost(final long zoneId, final ServerResource resource, final Type hostType, final Map<String, String> hostDetails) {
+    public Host addHost(final long zoneId, final ServerResource resource, final HostType hostType, final Map<String, String> hostDetails) {
         // TODO Auto-generated method stub
         return null;
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#createHostVOForConnectedAgent(com.cloud.agent.api.StartupCommand[])
+     * @see com.cloud.resource.ResourceManager#createHostVOForConnectedAgent(com.cloud.legacymodel.communication.command.StartupCommand[])
      */
     @Override
     public HostVO createHostVOForConnectedAgent(final StartupCommand[] cmds) {
@@ -242,7 +243,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.agent.api.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
+     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.legacymodel.communication.command.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
      * .HypervisorType, java.util.Map, java.util.List)
      */
     @Override
@@ -262,7 +263,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#executeUserRequest(long, com.cloud.resource.ResourceState.Event)
+     * @see com.cloud.resource.ResourceManager#executeUserRequest(long, com.cloud.legacymodel.resource.ResourceState.Event)
      */
     @Override
     public boolean executeUserRequest(final long hostId, final Event event) throws AgentUnavailableException {
@@ -271,7 +272,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#resourceStateTransitTo(com.cloud.host.Host, com.cloud.resource.ResourceState.Event, long)
+     * @see com.cloud.resource.ResourceManager#resourceStateTransitTo(com.cloud.legacymodel.dc.Host, com.cloud.legacymodel.resource.ResourceState.Event, long)
      */
     @Override
     public boolean resourceStateTransitTo(final Host host, final Event event, final long msId) throws NoTransitionException {
@@ -334,10 +335,10 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHosts(com.cloud.host.Host.Type, java.lang.Long, java.lang.Long, long)
+     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHosts(com.cloud.legacymodel.dc.Host.Type, java.lang.Long, java.lang.Long, long)
      */
     @Override
-    public List<HostVO> listAllUpAndEnabledHosts(final Type type, final Long clusterId, final Long podId, final long dcId) {
+    public List<HostVO> listAllUpAndEnabledHosts(final HostType type, final Long clusterId, final Long podId, final long dcId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -352,19 +353,19 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listHostsInClusterByStatus(long, com.cloud.host.Status)
+     * @see com.cloud.resource.ResourceManager#listHostsInClusterByStatus(long, com.cloud.legacymodel.dc.HostStatus)
      */
     @Override
-    public List<HostVO> listHostsInClusterByStatus(final long clusterId, final Status status) {
+    public List<HostVO> listHostsInClusterByStatus(final long clusterId, final HostStatus status) {
         // TODO Auto-generated method stub
         return null;
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHostsInOneZoneByType(com.cloud.host.Host.Type, long)
+     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledHostsInOneZoneByType(com.cloud.legacymodel.dc.Host.Type, long)
      */
     @Override
-    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(final Type type, final long dcId) {
+    public List<HostVO> listAllUpAndEnabledHostsInOneZoneByType(final HostType type, final long dcId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -382,19 +383,19 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllHostsInOneZoneByType(com.cloud.host.Host.Type, long)
+     * @see com.cloud.resource.ResourceManager#listAllHostsInOneZoneByType(com.cloud.legacymodel.dc.Host.Type, long)
      */
     @Override
-    public List<HostVO> listAllHostsInOneZoneByType(final Type type, final long dcId) {
+    public List<HostVO> listAllHostsInOneZoneByType(final HostType type, final long dcId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllHostsInAllZonesByType(com.cloud.host.Host.Type)
+     * @see com.cloud.resource.ResourceManager#listAllHostsInAllZonesByType(com.cloud.legacymodel.dc.Host.Type)
      */
     @Override
-    public List<HostVO> listAllHostsInAllZonesByType(final Type type) {
+    public List<HostVO> listAllHostsInAllZonesByType(final HostType type) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -463,10 +464,10 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllNotInMaintenanceHostsInOneZone(com.cloud.host.Host.Type, java.lang.Long)
+     * @see com.cloud.resource.ResourceManager#listAllNotInMaintenanceHostsInOneZone(com.cloud.legacymodel.dc.Host.Type, java.lang.Long)
      */
     @Override
-    public List<HostVO> listAllNotInMaintenanceHostsInOneZone(final Type type, final Long dcId) {
+    public List<HostVO> listAllNotInMaintenanceHostsInOneZone(final HostType type, final Long dcId) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -508,10 +509,10 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledNonHAHosts(com.cloud.host.Host.Type, java.lang.Long, java.lang.Long, long)
+     * @see com.cloud.resource.ResourceManager#listAllUpAndEnabledNonHAHosts(com.cloud.legacymodel.dc.Host.Type, java.lang.Long, java.lang.Long, long)
      */
     @Override
-    public List<HostVO> listAllUpAndEnabledNonHAHosts(final Type type, final Long clusterId, final Long podId, final long dcId) {
+    public List<HostVO> listAllUpAndEnabledNonHAHosts(final HostType type, final Long clusterId, final Long podId, final long dcId) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -1,9 +1,9 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.domain.Domain;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

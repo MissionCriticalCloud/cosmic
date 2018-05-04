@@ -5,13 +5,13 @@ import com.cloud.event.EventCategory;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.Transition;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.storage.Volume.Event;
+import com.cloud.legacymodel.storage.Volume.State;
 import com.cloud.server.ManagementService;
-import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Event;
-import com.cloud.storage.Volume.State;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +42,7 @@ public class VolumeStateListener implements StateListener<State, Event, Volume> 
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final Volume vol, final boolean status, final Object opaque) {
+    public boolean postStateTransitionEvent(final Transition<State, Event> transition, final Volume vol, final boolean status, final Object opaque) {
         pubishOnEventBus(transition.getEvent().name(), "postStateTransitionEvent", vol, transition.getCurrentState(), transition.getToState());
 
         return true;

@@ -1,8 +1,8 @@
 package com.cloud.vm.dao;
 
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.VirtualMachine;
 
 import java.net.URI;
 import java.util.List;
@@ -24,11 +24,11 @@ public interface NicDao extends GenericDao<NicVO, Long> {
 
     NicVO findByInstanceIdAndNetworkIdIncludingRemoved(long networkId, long instanceId);
 
-    NicVO findByNetworkIdTypeAndGateway(long networkId, VirtualMachine.Type vmType, String gateway);
+    NicVO findByNetworkIdTypeAndGateway(long networkId, VirtualMachineType vmType, String gateway);
 
     void removeNicsForInstance(long instanceId);
 
-    NicVO findByNetworkIdAndType(long networkId, VirtualMachine.Type vmType);
+    NicVO findByNetworkIdAndType(long networkId, VirtualMachineType vmType);
 
     NicVO findByIp4AddressAndNetworkId(String ip4Address, long networkId);
 
@@ -55,13 +55,13 @@ public interface NicDao extends GenericDao<NicVO, Long> {
 
     List<NicVO> listPlaceholderNicsByNetworkId(long networkId);
 
-    List<NicVO> listPlaceholderNicsByNetworkIdAndVmType(long networkId, VirtualMachine.Type vmType);
+    List<NicVO> listPlaceholderNicsByNetworkIdAndVmType(long networkId, VirtualMachineType vmType);
 
-    List<NicVO> listByNetworkIdAndVmType(long networkId, VirtualMachine.Type vmType);
+    List<NicVO> listByNetworkIdAndVmType(long networkId, VirtualMachineType vmType);
 
-    NicVO findByInstanceIdAndIpAddressAndVmtype(long instanceId, String ipaddress, VirtualMachine.Type type);
+    NicVO findByInstanceIdAndIpAddressAndVmtype(long instanceId, String ipaddress, VirtualMachineType type);
 
-    List<NicVO> listByNetworkIdTypeAndGatewayAndBroadcastUri(long networkId, VirtualMachine.Type vmType, String gateway, URI broadcastUri);
+    List<NicVO> listByNetworkIdTypeAndGatewayAndBroadcastUri(long networkId, VirtualMachineType vmType, String gateway, URI broadcastUri);
 
     int countNicsForStartingVms(long networkId);
 }

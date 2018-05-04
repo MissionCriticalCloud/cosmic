@@ -1,8 +1,8 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.storage.Storage;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -16,7 +16,7 @@ import java.util.Date;
 public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentity, Identity {
 
     @Column(name = "provisioning_type")
-    Storage.ProvisioningType provisioningType;
+    StorageProvisioningType provisioningType;
     @Column(name = "tags", length = 4096)
     String tags;
     @Column(name = "sort_key")
@@ -94,7 +94,7 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     public ServiceOfferingJoinVO() {
     }
 
-    public void setProvisioningType(final Storage.ProvisioningType provisioningType) {
+    public void setProvisioningType(final StorageProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 
@@ -248,7 +248,7 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
         return displayText;
     }
 
-    public Storage.ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 

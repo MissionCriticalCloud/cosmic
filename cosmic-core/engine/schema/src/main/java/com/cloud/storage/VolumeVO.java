@@ -1,8 +1,11 @@
 package com.cloud.storage;
 
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 
@@ -82,7 +85,7 @@ public class VolumeVO implements Volume {
 
     @Column(name = "volume_type")
     @Enumerated(EnumType.STRING)
-    Type volumeType = Volume.Type.UNKNOWN;
+    VolumeType volumeType = VolumeType.UNKNOWN;
 
     @Column(name = "pool_type")
     @Enumerated(EnumType.STRING)
@@ -114,9 +117,9 @@ public class VolumeVO implements Volume {
     @Enumerated(value = EnumType.STRING)
     private State state;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
     @Column(name = "provisioning_type")
-    private Storage.ProvisioningType provisioningType;
+    private StorageProvisioningType provisioningType;
     @Column(name = "iscsi_name")
     private String _iScsiName;
     @Column(name = "vm_snapshot_chain_size")
@@ -130,8 +133,8 @@ public class VolumeVO implements Volume {
     private DiskControllerType diskController;
 
     // Real Constructor
-    public VolumeVO(final Type type, final String name, final long dcId, final long domainId,
-                    final long accountId, final long diskOfferingId, final Storage.ProvisioningType provisioningType, final long size,
+    public VolumeVO(final VolumeType type, final String name, final long dcId, final long domainId,
+                    final long accountId, final long diskOfferingId, final StorageProvisioningType provisioningType, final long size,
                     final Long minIops, final Long maxIops, final String iScsiName, final DiskControllerType diskControllerType) {
         this.volumeType = type;
         this.name = name;
@@ -150,8 +153,8 @@ public class VolumeVO implements Volume {
     }
 
     public VolumeVO(final String name, final long dcId, final long podId, final long accountId,
-                    final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
-                    final long size, final Volume.Type vType, final DiskControllerType diskControllerType) {
+                    final long domainId, final Long instanceId, final String folder, final String path, final StorageProvisioningType provisioningType,
+                    final long size, final VolumeType vType, final DiskControllerType diskControllerType) {
         this.name = name;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -208,9 +211,9 @@ public class VolumeVO implements Volume {
     }
 
     public VolumeVO(final String name, final long dcId, final Long podId, final long accountId,
-                    final long domainId, final Long instanceId, final String folder, final String path, final Storage.ProvisioningType provisioningType,
+                    final long domainId, final Long instanceId, final String folder, final String path, final StorageProvisioningType provisioningType,
                     final long size, final Long minIops, final Long maxIops, final String iScsiName,
-                    final Volume.Type vType, DiskControllerType diskControllerType) {
+                    final VolumeType vType, DiskControllerType diskControllerType) {
         this.name = name;
         this.accountId = accountId;
         this.domainId = domainId;
@@ -306,11 +309,11 @@ public class VolumeVO implements Volume {
     }
 
     @Override
-    public Type getVolumeType() {
+    public VolumeType getVolumeType() {
         return volumeType;
     }
 
-    public void setVolumeType(final Type type) {
+    public void setVolumeType(final VolumeType type) {
         volumeType = type;
     }
 
@@ -396,20 +399,20 @@ public class VolumeVO implements Volume {
     }
 
     @Override
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 
     @Override
-    public ProvisioningType getProvisioningType() {
+    public StorageProvisioningType getProvisioningType() {
         return provisioningType;
     }
 
-    public void setProvisioningType(final ProvisioningType provisioningType) {
+    public void setProvisioningType(final StorageProvisioningType provisioningType) {
         this.provisioningType = provisioningType;
     }
 

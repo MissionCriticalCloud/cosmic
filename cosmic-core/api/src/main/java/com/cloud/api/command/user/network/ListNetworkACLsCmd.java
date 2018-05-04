@@ -10,8 +10,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkACLItemResponse;
 import com.cloud.api.response.NetworkACLResponse;
 import com.cloud.api.response.NetworkResponse;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

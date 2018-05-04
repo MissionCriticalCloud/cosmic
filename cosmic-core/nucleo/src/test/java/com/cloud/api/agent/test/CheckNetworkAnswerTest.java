@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CheckNetworkAnswer;
-import com.cloud.agent.api.CheckNetworkCommand;
-import com.cloud.agent.api.storage.ResizeVolumeCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.storage.Storage;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.StoragePoolStatus;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
+import com.cloud.legacymodel.communication.answer.CheckNetworkAnswer;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StoragePoolType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -69,8 +69,8 @@ public class CheckNetworkAnswerTest {
             }
 
             @Override
-            public Storage.StoragePoolType getPoolType() {
-                return Storage.StoragePoolType.Filesystem;
+            public StoragePoolType getPoolType() {
+                return StoragePoolType.Filesystem;
             }
 
             @Override
@@ -167,7 +167,7 @@ public class CheckNetworkAnswerTest {
             }
 
             @Override
-            public Hypervisor.HypervisorType getHypervisor() {
+            public HypervisorType getHypervisor() {
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
 
@@ -224,8 +224,8 @@ public class CheckNetworkAnswerTest {
             final Integer expectedI = 25;
             assertEquals(expectedI, port);
 
-            final Storage.StoragePoolType type = pool.getType();
-            assertEquals(Storage.StoragePoolType.Filesystem, type);
+            final StoragePoolType type = pool.getType();
+            assertEquals(StoragePoolType.Filesystem, type);
 
             final String str = pool.toString();
             assertTrue(str.equals("Pool[" + id.toString() + "|" + host + ":" + port.toString() + "|" + path + "]"));

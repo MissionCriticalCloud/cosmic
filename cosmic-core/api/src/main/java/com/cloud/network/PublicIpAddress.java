@@ -1,8 +1,8 @@
 package com.cloud.network;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.dc.Vlan;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.dc.Vlan;
 
 public interface PublicIpAddress extends ControlledEntity, IpAddress, Vlan, InternalIdentity {
 

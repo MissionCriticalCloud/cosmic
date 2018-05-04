@@ -23,8 +23,8 @@ import com.cloud.api.response.UserResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -33,8 +33,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVirtualMachines", group = APICommandGroup.VirtualMachineService, description = "List the virtual machines owned by the account.", responseObject = UserVmResponse.class, responseView = ResponseView
-        .Restricted, entityType = {VirtualMachine.class},
+@APICommand(name = "listVirtualMachines", group = APICommandGroup.VirtualMachineService, description = "List the virtual machines owned by the account.", responseObject = UserVmResponse.class,
+        responseView = ResponseView
+                .Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class ListVMsCmd extends BaseListTaggedResourcesCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListVMsCmd.class.getName());

@@ -1,22 +1,25 @@
 package com.cloud.network;
 
-import com.cloud.dc.Vlan;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.IpAddresses;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.IpAddresses;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Detail;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +65,7 @@ public interface NetworkModel {
 
     boolean areServicesSupportedByNetworkOffering(long networkOfferingId, Service... services);
 
-    List<? extends Network> listNetworksForAccount(long accountId, long zoneId, Network.GuestType type);
+    List<? extends Network> listNetworksForAccount(long accountId, long zoneId, GuestType type);
 
     String getStartIpAddress(long networkId);
 

@@ -14,13 +14,14 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ProjectResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createAffinityGroup", group = APICommandGroup.AffinityGroupService, responseObject = AffinityGroupResponse.class, description = "Creates an affinity/anti-affinity group", entityType = {AffinityGroup.class},
+@APICommand(name = "createAffinityGroup", group = APICommandGroup.AffinityGroupService, responseObject = AffinityGroupResponse.class, description = "Creates an affinity/anti-affinity group",
+        entityType = {AffinityGroup.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateAffinityGroupCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateAffinityGroupCmd.class.getName());

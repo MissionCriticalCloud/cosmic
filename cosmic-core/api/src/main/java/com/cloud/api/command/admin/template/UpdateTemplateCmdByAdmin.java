@@ -7,12 +7,13 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.template.UpdateTemplateCmd;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateTemplate", group = APICommandGroup.TemplateService, description = "Updates attributes of a template.", responseObject = TemplateResponse.class, responseView = ResponseView.Full,
+@APICommand(name = "updateTemplate", group = APICommandGroup.TemplateService, description = "Updates attributes of a template.", responseObject = TemplateResponse.class, responseView = ResponseView
+        .Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateTemplateCmdByAdmin extends UpdateTemplateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateTemplateCmdByAdmin.class.getName());

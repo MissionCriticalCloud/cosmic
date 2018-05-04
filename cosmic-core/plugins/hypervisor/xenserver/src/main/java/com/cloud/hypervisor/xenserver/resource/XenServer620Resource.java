@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.resource.ServerResource;
 
 import javax.ejb.Local;

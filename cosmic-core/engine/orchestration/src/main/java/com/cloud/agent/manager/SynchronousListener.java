@@ -1,13 +1,13 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.utils.Profiler;
 
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class SynchronousListener implements Listener {
     }
 
     @Override
-    public synchronized boolean processDisconnect(final long agentId, final Status state) {
+    public synchronized boolean processDisconnect(final long agentId, final HostStatus state) {
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Agent disconnected, agent id: " + agentId + ", state: " + state + ". Will notify waiters");
         }

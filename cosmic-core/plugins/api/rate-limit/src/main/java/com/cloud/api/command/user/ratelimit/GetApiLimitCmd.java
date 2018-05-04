@@ -9,8 +9,8 @@ import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.configuration.Config;
 import com.cloud.context.CallContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.ratelimit.ApiRateLimitService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 

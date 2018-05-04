@@ -1,7 +1,7 @@
 package com.cloud.utils.db;
 
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.utils.db.Attribute.Flag;
 
 import javax.persistence.AttributeOverride;

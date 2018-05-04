@@ -2,8 +2,9 @@ package com.cloud.dc.dao;
 
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
 import com.cloud.utils.db.JoinBuilder;
@@ -12,7 +13,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.sql.PreparedStatement;

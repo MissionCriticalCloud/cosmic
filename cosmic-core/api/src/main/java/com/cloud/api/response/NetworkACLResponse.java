@@ -4,7 +4,7 @@ import com.cloud.acl.RoleType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.network.vpc.NetworkACL;
+import com.cloud.legacymodel.network.vpc.NetworkACL;
 import com.cloud.serializer.Param;
 
 import com.google.gson.annotations.SerializedName;

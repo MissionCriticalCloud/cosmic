@@ -14,11 +14,12 @@ import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
 import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.api.command.user.template.UpdateTemplateCmd;
 import com.cloud.api.response.GetUploadParamsResponse;
-import com.cloud.exception.InternalErrorException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.StorageUnavailableException;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.user.Account;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

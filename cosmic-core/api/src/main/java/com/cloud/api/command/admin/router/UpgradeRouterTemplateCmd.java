@@ -17,10 +17,10 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.UpgradeRouterTemplateResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.List;
 

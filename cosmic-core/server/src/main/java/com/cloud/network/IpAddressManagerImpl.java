@@ -2,43 +2,54 @@ package com.cloud.network;
 
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ApiDBUtils;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.dc.AccountVlanMapVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DomainVlanMapVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.AccountVlanMapDao;
 import com.cloud.dc.dao.DomainVlanMapDao;
 import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.AccountLimitException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.exceptions.AccountLimitException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.vpc.NetworkACL;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress.State;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -50,13 +61,9 @@ import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.lb.LoadBalancingRulesManager;
 import com.cloud.network.rules.FirewallManager;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.StaticNat;
-import com.cloud.network.vpc.NetworkACL;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.network.vpn.RemoteAccessVpnService;
@@ -66,7 +73,6 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.server.ResourceTag;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.dao.AccountDao;
@@ -83,15 +89,10 @@ import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithException;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 
@@ -395,7 +396,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     protected boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
         final NetworkOfferingVO networkOffering = _networkOfferingDao.findById(networkOfferingId);
-        if ((networkOffering.getGuestType() == Network.GuestType.Shared)
+        if ((networkOffering.getGuestType() == GuestType.Shared)
                 && (_networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.SourceNat)
                 || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.StaticNat)
                 || _networkModel.areServicesSupportedByNetworkOffering(networkOfferingId, Service.Firewall)
@@ -942,7 +943,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
             final DataCenter zone = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
             if (zone.getNetworkType() == NetworkType.Advanced) {
-                if (network.getGuestType() == Network.GuestType.Shared) {
+                if (network.getGuestType() == GuestType.Shared) {
                     if (isSharedNetworkOfferingWithServices(network.getNetworkOfferingId())) {
                         _accountMgr.checkAccess(CallContext.current().getCallingAccount(), AccessType.UseEntry, false,
                                 network);
@@ -985,7 +986,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
         //     - if shared network in Advanced zone
         //     - and it belongs to the system
         if (network.getAccountId() != owner.getId()) {
-            if (zone.getNetworkType() != NetworkType.Basic && !(zone.getNetworkType() == NetworkType.Advanced && network.getGuestType() == Network.GuestType.Shared)) {
+            if (zone.getNetworkType() != NetworkType.Basic && !(zone.getNetworkType() == NetworkType.Advanced && network.getGuestType() == GuestType.Shared)) {
                 throw new InvalidParameterValueException("The owner of the network is not the same as owner of the IP");
             }
         }
@@ -1042,7 +1043,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     protected List<? extends Network> getIsolatedNetworksWithSourceNATOwnedByAccountInZone(final long zoneId, final Account owner) {
 
-        return _networksDao.listSourceNATEnabledNetworks(owner.getId(), zoneId, Network.GuestType.Isolated);
+        return _networksDao.listSourceNATEnabledNetworks(owner.getId(), zoneId, GuestType.Isolated);
     }
 
     @Override
@@ -1186,7 +1187,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
 
     @Override
     public String acquireGuestIpAddressForVpcRouter(final Vpc vpc, final Network network, final String requestedIp) {
-        final List<NicVO> nics = _nicDao.listByNetworkIdAndVmType(network.getId(), VirtualMachine.Type.DomainRouter);
+        final List<NicVO> nics = _nicDao.listByNetworkIdAndVmType(network.getId(), VirtualMachineType.DomainRouter);
         if (vpc.isRedundant() && !nics.isEmpty()) {
             return nics.get(0).getIPv4Address();
         }
@@ -1360,7 +1361,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         PublicIp ip = null;
 
                         //Get ip address from the placeholder and don't allocate a new one
-                        if (requestedIpv4 != null && vm.getType() == VirtualMachine.Type.DomainRouter) {
+                        if (requestedIpv4 != null && vm.getType() == VirtualMachineType.DomainRouter) {
                             final Nic placeholderNic = _networkModel.getPlaceholderNicForRouter(network, null);
                             if (placeholderNic != null) {
                                 final IPAddressVO userIp = _ipAddressDao.findByIpAndSourceNetworkId(network.getId(), placeholderNic.getIPv4Address());
@@ -1385,7 +1386,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         } else {
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(ip.getVlanTag()));
                         }
-                        nic.setFormat(AddressFormat.Ip4);
+                        nic.setFormat(IpAddressFormat.Ip4);
                         nic.setReservationId(String.valueOf(ip.getVlanTag()));
                         nic.setMacAddress(ip.getMacAddress());
                     }
@@ -1402,12 +1403,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setIPv6Gateway(vlan.getIp6Gateway());
                         nic.setIPv6Cidr(vlan.getIp6Cidr());
                         if (ipv4) {
-                            nic.setFormat(AddressFormat.DualStack);
+                            nic.setFormat(IpAddressFormat.DualStack);
                         } else {
                             nic.setIsolationUri(IsolationType.Vlan.toUri(vlan.getVlanTag()));
                             nic.setBroadcastType(BroadcastDomainType.Vlan);
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(vlan.getVlanTag()));
-                            nic.setFormat(AddressFormat.Ip6);
+                            nic.setFormat(IpAddressFormat.Ip6);
                             nic.setReservationId(String.valueOf(vlan.getVlanTag()));
                             if (nic.getMacAddress() == null) {
                                 nic.setMacAddress(ip.getMacAddress());
@@ -1437,7 +1438,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         // PublicIp ip = null;
 
                         //Get ip address from the placeholder and don't allocate a new one
-                        if (requestedIpv4 != null && vm.getType() == VirtualMachine.Type.DomainRouter) {
+                        if (requestedIpv4 != null && vm.getType() == VirtualMachineType.DomainRouter) {
                             s_logger.debug("There won't be nic assignment for VR id " + vm.getId() + "  in this network " + network);
                         }
 
@@ -1456,7 +1457,7 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setBroadcastType(network.getBroadcastDomainType());
 
                         nic.setBroadcastUri(network.getBroadcastUri());
-                        nic.setFormat(AddressFormat.Ip4);
+                        nic.setFormat(IpAddressFormat.Ip4);
 
                         if (nic.getMacAddress() == null) {
                             nic.setMacAddress(_networkModel.getNextAvailableMacAddressInNetwork(network.getId()));
@@ -1476,12 +1477,12 @@ public class IpAddressManagerImpl extends ManagerBase implements IpAddressManage
                         nic.setIPv6Gateway(vlan.getIp6Gateway());
                         nic.setIPv6Cidr(vlan.getIp6Cidr());
                         if (ipv4) {
-                            nic.setFormat(AddressFormat.DualStack);
+                            nic.setFormat(IpAddressFormat.DualStack);
                         } else {
                             nic.setIsolationUri(IsolationType.Vlan.toUri(vlan.getVlanTag()));
                             nic.setBroadcastType(BroadcastDomainType.Vlan);
                             nic.setBroadcastUri(BroadcastDomainType.Vlan.toUri(vlan.getVlanTag()));
-                            nic.setFormat(AddressFormat.Ip6);
+                            nic.setFormat(IpAddressFormat.Ip6);
                             nic.setReservationId(String.valueOf(vlan.getVlanTag()));
                             nic.setMacAddress(ip.getMacAddress());
                         }

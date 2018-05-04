@@ -1,14 +1,14 @@
 package com.cloud.network.element;
 
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.network.IpAddress;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.vm.ReservationContext;
 
 import java.util.List;

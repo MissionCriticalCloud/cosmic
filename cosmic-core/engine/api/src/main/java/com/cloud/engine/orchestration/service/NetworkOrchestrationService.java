@@ -1,20 +1,28 @@
 package com.cloud.engine.orchestration.service;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.ConfigKey.Scope;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.element.DhcpServiceProvider;
@@ -22,17 +30,9 @@ import com.cloud.network.element.LoadBalancingServiceProvider;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
-import com.cloud.user.User;
-import com.cloud.utils.Pair;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.LinkedHashMap;
@@ -213,7 +213,7 @@ public interface NetworkOrchestrationService {
 
     List<? extends Nic> listVmNics(long vmId, Long nicId, Long networkId);
 
-    Nic savePlaceholderNic(Network network, String ip4Address, String ip6Address, Type vmType);
+    Nic savePlaceholderNic(Network network, String ip4Address, String ip6Address, VirtualMachineType vmType);
 
     DhcpServiceProvider getDhcpServiceProvider(Network network);
 

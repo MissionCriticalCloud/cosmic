@@ -1,11 +1,11 @@
 package com.cloud.resource.hypervisor;
 
-import com.cloud.agent.api.RebootAnswer;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.StartAnswer;
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.StopAnswer;
-import com.cloud.agent.api.StopCommand;
+import com.cloud.legacymodel.communication.answer.RebootAnswer;
+import com.cloud.legacymodel.communication.answer.StartAnswer;
+import com.cloud.legacymodel.communication.answer.StopAnswer;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.communication.command.StopCommand;
 import com.cloud.resource.ServerResource;
 
 /**

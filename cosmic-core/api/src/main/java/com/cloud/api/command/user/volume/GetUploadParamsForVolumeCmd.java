@@ -10,14 +10,15 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DiskOfferingResponse;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 
 import java.net.MalformedURLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getUploadParamsForVolume", group = APICommandGroup.VolumeService, description = "Upload a data disk to the cloudstack cloud.", responseObject = GetUploadParamsResponse.class, since = "4.6.0",
+@APICommand(name = "getUploadParamsForVolume", group = APICommandGroup.VolumeService, description = "Upload a data disk to the cloudstack cloud.", responseObject = GetUploadParamsResponse.class,
+        since = "4.6.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class GetUploadParamsForVolumeCmd extends AbstractGetUploadParamsCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetUploadParamsForVolumeCmd.class.getName());

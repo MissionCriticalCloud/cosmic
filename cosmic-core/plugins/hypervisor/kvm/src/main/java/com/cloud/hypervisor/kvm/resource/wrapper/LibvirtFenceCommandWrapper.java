@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.FenceAnswer;
-import com.cloud.agent.api.FenceCommand;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.NfsStoragePool;
 import com.cloud.hypervisor.kvm.resource.KvmHaChecker;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.FenceAnswer;
+import com.cloud.legacymodel.communication.command.FenceCommand;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 

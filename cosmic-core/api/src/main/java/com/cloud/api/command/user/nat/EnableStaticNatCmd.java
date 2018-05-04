@@ -11,12 +11,12 @@ import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.UserVmResponse;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

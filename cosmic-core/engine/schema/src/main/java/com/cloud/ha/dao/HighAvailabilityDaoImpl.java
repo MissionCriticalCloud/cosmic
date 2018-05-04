@@ -1,7 +1,8 @@
 package com.cloud.ha.dao;
 
-import com.cloud.ha.HaWork.Step;
-import com.cloud.ha.HaWork.WorkType;
+import com.cloud.ha.HaWork;
+import com.cloud.ha.HaWork.HaWorkStep;
+import com.cloud.ha.HaWork.HaWorkType;
 import com.cloud.ha.HaWorkVO;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.GenericDaoBase;
@@ -99,7 +100,7 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final SearchCriteria<HaWorkVO> sc = TBASearch.create();
         sc.setParameters("time", System.currentTimeMillis() >> 10);
-        sc.setParameters("step", Step.Done, Step.Cancelled);
+        sc.setParameters("step", HaWorkStep.Done, HaWorkStep.Cancelled);
 
         final Filter filter = new Filter(HaWorkVO.class, null, true, 0l, 1l);
 
@@ -127,7 +128,7 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     }
 
     @Override
-    public boolean delete(final long instanceId, final WorkType type) {
+    public boolean delete(final long instanceId, final HaWork.HaWorkType type) {
         final SearchCriteria<HaWorkVO> sc = PreviousWorkSearch.create();
         sc.setParameters("instance", instanceId);
         sc.setParameters("type", type);
@@ -138,12 +139,12 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     public void cleanup(final long time) {
         final SearchCriteria<HaWorkVO> sc = CleanupSearch.create();
         sc.setParameters("time", time);
-        sc.setParameters("step", Step.Done, Step.Cancelled);
+        sc.setParameters("step", HaWorkStep.Done, HaWorkStep.Cancelled);
         expunge(sc);
     }
 
     @Override
-    public void deleteMigrationWorkItems(final long hostId, final WorkType type, final long serverId) {
+    public void deleteMigrationWorkItems(final long hostId, final HaWork.HaWorkType type, final long serverId) {
         final SearchCriteria<HaWorkVO> sc = UntakenMigrationSearch.create();
         sc.setParameters("host", hostId);
         sc.setParameters("type", type.toString());
@@ -152,22 +153,22 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
         final Date date = new Date();
         work.setDateTaken(date);
         work.setServerId(serverId);
-        work.setStep(Step.Cancelled);
+        work.setStep(HaWorkStep.Cancelled);
 
         update(work, sc);
     }
 
     @Override
-    public List<HaWorkVO> findTakenWorkItems(final WorkType type) {
+    public List<HaWorkVO> findTakenWorkItems(final HaWork.HaWorkType type) {
         final SearchCriteria<HaWorkVO> sc = TakenWorkSearch.create();
         sc.setParameters("type", type);
-        sc.setParameters("step", Step.Done, Step.Cancelled, Step.Error);
+        sc.setParameters("step", HaWorkStep.Done, HaWorkStep.Cancelled, HaWork.HaWorkStep.Error);
 
         return listBy(sc);
     }
 
     @Override
-    public boolean hasBeenScheduled(final long instanceId, final WorkType type) {
+    public boolean hasBeenScheduled(final long instanceId, final HaWork.HaWorkType type) {
         final SearchCriteria<HaWorkVO> sc = PreviousWorkSearch.create();
         sc.setParameters("instance", instanceId);
         sc.setParameters("type", type);
@@ -178,7 +179,7 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     public int releaseWorkItems(final long nodeId) {
         final SearchCriteria<HaWorkVO> sc = ReleaseSearch.create();
         sc.setParameters("server", nodeId);
-        sc.setParameters("step", Step.Done, Step.Cancelled, Step.Error);
+        sc.setParameters("step", HaWorkStep.Done, HaWorkStep.Cancelled, HaWorkStep.Error);
 
         final HaWorkVO vo = createForUpdate();
         vo.setDateTaken(null);
@@ -191,7 +192,7 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     public List<HaWorkVO> listFutureHaWorkForVm(final long vmId, final long workId) {
         final SearchCriteria<HaWorkVO> sc = FutureHaWorkSearch.create();
         sc.setParameters("instance", vmId);
-        sc.setParameters("type", WorkType.HA);
+        sc.setParameters("type", HaWork.HaWorkType.HA);
         sc.setParameters("id", workId);
 
         return search(sc, null);
@@ -201,8 +202,8 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     public List<HaWorkVO> listRunningHaWorkForVm(final long vmId) {
         final SearchCriteria<HaWorkVO> sc = RunningHaWorkSearch.create();
         sc.setParameters("instance", vmId);
-        sc.setParameters("type", WorkType.HA);
-        sc.setParameters("step", Step.Done, Step.Error, Step.Cancelled);
+        sc.setParameters("type", HaWorkType.HA);
+        sc.setParameters("step", HaWorkStep.Done, HaWorkStep.Error, HaWorkStep.Cancelled);
 
         return search(sc, null);
     }
@@ -211,8 +212,8 @@ public class HighAvailabilityDaoImpl extends GenericDaoBase<HaWorkVO, Long> impl
     public List<HaWorkVO> listPendingHaWorkForVm(final long vmId) {
         final SearchCriteria<HaWorkVO> sc = PendingHaWorkSearch.create();
         sc.setParameters("instance", vmId);
-        sc.setParameters("type", WorkType.HA);
-        sc.setParameters("step", Step.Done, Step.Error, Step.Cancelled);
+        sc.setParameters("type", HaWorkType.HA);
+        sc.setParameters("step", HaWorkStep.Done, HaWorkStep.Error, HaWorkStep.Cancelled);
 
         return search(sc, null);
     }

@@ -4,12 +4,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.agent.api.to.HostTO;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.resource.ResourceState;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.to.HostTO;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,8 +21,8 @@ import org.junit.Test;
 public class CheckOnHostCommandTest {
     public Host host = new Host() {
         @Override
-        public Status getState() {
-            return Status.Up;
+        public HostStatus getState() {
+            return HostStatus.Up;
         }
 
         @Override
@@ -40,8 +41,8 @@ public class CheckOnHostCommandTest {
         }
 
         @Override
-        public Type getType() {
-            return Host.Type.Storage;
+        public HostType getType() {
+            return HostType.Storage;
         }
 
         @Override
@@ -56,8 +57,8 @@ public class CheckOnHostCommandTest {
         }
 
         @Override
-        public Status getStatus() {
-            return Status.Up;
+        public HostStatus getStatus() {
+            return HostStatus.Up;
         }
 
         @Override
@@ -246,8 +247,8 @@ public class CheckOnHostCommandTest {
 
     @Test
     public void testGetState() {
-        final Status s = host.getState();
-        assertTrue(s == Status.Up);
+        final HostStatus s = host.getState();
+        assertTrue(s == HostStatus.Up);
     }
 
     @Test
@@ -264,8 +265,8 @@ public class CheckOnHostCommandTest {
 
     @Test
     public void testGetType() {
-        final Host.Type t = host.getType();
-        assertTrue(t == Host.Type.Storage);
+        final HostType t = host.getType();
+        assertTrue(t == HostType.Storage);
     }
 
     @Test
@@ -281,8 +282,8 @@ public class CheckOnHostCommandTest {
 
     @Test
     public void testGetStatus() {
-        final Status s = host.getStatus();
-        assertTrue(s == Status.Up);
+        final HostStatus s = host.getStatus();
+        assertTrue(s == HostStatus.Up);
     }
 
     @Test

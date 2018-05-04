@@ -5,14 +5,16 @@ import com.cloud.event.EventCategory;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
+import com.cloud.legacymodel.statemachine.StateListener;
+import com.cloud.legacymodel.statemachine.Transition;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.Event;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.server.ManagementService;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.fsm.StateListener;
-import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.vm.VirtualMachine.Event;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
 
@@ -61,7 +63,7 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
+    public boolean postStateTransitionEvent(final Transition<State, Event> transition, final VirtualMachine vo, final boolean status, final Object opaque) {
         if (!status) {
             return false;
         }
@@ -70,7 +72,7 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
         final State newState = transition.getToState();
         pubishOnEventBus(event.name(), "postStateTransitionEvent", vo, oldState, newState);
 
-        if (vo.getType() != VirtualMachine.Type.User) {
+        if (vo.getType() != VirtualMachineType.User) {
             return true;
         }
 

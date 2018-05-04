@@ -1,28 +1,40 @@
 package com.cloud.network.router;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.Command.OnError;
-import com.cloud.agent.api.NetworkUsageCommand;
-import com.cloud.agent.api.PlugNicCommand;
-import com.cloud.agent.api.UpdateNetworkOverviewCommand;
-import com.cloud.agent.api.UpdateVmOverviewCommand;
-import com.cloud.agent.api.routing.AggregationControlCommand;
-import com.cloud.agent.api.routing.AggregationControlCommand.Action;
-import com.cloud.agent.api.to.overviews.NetworkOverviewTO;
-import com.cloud.agent.api.to.overviews.VMOverviewTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AggregationControlCommand;
+import com.cloud.legacymodel.communication.command.AggregationControlCommand.Action;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.Command.OnError;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
+import com.cloud.legacymodel.communication.command.PlugNicCommand;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
+import com.cloud.legacymodel.communication.command.UpdateVmOverviewCommand;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.statemachine.Transition;
+import com.cloud.legacymodel.to.NetworkOverviewTO;
+import com.cloud.legacymodel.to.VMOverviewTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.Site2SiteVpnConnection;
@@ -32,27 +44,17 @@ import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.vpc.NetworkACLItemDao;
 import com.cloud.network.vpc.NetworkACLItemVO;
 import com.cloud.network.vpc.NetworkACLManager;
-import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
-import com.cloud.network.vpc.StaticRouteProfile;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.network.vpn.Site2SiteVpnManager;
 import com.cloud.user.UserStatisticsVO;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.fsm.StateMachine2;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfile.Param;
 
@@ -86,7 +88,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _itMgr.registerGuru(VirtualMachine.Type.DomainRouter, this);
+        _itMgr.registerGuru(VirtualMachineType.DomainRouter, this);
         return super.configure(name, params);
     }
 
@@ -431,7 +433,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
     }
 
     @Override
-    public boolean postStateTransitionEvent(final StateMachine2.Transition<State, VirtualMachine.Event> transition, final VirtualMachine vo, final boolean status, final Object
+    public boolean postStateTransitionEvent(final Transition<State, VirtualMachine.Event> transition, final VirtualMachine vo, final boolean status, final Object
             opaque) {
         // Without this VirtualNetworkApplianceManagerImpl.postStateTransitionEvent() gets called twice as part of listeners -
         // once from VpcVirtualNetworkApplianceManagerImpl and once from VirtualNetworkApplianceManagerImpl itself
@@ -630,7 +632,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
 
             final List<Ip> ipsToExclude = new ArrayList<>();
             if (!add) {
-                ipsToExclude.add(new Ip(ip.getIpAddress()));
+                ipsToExclude.add(new Ip(NetUtils.ip2Long(ip.getIpAddress())));
             }
 
             final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
@@ -783,7 +785,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
         return true;
     }
 
-    private  boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
+    private boolean applySite2SiteVpn(final boolean isCreate, final VirtualRouter router, final Site2SiteVpnConnection conn) throws ResourceUnavailableException {
         final Commands cmds = new Commands(Command.OnError.Continue);
         final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
                 router,

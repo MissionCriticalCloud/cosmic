@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.PhysicalNetworkTrafficType;
 
 import javax.persistence.Column;

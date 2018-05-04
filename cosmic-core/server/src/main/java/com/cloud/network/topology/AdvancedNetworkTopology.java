@@ -1,15 +1,19 @@
 package com.cloud.network.topology;
 
-import com.cloud.dc.DataCenter;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VpnUser;
+import com.cloud.legacymodel.network.vpc.NetworkACLItem;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.legacymodel.network.vpc.StaticRouteProfile;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.VpnUser;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.rules.AdvancedVpnRules;
 import com.cloud.network.rules.DhcpEntryRules;
 import com.cloud.network.rules.DhcpPvlanRules;
@@ -21,12 +25,8 @@ import com.cloud.network.rules.RuleApplierWrapper;
 import com.cloud.network.rules.StaticRoutesRules;
 import com.cloud.network.rules.UserdataPwdRules;
 import com.cloud.network.rules.VpcIpAssociationRules;
-import com.cloud.network.vpc.NetworkACLItem;
-import com.cloud.network.vpc.PrivateGateway;
-import com.cloud.network.vpc.StaticRouteProfile;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicProfile;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;

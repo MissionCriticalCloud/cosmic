@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen56;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.NetworkUsageAnswer;
-import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.ExecutionResult;
@@ -34,7 +34,7 @@ public final class XenServer56NetworkUsageCommandWrapper extends CommandWrapper<
             return answer;
         } catch (final Exception ex) {
             s_logger.warn("Failed to get network usage stats due to ", ex);
-            return new NetworkUsageAnswer(command, ex);
+            return new NetworkUsageAnswer(command, false, ex.getMessage());
         }
     }
 
@@ -80,7 +80,7 @@ public final class XenServer56NetworkUsageCommandWrapper extends CommandWrapper<
             return new NetworkUsageAnswer(command, "success", 0L, 0L);
         } catch (final Exception ex) {
             s_logger.warn("Failed to get network usage stats due to ", ex);
-            return new NetworkUsageAnswer(command, ex);
+            return new NetworkUsageAnswer(command, false, ex.getMessage());
         }
     }
 }

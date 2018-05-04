@@ -12,9 +12,9 @@ import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.TrafficTypeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.PhysicalNetworkTrafficType;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

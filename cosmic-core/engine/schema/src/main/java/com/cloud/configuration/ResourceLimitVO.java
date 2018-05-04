@@ -1,5 +1,8 @@
 package com.cloud.configuration;
 
+import com.cloud.legacymodel.configuration.ResourceCount;
+import com.cloud.legacymodel.configuration.ResourceLimit;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;

@@ -1,5 +1,7 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.PrivateIp;
+
 public class PrivateIpAddress implements PrivateIp {
     private String broadcastUri;
     private String gateway;

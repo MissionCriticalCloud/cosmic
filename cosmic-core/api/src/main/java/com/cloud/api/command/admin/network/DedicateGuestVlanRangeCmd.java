@@ -11,10 +11,10 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.GuestVlanRangeResponse;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.api.response.ProjectResponse;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.GuestVlan;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

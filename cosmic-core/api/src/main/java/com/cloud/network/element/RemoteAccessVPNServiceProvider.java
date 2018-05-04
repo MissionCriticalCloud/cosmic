@@ -1,8 +1,8 @@
 package com.cloud.network.element;
 
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.VpnUser;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.network.VpnUser;
 import com.cloud.utils.component.Adapter;
 
 import java.util.List;

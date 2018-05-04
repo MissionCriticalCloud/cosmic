@@ -1,17 +1,17 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.FenceAnswer;
-import com.cloud.agent.api.FenceCommand;
 import com.cloud.alert.AlertManager;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.FenceAnswer;
+import com.cloud.legacymodel.communication.command.FenceCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,7 +55,7 @@ public class KVMFencerTest {
         Mockito.when(host.getHypervisorType()).thenReturn(HypervisorType.KVM);
         Mockito.when(host.getDataCenterId()).thenReturn(1l);
         Mockito.when(host.getPodId()).thenReturn(1l);
-        Mockito.when(host.getStatus()).thenReturn(Status.Up);
+        Mockito.when(host.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(host.getId()).thenReturn(1l);
         final VirtualMachine virtualMachine = Mockito.mock(VirtualMachine.class);
 
@@ -70,7 +70,7 @@ public class KVMFencerTest {
         Mockito.when(host.getHypervisorType()).thenReturn(HypervisorType.KVM);
         Mockito.when(host.getDataCenterId()).thenReturn(1l);
         Mockito.when(host.getPodId()).thenReturn(1l);
-        Mockito.when(host.getStatus()).thenReturn(Status.Down);
+        Mockito.when(host.getStatus()).thenReturn(HostStatus.Down);
         Mockito.when(host.getId()).thenReturn(1l);
         final VirtualMachine virtualMachine = Mockito.mock(VirtualMachine.class);
 
@@ -83,7 +83,7 @@ public class KVMFencerTest {
         final HostVO host = Mockito.mock(HostVO.class);
         Mockito.when(host.getClusterId()).thenReturn(1l);
         Mockito.when(host.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(host.getStatus()).thenReturn(Status.Up);
+        Mockito.when(host.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(host.getDataCenterId()).thenReturn(1l);
         Mockito.when(host.getPodId()).thenReturn(1l);
         Mockito.when(host.getId()).thenReturn(1l);
@@ -91,7 +91,7 @@ public class KVMFencerTest {
         final HostVO secondHost = Mockito.mock(HostVO.class);
         Mockito.when(secondHost.getClusterId()).thenReturn(1l);
         Mockito.when(secondHost.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(secondHost.getStatus()).thenReturn(Status.Up);
+        Mockito.when(secondHost.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(secondHost.getDataCenterId()).thenReturn(1l);
         Mockito.when(secondHost.getPodId()).thenReturn(1l);
         Mockito.when(host.getId()).thenReturn(2l);
@@ -111,7 +111,7 @@ public class KVMFencerTest {
         final HostVO host = Mockito.mock(HostVO.class);
         Mockito.when(host.getClusterId()).thenReturn(1l);
         Mockito.when(host.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(host.getStatus()).thenReturn(Status.Up);
+        Mockito.when(host.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(host.getDataCenterId()).thenReturn(1l);
         Mockito.when(host.getPodId()).thenReturn(1l);
         Mockito.when(host.getId()).thenReturn(1l);
@@ -119,7 +119,7 @@ public class KVMFencerTest {
         final HostVO secondHost = Mockito.mock(HostVO.class);
         Mockito.when(secondHost.getClusterId()).thenReturn(1l);
         Mockito.when(secondHost.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(secondHost.getStatus()).thenReturn(Status.Up);
+        Mockito.when(secondHost.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(secondHost.getDataCenterId()).thenReturn(1l);
         Mockito.when(secondHost.getPodId()).thenReturn(1l);
         Mockito.when(host.getId()).thenReturn(2l);
@@ -138,7 +138,7 @@ public class KVMFencerTest {
         final HostVO host = Mockito.mock(HostVO.class);
         Mockito.when(host.getClusterId()).thenReturn(1l);
         Mockito.when(host.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(host.getStatus()).thenReturn(Status.Up);
+        Mockito.when(host.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(host.getDataCenterId()).thenReturn(1l);
         Mockito.when(host.getPodId()).thenReturn(1l);
         Mockito.when(host.getId()).thenReturn(1l);
@@ -146,7 +146,7 @@ public class KVMFencerTest {
         final HostVO secondHost = Mockito.mock(HostVO.class);
         Mockito.when(secondHost.getClusterId()).thenReturn(1l);
         Mockito.when(secondHost.getHypervisorType()).thenReturn(HypervisorType.KVM);
-        Mockito.when(secondHost.getStatus()).thenReturn(Status.Up);
+        Mockito.when(secondHost.getStatus()).thenReturn(HostStatus.Up);
         Mockito.when(secondHost.getDataCenterId()).thenReturn(1l);
         Mockito.when(secondHost.getPodId()).thenReturn(1l);
         Mockito.when(host.getId()).thenReturn(2l);
@@ -165,7 +165,7 @@ public class KVMFencerTest {
         final HostVO host = Mockito.mock(HostVO.class);
         Mockito.when(host.getClusterId()).thenReturn(1l);
         Mockito.when(host.getHypervisorType()).thenReturn(HypervisorType.Any);
-        Mockito.when(host.getStatus()).thenReturn(Status.Down);
+        Mockito.when(host.getStatus()).thenReturn(HostStatus.Down);
         Mockito.when(host.getId()).thenReturn(1l);
         Mockito.when(host.getDataCenterId()).thenReturn(1l);
         Mockito.when(host.getPodId()).thenReturn(1l);

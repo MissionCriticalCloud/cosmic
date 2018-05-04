@@ -1,5 +1,6 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -8,7 +9,6 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
-import com.cloud.vm.VirtualMachine.State;
 
 import java.util.List;
 

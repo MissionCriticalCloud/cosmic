@@ -9,9 +9,9 @@ import com.cloud.engine.subsystem.api.storage.StorageStrategyFactory;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VMSnapshotStrategy;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.host.Host;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.storage.Snapshot;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import javax.inject.Inject;
 import java.util.Collection;

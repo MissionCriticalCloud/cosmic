@@ -1,36 +1,36 @@
 package com.cloud.capacity;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 public interface Capacity extends InternalIdentity, Identity {
-    public static final short CAPACITY_TYPE_MEMORY = 0;
-    public static final short CAPACITY_TYPE_CPU = 1;
-    public static final short CAPACITY_TYPE_STORAGE = 2;
-    public static final short CAPACITY_TYPE_STORAGE_ALLOCATED = 3;
-    public static final short CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP = 4;
-    public static final short CAPACITY_TYPE_PRIVATE_IP = 5;
-    public static final short CAPACITY_TYPE_SECONDARY_STORAGE = 6;
-    public static final short CAPACITY_TYPE_VLAN = 7;
-    public static final short CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP = 8;
-    public static final short CAPACITY_TYPE_LOCAL_STORAGE = 9;
-    public static final short CAPACITY_TYPE_GPU = 19;
+    short CAPACITY_TYPE_MEMORY = 0;
+    short CAPACITY_TYPE_CPU = 1;
+    short CAPACITY_TYPE_STORAGE = 2;
+    short CAPACITY_TYPE_STORAGE_ALLOCATED = 3;
+    short CAPACITY_TYPE_VIRTUAL_NETWORK_PUBLIC_IP = 4;
+    short CAPACITY_TYPE_PRIVATE_IP = 5;
+    short CAPACITY_TYPE_SECONDARY_STORAGE = 6;
+    short CAPACITY_TYPE_VLAN = 7;
+    short CAPACITY_TYPE_DIRECT_ATTACHED_PUBLIC_IP = 8;
+    short CAPACITY_TYPE_LOCAL_STORAGE = 9;
+    short CAPACITY_TYPE_GPU = 19;
 
-    public Long getHostOrPoolId();
+    Long getHostOrPoolId();
 
-    public Long getDataCenterId();
+    Long getDataCenterId();
 
-    public Long getPodId();
+    Long getPodId();
 
-    public Long getClusterId();
+    Long getClusterId();
 
-    public long getUsedCapacity();
+    long getUsedCapacity();
 
-    public long getTotalCapacity();
+    long getTotalCapacity();
 
-    public short getCapacityType();
+    short getCapacityType();
 
-    public long getReservedCapacity();
+    long getReservedCapacity();
 
-    public Float getUsedPercentage();
+    Float getUsedPercentage();
 }

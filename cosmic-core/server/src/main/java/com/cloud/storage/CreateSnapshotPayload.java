@@ -1,6 +1,6 @@
 package com.cloud.storage;
 
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 public class CreateSnapshotPayload {
     private Long snapshotId;

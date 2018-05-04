@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.vm.AssignVMCmd;
@@ -30,19 +29,29 @@ import com.cloud.db.repository.ZoneRepository;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.NetworkDao;
@@ -52,10 +61,7 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -63,18 +69,13 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -248,7 +249,7 @@ public class UserVmManagerTest {
 
         doReturn(VirtualMachine.State.Stopped).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(3L).when(_volumeMock).getTemplateId();
@@ -284,7 +285,7 @@ public class UserVmManagerTest {
 
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(3L).when(_volumeMock).getTemplateId();
@@ -319,7 +320,7 @@ public class UserVmManagerTest {
             ResourceAllocationException {
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(3L).when(_volumeMock).getTemplateId();
@@ -363,7 +364,7 @@ public class UserVmManagerTest {
             ResourceAllocationException {
         doReturn(VirtualMachine.State.Running).when(_vmMock).getState();
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-        when(_volsDao.findByInstanceAndType(314L, Volume.Type.ROOT)).thenReturn(_rootVols);
+        when(_volsDao.findByInstanceAndType(314L, VolumeType.ROOT)).thenReturn(_rootVols);
         doReturn(false).when(_rootVols).isEmpty();
         when(_rootVols.get(eq(0))).thenReturn(_volumeMock);
         doReturn(null).when(_volumeMock).getTemplateId();
@@ -452,7 +453,7 @@ public class UserVmManagerTest {
         serviceOfferingIdField.set(cmd, 1L);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
+        doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
         doReturn(VirtualMachine.State.Running).when(_vmInstance).getState();
 
@@ -487,7 +488,7 @@ public class UserVmManagerTest {
         final boolean useLocalStorage = false;
 
         final ServiceOfferingVO serviceOffering =
-                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, Storage.ProvisioningType.THIN,
+                new ServiceOfferingVO(name, cpu, ramSize, null, null, ha, displayText, StorageProvisioningType.THIN,
                         useLocalStorage, false, null, false, null, false);
         return serviceOffering;
     }
@@ -508,7 +509,7 @@ public class UserVmManagerTest {
         serviceOfferingIdField.set(cmd, 1L);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
+        doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
         final ServiceOffering so1 = getSvcoffering(512);
         final ServiceOffering so2 = getSvcoffering(256);
@@ -553,7 +554,7 @@ public class UserVmManagerTest {
         //UserContext.registerContext(1, account, null, true);
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
-        doReturn(Hypervisor.HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
+        doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
         final ServiceOffering so1 = getSvcoffering(512);
         final ServiceOffering so2 = getSvcoffering(256);
@@ -672,7 +673,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -721,7 +722,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -769,7 +770,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -807,7 +808,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);
@@ -854,7 +855,7 @@ public class UserVmManagerTest {
         accountNameField.setAccessible(true);
         accountNameField.set(cmd, "10.10.10.10");
 
-        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachine.Type.User);
+        final NicVO nic = new NicVO("nic", 1L, 2L, VirtualMachineType.User);
         when(_nicDao.findById(anyLong())).thenReturn(nic);
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_networkDao.findById(anyLong())).thenReturn(_networkMock);

@@ -1,21 +1,21 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NfsTO;
-import com.cloud.exception.InternalErrorException;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.Storage;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.CopyCommand;
-import com.cloud.storage.to.PrimaryDataStoreTO;
-import com.cloud.storage.to.SnapshotObjectTO;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.storage.to.VolumeObjectTO;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.command.CopyCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 
 import java.io.File;
 import java.net.URI;
@@ -179,7 +179,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
                 if (physicalSize != null) {
                     newVol.setSize(physicalSize);
                 }
-                newVol.setFormat(Storage.ImageFormat.VHD);
+                newVol.setFormat(ImageFormat.VHD);
 
                 return new CopyCmdAnswer(newVol);
             }
@@ -471,7 +471,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
             tmpltSR = null;
             final TemplateObjectTO newTemplate = new TemplateObjectTO();
             newTemplate.setPath(installPath);
-            newTemplate.setFormat(Storage.ImageFormat.VHD);
+            newTemplate.setFormat(ImageFormat.VHD);
             newTemplate.setSize(virtualSize);
             newTemplate.setPhysicalSize(physicalSize);
             newTemplate.setName(tmpltUUID);
@@ -610,7 +610,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
             final TemplateObjectTO newTemplate = new TemplateObjectTO();
 
             newTemplate.setPath(destDir + "/" + templateFilename);
-            newTemplate.setFormat(Storage.ImageFormat.VHD);
+            newTemplate.setFormat(ImageFormat.VHD);
             newTemplate.setSize(destVdi.getVirtualSize(conn));
             newTemplate.setPhysicalSize(destVdi.getPhysicalUtilisation(conn));
             newTemplate.setName(destVdiUuid);
@@ -1042,7 +1042,7 @@ public class Xenserver625StorageProcessor extends XenServerStorageProcessor {
             final TemplateObjectTO newTemplate = new TemplateObjectTO();
 
             newTemplate.setPath(destDir + "/" + templateFilename);
-            newTemplate.setFormat(Storage.ImageFormat.VHD);
+            newTemplate.setFormat(ImageFormat.VHD);
             newTemplate.setHypervisorType(HypervisorType.XenServer);
             newTemplate.setSize(virtualSize);
             newTemplate.setPhysicalSize(physicalSize);

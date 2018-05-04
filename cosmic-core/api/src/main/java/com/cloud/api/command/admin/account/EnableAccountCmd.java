@@ -12,8 +12,8 @@ import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.DomainResponse;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
 
 import javax.inject.Inject;
 

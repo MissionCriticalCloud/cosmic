@@ -1,9 +1,9 @@
 package com.cloud.service.dao;
 
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.service.ServiceOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
 import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +15,8 @@ public interface ServiceOfferingDao extends GenericDao<ServiceOfferingVO, Long> 
     ServiceOfferingVO findByName(String name);
 
     List<ServiceOfferingVO> createSystemServiceOfferings(String name, String uniqueName, int cpuCount, int ramSize,
-                                                         Integer rateMbps, Integer multicastRateMbps, boolean offerHA, String displayText, ProvisioningType provisioningType,
-                                                         boolean recreatable, String tags, boolean systemUse, VirtualMachine.Type vmType, boolean defaultUse);
+                                                         Integer rateMbps, Integer multicastRateMbps, boolean offerHA, String displayText, StorageProvisioningType provisioningType,
+                                                         boolean recreatable, String tags, boolean systemUse, VirtualMachineType vmType, boolean defaultUse);
 
     ServiceOfferingVO persistSystemServiceOffering(ServiceOfferingVO vo);
 

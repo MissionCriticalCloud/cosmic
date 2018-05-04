@@ -11,15 +11,17 @@ import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.HostPodDao;
-import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.GPU;
 import com.cloud.gpu.dao.HostGpuGroupsDao;
-import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostTagsDao;
+import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.StorageManager;
@@ -31,9 +33,7 @@ import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -182,7 +182,7 @@ public class FirstFitPlanner extends AdapterBase implements DeploymentClusterPla
         Long uniqueTags;
         for (final Long clusterId : clusterList) {
             uniqueTags = (long) 0;
-            final List<Long> hostList = capacityDao.listHostsWithEnoughCapacity(requiredCpu, requiredRam, clusterId, Host.Type.Routing.toString());
+            final List<Long> hostList = capacityDao.listHostsWithEnoughCapacity(requiredCpu, requiredRam, clusterId, HostType.Routing.toString());
             if (!hostList.isEmpty() && implicitHostTags.length > 0) {
                 uniqueTags = (long) hostTagsDao.getDistinctImplicitHostTags(hostList, implicitHostTags).size();
             }

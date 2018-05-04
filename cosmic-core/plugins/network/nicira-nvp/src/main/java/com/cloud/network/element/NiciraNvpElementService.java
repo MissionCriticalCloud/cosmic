@@ -5,7 +5,7 @@ import com.cloud.api.commands.DeleteNiciraNvpDeviceCmd;
 import com.cloud.api.commands.ListNiciraNvpDeviceNetworksCmd;
 import com.cloud.api.commands.ListNiciraNvpDevicesCmd;
 import com.cloud.api.response.NiciraNvpDeviceResponse;
-import com.cloud.network.Network;
+import com.cloud.legacymodel.network.Network;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.utils.component.PluggableService;
 

@@ -1,8 +1,8 @@
 package com.cloud.storage.dao;
 
-import com.cloud.host.Status;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
@@ -69,7 +69,7 @@ public class StoragePoolHostDaoImpl extends GenericDaoBase<StoragePoolHostVO, Lo
     }
 
     @Override
-    public List<StoragePoolHostVO> listByHostStatus(final long poolId, final Status hostStatus) {
+    public List<StoragePoolHostVO> listByHostStatus(final long poolId, final HostStatus hostStatus) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final String sql = HOST_FOR_POOL_SEARCH;
         final List<StoragePoolHostVO> result = new ArrayList<>();

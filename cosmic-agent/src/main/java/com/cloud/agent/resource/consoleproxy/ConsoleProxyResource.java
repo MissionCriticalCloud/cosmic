@@ -1,22 +1,21 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckHealthAnswer;
-import com.cloud.agent.api.CheckHealthCommand;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.ReadyAnswer;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
-import com.cloud.agent.api.proxy.CheckConsoleProxyLoadCommand;
-import com.cloud.agent.api.proxy.ConsoleProxyLoadAnswer;
-import com.cloud.agent.api.proxy.StartConsoleProxyAgentHttpHandlerCommand;
-import com.cloud.agent.api.proxy.WatchConsoleProxyLoadCommand;
-import com.cloud.agent.service.Agent.ExitStatus;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
+import com.cloud.legacymodel.communication.answer.ReadyAnswer;
+import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.ExitStatus;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.utils.NumbersUtil;
@@ -68,8 +67,8 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
     private Thread _consoleProxyMain = null;
 
     @Override
-    public Type getType() {
-        return Host.Type.ConsoleProxy;
+    public HostType getType() {
+        return HostType.ConsoleProxy;
     }
 
     @Override
@@ -87,7 +86,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
     @Override
     public PingCommand getCurrentStatus(final long id) {
-        return new PingCommand(Type.ConsoleProxy, id);
+        return new PingCommand(HostType.ConsoleProxy, id);
     }
 
     @Override

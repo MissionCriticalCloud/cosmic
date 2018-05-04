@@ -1,6 +1,5 @@
 package com.cloud.vpc;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
 import com.cloud.api.command.user.network.CreateNetworkCmd;
@@ -11,20 +10,29 @@ import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.GuestVlan;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.NetworkService;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.network.PhysicalNetworkTrafficType;
@@ -36,21 +44,13 @@ import com.cloud.network.element.NetworkElement;
 import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.user.Account;
-import com.cloud.user.User;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.ManagerBase;
-import com.cloud.vm.Nic;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -122,7 +122,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#getIsolatedNetworksOwnedByAccountInZone(long, com.cloud.user.Account)
+     * @see com.cloud.network.NetworkService#getIsolatedNetworksOwnedByAccountInZone(long, com.cloud.legacymodel.user.Account)
      */
     @Override
     public List<? extends Network> getIsolatedNetworksOwnedByAccountInZone(final long zoneId, final Account owner) {
@@ -131,7 +131,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#allocateIP(com.cloud.user.Account, long, java.lang.Long)
+     * @see com.cloud.network.NetworkService#allocateIP(com.cloud.legacymodel.user.Account, long, java.lang.Long)
      */
     @Override
     public IpAddress allocateIP(final Account ipOwner, final long zoneId, final Long networkId, final Boolean displayIp) throws ResourceAllocationException,
@@ -215,7 +215,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkService#updateGuestNetwork(long, java.lang.String, java.lang.String, com.cloud.user.Account, com.cloud.user.User, java.lang.String, java
+     * @see com.cloud.network.NetworkService#updateGuestNetwork(long, java.lang.String, java.lang.String, com.cloud.legacymodel.user.Account, com.cloud.legacymodel.user.User, java.lang.String, java
      * .lang.Long, java.lang.Boolean)
      */
     @Override
@@ -477,7 +477,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.deploy.DeploymentPlan, java.lang.String, java
+     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.deploy.DeploymentPlan, java.lang.String, java
      * .lang.String, boolean)
      */
     @Override
@@ -489,7 +489,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.network.Network, com.cloud.deploy
+     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.offerings.NetworkOfferingVO, com.cloud.legacymodel.network.Network, com.cloud.deploy
      * .DeploymentPlan, java.lang.String, java.lang.String, boolean, java.lang.Long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
      */
     @Override
@@ -503,7 +503,8 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.user.Account, com.cloud.deploy.DeploymentPlan, boolean, com.cloud.network.vpc.Vpc, com.cloud.network.Network)
+     * @see com.cloud.network.NetworkManager#setupNetwork(com.cloud.legacymodel.user.Account, com.cloud.deploy.DeploymentPlan, boolean, com.cloud.legacymodel.network.vpc.Vpc, com.cloud.network
+     * .Network)
      */
     @Override
     public Network setupSyncNetwork(final Account owner, final DeploymentPlan plan, final boolean isVpcRouter, final Vpc vpc, final Network isolatedNetwork) {
@@ -558,7 +559,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#getNicProfiles(com.cloud.vm.VirtualMachine)
+     * @see com.cloud.network.NetworkManager#getNicProfiles(com.cloud.legacymodel.vm.VirtualMachine)
      */
     @Override
     public List<NicProfile> getNicProfiles(final VirtualMachine vm) {
@@ -623,7 +624,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
 
     /* (non-Javadoc)
      * @see com.cloud.network.NetworkManager#createGuestNetwork(long, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String,
-     * com.cloud.user.Account, java.lang.Long, com.cloud.network.PhysicalNetwork, long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
+     * com.cloud.legacymodel.user.Account, java.lang.Long, com.cloud.network.PhysicalNetwork, long, ControlledEntity.ACLType, java.lang.Boolean, java.lang.Long)
      */
     @Override
     public Network createGuestNetwork(final long networkOfferingId, final String name, final String displayText, final String gateway, final String cidr, final String vlanId,
@@ -638,7 +639,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#getPasswordResetProvider(com.cloud.network.Network)
+     * @see com.cloud.network.NetworkManager#getPasswordResetProvider(com.cloud.legacymodel.network.Network)
      */
     @Override
     public UserDataServiceProvider getPasswordResetProvider(final Network network) {
@@ -673,7 +674,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#allocateNic(com.cloud.vm.NicProfile, com.cloud.network.Network, java.lang.Boolean, com.cloud.vm.VirtualMachineProfile)
+     * @see com.cloud.network.NetworkManager#allocateNic(com.cloud.vm.NicProfile, com.cloud.legacymodel.network.Network, java.lang.Boolean, com.cloud.vm.VirtualMachineProfile)
      */
     @Override
     public NicProfile allocateNic(final NicProfile requested, final Network network, final Boolean isDefaultNic, final VirtualMachineProfile vm)
@@ -691,7 +692,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#removeNic(com.cloud.vm.VirtualMachineProfile, com.cloud.vm.Nic)
+     * @see com.cloud.network.NetworkManager#removeNic(com.cloud.vm.VirtualMachineProfile, com.cloud.legacymodel.network.Nic)
      */
     @Override
     public void removeNic(final VirtualMachineProfile vm, final Nic nic) {
@@ -700,7 +701,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#releaseNic(com.cloud.vm.VirtualMachineProfile, com.cloud.vm.Nic)
+     * @see com.cloud.network.NetworkManager#releaseNic(com.cloud.vm.VirtualMachineProfile, com.cloud.legacymodel.network.Nic)
      */
     @Override
     public void releaseNic(final VirtualMachineProfile vmProfile, final Nic nic) throws ConcurrentOperationException, ResourceUnavailableException {
@@ -709,7 +710,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#createNicForVm(com.cloud.network.Network, com.cloud.vm.NicProfile, com.cloud.vm.ReservationContext, com.cloud.vm
+     * @see com.cloud.network.NetworkManager#createNicForVm(com.cloud.legacymodel.network.Network, com.cloud.vm.NicProfile, com.cloud.vm.ReservationContext, com.cloud.vm
      * .VirtualMachineProfileImpl, boolean, boolean)
      */
     @Override
@@ -731,7 +732,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.network.NetworkManager#restartNetwork(java.lang.Long, com.cloud.user.Account, com.cloud.user.User, boolean)
+     * @see com.cloud.network.NetworkManager#restartNetwork(java.lang.Long, com.cloud.legacymodel.user.Account, com.cloud.legacymodel.user.User, boolean)
      */
     @Override
     public boolean restartNetwork(final Long networkId, final Account callerAccount, final User callerUser, final boolean cleanup) throws ConcurrentOperationException,
@@ -806,7 +807,7 @@ public class MockNetworkManagerImpl extends ManagerBase implements NetworkOrches
     }
 
     @Override
-    public NicVO savePlaceholderNic(final Network network, final String ip4Address, final String ip6Address, final Type vmType) {
+    public NicVO savePlaceholderNic(final Network network, final String ip4Address, final String ip6Address, final VirtualMachineType vmType) {
         // TODO Auto-generated method stub
         return null;
     }

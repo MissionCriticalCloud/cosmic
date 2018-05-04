@@ -13,17 +13,18 @@ import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "changeServiceForSystemVm", group = APICommandGroup.SystemVMService, responseObject = SystemVmResponse.class, description = "Changes the service offering for a system vm (console proxy or secondary " +
+@APICommand(name = "changeServiceForSystemVm", group = APICommandGroup.SystemVMService, responseObject = SystemVmResponse.class, description = "Changes the service offering for a system vm (console" +
+        " proxy or secondary " +
         "storage). "
         + "The system vm must be in a \"Stopped\" state for " + "this command to take effect.", entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)

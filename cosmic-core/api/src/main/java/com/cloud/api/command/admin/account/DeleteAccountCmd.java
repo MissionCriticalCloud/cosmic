@@ -14,17 +14,18 @@ import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteAccount", group = APICommandGroup.AccountService, description = "Deletes a account, and all users associated with this account", responseObject = SuccessResponse.class, entityType = {Account
-        .class},
+@APICommand(name = "deleteAccount", group = APICommandGroup.AccountService, description = "Deletes a account, and all users associated with this account", responseObject = SuccessResponse.class,
+        entityType = {Account
+                .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteAccountCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteAccountCmd.class.getName());

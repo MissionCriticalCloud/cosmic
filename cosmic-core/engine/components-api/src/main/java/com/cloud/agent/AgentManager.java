@@ -1,17 +1,17 @@
 package com.cloud.agent;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.manager.Commands;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.model.enumeration.Event;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ServerResource;
 
 /**
@@ -95,13 +95,13 @@ public interface AgentManager {
 
     Answer sendTo(Long dcId, HypervisorType type, Command cmd);
 
-    public boolean agentStatusTransitTo(HostVO host, Status.Event e, long msId);
+    public boolean agentStatusTransitTo(HostVO host, Event e, long msId);
 
     //    public AgentAttache handleDirectConnectAgent(HostVO host, StartupCommand[] cmds, ServerResource resource, boolean forRebalance) throws ConnectionException;
 
     boolean isAgentAttached(long hostId);
 
-    void disconnectWithoutInvestigation(long hostId, Status.Event event);
+    void disconnectWithoutInvestigation(long hostId, Event event);
 
     public void pullAgentToMaintenance(long hostId);
 

@@ -1,6 +1,6 @@
 package com.cloud.agent.manager;
 
-import com.cloud.exception.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 
 public interface Routable {
     /**

@@ -1,7 +1,5 @@
 package com.cloud.vm.snapshot;
 
-import com.cloud.agent.api.RestoreVMSnapshotCommand;
-import com.cloud.agent.api.VMSnapshotTO;
 import com.cloud.api.command.user.vmsnapshot.ListVMSnapshotCmd;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
@@ -12,11 +10,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.CloudException;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.jobs.AsyncJob;
@@ -28,43 +21,52 @@ import com.cloud.framework.jobs.impl.AsyncJobVO;
 import com.cloud.framework.jobs.impl.OutcomeImpl;
 import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.gpu.GPU;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.communication.command.RestoreVMSnapshotCommand;
+import com.cloud.legacymodel.exceptions.CloudException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.VMSnapshotTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.Type;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.ReflectionUse;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VmWork;
 import com.cloud.vm.VmWorkConstants;
@@ -283,7 +285,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             throw new InvalidParameterValueException("Creating VM snapshot failed due to VM:" + vmId + " is a system VM or does not exist");
         }
 
-        if (_snapshotDao.listByInstanceId(vmId, Snapshot.State.BackedUp).size() > 0 && ! HypervisorType.KVM.equals(userVmVo.getHypervisorType())) {
+        if (_snapshotDao.listByInstanceId(vmId, Snapshot.State.BackedUp).size() > 0 && !HypervisorType.KVM.equals(userVmVo.getHypervisorType())) {
             throw new InvalidParameterValueException("VM snapshot for this VM is not allowed. This VM has volumes attached which has snapshots, please remove all snapshots " +
                     "before taking VM snapshot");
         }
@@ -483,7 +485,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -658,7 +660,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         }
     }
 
-     @Override
+    @Override
     public RestoreVMSnapshotCommand createRestoreCommand(final UserVmVO userVm, final List<VMSnapshotVO> vmSnapshotVOs) {
         if (!HypervisorType.KVM.equals(userVm.getHypervisorType())) {
             return null;
@@ -666,7 +668,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
 
         final List<VMSnapshotTO> snapshots = new ArrayList<>();
         final Map<Long, VMSnapshotTO> snapshotAndParents = new HashMap<>();
-        for (final VMSnapshotVO vmSnapshotVO: vmSnapshotVOs) {
+        for (final VMSnapshotVO vmSnapshotVO : vmSnapshotVOs) {
             if (vmSnapshotVO.getType() == VMSnapshot.Type.DiskAndMemory) {
                 final VMSnapshotVO snapshot = _vmSnapshotDao.findById(vmSnapshotVO.getId());
                 final VMSnapshotTO parent = getSnapshotWithParents(snapshot).getParent();
@@ -713,7 +715,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -750,7 +752,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(0);
         workJob.setUserId(0);
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(instanceId);
         workJob.setInitMsid(ManagementServerNode.getManagementServerId());
 
@@ -801,7 +803,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             throw new InvalidParameterValueException("Create vm to snapshot failed due to vm: " + vmId + " is not found");
         }
 
-        final List<VolumeVO> volumeVos = _volumeDao.findByInstanceAndType(vmId, Type.ROOT);
+        final List<VolumeVO> volumeVos = _volumeDao.findByInstanceAndType(vmId, VolumeType.ROOT);
         if (volumeVos == null || volumeVos.isEmpty()) {
             throw new CloudRuntimeException("Create vm to snapshot failed due to no root disk found");
         }
@@ -843,7 +845,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 
@@ -980,7 +982,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
         workJob.setAccountId(callingAccount.getId());
         workJob.setUserId(callingUser.getId());
         workJob.setStep(VmWorkJobVO.Step.Starting);
-        workJob.setVmType(VirtualMachine.Type.Instance);
+        workJob.setVmType(VirtualMachineType.Instance);
         workJob.setVmInstanceId(vm.getId());
         workJob.setRelated(AsyncJobExecutionContext.getOriginJobId());
 

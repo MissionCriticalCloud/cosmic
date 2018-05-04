@@ -1,8 +1,8 @@
 package com.cloud.network.dao;
 
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.CollectionTable;

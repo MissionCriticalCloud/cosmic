@@ -9,9 +9,9 @@ import com.cloud.api.Parameter;
 import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.LBHealthCheckResponse;
 import com.cloud.api.response.ListResponse;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.network.rules.HealthCheckPolicy;
-import com.cloud.network.rules.LoadBalancer;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listLBHealthCheckPolicies", group = APICommandGroup.LoadBalancerService, description = "Lists load balancer health check policies.", responseObject = LBHealthCheckResponse.class, since = "4.2.0",
+@APICommand(name = "listLBHealthCheckPolicies", group = APICommandGroup.LoadBalancerService, description = "Lists load balancer health check policies.", responseObject = LBHealthCheckResponse
+        .class, since = "4.2.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListLBHealthCheckPoliciesCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListLBHealthCheckPoliciesCmd.class.getName());

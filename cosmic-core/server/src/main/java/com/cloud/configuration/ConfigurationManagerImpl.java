@@ -29,7 +29,6 @@ import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.config.Configuration;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
@@ -38,17 +37,13 @@ import com.cloud.dc.AccountVlanMapVO;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterDetailsVO;
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterIpAddressVO;
 import com.cloud.dc.DataCenterLinkLocalIpAddressVO;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.DomainVlanMapVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.AccountVlanMapDao;
 import com.cloud.dc.dao.ClusterDao;
@@ -63,18 +58,12 @@ import com.cloud.dc.dao.PodVlanMapDao;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentClusterPlanner;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
@@ -82,19 +71,40 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
 import com.cloud.gpu.GPU;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkService;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
@@ -106,9 +116,7 @@ import com.cloud.network.dao.PhysicalNetworkTrafficTypeDao;
 import com.cloud.network.dao.PhysicalNetworkTrafficTypeVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.element.NetworkElement;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.vpc.VpcManager;
-import com.cloud.offering.DiskOffering;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offering.NetworkOffering.Detail;
@@ -127,8 +135,6 @@ import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.VolumeDao;
@@ -136,17 +142,14 @@ import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolDetailsDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.test.IPRangeConfig;
-import com.cloud.user.Account;
 import com.cloud.user.AccountDetailVO;
 import com.cloud.user.AccountDetailsDao;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.DB;
@@ -157,10 +160,7 @@ import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -751,19 +751,19 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final Boolean volatileVm = cmd.getVolatileVm();
 
         final String vmTypeString = cmd.getSystemVmType();
-        VirtualMachine.Type vmType = null;
+        VirtualMachineType vmType = null;
         boolean allowNetworkRate = false;
         if (cmd.getIsSystem()) {
-            if (vmTypeString == null || VirtualMachine.Type.DomainRouter.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.DomainRouter;
+            if (vmTypeString == null || VirtualMachineType.DomainRouter.toString().toLowerCase().equals(vmTypeString)) {
+                vmType = VirtualMachineType.DomainRouter;
                 allowNetworkRate = true;
-            } else if (VirtualMachine.Type.ConsoleProxy.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.ConsoleProxy;
-            } else if (VirtualMachine.Type.SecondaryStorageVm.toString().toLowerCase().equals(vmTypeString)) {
-                vmType = VirtualMachine.Type.SecondaryStorageVm;
+            } else if (VirtualMachineType.ConsoleProxy.toString().toLowerCase().equals(vmTypeString)) {
+                vmType = VirtualMachineType.ConsoleProxy;
+            } else if (VirtualMachineType.SecondaryStorageVm.toString().toLowerCase().equals(vmTypeString)) {
+                vmType = VirtualMachineType.SecondaryStorageVm;
             } else {
-                throw new InvalidParameterValueException("Invalid systemVmType. Supported types are: " + VirtualMachine.Type.DomainRouter + ", " + VirtualMachine.Type.ConsoleProxy
-                        + ", " + VirtualMachine.Type.SecondaryStorageVm);
+                throw new InvalidParameterValueException("Invalid systemVmType. Supported types are: " + VirtualMachineType.DomainRouter + ", " + VirtualMachineType.ConsoleProxy
+                        + ", " + VirtualMachineType.SecondaryStorageVm);
             }
         } else {
             allowNetworkRate = true;
@@ -795,7 +795,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 cmd.getBytesReadRate(), cmd.getBytesWriteRate(), cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getHypervisorSnapshotReserve());
     }
 
-    protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachine.Type vmType,
+    protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachineType vmType,
                                                       final String name, final Integer cpu, final Integer ramSize, final String displayText, final String
                                                               provisioningType, final boolean localStorageRequired,
                                                       final boolean offerHA, final boolean limitResourceUse, final boolean volatileVm, String tags, final Long domainId, final
@@ -824,7 +824,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new InvalidParameterValueException("Unable to create service offering by id " + userId + " because it is not root-admin or domain-admin");
         }
 
-        final ProvisioningType typedProvisioningType = ProvisioningType.getProvisioningType(provisioningType);
+        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.getProvisioningType(provisioningType);
 
         tags = StringUtils.cleanupTags(tags);
 
@@ -1795,7 +1795,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                     network = _networkModel.getNetwork(networkId);
                 }
             } else if (network.getGuestType() == null ||
-                    network.getGuestType() == Network.GuestType.Isolated
+                    network.getGuestType() == GuestType.Isolated
                             && _ntwkOffServiceMapDao.areServicesSupportedByNetworkOffering(network.getNetworkOfferingId(), Service.SourceNat)) {
                 throw new InvalidParameterValueException("Can't create direct vlan for network id=" + networkId + " with type: " + network.getGuestType());
             }
@@ -2355,7 +2355,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         Integer networkRate = cmd.getNetworkRate();
         TrafficType trafficType = null;
         Availability availability = null;
-        Network.GuestType guestType = null;
+        GuestType guestType = null;
         final boolean specifyIpRanges = cmd.getSpecifyIpRanges();
         final boolean isPersistent = cmd.getIsPersistent();
         final Map<String, String> detailsStr = cmd.getDetails();
@@ -2380,7 +2380,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
 
         // Verify offering type
-        for (final Network.GuestType offType : Network.GuestType.values()) {
+        for (final GuestType offType : GuestType.values()) {
             if (offType.name().equalsIgnoreCase(cmd.getGuestIpType())) {
                 guestType = offType;
                 break;
@@ -2592,7 +2592,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (offering == null) {
             throw new InvalidParameterValueException("Cannot find specified service offering: " + serviceOfferingId);
         }
-        if (!VirtualMachine.Type.DomainRouter.toString().equalsIgnoreCase(offering.getSystemVmType())) {
+        if (!VirtualMachineType.DomainRouter.toString().equalsIgnoreCase(offering.getSystemVmType())) {
             throw new InvalidParameterValueException("The specified service offering " + serviceOfferingId + " cannot be used by virtual router!");
         }
     }
@@ -3132,7 +3132,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             networkRate = offering.getRateMbps();
         } else {
             // for domain router service offering, get network rate from
-            if (offering.getSystemVmType() != null && offering.getSystemVmType().equalsIgnoreCase(VirtualMachine.Type.DomainRouter.toString())) {
+            if (offering.getSystemVmType() != null && offering.getSystemVmType().equalsIgnoreCase(VirtualMachineType.DomainRouter.toString())) {
                 networkRate = NetworkOrchestrationService.NetworkThrottlingRate.valueIn(dataCenterId);
             } else {
                 networkRate = Integer.parseInt(_configDao.getValue(Config.VmNetworkThrottlingRate.key()));
@@ -3568,7 +3568,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     @DB
     public NetworkOfferingVO createNetworkOffering(final String name, final String displayText, final TrafficType trafficType, String tags, final boolean specifyVlan,
                                                    final Availability availability, final Integer networkRate, final Map<Service, Set<Provider>> serviceProviderMap,
-                                                   final boolean isDefault, final Network.GuestType type, final boolean systemOnly, final Long serviceOfferingId,
+                                                   final boolean isDefault, final GuestType type, final boolean systemOnly, final Long serviceOfferingId,
                                                    final Long secondaryServiceOfferingId, final boolean conserveMode, final Map<Service, Map<Capability, String>>
                                                            serviceCapabilityMap,
                                                    final boolean specifyIpRanges, final boolean isPersistent, final Map<NetworkOffering.Detail, String> details,
@@ -4712,7 +4712,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         } else if (numGibibytes != null && numGibibytes > _maxVolumeSizeInGb) {
             throw new InvalidParameterValueException("The maximum size for a disk is " + _maxVolumeSizeInGb + " Gb.");
         }
-        final ProvisioningType typedProvisioningType = ProvisioningType.getProvisioningType(provisioningType);
+        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.getProvisioningType(provisioningType);
 
         if (numGibibytes != null) {
             diskSize = numGibibytes * 1024 * 1024 * 1024;

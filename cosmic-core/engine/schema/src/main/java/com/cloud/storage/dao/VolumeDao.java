@@ -1,12 +1,13 @@
 package com.cloud.storage.dao;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 
@@ -29,7 +30,7 @@ public interface VolumeDao extends GenericDao<VolumeVO, Long>, StateDao<Volume.S
 
     List<VolumeVO> findByInstance(long id);
 
-    List<VolumeVO> findByInstanceAndType(long id, Volume.Type vType);
+    List<VolumeVO> findByInstanceAndType(long id, VolumeType vType);
 
     List<VolumeVO> findByInstanceIdDestroyed(long vmId);
 
@@ -55,7 +56,7 @@ public interface VolumeDao extends GenericDao<VolumeVO, Long>, StateDao<Volume.S
 
     VolumeVO findByPoolIdName(long poolId, String name);
 
-    List<VolumeVO> findByPoolId(long poolId, Volume.Type volumeType);
+    List<VolumeVO> findByPoolId(long poolId, VolumeType volumeType);
 
     List<VolumeVO> findByInstanceAndDeviceId(long instanceId, long deviceId);
 

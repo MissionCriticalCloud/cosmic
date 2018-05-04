@@ -10,9 +10,9 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.UserResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.region.RegionService;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 
 import javax.inject.Inject;
 

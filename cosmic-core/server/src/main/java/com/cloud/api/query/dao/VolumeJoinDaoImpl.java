@@ -8,12 +8,13 @@ import com.cloud.api.query.vo.VolumeJoinVO;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateHostVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.storage.Volume;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -139,7 +140,7 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
         // ApiDBUtils.findDiskOfferingById(volume.getDiskOfferingId());
         if (volume.getDiskOfferingId() > 0) {
             boolean isServiceOffering = false;
-            if (volume.getVolumeType().equals(Volume.Type.ROOT)) {
+            if (volume.getVolumeType().equals(VolumeType.ROOT)) {
                 isServiceOffering = true;
             } else {
                 // can't rely on the fact that the volume is the datadisk as it might have been created as a root, and
@@ -185,14 +186,14 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
         volResponse.setAttached(volume.getAttached());
         volResponse.setDestroyed(volume.getState() == Volume.State.Destroy);
         boolean isExtractable = true;
-        if (volume.getVolumeType() != Volume.Type.DATADISK) { // Datadisk dont
+        if (volume.getVolumeType() != VolumeType.DATADISK) { // Datadisk dont
             // have any
             // template
             // dependence.
             if (volume.getTemplateId() > 0) { // For ISO based volumes template
                 // = null and we allow extraction
                 // of all ISO based volumes
-                isExtractable = volume.isExtractable() && volume.getTemplateType() != Storage.TemplateType.SYSTEM;
+                isExtractable = volume.isExtractable() && volume.getTemplateType() != TemplateType.SYSTEM;
             }
         }
 

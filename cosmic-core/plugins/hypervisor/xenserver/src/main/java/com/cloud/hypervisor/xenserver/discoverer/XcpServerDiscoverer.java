@@ -2,31 +2,13 @@ package com.cloud.hypervisor.xenserver.discoverer;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.SetupAnswer;
-import com.cloud.agent.api.SetupCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.HostPodDao;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.DiscoveredWithErrorException;
-import com.cloud.exception.DiscoveryException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.HostEnvironment;
-import com.cloud.host.HostInfo;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
 import com.cloud.hypervisor.xenserver.resource.CitrixHelper;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
@@ -42,22 +24,39 @@ import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServer650Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServerConnectionPool;
 import com.cloud.hypervisor.xenserver.resource.Xenserver625Resource;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.SetupAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.SetupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.dc.HostEnvironment;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.DiscoveredWithErrorException;
+import com.cloud.legacymodel.exceptions.DiscoveryException;
+import com.cloud.legacymodel.exceptions.HypervisorVersionChangedException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.Zone;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
-import com.cloud.user.Account;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.HypervisorVersionChangedException;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -422,12 +421,12 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
         if (hypervisor == null) {
             return true;
         }
-        return Hypervisor.HypervisorType.XenServer.toString().equalsIgnoreCase(hypervisor);
+        return HypervisorType.XenServer.toString().equalsIgnoreCase(hypervisor);
     }
 
     @Override
-    public Hypervisor.HypervisorType getHypervisorType() {
-        return Hypervisor.HypervisorType.XenServer;
+    public HypervisorType getHypervisorType() {
+        return HypervisorType.XenServer;
     }
 
     String getPoolUuid(final Connection conn) throws XenAPIException, XmlRpcException {
@@ -530,7 +529,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     }
 
     @Override
-    public void processConnect(final com.cloud.host.Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
+    public void processConnect(final com.cloud.legacymodel.dc.Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
         if (!(cmd instanceof StartupRoutingCommand)) {
             return;
         }
@@ -607,7 +606,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 
@@ -655,7 +654,7 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
 
     @Override
     public DeleteHostAnswer deleteHost(final HostVO host, final boolean isForced, final boolean isForceDeleteStorage) throws UnableDeleteHostException {
-        if (host.getType() != com.cloud.host.Host.Type.Routing || host.getHypervisorType() != HypervisorType.XenServer) {
+        if (host.getType() != HostType.Routing || host.getHypervisorType() != HypervisorType.XenServer) {
             return null;
         }
 

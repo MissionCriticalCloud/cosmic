@@ -19,9 +19,10 @@ import com.cloud.framework.messagebus.MessageDetector;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.jobs.JobInfo;
 import com.cloud.jobs.JobInfo.Status;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ComponentLifecycle;
@@ -40,7 +41,6 @@ import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.mgmt.JmxUtil;
@@ -143,8 +143,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @DB
     public long submitAsyncJob(final AsyncJob job, final boolean scheduleJobExecutionInContext) {
-        final
-        GenericDao dao = GenericDaoBase.getDao(job.getClass());
+        final GenericDao dao = GenericDaoBase.getDao(job.getClass());
         job.setInitMsid(getMsid());
         job.setSyncSource(null);        // no sync source originally
         dao.persist(job);

@@ -4,6 +4,7 @@ import com.cloud.cluster.ClusterInvalidSessionException;
 import com.cloud.cluster.ManagementServerHost;
 import com.cloud.cluster.ManagementServerHost.State;
 import com.cloud.cluster.ManagementServerHostVO;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Filter;
@@ -11,7 +12,6 @@ import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

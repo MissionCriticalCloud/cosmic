@@ -2,8 +2,8 @@ package com.cloud.api.query.dao;
 
 import com.cloud.api.query.vo.DomainRouterJoinVO;
 import com.cloud.api.response.DomainRouterResponse;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

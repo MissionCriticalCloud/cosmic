@@ -1,12 +1,12 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Cluster;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

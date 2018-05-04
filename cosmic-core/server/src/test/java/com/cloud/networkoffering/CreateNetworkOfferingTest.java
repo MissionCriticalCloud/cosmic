@@ -4,10 +4,12 @@ import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.config.impl.ConfigurationVO;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.offering.NetworkOffering.Availability;
 import com.cloud.offerings.NetworkOfferingServiceMapVO;
 import com.cloud.offerings.NetworkOfferingVO;
@@ -17,7 +19,6 @@ import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class CreateNetworkOfferingTest extends TestCase {
     @Test
     public void createSharedNtwkOffWithVlan() {
         final NetworkOfferingVO off =
-                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, true, Availability.Optional, 200, null, false, Network.GuestType.Shared, false,
+                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, true, Availability.Optional, 200, null, false, GuestType.Shared, false,
                         null, null, false, null, true, false, null, false, null, true);
         assertNotNull("Shared network offering with specifyVlan=true failed to create ", off);
     }
@@ -89,7 +90,7 @@ public class CreateNetworkOfferingTest extends TestCase {
     @Test(expected = InvalidParameterValueException.class)
     public void createSharedNtwkOffWithNoVlan() {
         final NetworkOfferingVO off =
-                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, false, Availability.Optional, 200, null, false, Network.GuestType.Shared,
+                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, false, Availability.Optional, 200, null, false, GuestType.Shared,
                         false, null, null, false, null, true, false, null, false, null, true);
         assertNull("Shared network offering with specifyVlan=false was created", off);
     }
@@ -97,7 +98,7 @@ public class CreateNetworkOfferingTest extends TestCase {
     @Test
     public void createSharedNtwkOffWithSpecifyIpRanges() {
         final NetworkOfferingVO off =
-                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, true, Availability.Optional, 200, null, false, Network.GuestType.Shared, false,
+                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, true, Availability.Optional, 200, null, false, GuestType.Shared, false,
                         null, null, false, null, true, false, null, false, null, true);
 
         assertNotNull("Shared network offering with specifyIpRanges=true failed to create ", off);
@@ -106,7 +107,7 @@ public class CreateNetworkOfferingTest extends TestCase {
     @Test(expected = InvalidParameterValueException.class)
     public void createSharedNtwkOffWithoutSpecifyIpRanges() {
         final NetworkOfferingVO off =
-                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, true, Availability.Optional, 200, null, false, Network.GuestType.Shared,
+                configMgr.createNetworkOffering("shared", "shared", TrafficType.Guest, null, true, Availability.Optional, 200, null, false, GuestType.Shared,
                         false, null, null, false, null, false, false, null, false, null, true);
         assertNull("Shared network offering with specifyIpRanges=false was created", off);
     }
@@ -120,7 +121,7 @@ public class CreateNetworkOfferingTest extends TestCase {
         serviceProviderMap.put(Network.Service.SourceNat, vrProvider);
         final NetworkOfferingVO off =
                 configMgr.createNetworkOffering("isolated", "isolated", TrafficType.Guest, null, false, Availability.Optional, 200, serviceProviderMap, false,
-                        Network.GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
+                        GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
 
         assertNotNull("Isolated network offering with specifyIpRanges=false failed to create ", off);
     }
@@ -133,7 +134,7 @@ public class CreateNetworkOfferingTest extends TestCase {
         serviceProviderMap.put(Network.Service.SourceNat, vrProvider);
         final NetworkOfferingVO off =
                 configMgr.createNetworkOffering("isolated", "isolated", TrafficType.Guest, null, true, Availability.Optional, 200, serviceProviderMap, false,
-                        Network.GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
+                        GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
         assertNotNull("Isolated network offering with specifyVlan=true wasn't created", off);
     }
 
@@ -145,7 +146,7 @@ public class CreateNetworkOfferingTest extends TestCase {
         serviceProviderMap.put(Network.Service.SourceNat, vrProvider);
         final NetworkOfferingVO off =
                 configMgr.createNetworkOffering("isolated", "isolated", TrafficType.Guest, null, false, Availability.Optional, 200, serviceProviderMap, false,
-                        Network.GuestType.Isolated, false, null, null, false, null, true, false, null, false, null, true);
+                        GuestType.Isolated, false, null, null, false, null, true, false, null, false, null, true);
         assertNull("Isolated network offering with specifyIpRanges=true and source nat service enabled, was created", off);
     }
 
@@ -156,7 +157,7 @@ public class CreateNetworkOfferingTest extends TestCase {
         final Set<Network.Provider> vrProvider = new HashSet<>();
         final NetworkOfferingVO off =
                 configMgr.createNetworkOffering("isolated", "isolated", TrafficType.Guest, null, false, Availability.Optional, 200, serviceProviderMap, false,
-                        Network.GuestType.Isolated, false, null, null, false, null, true, false, null, false, null, true);
+                        GuestType.Isolated, false, null, null, false, null, true, false, null, false, null, true);
         assertNotNull("Isolated network offering with specifyIpRanges=true and with no sourceNatService, failed to create", off);
     }
 
@@ -173,7 +174,7 @@ public class CreateNetworkOfferingTest extends TestCase {
         serviceProviderMap.put(Network.Service.Lb, vrProvider);
         final NetworkOfferingVO off =
                 configMgr.createNetworkOffering("isolated", "isolated", TrafficType.Guest, null, true, Availability.Optional, 200, serviceProviderMap, false,
-                        Network.GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
+                        GuestType.Isolated, false, null, null, false, null, false, false, null, false, null, true);
         // System.out.println("Creating Vpc Network Offering");
         assertNotNull("Vpc Isolated network offering with Vpc provider ", off);
     }

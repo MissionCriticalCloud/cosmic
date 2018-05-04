@@ -1,6 +1,6 @@
 package com.cloud.resource;
 
-import com.cloud.agent.api.Command;
+import com.cloud.legacymodel.communication.command.Command;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

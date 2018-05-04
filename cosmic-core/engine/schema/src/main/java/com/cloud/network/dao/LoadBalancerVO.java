@@ -1,7 +1,7 @@
 package com.cloud.network.dao;
 
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.LoadBalancer;
 import com.cloud.utils.net.NetUtils;
 
 import javax.persistence.Column;

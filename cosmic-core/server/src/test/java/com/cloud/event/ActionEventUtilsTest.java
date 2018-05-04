@@ -7,15 +7,15 @@ import com.cloud.event.dao.EventDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.events.EventBus;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.network.IpAddress;
 import com.cloud.projects.dao.ProjectDao;
 import com.cloud.user.AccountVO;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.vm.VirtualMachine;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;

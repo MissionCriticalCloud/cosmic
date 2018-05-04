@@ -1,13 +1,14 @@
 package com.cloud.storage.snapshot;
 
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.Snapshot.Event;
 import com.cloud.storage.Snapshot.State;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.listener.SnapshotStateListener;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 
 import javax.inject.Inject;
 
@@ -41,6 +42,6 @@ public class SnapshotStateMachineManagerImpl implements SnapshotStateMachineMana
 
     @Override
     public void processEvent(final SnapshotVO snapshot, final Event event) throws NoTransitionException {
-        stateMachine.transitTo(snapshot, event, null, snapshotDao);
+        new StateMachine2Transitions(stateMachine).transitTo(snapshot, event, null, snapshotDao);
     }
 }

@@ -1,6 +1,6 @@
 package com.cloud.storage.datastore.db;
 
-import com.cloud.storage.DataStoreRole;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.ImageStore;
 import com.cloud.storage.ScopeType;
 import com.cloud.utils.UriUtils;

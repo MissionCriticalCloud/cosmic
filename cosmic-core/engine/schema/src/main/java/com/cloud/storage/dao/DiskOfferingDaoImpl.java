@@ -1,6 +1,6 @@
 package com.cloud.storage.dao;
 
-import com.cloud.offering.DiskOffering.Type;
+import com.cloud.legacymodel.storage.DiskOffering.Type;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.Filter;

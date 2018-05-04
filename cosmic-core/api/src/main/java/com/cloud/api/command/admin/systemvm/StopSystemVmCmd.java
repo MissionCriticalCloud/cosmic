@@ -13,10 +13,11 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,8 @@ public class StopSystemVmCmd extends BaseAsyncCmd {
 
     @Override
     public String getEventType() {
-        final VirtualMachine.Type type = _mgr.findSystemVMTypeById(getId());
-        if (type == VirtualMachine.Type.ConsoleProxy) {
+        final VirtualMachineType type = _mgr.findSystemVMTypeById(getId());
+        if (type == VirtualMachineType.ConsoleProxy) {
             return EventTypes.EVENT_PROXY_STOP;
         } else {
             return EventTypes.EVENT_SSVM_STOP;

@@ -1,8 +1,8 @@
 package com.cloud.network.rules.dao;
 
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.FirewallRule.State;
 import com.cloud.network.dao.FirewallRulesCidrsDao;
-import com.cloud.network.rules.FirewallRule.Purpose;
-import com.cloud.network.rules.FirewallRule.State;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;

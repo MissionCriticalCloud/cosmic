@@ -1,9 +1,9 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.VgpuTypesInfo;
-import com.cloud.agent.api.to.GPUDeviceTO;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.to.GPUDeviceTO;
+import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.resource.ServerResource;
 
 import javax.ejb.Local;

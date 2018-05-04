@@ -1,8 +1,8 @@
 package com.cloud.cluster.agentlb;
 
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
@@ -26,7 +26,7 @@ public class ClusterBasedAgentLoadBalancerPlanner extends AdapterBase implements
     @Override
     public List<HostVO> getHostsToRebalance(final long msId, final int avLoad) {
         QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
         sc.and(sc.entity().getManagementServerId(), Op.EQ, msId);
         final List<HostVO> allHosts = sc.list();
 
@@ -38,12 +38,12 @@ public class ClusterBasedAgentLoadBalancerPlanner extends AdapterBase implements
 
         sc = QueryBuilder.create(HostVO.class);
         sc.and(sc.entity().getManagementServerId(), Op.EQ, msId);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.Routing);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         final List<HostVO> directHosts = sc.list();
 
         if (directHosts.isEmpty()) {
-            s_logger.debug("No direct agents in status " + Status.Up + " exist for the management server " + msId +
+            s_logger.debug("No direct agents in status " + HostStatus.Up + " exist for the management server " + msId +
                     "; so it doesn't participate in agent rebalancing process");
             return null;
         }

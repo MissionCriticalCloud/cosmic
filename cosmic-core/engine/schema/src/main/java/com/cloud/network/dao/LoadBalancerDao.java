@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

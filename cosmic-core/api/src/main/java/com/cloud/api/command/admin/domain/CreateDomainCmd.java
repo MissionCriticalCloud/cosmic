@@ -9,8 +9,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.context.CallContext;
-import com.cloud.domain.Domain;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

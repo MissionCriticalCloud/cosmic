@@ -2,23 +2,30 @@ package com.cloud.network.router.deployment;
 
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetworkServiceProvider;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
@@ -29,22 +36,17 @@ import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.UserIpv6AddressDao;
 import com.cloud.network.dao.VirtualRouterProviderDao;
 import com.cloud.network.router.NetworkHelper;
-import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.JoinBuilder;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile.Param;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
@@ -274,7 +276,7 @@ public class RouterDeploymentDefinition {
         if (isBasic() && dest.getPod() == null) {
             // Find all pods in the data center with running or starting user vms
             final long dcId = dest.getZone().getId();
-            final List<HostPodVO> pods = listByDataCenterIdVMTypeAndStates(dcId, VirtualMachine.Type.User, VirtualMachine.State.Starting, VirtualMachine.State.Running);
+            final List<HostPodVO> pods = listByDataCenterIdVMTypeAndStates(dcId, VirtualMachineType.User, VirtualMachine.State.Starting, VirtualMachine.State.Running);
 
             // Loop through all the pods skip those with running or starting VRs
             for (final HostPodVO pod : pods) {
@@ -322,7 +324,7 @@ public class RouterDeploymentDefinition {
     }
 
     protected void setupAccountOwner() {
-        if (networkModel.isNetworkSystem(guestNetwork) || guestNetwork.getGuestType() == Network.GuestType.Shared) {
+        if (networkModel.isNetworkSystem(guestNetwork) || guestNetwork.getGuestType() == GuestType.Shared) {
             owner = accountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM);
         }
     }
@@ -424,7 +426,7 @@ public class RouterDeploymentDefinition {
     }
 
     /**
-     * Lists all pods given a Data Center Id, a {@link VirtualMachine.Type} and
+     * Lists all pods given a Data Center Id, a {@link VirtualMachineType} and
      * a list of {@link VirtualMachine.State}
      *
      * @param id
@@ -432,7 +434,7 @@ public class RouterDeploymentDefinition {
      * @param states
      * @return
      */
-    protected List<HostPodVO> listByDataCenterIdVMTypeAndStates(final long id, final VirtualMachine.Type type, final VirtualMachine.State... states) {
+    protected List<HostPodVO> listByDataCenterIdVMTypeAndStates(final long id, final VirtualMachineType type, final VirtualMachine.State... states) {
         final SearchBuilder<VMInstanceVO> vmInstanceSearch = vmDao.createSearchBuilder();
         vmInstanceSearch.and("type", vmInstanceSearch.entity().getType(), SearchCriteria.Op.EQ);
         vmInstanceSearch.and("states", vmInstanceSearch.entity().getState(), SearchCriteria.Op.IN);

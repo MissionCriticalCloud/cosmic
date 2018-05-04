@@ -9,8 +9,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.AddNicToVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -18,8 +18,9 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "addNicToVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Adds VM to specified network by creating a NIC", responseObject = UserVmResponse.class, responseView = ResponseView
-        .Full, entityType = {VirtualMachine.class},
+@APICommand(name = "addNicToVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Adds VM to specified network by creating a NIC", responseObject = UserVmResponse.class,
+        responseView = ResponseView
+                .Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class AddNicToVMCmdByAdmin extends AddNicToVMCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(AddNicToVMCmdByAdmin.class);

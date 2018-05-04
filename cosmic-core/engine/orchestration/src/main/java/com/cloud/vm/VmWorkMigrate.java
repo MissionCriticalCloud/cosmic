@@ -3,12 +3,12 @@ package com.cloud.vm;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.Pod;
 import com.cloud.deploy.DeployDestination;
-import com.cloud.host.Host;
-import com.cloud.org.Cluster;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
 
 import java.util.HashMap;
 import java.util.Map;

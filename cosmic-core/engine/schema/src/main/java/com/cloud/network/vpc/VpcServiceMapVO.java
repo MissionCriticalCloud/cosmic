@@ -1,7 +1,7 @@
 package com.cloud.network.vpc;
 
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

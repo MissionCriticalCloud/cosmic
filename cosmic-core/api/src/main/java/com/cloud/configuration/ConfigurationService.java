@@ -21,21 +21,21 @@ import com.cloud.api.command.admin.zone.DeleteZoneCmd;
 import com.cloud.api.command.admin.zone.UpdateZoneCmd;
 import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
 import com.cloud.config.Configuration;
-import com.cloud.dc.DataCenter;
-import com.cloud.dc.Pod;
-import com.cloud.dc.Vlan;
-import com.cloud.domain.Domain;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.offering.DiskOffering;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offering.ServiceOffering;
-import com.cloud.user.Account;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 
@@ -67,7 +67,6 @@ public interface ConfigurationService {
 
     /**
      * Deletes a service offering
-     *
      */
     boolean deleteServiceOffering(DeleteServiceOfferingCmd cmd);
 
@@ -114,7 +113,6 @@ public interface ConfigurationService {
 
     /**
      * Edits a pod in the database. Will not allow you to edit pods that are being used anywhere in the system.
-     *
      */
     Pod editPod(UpdatePodCmd cmd);
 
@@ -146,7 +144,6 @@ public interface ConfigurationService {
 
     /**
      * Deletes a zone from the database. Will not allow you to delete zones that are being used anywhere in the system.
-     *
      */
     boolean deleteZone(DeleteZoneCmd cmd);
 

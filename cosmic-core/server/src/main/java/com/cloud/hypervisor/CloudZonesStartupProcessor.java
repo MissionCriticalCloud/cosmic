@@ -2,10 +2,9 @@ package com.cloud.hypervisor;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.StartupCommandProcessor;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.exception.ConnectionException;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.net.MacAddress;
 
@@ -38,18 +37,6 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
             _nodeId = MacAddress.getMacAddress().toLong();
         }
         return true;
-    }
-
-    @Override
-    public boolean processInitialConnect(final StartupCommand[] cmd) throws ConnectionException {
-        final StartupCommand startup = cmd[0];
-        if (startup instanceof StartupRoutingCommand) {
-            return processHostStartup((StartupRoutingCommand) startup);
-        } else if (startup instanceof StartupStorageCommand) {
-            return processStorageStartup((StartupStorageCommand) startup);
-        }
-
-        return false;
     }
 
     protected boolean processHostStartup(final StartupRoutingCommand startup) throws ConnectionException {

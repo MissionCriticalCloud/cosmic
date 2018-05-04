@@ -1,5 +1,6 @@
 package com.cloud.engine.subsystem.api.storage;
 
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.storage.Snapshot;
 
 public interface SnapshotInfo extends DataObject, Snapshot {

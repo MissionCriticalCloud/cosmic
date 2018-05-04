@@ -1,29 +1,29 @@
 package com.cloud.agent.service;
 
-import com.cloud.agent.IAgentControl;
-import com.cloud.agent.IAgentControlListener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.CronCommand;
-import com.cloud.agent.api.MaintainAnswer;
-import com.cloud.agent.api.MaintainCommand;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.ShutdownCommand;
-import com.cloud.agent.api.StartupAnswer;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.transport.Request;
-import com.cloud.agent.transport.Response;
-import com.cloud.exception.AgentControlChannelException;
+import com.cloud.common.agent.IAgentControl;
+import com.cloud.common.agent.IAgentControlListener;
+import com.cloud.common.transport.Request;
+import com.cloud.common.transport.Response;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MaintainAnswer;
+import com.cloud.legacymodel.communication.answer.StartupAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CronCommand;
+import com.cloud.legacymodel.communication.command.MaintainCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.ShutdownCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.exceptions.AgentControlChannelException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.NioConnectionException;
+import com.cloud.legacymodel.exceptions.TaskExecutionException;
 import com.cloud.managed.context.ManagedContextTimerTask;
 import com.cloud.resource.ServerResource;
 import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.NioConnectionException;
-import com.cloud.utils.exception.TaskExecutionException;
 import com.cloud.utils.nio.HandlerFactory;
 import com.cloud.utils.nio.Link;
 import com.cloud.utils.nio.NioClient;
@@ -581,23 +581,6 @@ public class Agent implements HandlerFactory, IAgentControl {
             }
         } else {
             logger.warn("Ignoring an unknown task");
-        }
-    }
-
-    public enum ExitStatus {
-        Normal(0), // Normal status = 0.
-        Upgrade(65), // Exiting for upgrade.
-        Configuration(66), // Exiting due to configuration problems.
-        Error(67); // Exiting because of error.
-
-        int value;
-
-        ExitStatus(final int value) {
-            this.value = value;
-        }
-
-        public int value() {
-            return value;
         }
     }
 

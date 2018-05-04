@@ -1,16 +1,24 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.ModifyStoragePoolCommand;
 import com.cloud.alert.AlertManager;
 import com.cloud.context.CallContext;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.DataStoreProviderManager;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.ModifyStoragePoolCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -18,17 +26,12 @@ import com.cloud.storage.dao.StoragePoolWorkDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 import com.cloud.user.dao.UserDao;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.ConsoleProxyVO;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.ConsoleProxyDao;
 import com.cloud.vm.dao.DomainRouterDao;
@@ -116,7 +119,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                     hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByHypervisor(pool.getHypervisor(), pool.getDataCenterId());
                 }
             } else {
-                hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), Status.Up);
+                hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), HostStatus.Up);
             }
 
             if (hosts == null || hosts.size() == 0) {
@@ -194,7 +197,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
 
                 // if the instance is of type consoleproxy, call the console
                 // proxy
-                if (vmInstance.getType().equals(VirtualMachine.Type.ConsoleProxy)) {
+                if (vmInstance.getType().equals(VirtualMachineType.ConsoleProxy)) {
                     // call the consoleproxymanager
                     final ConsoleProxyVO consoleProxy = _consoleProxyDao.findById(vmInstance.getId());
                     vmMgr.advanceStop(consoleProxy.getUuid(), false);
@@ -212,7 +215,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                 }
 
                 // if the instance is of type uservm, call the user vm manager
-                if (vmInstance.getType() == VirtualMachine.Type.User) {
+                if (vmInstance.getType() == VirtualMachineType.User) {
                     final UserVmVO userVm = userVmDao.findById(vmInstance.getId());
                     vmMgr.advanceStop(userVm.getUuid(), false);
                     // update work status
@@ -222,7 +225,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
 
                 // if the instance is of type secondary storage vm, call the
                 // secondary storage vm manager
-                if (vmInstance.getType().equals(VirtualMachine.Type.SecondaryStorageVm)) {
+                if (vmInstance.getType().equals(VirtualMachineType.SecondaryStorageVm)) {
                     final SecondaryStorageVmVO secStrgVm = _secStrgDao.findById(vmInstance.getId());
                     vmMgr.advanceStop(secStrgVm.getUuid(), false);
                     // update work status
@@ -239,7 +242,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
 
                 // if the instance is of type domain router vm, call the network
                 // manager
-                if (vmInstance.getType().equals(VirtualMachine.Type.DomainRouter)) {
+                if (vmInstance.getType().equals(VirtualMachineType.DomainRouter)) {
                     final DomainRouterVO domR = _domrDao.findById(vmInstance.getId());
                     vmMgr.advanceStop(domR.getUuid(), false);
                     // update work status
@@ -282,7 +285,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                 hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByHypervisor(poolVO.getHypervisor(), pool.getDataCenterId());
             }
         } else {
-            hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), Status.Up);
+            hosts = _resourceMgr.listHostsInClusterByStatus(pool.getClusterId(), HostStatus.Up);
         }
 
         if (hosts == null || hosts.size() == 0) {
@@ -317,7 +320,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
 
                 // if the instance is of type consoleproxy, call the console
                 // proxy
-                if (vmInstance.getType().equals(VirtualMachine.Type.ConsoleProxy)) {
+                if (vmInstance.getType().equals(VirtualMachineType.ConsoleProxy)) {
 
                     final ConsoleProxyVO consoleProxy = _consoleProxyDao
                             .findById(vmInstance.getId());
@@ -329,7 +332,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
 
                 // if the instance is of type ssvm, call the ssvm manager
                 if (vmInstance.getType().equals(
-                        VirtualMachine.Type.SecondaryStorageVm)) {
+                        VirtualMachineType.SecondaryStorageVm)) {
                     final SecondaryStorageVmVO ssVm = _secStrgDao.findById(vmInstance
                             .getId());
                     vmMgr.advanceStart(ssVm.getUuid(), null, null);
@@ -341,7 +344,7 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
 
                 // if the instance is of type domain router vm, call the network
                 // manager
-                if (vmInstance.getType().equals(VirtualMachine.Type.DomainRouter)) {
+                if (vmInstance.getType().equals(VirtualMachineType.DomainRouter)) {
                     final DomainRouterVO domR = _domrDao.findById(vmInstance.getId());
                     vmMgr.advanceStart(domR.getUuid(), null, null);
                     // update work queue
@@ -350,11 +353,11 @@ public class StoragePoolAutomationImpl implements StoragePoolAutomation {
                 }
 
                 // if the instance is of type user vm, call the user vm manager
-                if (vmInstance.getType().equals(VirtualMachine.Type.User)) {
+                if (vmInstance.getType().equals(VirtualMachineType.User)) {
                     // check if the vm has a root volume. If not, remove the item from the queue, the vm should be
                     // started only when it has at least one root volume attached to it
                     // don't allow to start vm that doesn't have a root volume
-                    if (volumeDao.findByInstanceAndType(vmInstance.getId(), Volume.Type.ROOT).isEmpty()) {
+                    if (volumeDao.findByInstanceAndType(vmInstance.getId(), VolumeType.ROOT).isEmpty()) {
                         _storagePoolWorkDao.remove(work.getId());
                     } else {
                         final UserVmVO userVm = userVmDao.findById(vmInstance.getId());

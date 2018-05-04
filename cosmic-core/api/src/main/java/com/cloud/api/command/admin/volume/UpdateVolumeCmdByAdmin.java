@@ -8,7 +8,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.volume.UpdateVolumeCmd;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
-import com.cloud.storage.Volume;
+import com.cloud.legacymodel.storage.Volume;
 
 @APICommand(name = "updateVolume", group = APICommandGroup.VolumeService, description = "Updates the volume.", responseObject = VolumeResponse.class, responseView = ResponseView.Full, entityType =
         {Volume.class},

@@ -1,18 +1,19 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.PingTestCommand;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.PingTestCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.network.router.VpcVirtualNetworkApplianceManager;
-import com.cloud.vm.Nic;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.UserVmDao;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
 
     @Override
     public boolean isVmAlive(final VirtualMachine vm, final Host host) throws UnknownVM {
-        if (vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getType() != VirtualMachineType.User) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Not a User Vm, unable to determine state of " + vm + " returning null");
             }
@@ -86,7 +87,7 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
     }
 
     @Override
-    public Status isAgentAlive(final Host agent) {
+    public HostStatus isAgentAlive(final Host agent) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("checking if agent (" + agent.getId() + ") is alive");
         }
@@ -101,20 +102,20 @@ public class UserVmDomRInvestigator extends AbstractInvestigatorImpl {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("sending ping from (" + hostId + ") to agent's host ip address (" + agent.getPrivateIpAddress() + ")");
             }
-            final Status hostState = testIpAddress(hostId, agent.getPrivateIpAddress());
+            final HostStatus hostState = testIpAddress(hostId, agent.getPrivateIpAddress());
             assert hostState != null;
-            // In case of Status.Unknown, next host will be tried
-            if (hostState == Status.Up) {
+            // In case of HostStatus.Unknown, next host will be tried
+            if (hostState == HostStatus.Up) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("ping from (" + hostId + ") to agent's host ip address (" + agent.getPrivateIpAddress() +
                             ") successful, returning that agent is disconnected");
                 }
-                return Status.Disconnected; // the computing host ip is ping-able, but the computing agent is down, report that the agent is disconnected
-            } else if (hostState == Status.Down) {
+                return HostStatus.Disconnected; // the computing host ip is ping-able, but the computing agent is down, report that the agent is disconnected
+            } else if (hostState == HostStatus.Down) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("returning host state: " + hostState);
                 }
-                return Status.Down;
+                return HostStatus.Down;
             }
         }
 

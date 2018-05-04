@@ -9,8 +9,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.vm.RemoveNicFromVMCmd;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -18,7 +18,8 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "removeNicFromVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse.class, responseView =
+@APICommand(name = "removeNicFromVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Removes VM from specified network by deleting a NIC", responseObject = UserVmResponse
+        .class, responseView =
         ResponseView.Full, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class RemoveNicFromVMCmdByAdmin extends RemoveNicFromVMCmd {

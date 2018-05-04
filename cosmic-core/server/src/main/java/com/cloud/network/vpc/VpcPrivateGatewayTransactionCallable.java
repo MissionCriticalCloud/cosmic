@@ -1,5 +1,6 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpc.dao.VpcGatewayDao;
 import com.cloud.utils.db.Transaction;

@@ -5,12 +5,12 @@ import com.cloud.api.command.admin.ratelimit.ResetApiLimitCmd;
 import com.cloud.api.command.user.ratelimit.GetApiLimitCmd;
 import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.configuration.Config;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.RequestLimitException;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.RequestLimitException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.user.AccountService;
-import com.cloud.user.User;
 import com.cloud.utils.component.AdapterBase;
 
 import javax.inject.Inject;

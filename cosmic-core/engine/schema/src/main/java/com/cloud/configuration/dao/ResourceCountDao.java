@@ -1,8 +1,8 @@
 package com.cloud.configuration.dao;
 
-import com.cloud.configuration.Resource.ResourceOwnerType;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.configuration.ResourceCountVO;
+import com.cloud.legacymodel.configuration.Resource.ResourceOwnerType;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

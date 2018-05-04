@@ -1,8 +1,8 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DataTO;
 import com.cloud.framework.async.AsyncCompletionCallback;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DataTO;
 import com.cloud.storage.command.CommandResult;
 
 import java.util.Map;

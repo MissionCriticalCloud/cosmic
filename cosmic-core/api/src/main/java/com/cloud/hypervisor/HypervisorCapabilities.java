@@ -1,8 +1,8 @@
 package com.cloud.hypervisor;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.model.enumeration.HypervisorType;
 
 /**
  * HypervisorCapability represents one particular hypervisor version's capabilities.

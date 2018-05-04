@@ -7,13 +7,14 @@ import com.cloud.api.BaseUpdateTemplateOrIsoCmd;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.template.VirtualMachineTemplate;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateTemplate", group = APICommandGroup.TemplateService, description = "Updates attributes of a template.", responseObject = TemplateResponse.class, responseView = ResponseView.Restricted,
+@APICommand(name = "updateTemplate", group = APICommandGroup.TemplateService, description = "Updates attributes of a template.", responseObject = TemplateResponse.class, responseView = ResponseView
+        .Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateTemplateCmd extends BaseUpdateTemplateOrIsoCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateTemplateCmd.class.getName());

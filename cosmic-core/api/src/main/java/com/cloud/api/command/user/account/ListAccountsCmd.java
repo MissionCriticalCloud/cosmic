@@ -8,12 +8,13 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ResponseObject.ResponseView;
 import com.cloud.api.response.AccountResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listAccounts", group = APICommandGroup.AccountService, description = "Lists accounts and provides detailed account information for listed accounts", responseObject = AccountResponse.class,
+@APICommand(name = "listAccounts", group = APICommandGroup.AccountService, description = "Lists accounts and provides detailed account information for listed accounts", responseObject =
+        AccountResponse.class,
         responseView = ResponseView.Restricted, entityType = {Account.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class ListAccountsCmd extends BaseListDomainResourcesCmd {

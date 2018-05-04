@@ -1,9 +1,9 @@
 package com.cloud.dc;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.model.enumeration.AllocationState;
-import com.cloud.org.Cluster;
-import com.cloud.org.Managed.ManagedState;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ManagedState;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
 

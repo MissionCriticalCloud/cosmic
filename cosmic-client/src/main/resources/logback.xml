@@ -70,7 +70,7 @@
     <logger name="com.cloud.agent.manager.DirectAgentAttache" level="DEBUG" additivity="false">
         <appender-ref ref="APIAGENT" />
     </logger>
-    <logger name="com.cloud.agent.transport.Request" level="DEBUG" additivity="false">
+    <logger name="com.cloud.common.transport.Request" level="DEBUG" additivity="false">
         <appender-ref ref="APIAGENT" />
     </logger>
 

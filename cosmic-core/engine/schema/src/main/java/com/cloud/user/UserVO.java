@@ -1,8 +1,9 @@
 package com.cloud.user;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.user.Account.State;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.user.Account.State;
+import com.cloud.legacymodel.user.User;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
 
@@ -244,14 +245,6 @@ public class UserVO implements User, Identity, InternalIdentity {
 
     public void setSource(final Source source) {
         this.source = source;
-    }
-
-    public String getExternalEntity() {
-        return externalEntity;
-    }
-
-    public void setExternalEntity(final String externalEntity) {
-        this.externalEntity = externalEntity;
     }
 
     @Override

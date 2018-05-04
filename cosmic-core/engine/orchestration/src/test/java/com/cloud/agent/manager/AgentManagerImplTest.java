@@ -1,21 +1,22 @@
 package com.cloud.agent.manager;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.exception.ConnectionException;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.Event;
+
+import java.util.ArrayList;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
 
 public class AgentManagerImplTest {
 
@@ -45,9 +46,9 @@ public class AgentManagerImplTest {
     public void testNotifyMonitorsOfConnectionNormal() throws ConnectionException {
         Mockito.when(hostDao.findById(Mockito.anyLong())).thenReturn(host);
         Mockito.doNothing().when(storagePoolMonitor).processConnect(Mockito.eq(host), Mockito.eq(cmds[0]), Mockito.eq(false));
-        Mockito.doReturn(true).when(mgr).handleDisconnectWithoutInvestigation(Mockito.any(attache.getClass()), Mockito.any(Status.Event.class), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(true).when(mgr).handleDisconnectWithoutInvestigation(Mockito.any(attache.getClass()), Mockito.any(Event.class), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(Mockito.mock(Answer.class)).when(mgr).easySend(Mockito.anyLong(), Mockito.any(ReadyCommand.class));
-        Mockito.doReturn(true).when(mgr).agentStatusTransitTo(Mockito.eq(host), Mockito.eq(Status.Event.Ready), Mockito.anyLong());
+        Mockito.doReturn(true).when(mgr).agentStatusTransitTo(Mockito.eq(host), Mockito.eq(Event.Ready), Mockito.anyLong());
 
         final AgentAttache agentAttache = mgr.notifyMonitorsOfConnection(attache, cmds, false);
         Assert.assertTrue(agentAttache.isReady()); // Agent is in UP state
@@ -58,13 +59,13 @@ public class AgentManagerImplTest {
         ConnectionException connectionException = new ConnectionException(true, "storage pool could not be connected on host");
         Mockito.when(hostDao.findById(Mockito.anyLong())).thenReturn(host);
         Mockito.doThrow(connectionException).when(storagePoolMonitor).processConnect(Mockito.eq(host), Mockito.eq(cmds[0]), Mockito.eq(false));
-        Mockito.doReturn(true).when(mgr).handleDisconnectWithoutInvestigation(Mockito.any(attache.getClass()), Mockito.any(Status.Event.class), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(true).when(mgr).handleDisconnectWithoutInvestigation(Mockito.any(attache.getClass()), Mockito.any(Event.class), Mockito.anyBoolean(), Mockito.anyBoolean());
         try {
             mgr.notifyMonitorsOfConnection(attache, cmds, false);
             Assert.fail("Connection Exception was expected");
         } catch (ConnectionException e) {
             Assert.assertEquals(e.getMessage(), connectionException.getMessage());
         }
-        Mockito.verify(mgr, Mockito.times(1)).handleDisconnectWithoutInvestigation(Mockito.any(attache.getClass()), Mockito.eq(Status.Event.AgentDisconnected), Mockito.eq(true), Mockito.eq(true));
+        Mockito.verify(mgr, Mockito.times(1)).handleDisconnectWithoutInvestigation(Mockito.any(attache.getClass()), Mockito.eq(Event.AgentDisconnected), Mockito.eq(true), Mockito.eq(true));
     }
 }

@@ -1,5 +1,6 @@
 package com.cloud.offering;
 
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.model.enumeration.DiskControllerType;
 
 public class DiskOfferingInfo {

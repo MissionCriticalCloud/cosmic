@@ -7,10 +7,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.NetworkUsageCommand;
 import com.cloud.hypervisor.xenserver.resource.XcpServerResource;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import com.xensource.xenapi.Connection;
 import org.junit.Test;

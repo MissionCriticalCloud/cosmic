@@ -14,13 +14,13 @@ import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.IpForwardingRuleResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.StaticNatRule;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.StaticNatRule;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 

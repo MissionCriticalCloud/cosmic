@@ -12,8 +12,8 @@ import com.cloud.api.response.PodResponse;
 import com.cloud.api.response.StoragePoolResponse;
 import com.cloud.api.response.SystemVmResponse;
 import com.cloud.api.response.ZoneResponse;
-import com.cloud.utils.Pair;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listSystemVms", group = APICommandGroup.SystemVMService, description = "List system virtual machines.", responseObject = SystemVmResponse.class, entityType = {VirtualMachine.class},
+@APICommand(name = "listSystemVms", group = APICommandGroup.SystemVMService, description = "List system virtual machines.", responseObject = SystemVmResponse.class, entityType = {VirtualMachine
+        .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListSystemVMsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListSystemVMsCmd.class.getName());

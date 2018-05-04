@@ -15,9 +15,9 @@ import com.cloud.api.response.NicResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -25,8 +25,9 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateDefaultNicForVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Changes the default NIC on a VM", responseObject = UserVmResponse.class, responseView = ResponseView
-        .Restricted, entityType = {VirtualMachine.class},
+@APICommand(name = "updateDefaultNicForVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Changes the default NIC on a VM", responseObject = UserVmResponse.class,
+        responseView = ResponseView
+                .Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class UpdateDefaultNicForVMCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateDefaultNicForVMCmd.class);

@@ -13,9 +13,9 @@ import com.cloud.api.response.DedicateClusterResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.ListResponse;
 import com.cloud.dc.DedicatedResourceVO;
-import com.cloud.dc.DedicatedResources;
+import com.cloud.legacymodel.dc.DedicatedResources;
 import com.cloud.dedicated.DedicatedService;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

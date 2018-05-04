@@ -1,8 +1,9 @@
 package com.cloud.storage.image.datastore;
 
 import com.cloud.api.ApiConstants;
-import com.cloud.engine.subsystem.api.storage.DataStore;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreDetailVO;
@@ -10,8 +11,6 @@ import com.cloud.storage.datastore.db.ImageStoreDetailsDao;
 import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.utils.crypt.DBEncryptionUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;

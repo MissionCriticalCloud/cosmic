@@ -1,8 +1,8 @@
 package com.cloud.dc.dao;
 
-import com.cloud.dc.Vlan;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

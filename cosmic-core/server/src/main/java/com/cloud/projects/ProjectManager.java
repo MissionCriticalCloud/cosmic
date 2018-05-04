@@ -1,6 +1,6 @@
 package com.cloud.projects;
 
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import java.util.List;
 

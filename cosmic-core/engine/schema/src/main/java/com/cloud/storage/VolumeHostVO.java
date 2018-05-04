@@ -1,11 +1,11 @@
 package com.cloud.storage;
 
-import com.cloud.api.InternalIdentity;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.db.GenericDaoBase;
 
 import javax.persistence.Column;
@@ -72,7 +72,7 @@ public class VolumeHostVO implements InternalIdentity, DataObjectInStore {
     @Column(name = "url", length = 2048)
     private String downloadUrl;
     @Column(name = "format")
-    private Storage.ImageFormat format;
+    private ImageFormat format;
 
     public VolumeHostVO(final long hostId, final long volumeId) {
         super();
@@ -291,11 +291,11 @@ public class VolumeHostVO implements InternalIdentity, DataObjectInStore {
         this.downloadUrl = downloadUrl;
     }
 
-    public Storage.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final Storage.ImageFormat format) {
+    public void setFormat(final ImageFormat format) {
         this.format = format;
     }
 

@@ -1,14 +1,14 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.PingTestCommand;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.PingTestCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.QueryBuilder;
@@ -52,9 +52,9 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
     // Host.status is up and Host.type is routing
     protected List<Long> findHostByPod(final long podId, final Long excludeHostId) {
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-        sc.and(sc.entity().getType(), Op.EQ, Type.Routing);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.Routing);
         sc.and(sc.entity().getPodId(), Op.EQ, podId);
-        sc.and(sc.entity().getStatus(), Op.EQ, Status.Up);
+        sc.and(sc.entity().getStatus(), Op.EQ, HostStatus.Up);
         final List<HostVO> hosts = sc.list();
 
         final List<Long> hostIds = new ArrayList<>(hosts.size());
@@ -69,15 +69,15 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
         return hostIds;
     }
 
-    // Method only returns Status.Up, Status.Down and Status.Unknown
-    protected Status testIpAddress(final Long hostId, final String testHostIp) {
+    // Method only returns HostStatus.Up, HostStatus.Down and HostStatus.Unknown
+    protected HostStatus testIpAddress(final Long hostId, final String testHostIp) {
         try {
             final Answer pingTestAnswer = _agentMgr.send(hostId, new PingTestCommand(testHostIp));
             if (pingTestAnswer == null) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("host (" + testHostIp + ") returns Unknown (null) answer");
                 }
-                return Status.Unknown;
+                return HostStatus.Unknown;
             }
 
             if (pingTestAnswer.getResult()) {
@@ -85,23 +85,23 @@ public abstract class AbstractInvestigatorImpl extends AdapterBase implements In
                     s_logger.debug("host (" + testHostIp + ") has been successfully pinged, returning that host is up");
                 }
                 // computing host is available, but could not reach agent, return false
-                return Status.Up;
+                return HostStatus.Up;
             } else {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("host (" + testHostIp + ") cannot be pinged, returning Unknown (I don't know) state");
                 }
-                return Status.Unknown;
+                return HostStatus.Unknown;
             }
         } catch (final AgentUnavailableException e) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("host (" + testHostIp + "): " + e.getLocalizedMessage() + ", trapped AgentUnavailableException returning Unknown state");
             }
-            return Status.Unknown;
+            return HostStatus.Unknown;
         } catch (final OperationTimedoutException e) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("host (" + testHostIp + "): " + e.getLocalizedMessage() + ", trapped OperationTimedoutException returning Unknown state");
             }
-            return Status.Unknown;
+            return HostStatus.Unknown;
         }
     }
 }

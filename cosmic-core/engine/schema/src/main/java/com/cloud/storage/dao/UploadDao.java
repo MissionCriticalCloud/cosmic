@@ -1,8 +1,8 @@
 package com.cloud.storage.dao;
 
-import com.cloud.storage.Upload.Mode;
-import com.cloud.storage.Upload.Status;
-import com.cloud.storage.Upload.Type;
+import com.cloud.legacymodel.storage.Upload.Mode;
+import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.Upload.Type;
 import com.cloud.storage.UploadVO;
 import com.cloud.utils.db.GenericDao;
 

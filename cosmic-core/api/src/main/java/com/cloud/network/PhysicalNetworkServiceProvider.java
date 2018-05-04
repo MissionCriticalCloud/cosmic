@@ -1,7 +1,7 @@
 package com.cloud.network;
 
-import com.cloud.api.InternalIdentity;
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.network.Network.Service;
 
 import java.util.List;
 

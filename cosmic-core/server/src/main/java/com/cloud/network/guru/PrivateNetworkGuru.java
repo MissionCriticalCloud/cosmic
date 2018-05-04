@@ -5,26 +5,30 @@ import static com.cloud.network.guru.GuestNetworkGuru.UseSystemGuestVlans;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
 import com.cloud.event.EventVO;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.State;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.IpAddressFormat;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.State;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
-import com.cloud.network.Networks.AddressFormat;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkDao;
@@ -33,12 +37,8 @@ import com.cloud.network.vpc.PrivateIpAddress;
 import com.cloud.network.vpc.PrivateIpVO;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.user.Account;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.VirtualMachineProfile;
@@ -91,7 +91,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
             broadcastType = BroadcastDomainType.Vlan;
         }
         final NetworkVO network =
-                new NetworkVO(offering.getTrafficType(), Mode.Static, broadcastType, offering.getId(), State.Allocated, plan.getDataCenterId(),
+                new NetworkVO(offering.getTrafficType(), DHCPMode.Static, broadcastType, offering.getId(), State.Allocated, plan.getDataCenterId(),
                         plan.getPhysicalNetworkId(), offering.getRedundantRouter());
         if (userSpecified != null) {
             if (!GuestType.Private.equals(offering.getGuestType()) &&
@@ -246,7 +246,7 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
             nic.setIsolationUri(IsolationType.Vlan.toUri(ip.getBroadcastUri()));
             nic.setBroadcastUri(IsolationType.Vlan.toUri(ip.getBroadcastUri()));
             nic.setBroadcastType(BroadcastDomainType.Vlan);
-            nic.setFormat(AddressFormat.Ip4);
+            nic.setFormat(IpAddressFormat.Ip4);
             nic.setReservationId(String.valueOf(ip.getBroadcastUri()));
             nic.setMacAddress(ip.getMacAddress());
         }

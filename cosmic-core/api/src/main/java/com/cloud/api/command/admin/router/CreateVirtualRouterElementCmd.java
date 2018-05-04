@@ -11,12 +11,12 @@ import com.cloud.api.response.ProviderResponse;
 import com.cloud.api.response.VirtualRouterProviderResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.element.VirtualRouterElementService;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.inject.Inject;
 import java.util.List;

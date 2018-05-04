@@ -1,19 +1,19 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.StartAnswer;
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.StartAnswer;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.vm.VirtualMachine;
 
 import java.net.URISyntaxException;
 
@@ -65,7 +65,7 @@ public final class LibvirtStartCommandWrapper extends CommandWrapper<StartComman
             libvirtComputingResource.startVm(conn, vmName, vm.toString());
 
             // system vms
-            if (vmSpec.getType() != VirtualMachine.Type.User) {
+            if (vmSpec.getType() != VirtualMachineType.User) {
 
                 // pass cmdline with config for the systemvm to configure itself
                 if (libvirtComputingResource.passCmdLine(vmName, vmSpec.getBootArgs())) {

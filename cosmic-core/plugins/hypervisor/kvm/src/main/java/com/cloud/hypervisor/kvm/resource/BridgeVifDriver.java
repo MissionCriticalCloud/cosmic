@@ -1,8 +1,9 @@
 package com.cloud.hypervisor.kvm.resource;
 
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.exception.InternalErrorException;
-import com.cloud.network.Networks;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.OutputInterpreter;
@@ -83,11 +84,11 @@ public class BridgeVifDriver extends VifDriverBase {
 
         String netId = null;
         String protocol = null;
-        if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan
-                || nic.getBroadcastType() == Networks.BroadcastDomainType.Vxlan) {
-            netId = Networks.BroadcastDomainType.getValue(nic.getBroadcastUri());
-            protocol = Networks.BroadcastDomainType.getSchemeValue(nic.getBroadcastUri()).scheme();
-        } else if (nic.getBroadcastType() == Networks.BroadcastDomainType.Lswitch) {
+        if (nic.getBroadcastType() == BroadcastDomainType.Vlan
+                || nic.getBroadcastType() == BroadcastDomainType.Vxlan) {
+            netId = BroadcastDomainType.getValue(nic.getBroadcastUri());
+            protocol = BroadcastDomainType.getSchemeValue(nic.getBroadcastUri()).scheme();
+        } else if (nic.getBroadcastType() == BroadcastDomainType.Lswitch) {
             throw new InternalErrorException("Nicira NVP Logicalswitches are not supported by the BridgeVifDriver");
         }
         final String trafficLabel = nic.getName();
@@ -97,10 +98,10 @@ public class BridgeVifDriver extends VifDriverBase {
                     ? nic.getNetworkRateMbps().intValue() * 128 : 0;
         }
 
-        if (nic.getType() == Networks.TrafficType.Guest) {
-            if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan && netId != null && protocol != null
+        if (nic.getType() == TrafficType.Guest) {
+            if (nic.getBroadcastType() == BroadcastDomainType.Vlan && netId != null && protocol != null
                     && !netId.equalsIgnoreCase("untagged")
-                    || nic.getBroadcastType() == Networks.BroadcastDomainType.Vxlan) {
+                    || nic.getBroadcastType() == BroadcastDomainType.Vxlan) {
                 if (trafficLabel != null && !trafficLabel.isEmpty()) {
                     logger.debug("creating a vNet dev and bridge for guest traffic per traffic label " + trafficLabel);
                     final String brName = createVnetBr(netId, trafficLabel, protocol);
@@ -118,14 +119,14 @@ public class BridgeVifDriver extends VifDriverBase {
                 }
                 intf.defBridgeNet(brname, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter), networkRateKBps);
             }
-        } else if (nic.getType() == Networks.TrafficType.Control) {
-      /* Make sure the network is still there */
+        } else if (nic.getType() == TrafficType.Control) {
+            /* Make sure the network is still there */
             createControlNetwork();
             intf.defBridgeNet(bridges.get("linklocal"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
-        } else if (nic.getType() == Networks.TrafficType.Public) {
-            if (nic.getBroadcastType() == Networks.BroadcastDomainType.Vlan && netId != null && protocol != null
+        } else if (nic.getType() == TrafficType.Public) {
+            if (nic.getBroadcastType() == BroadcastDomainType.Vlan && netId != null && protocol != null
                     && !netId.equalsIgnoreCase("untagged")
-                    || nic.getBroadcastType() == Networks.BroadcastDomainType.Vxlan) {
+                    || nic.getBroadcastType() == BroadcastDomainType.Vxlan) {
                 if (trafficLabel != null && !trafficLabel.isEmpty()) {
                     logger.debug("creating a vNet dev and bridge for public traffic per traffic label " + trafficLabel);
                     final String brName = createVnetBr(netId, trafficLabel, protocol);
@@ -138,9 +139,9 @@ public class BridgeVifDriver extends VifDriverBase {
                 intf.defBridgeNet(bridges.get("public"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter),
                         networkRateKBps);
             }
-        } else if (nic.getType() == Networks.TrafficType.Management) {
+        } else if (nic.getType() == TrafficType.Management) {
             intf.defBridgeNet(bridges.get("private"), null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
-        } else if (nic.getType() == Networks.TrafficType.Storage) {
+        } else if (nic.getType() == TrafficType.Storage) {
             final String storageBrName = nic.getName() == null ? bridges.get("private") : nic.getName();
             intf.defBridgeNet(storageBrName, null, nic.getMac(), getGuestNicModel(guestOsType, nicAdapter));
         }
@@ -220,7 +221,7 @@ public class BridgeVifDriver extends VifDriverBase {
             }
         }
         String brName = "";
-        if (protocol.equals(Networks.BroadcastDomainType.Vxlan.scheme())) {
+        if (protocol.equals(BroadcastDomainType.Vxlan.scheme())) {
             brName = setVxnetBrName(nic, netId);
         } else {
             brName = setVnetBrName(nic, netId);
@@ -240,7 +241,7 @@ public class BridgeVifDriver extends VifDriverBase {
     private void createVnet(final String vnetId, final String pif, final String brName, final String protocol) throws InternalErrorException {
         synchronized (vnetBridgeMonitor) {
             String script = modifyVlanPath;
-            if (protocol.equals(Networks.BroadcastDomainType.Vxlan.scheme())) {
+            if (protocol.equals(BroadcastDomainType.Vxlan.scheme())) {
                 script = modifyVxlanPath;
             }
             final Script command = new Script(script, timeout, logger);

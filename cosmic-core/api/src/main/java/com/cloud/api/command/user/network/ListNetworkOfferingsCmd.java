@@ -9,8 +9,8 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.NetworkOfferingResponse;
 import com.cloud.api.response.NetworkResponse;
 import com.cloud.api.response.ZoneResponse;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.offering.NetworkOffering;
-import com.cloud.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

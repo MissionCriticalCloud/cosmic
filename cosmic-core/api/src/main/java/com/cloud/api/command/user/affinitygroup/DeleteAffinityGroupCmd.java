@@ -17,12 +17,13 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deleteAffinityGroup", group = APICommandGroup.AffinityGroupService, description = "Deletes affinity group", responseObject = SuccessResponse.class, entityType = {AffinityGroup.class},
+@APICommand(name = "deleteAffinityGroup", group = APICommandGroup.AffinityGroupService, description = "Deletes affinity group", responseObject = SuccessResponse.class, entityType = {AffinityGroup
+        .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeleteAffinityGroupCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeleteAffinityGroupCmd.class.getName());

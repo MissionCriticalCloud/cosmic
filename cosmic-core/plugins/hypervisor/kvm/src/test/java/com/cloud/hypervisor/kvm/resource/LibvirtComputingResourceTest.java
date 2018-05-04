@@ -10,61 +10,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.AttachIsoCommand;
-import com.cloud.agent.api.BackupSnapshotCommand;
-import com.cloud.agent.api.CheckHealthCommand;
-import com.cloud.agent.api.CheckNetworkCommand;
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.agent.api.CheckRouterAnswer;
-import com.cloud.agent.api.CheckRouterCommand;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
-import com.cloud.agent.api.CreatePrivateTemplateFromSnapshotCommand;
-import com.cloud.agent.api.CreatePrivateTemplateFromVolumeCommand;
-import com.cloud.agent.api.CreateStoragePoolCommand;
-import com.cloud.agent.api.CreateVolumeFromSnapshotCommand;
-import com.cloud.agent.api.DeleteStoragePoolCommand;
-import com.cloud.agent.api.FenceCommand;
-import com.cloud.agent.api.GetHostStatsCommand;
-import com.cloud.agent.api.GetStorageStatsCommand;
-import com.cloud.agent.api.GetVmDiskStatsCommand;
-import com.cloud.agent.api.GetVmStatsCommand;
-import com.cloud.agent.api.GetVncPortCommand;
-import com.cloud.agent.api.MaintainCommand;
-import com.cloud.agent.api.ManageSnapshotCommand;
-import com.cloud.agent.api.MigrateCommand;
-import com.cloud.agent.api.ModifySshKeysCommand;
-import com.cloud.agent.api.ModifyStoragePoolCommand;
-import com.cloud.agent.api.NetworkUsageCommand;
-import com.cloud.agent.api.PingTestCommand;
-import com.cloud.agent.api.PlugNicCommand;
-import com.cloud.agent.api.PrepareForMigrationCommand;
-import com.cloud.agent.api.PvlanSetupCommand;
-import com.cloud.agent.api.ReadyCommand;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.RebootRouterCommand;
-import com.cloud.agent.api.StartCommand;
-import com.cloud.agent.api.StopCommand;
-import com.cloud.agent.api.UnPlugNicCommand;
-import com.cloud.agent.api.UpdateHostPasswordCommand;
-import com.cloud.agent.api.UpgradeSnapshotCommand;
-import com.cloud.agent.api.VmStatsEntry;
-import com.cloud.agent.api.check.CheckSshCommand;
-import com.cloud.agent.api.proxy.CheckConsoleProxyLoadCommand;
-import com.cloud.agent.api.proxy.WatchConsoleProxyLoadCommand;
-import com.cloud.agent.api.storage.CopyVolumeCommand;
-import com.cloud.agent.api.storage.CreateCommand;
-import com.cloud.agent.api.storage.DestroyCommand;
-import com.cloud.agent.api.storage.PrimaryStorageDownloadCommand;
-import com.cloud.agent.api.storage.ResizeVolumeCommand;
-import com.cloud.agent.api.to.DataStoreTO;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.agent.api.to.VolumeTO;
+import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
+import com.cloud.legacymodel.communication.command.DestroyCommand;
+import com.cloud.legacymodel.communication.command.PrimaryStorageDownloadCommand;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
 import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
-import com.cloud.exception.InternalErrorException;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.NfsStoragePool;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.wrapper.LibvirtRequestWrapper;
@@ -73,30 +23,82 @@ import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.PhysicalNetworkSetupInfo;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
+import com.cloud.legacymodel.communication.command.AttachIsoCommand;
+import com.cloud.legacymodel.communication.command.BackupSnapshotCommand;
+import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
+import com.cloud.legacymodel.communication.command.CheckRouterCommand;
+import com.cloud.legacymodel.communication.command.CheckSshCommand;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
+import com.cloud.legacymodel.communication.command.CopyVolumeCommand;
+import com.cloud.legacymodel.communication.command.CreateCommand;
+import com.cloud.legacymodel.communication.command.CreatePrivateTemplateFromSnapshotCommand;
+import com.cloud.legacymodel.communication.command.CreatePrivateTemplateFromVolumeCommand;
+import com.cloud.legacymodel.communication.command.CreateStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.CreateVolumeFromSnapshotCommand;
+import com.cloud.legacymodel.communication.command.DeleteStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.FenceCommand;
+import com.cloud.legacymodel.communication.command.GetHostStatsCommand;
+import com.cloud.legacymodel.communication.command.GetStorageStatsCommand;
+import com.cloud.legacymodel.communication.command.GetVmDiskStatsCommand;
+import com.cloud.legacymodel.communication.command.GetVmStatsCommand;
+import com.cloud.legacymodel.communication.command.GetVncPortCommand;
+import com.cloud.legacymodel.communication.command.MaintainCommand;
+import com.cloud.legacymodel.communication.command.ManageSnapshotCommand;
+import com.cloud.legacymodel.communication.command.MigrateCommand;
+import com.cloud.legacymodel.communication.command.ModifySshKeysCommand;
+import com.cloud.legacymodel.communication.command.ModifyStoragePoolCommand;
+import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
+import com.cloud.legacymodel.communication.command.PingTestCommand;
+import com.cloud.legacymodel.communication.command.PlugNicCommand;
+import com.cloud.legacymodel.communication.command.PrepareForMigrationCommand;
+import com.cloud.legacymodel.communication.command.ReadyCommand;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.RebootRouterCommand;
+import com.cloud.legacymodel.communication.command.StartCommand;
+import com.cloud.legacymodel.communication.command.StopCommand;
+import com.cloud.legacymodel.communication.command.UnPlugNicCommand;
+import com.cloud.legacymodel.communication.command.UpdateHostPasswordCommand;
+import com.cloud.legacymodel.communication.command.UpgradeSnapshotCommand;
+import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.storage.DiskProfile;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
+import com.cloud.legacymodel.vm.VmStatsEntry;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
-import com.cloud.storage.command.AttachAnswer;
-import com.cloud.storage.command.AttachCommand;
+import com.cloud.legacymodel.communication.answer.AttachAnswer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.TemplateLocation;
-import com.cloud.template.VirtualMachineTemplate.BootloaderType;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
-import com.cloud.vm.DiskProfile;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.PowerState;
-import com.cloud.vm.VirtualMachine.Type;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -163,7 +165,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus, minRam, maxRam,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachineType.User, cpus, minRam, maxRam,
                 BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -260,7 +262,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachineType.User, cpus,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -287,7 +289,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachineType.User, cpus,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -314,7 +316,7 @@ public class LibvirtComputingResourceTest {
         final String vncPassword = "mySuperSecretPassword";
 
         final LibvirtComputingResource lcr = new LibvirtComputingResource();
-        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachine.Type.User, cpus,
+        final VirtualMachineTO to = new VirtualMachineTO(id, name, VirtualMachineType.User, cpus,
                 minRam, maxRam, BootloaderType.HVM, os, false, false, vncPassword);
         to.setUuid("b0f0a72d-7efb-3cad-a8ff-70ebf30b3af9");
 
@@ -925,7 +927,7 @@ public class LibvirtComputingResourceTest {
         when(vm.getDisks()).thenReturn(new DiskTO[]{diskTO});
 
         when(nicTO.getType()).thenReturn(TrafficType.Guest);
-        when(diskTO.getType()).thenReturn(Volume.Type.ISO);
+        when(diskTO.getType()).thenReturn(VolumeType.ISO);
 
         when(libvirtComputingResource.getVifDriver(nicTO.getType())).thenReturn(vifDriver);
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolManager);
@@ -973,7 +975,7 @@ public class LibvirtComputingResourceTest {
         when(vm.getDisks()).thenReturn(new DiskTO[]{diskTO});
 
         when(nicTO.getType()).thenReturn(TrafficType.Guest);
-        when(diskTO.getType()).thenReturn(Volume.Type.ISO);
+        when(diskTO.getType()).thenReturn(VolumeType.ISO);
 
         when(libvirtComputingResource.getVifDriver(nicTO.getType())).thenReturn(vifDriver);
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolManager);
@@ -1063,7 +1065,7 @@ public class LibvirtComputingResourceTest {
         when(vm.getDisks()).thenReturn(new DiskTO[]{volume});
 
         when(nicTO.getType()).thenReturn(TrafficType.Guest);
-        when(volume.getType()).thenReturn(Volume.Type.ISO);
+        when(volume.getType()).thenReturn(VolumeType.ISO);
 
         when(libvirtComputingResource.getVifDriver(nicTO.getType())).thenReturn(vifDriver);
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolManager);
@@ -2175,7 +2177,7 @@ public class LibvirtComputingResourceTest {
 
     @Test
     public void testCheckOnHostCommand() {
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
 
         final CheckOnHostCommand command = new CheckOnHostCommand(host);
 
@@ -2284,7 +2286,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testFenceCommand() {
         final VirtualMachine vm = Mockito.mock(VirtualMachine.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
 
         final FenceCommand command = new FenceCommand(vm, host);
 
@@ -2311,7 +2313,7 @@ public class LibvirtComputingResourceTest {
     public void testPlugNicCommandMatchMack() {
         final NicTO nic = Mockito.mock(NicTO.class);
         final String instanceName = "Test";
-        final Type vmtype = Type.DomainRouter;
+        final VirtualMachineType vmtype = VirtualMachineType.DomainRouter;
 
         final PlugNicCommand command = new PlugNicCommand(nic, instanceName, vmtype);
 
@@ -2358,7 +2360,7 @@ public class LibvirtComputingResourceTest {
     public void testPlugNicCommandNoMatchMack() {
         final NicTO nic = Mockito.mock(NicTO.class);
         final String instanceName = "Test";
-        final Type vmtype = Type.DomainRouter;
+        final VirtualMachineType vmtype = VirtualMachineType.DomainRouter;
 
         final PlugNicCommand command = new PlugNicCommand(nic, instanceName, vmtype);
 
@@ -2421,7 +2423,7 @@ public class LibvirtComputingResourceTest {
     public void testPlugNicCommandLibvirtException() {
         final NicTO nic = Mockito.mock(NicTO.class);
         final String instanceName = "Test";
-        final Type vmtype = Type.DomainRouter;
+        final VirtualMachineType vmtype = VirtualMachineType.DomainRouter;
 
         final PlugNicCommand command = new PlugNicCommand(nic, instanceName, vmtype);
 
@@ -2453,7 +2455,7 @@ public class LibvirtComputingResourceTest {
     public void testPlugNicCommandInternalError() {
         final NicTO nic = Mockito.mock(NicTO.class);
         final String instanceName = "Test";
-        final Type vmtype = Type.DomainRouter;
+        final VirtualMachineType vmtype = VirtualMachineType.DomainRouter;
 
         final PlugNicCommand command = new PlugNicCommand(nic, instanceName, vmtype);
 
@@ -3891,7 +3893,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommandFailedConnect() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -3908,7 +3910,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.DomainRouter);
         when(vmSpec.getName()).thenReturn(vmName);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
 
@@ -3944,7 +3946,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommandLibvirtException() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -3960,7 +3962,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.DomainRouter);
         when(vmSpec.getName()).thenReturn(vmName);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
 
@@ -3989,7 +3991,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommandInternalError() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -4006,7 +4008,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.DomainRouter);
         when(vmSpec.getName()).thenReturn(vmName);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
 
@@ -4040,7 +4042,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommandUriException() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -4057,7 +4059,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.DomainRouter);
         when(vmSpec.getName()).thenReturn(vmName);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
 
@@ -4091,7 +4093,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommand() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -4111,7 +4113,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.DomainRouter);
         when(vmSpec.getName()).thenReturn(vmName);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
 
@@ -4165,7 +4167,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommandIsolationEc2() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -4185,7 +4187,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.DomainRouter);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.DomainRouter);
         when(vmSpec.getName()).thenReturn(vmName);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);
 
@@ -4243,7 +4245,7 @@ public class LibvirtComputingResourceTest {
     @Test
     public void testStartCommandHostMemory() {
         final VirtualMachineTO vmSpec = Mockito.mock(VirtualMachineTO.class);
-        final com.cloud.host.Host host = Mockito.mock(com.cloud.host.Host.class);
+        final Host host = Mockito.mock(Host.class);
         final boolean executeInSequence = false;
 
         final StartCommand command = new StartCommand(vmSpec, host, executeInSequence);
@@ -4263,7 +4265,7 @@ public class LibvirtComputingResourceTest {
 
         when(libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
         when(vmSpec.getNics()).thenReturn(nics);
-        when(vmSpec.getType()).thenReturn(VirtualMachine.Type.User);
+        when(vmSpec.getType()).thenReturn(VirtualMachineType.User);
         when(vmSpec.getName()).thenReturn(vmName);
         when(vmSpec.getMaxRam()).thenReturn(512L);
         when(libvirtComputingResource.createVmFromSpec(vmSpec)).thenReturn(vmDef);

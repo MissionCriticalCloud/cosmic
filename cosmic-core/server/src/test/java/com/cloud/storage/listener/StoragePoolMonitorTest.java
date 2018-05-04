@@ -1,20 +1,21 @@
 package com.cloud.storage.listener;
 
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.StorageUnavailableException;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.host.HostVO;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.StorageManagerImpl;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
+
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.Collections;
 
 public class StoragePoolMonitorTest {
 
@@ -37,14 +38,14 @@ public class StoragePoolMonitorTest {
         pool.setStatus(StoragePoolStatus.Up);
         pool.setId(123L);
         cmd = new StartupRoutingCommand();
-        cmd.setHypervisorType(Hypervisor.HypervisorType.KVM);
+        cmd.setHypervisorType(HypervisorType.KVM);
     }
 
     @Test
     public void testProcessConnectStoragePoolNormal() throws Exception {
         Mockito.when(poolDao.listBy(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(ScopeType.class))).thenReturn(Collections.singletonList(pool));
         Mockito.when(poolDao.findZoneWideStoragePoolsByTags(Mockito.anyLong(), Mockito.any(String[].class))).thenReturn(Collections.<StoragePoolVO>emptyList());
-        Mockito.when(poolDao.findZoneWideStoragePoolsByHypervisor(Mockito.anyLong(), Mockito.any(Hypervisor.HypervisorType.class))).thenReturn(Collections.<StoragePoolVO>emptyList());
+        Mockito.when(poolDao.findZoneWideStoragePoolsByHypervisor(Mockito.anyLong(), Mockito.any(HypervisorType.class))).thenReturn(Collections.<StoragePoolVO>emptyList());
 
         storagePoolMonitor.processConnect(host, cmd, false);
 
@@ -56,7 +57,7 @@ public class StoragePoolMonitorTest {
     public void testProcessConnectStoragePoolFailureOnHost() throws Exception {
         Mockito.when(poolDao.listBy(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(ScopeType.class))).thenReturn(Collections.singletonList(pool));
         Mockito.when(poolDao.findZoneWideStoragePoolsByTags(Mockito.anyLong(), Mockito.any(String[].class))).thenReturn(Collections.<StoragePoolVO>emptyList());
-        Mockito.when(poolDao.findZoneWideStoragePoolsByHypervisor(Mockito.anyLong(), Mockito.any(Hypervisor.HypervisorType.class))).thenReturn(Collections.<StoragePoolVO>emptyList());
+        Mockito.when(poolDao.findZoneWideStoragePoolsByHypervisor(Mockito.anyLong(), Mockito.any(HypervisorType.class))).thenReturn(Collections.<StoragePoolVO>emptyList());
         Mockito.doThrow(new StorageUnavailableException("unable to mount storage", 123L)).when(storageManager).connectHostToSharedPool(Mockito.anyLong(), Mockito.anyLong());
 
         storagePoolMonitor.processConnect(host, cmd, false);

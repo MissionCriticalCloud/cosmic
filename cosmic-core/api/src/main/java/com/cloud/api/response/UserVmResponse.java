@@ -5,11 +5,11 @@ import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.network.router.VirtualRouter;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Date;
 import java.util.LinkedHashSet;

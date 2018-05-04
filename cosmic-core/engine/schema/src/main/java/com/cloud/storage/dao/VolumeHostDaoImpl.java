@@ -1,8 +1,8 @@
 package com.cloud.storage.dao;
 
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.storage.VolumeHostVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;

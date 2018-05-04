@@ -1,18 +1,19 @@
 package com.cloud.storage;
 
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupStorageCommand;
-import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.dc.dao.DataCenterDao;
-import com.cloud.exception.ConnectionException;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.utils.db.DB;
@@ -59,7 +60,7 @@ public class LocalStoragePoolListener implements Listener {
 
         final StartupStorageCommand ssCmd = (StartupStorageCommand) cmd;
 
-        if (ssCmd.getResourceType() != Storage.StorageResourceType.STORAGE_POOL) {
+        if (ssCmd.getResourceType() != StorageResourceType.STORAGE_POOL) {
             return;
         }
 
@@ -72,7 +73,7 @@ public class LocalStoragePoolListener implements Listener {
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 

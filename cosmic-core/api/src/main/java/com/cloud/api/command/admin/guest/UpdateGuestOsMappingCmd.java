@@ -10,14 +10,15 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.GuestOsMappingResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.storage.GuestOSHypervisor;
-import com.cloud.user.Account;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateGuestOsMapping", group = APICommandGroup.GuestOSService, description = "Updates the information about Guest OS to Hypervisor specific name mapping", responseObject = GuestOsMappingResponse
-        .class,
+@APICommand(name = "updateGuestOsMapping", group = APICommandGroup.GuestOSService, description = "Updates the information about Guest OS to Hypervisor specific name mapping", responseObject =
+        GuestOsMappingResponse
+                .class,
         since = "4.4.0", requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateGuestOsMappingCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateGuestOsMappingCmd.class.getName());

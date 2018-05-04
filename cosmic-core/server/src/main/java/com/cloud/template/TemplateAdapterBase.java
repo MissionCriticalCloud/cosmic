@@ -9,29 +9,31 @@ import com.cloud.api.command.user.template.ExtractTemplateCmd;
 import com.cloud.api.command.user.template.GetUploadParamsForTemplateCmd;
 import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.configuration.Config;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.domain.dao.DomainDao;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.projects.ProjectManager;
 import com.cloud.storage.GuestOS;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.user.UserVO;
@@ -39,8 +41,6 @@ import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.EnumUtils;
 import com.cloud.utils.component.AdapterBase;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
 
@@ -386,7 +386,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
             }
         }
 
-        if (hypervisorType.equals(Hypervisor.HypervisorType.XenServer)) {
+        if (hypervisorType.equals(HypervisorType.XenServer)) {
             if (details == null || !details.containsKey("hypervisortoolsversion") || details.get("hypervisortoolsversion") == null ||
                     ((String) details.get("hypervisortoolsversion")).equalsIgnoreCase("none")) {
                 final String hpvs = _configDao.getValue(Config.XenServerPVdriverVersion.key());

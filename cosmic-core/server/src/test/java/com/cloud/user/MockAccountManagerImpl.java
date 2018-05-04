@@ -1,6 +1,5 @@
 package com.cloud.user;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.acl.RoleType;
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.api.command.admin.account.UpdateAccountCmd;
@@ -8,15 +7,19 @@ import com.cloud.api.command.admin.user.DeleteUserCmd;
 import com.cloud.api.command.admin.user.RegisterCmd;
 import com.cloud.api.command.admin.user.UpdateUserCmd;
 import com.cloud.api.query.vo.ControlledViewEntity;
-import com.cloud.domain.Domain;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.offering.DiskOffering;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -162,12 +165,6 @@ public class MockAccountManagerImpl extends ManagerBase implements Manager, Acco
 
     @Override
     public Account lockAccount(final String accountName, final Long domainId, final Long accountId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<String> listAclGroupsByAccount(final Long accountId) {
         // TODO Auto-generated method stub
         return null;
     }

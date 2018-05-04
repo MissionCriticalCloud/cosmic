@@ -1,7 +1,7 @@
 package com.cloud.utils.db;
 
-import com.cloud.utils.Ternary;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Ternary;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

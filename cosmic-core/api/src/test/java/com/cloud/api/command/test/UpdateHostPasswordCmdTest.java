@@ -8,7 +8,7 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
 import com.cloud.resource.ResourceService;
 import com.cloud.server.ManagementService;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import junit.framework.TestCase;
 import org.junit.Assert;

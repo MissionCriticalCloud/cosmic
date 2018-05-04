@@ -1,5 +1,7 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.vm.VirtualMachine;
+
 import java.util.Date;
 
 public interface SystemVm extends VirtualMachine {

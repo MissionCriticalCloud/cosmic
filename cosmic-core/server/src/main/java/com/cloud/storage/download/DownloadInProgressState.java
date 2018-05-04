@@ -1,6 +1,6 @@
 package com.cloud.storage.download;
 
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 
 public class DownloadInProgressState extends DownloadActiveState {
 

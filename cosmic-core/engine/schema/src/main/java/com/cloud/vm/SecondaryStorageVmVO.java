@@ -1,6 +1,7 @@
 package com.cloud.vm;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -47,7 +48,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     public SecondaryStorageVmVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
                                 final long dataCenterId, final long domainId, final long accountId, final long userId, final Role role, final boolean haEnabled) {
-        super(id, serviceOfferingId, name, name, Type.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
+        super(id, serviceOfferingId, name, name, VirtualMachineType.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.role = role;
         this.dataCenterId = dataCenterId;
     }

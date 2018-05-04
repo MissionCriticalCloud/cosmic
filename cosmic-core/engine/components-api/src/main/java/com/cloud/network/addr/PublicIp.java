@@ -1,10 +1,10 @@
 package com.cloud.network.addr;
 
 import com.cloud.dc.VlanVO;
+import com.cloud.legacymodel.network.Ip;
 import com.cloud.network.IpAddress;
 import com.cloud.network.PublicIpAddress;
 import com.cloud.network.dao.IPAddressVO;
-import com.cloud.utils.net.Ip;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.Date;

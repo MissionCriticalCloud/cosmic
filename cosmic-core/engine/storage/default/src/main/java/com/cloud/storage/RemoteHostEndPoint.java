@@ -2,26 +2,27 @@ package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.manager.Commands;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.OperationTimedoutException;
 import com.cloud.framework.async.AsyncCompletionCallback;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.HypervisorGuruManager;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.concurrency.NamedThreadFactory;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 
@@ -62,7 +63,7 @@ public class RemoteHostEndPoint implements EndPoint {
         hostId = host.getId();
         hostAddress = host.getPrivateIpAddress();
         publicAddress = host.getPublicIpAddress();
-        if (Host.Type.SecondaryStorageVM == host.getType()) {
+        if (HostType.SecondaryStorageVM == host.getType()) {
             final String vmName = host.getName();
             final SecondaryStorageVmVO ssvm = vmDao.findByInstanceName(vmName);
             if (ssvm != null) {
@@ -105,7 +106,7 @@ public class RemoteHostEndPoint implements EndPoint {
         }
 
         @Override
-        public boolean processDisconnect(final long agentId, final Status state) {
+        public boolean processDisconnect(final long agentId, final HostStatus state) {
             // TODO Auto-generated method stub
             return false;
         }

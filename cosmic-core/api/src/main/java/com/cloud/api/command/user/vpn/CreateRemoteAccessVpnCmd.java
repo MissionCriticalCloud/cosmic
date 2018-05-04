@@ -13,17 +13,18 @@ import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.api.response.RemoteAccessVpnResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.IpAddress;
 import com.cloud.network.RemoteAccessVpn;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createRemoteAccessVpn", group = APICommandGroup.VPNService, description = "Creates a l2tp/ipsec remote access vpn", responseObject = RemoteAccessVpnResponse.class, entityType = {RemoteAccessVpn
-        .class},
+@APICommand(name = "createRemoteAccessVpn", group = APICommandGroup.VPNService, description = "Creates a l2tp/ipsec remote access vpn", responseObject = RemoteAccessVpnResponse.class, entityType =
+        {RemoteAccessVpn
+                .class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateRemoteAccessVpnCmd extends BaseAsyncCreateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateRemoteAccessVpnCmd.class.getName());

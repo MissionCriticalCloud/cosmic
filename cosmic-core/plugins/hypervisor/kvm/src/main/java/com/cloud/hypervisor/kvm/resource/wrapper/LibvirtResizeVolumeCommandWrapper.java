@@ -1,17 +1,17 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.storage.ResizeVolumeAnswer;
-import com.cloud.agent.api.storage.ResizeVolumeCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
+import com.cloud.legacymodel.communication.answer.ResizeVolumeAnswer;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
 
@@ -63,10 +63,10 @@ public final class LibvirtResizeVolumeCommandWrapper
             s_logger.debug("Resizing volume: " + path + "," + currentSize + "," + newSize + "," + type + "," + vmInstanceName
                     + "," + shrinkOk);
 
-      /*
-       * libvirt doesn't support resizing (C)LVM devices, and corrupts QCOW2 in some scenarios, so we have to do these
-       * via Bash script
-       */
+            /*
+             * libvirt doesn't support resizing (C)LVM devices, and corrupts QCOW2 in some scenarios, so we have to do these
+             * via Bash script
+             */
             if (pool.getType() != StoragePoolType.CLVM && vol.getFormat() != PhysicalDiskFormat.QCOW2) {
                 s_logger.debug("Volume " + path + " can be resized by libvirt. Asking libvirt to resize the volume.");
                 try {
@@ -109,7 +109,7 @@ public final class LibvirtResizeVolumeCommandWrapper
                 }
             }
 
-      /* fetch new size as seen from libvirt, don't want to assume anything */
+            /* fetch new size as seen from libvirt, don't want to assume anything */
             pool = storagePoolMgr.getStoragePool(spool.getType(), spool.getUuid());
             pool.refresh();
             final long finalSize = pool.getPhysicalDisk(volid).getVirtualSize();

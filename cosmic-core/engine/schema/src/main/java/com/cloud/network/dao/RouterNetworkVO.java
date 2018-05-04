@@ -1,8 +1,7 @@
 package com.cloud.network.dao;
 
-import com.cloud.api.InternalIdentity;
-import com.cloud.network.Network;
-import com.cloud.network.Network.GuestType;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.model.enumeration.GuestType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +27,7 @@ public class RouterNetworkVO implements InternalIdentity {
 
     @Column(name = "guest_type")
     @Enumerated(value = EnumType.STRING)
-    Network.GuestType guestType;
+    GuestType guestType;
 
     protected RouterNetworkVO() {
     }
@@ -47,7 +46,7 @@ public class RouterNetworkVO implements InternalIdentity {
         return networkId;
     }
 
-    public Network.GuestType getGuestType() {
+    public GuestType getGuestType() {
         return guestType;
     }
 

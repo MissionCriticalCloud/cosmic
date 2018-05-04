@@ -1,13 +1,10 @@
 package com.cloud.storage.datastore;
 
-import com.cloud.agent.api.to.DataObjectType;
-import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.engine.subsystem.api.storage.ClusterScope;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.DataStoreProvider;
 import com.cloud.engine.subsystem.api.storage.HostScope;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreLifeCycle;
@@ -18,12 +15,16 @@ import com.cloud.engine.subsystem.api.storage.TemplateDataFactory;
 import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.StoragePoolHostDao;
@@ -31,7 +32,6 @@ import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.storage.to.PrimaryDataStoreTO;
 import com.cloud.storage.volume.VolumeObject;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.db.GlobalLock;
@@ -348,8 +348,8 @@ public class PrimaryDataStoreImpl implements PrimaryDataStore {
     public DataStoreTO getTO() {
         final DataStoreTO to = getDriver().getStoreTO(this);
         if (to == null) {
-            final PrimaryDataStoreTO primaryTO = new PrimaryDataStoreTO(this);
-            return primaryTO;
+            return new PrimaryDataStoreTO(this.getUuid(), this.getName(), this.getId(), this.getHostAddress(), this.getPoolType(), this.getHostAddress(), this.getPath
+                    (), this.getPort(), this.getDetails());
         }
         return to;
     }

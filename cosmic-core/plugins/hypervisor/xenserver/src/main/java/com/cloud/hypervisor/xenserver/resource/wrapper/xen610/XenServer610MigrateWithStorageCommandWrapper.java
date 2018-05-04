@@ -1,21 +1,21 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen610;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.MigrateWithStorageAnswer;
-import com.cloud.agent.api.MigrateWithStorageCommand;
-import com.cloud.agent.api.to.NicTO;
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MigrateWithStorageAnswer;
+import com.cloud.legacymodel.communication.command.MigrateWithStorageCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.to.VolumeTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.storage.to.VolumeObjectTO;
 
 import java.util.HashMap;
 import java.util.List;

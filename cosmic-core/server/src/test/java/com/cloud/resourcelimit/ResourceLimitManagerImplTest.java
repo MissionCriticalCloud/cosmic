@@ -1,6 +1,6 @@
 package com.cloud.resourcelimit;
 
-import com.cloud.configuration.ResourceLimit;
+import com.cloud.legacymodel.configuration.ResourceLimit;
 import com.cloud.vpc.MockResourceLimitManagerImpl;
 
 import junit.framework.TestCase;

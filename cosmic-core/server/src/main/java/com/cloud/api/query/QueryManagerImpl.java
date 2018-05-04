@@ -1,6 +1,5 @@
 package com.cloud.api.query;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.affinity.AffinityGroupDomainMapVO;
 import com.cloud.affinity.AffinityGroupResponse;
 import com.cloud.affinity.AffinityGroupVMMapVO;
@@ -122,7 +121,6 @@ import com.cloud.context.CallContext;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.dao.DataCenterDetailsDao;
 import com.cloud.dc.dao.DedicatedResourceDao;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -131,25 +129,37 @@ import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.TemplateState;
 import com.cloud.event.dao.EventJoinDao;
-import com.cloud.exception.CloudAuthenticationException;
-import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.ha.HaWorkVO;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.ha.dao.HighAvailabilityDao;
-import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.CloudAuthenticationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate.TemplateFilter;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.AllocationState;
-import com.cloud.network.Network;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkDetailsDao;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.projects.Project;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
@@ -165,26 +175,16 @@ import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.server.TaggedResourceService;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.template.VirtualMachineTemplate.State;
-import com.cloud.template.VirtualMachineTemplate.TemplateFilter;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.DateUtil;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.db.Filter;
 import com.cloud.utils.db.JoinBuilder;
@@ -192,12 +192,10 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
@@ -1361,7 +1359,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Object haHosts = cmd.getHaHost();
         final Long startIndex = cmd.getStartIndex();
         final Long pageSize = cmd.getPageSizeVal();
-        final Hypervisor.HypervisorType hypervisorType = cmd.getHypervisor();
+        final HypervisorType hypervisorType = cmd.getHypervisor();
 
         final Filter searchFilter = new Filter(HostJoinVO.class, "id", Boolean.TRUE, startIndex, pageSize);
 
@@ -2902,7 +2900,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
             if (!showDomr) {
                 // excluding system template
-                sc.addAnd("templateType", SearchCriteria.Op.NEQ, Storage.TemplateType.SYSTEM);
+                sc.addAnd("templateType", SearchCriteria.Op.NEQ, TemplateType.SYSTEM);
             }
         }
 

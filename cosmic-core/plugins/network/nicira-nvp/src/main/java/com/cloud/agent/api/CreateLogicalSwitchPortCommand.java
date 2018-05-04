@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 public class CreateLogicalSwitchPortCommand extends Command {
     private final String logicalSwitchUuid;
     private final String attachmentUuid;

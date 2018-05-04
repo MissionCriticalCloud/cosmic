@@ -1,9 +1,9 @@
 package com.cloud.network.element;
 
-import com.cloud.agent.api.to.LoadBalancerTO;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.Network;
-import com.cloud.network.lb.LoadBalancingRule;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancingRule;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.to.LoadBalancerTO;
 
 import java.util.List;
 

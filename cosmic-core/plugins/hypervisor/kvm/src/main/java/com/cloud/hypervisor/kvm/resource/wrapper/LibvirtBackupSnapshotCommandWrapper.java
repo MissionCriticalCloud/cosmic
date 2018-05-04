@@ -1,16 +1,16 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.BackupSnapshotAnswer;
-import com.cloud.agent.api.BackupSnapshotCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.BackupSnapshotAnswer;
+import com.cloud.legacymodel.communication.command.BackupSnapshotCommand;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.script.Script;
 
 import java.io.BufferedOutputStream;
@@ -123,7 +123,7 @@ public final class LibvirtBackupSnapshotCommandWrapper
                     return new BackupSnapshotAnswer(command, false, result, null, true);
                 }
             }
-      /* Delete the snapshot on primary */
+            /* Delete the snapshot on primary */
 
             DomainState state = null;
             Domain vm = null;
@@ -155,9 +155,9 @@ public final class LibvirtBackupSnapshotCommandWrapper
                     throw new CloudRuntimeException("Unable to find vm snapshot with name -" + snapshotName);
                 }
 
-        /*
-         * libvirt on RHEL6 doesn't handle resume event emitted from qemu
-         */
+                /*
+                 * libvirt on RHEL6 doesn't handle resume event emitted from qemu
+                 */
                 vm = libvirtComputingResource.getDomain(conn, command.getVmName());
                 state = vm.getInfo().state;
                 if (state == DomainState.VIR_DOMAIN_PAUSED) {

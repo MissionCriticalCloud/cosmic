@@ -18,28 +18,30 @@ import com.cloud.dc.HostPodVO;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.VirtualRouter.Role;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.VirtualRouterProvider.Type;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderVO;
 import com.cloud.network.element.VirtualRouterProviderVO;
-import com.cloud.network.router.VirtualRouter.Role;
-import com.cloud.user.Account;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -306,7 +308,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         mockPods.add(mockHostPodVO3);
         final RouterDeploymentDefinition deployment = Mockito.spy(this.deployment);
         doReturn(mockPods).when(deployment).listByDataCenterIdVMTypeAndStates(
-                ZONE_ID, VirtualMachine.Type.User,
+                ZONE_ID, VirtualMachineType.User,
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
 
         // Leave this one empty to force adding add destination for this pod
@@ -354,7 +356,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         // Deployment under test is a Mockito spy
         final RouterDeploymentDefinition deploymentUT = Mockito.spy(deployment);
         doReturn(mockPods).when(deploymentUT).listByDataCenterIdVMTypeAndStates(
-                ZONE_ID, VirtualMachine.Type.User,
+                ZONE_ID, VirtualMachineType.User,
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
 
         // Leave this one empty to force adding add destination for this pod
@@ -412,7 +414,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         final SearchBuilder<VMInstanceVO> vmInstanceSearch = mock(SearchBuilder.class);
         when(mockVmDao.createSearchBuilder()).thenReturn(vmInstanceSearch);
         when(vmInstanceSearch.entity()).thenReturn(vmInstanceVO);
-        when(vmInstanceVO.getType()).thenReturn(VirtualMachine.Type.Instance);
+        when(vmInstanceVO.getType()).thenReturn(VirtualMachineType.Instance);
         when(vmInstanceVO.getState()).thenReturn(VirtualMachine.State.Stopped);
         when(vmInstanceVO.getPodIdToDeployIn()).thenReturn(POD_ID1);
 
@@ -430,7 +432,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
 
         // Execute
         final List<HostPodVO> pods = deployment.listByDataCenterIdVMTypeAndStates(ZONE_ID,
-                VirtualMachine.Type.User,
+                VirtualMachineType.User,
                 VirtualMachine.State.Starting,
                 VirtualMachine.State.Running);
 
@@ -438,7 +440,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
         assertNotNull(pods);
         assertEquals(expectedPods, pods);
         verify(sc, times(1)).setParameters("dc", ZONE_ID);
-        verify(sc, times(1)).setJoinParameters("vmInstanceSearch", "type", VirtualMachine.Type.User);
+        verify(sc, times(1)).setJoinParameters("vmInstanceSearch", "type", VirtualMachineType.User);
         verify(sc, times(1)).setJoinParameters("vmInstanceSearch", "states",
                 VirtualMachine.State.Starting, VirtualMachine.State.Running);
         verify(mockPodDao, times(1)).search(sc, null);
@@ -716,7 +718,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testSetupAccountOwnerNotNetworkSystem() {
         // Prepare
         when(mockNetworkModel.isNetworkSystem(mockNw)).thenReturn(false);
-        when(mockNw.getGuestType()).thenReturn(Network.GuestType.Shared);
+        when(mockNw.getGuestType()).thenReturn(GuestType.Shared);
         final Account newAccountOwner = mock(Account.class);
         when(mockAccountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM)).thenReturn(newAccountOwner);
         //Execute
@@ -729,7 +731,7 @@ public class RouterDeploymentDefinitionTest extends RouterDeploymentDefinitionTe
     public void testSetupAccountOwnerNotSharedNeitherNetworkSystem() {
         // Prepare
         when(mockNetworkModel.isNetworkSystem(mockNw)).thenReturn(false);
-        when(mockNw.getGuestType()).thenReturn(Network.GuestType.Isolated);
+        when(mockNw.getGuestType()).thenReturn(GuestType.Isolated);
         when(mockAccountMgr.getAccount(Account.ACCOUNT_ID_SYSTEM)).thenReturn(null);
         //Execute
         deployment.setupAccountOwner();

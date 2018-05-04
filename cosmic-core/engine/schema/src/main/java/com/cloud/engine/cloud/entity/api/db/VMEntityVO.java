@@ -1,12 +1,13 @@
 package com.cloud.engine.cloud.entity.api.db;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.db.StateMachine;
 import com.cloud.utils.fsm.FiniteStateObject;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -32,7 +33,7 @@ import java.util.UUID;
 @Table(name = "vm_instance")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING, length = 32)
-public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, VirtualMachine.Event> {
+public class VMEntityVO implements VirtualMachine, FiniteStateObject<State> {
     @Id
     @TableGenerator(name = "vm_instance_sq", table = "sequence", pkColumnName = "name", valueColumnName = "value", pkColumnValue = "vm_instance_seq", allocationSize = 1)
     @Column(name = "id", updatable = false, nullable = false)
@@ -91,7 +92,7 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
 
     @Column(name = "vm_type", updatable = false, nullable = false, length = 32)
     @Enumerated(value = EnumType.STRING)
-    protected Type type;
+    protected VirtualMachineType type;
 
     @Column(name = "ha_enabled", updatable = true, nullable = true)
     protected boolean haEnabled;
@@ -143,14 +144,14 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
     @Transient
     private VMReservationVO vmReservation;
 
-    public VMEntityVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId, final HypervisorType
+    public VMEntityVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId, final HypervisorType
             hypervisorType, final long guestOSId,
                       final long domainId, final long accountId, final boolean haEnabled, final boolean limitResourceUse) {
         this(id, serviceOfferingId, name, instanceName, type, vmTemplateId, hypervisorType, guestOSId, domainId, accountId, haEnabled, null);
         limitCpuUse = limitResourceUse;
     }
 
-    public VMEntityVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final Type type, final Long vmTemplateId, final HypervisorType
+    public VMEntityVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId, final HypervisorType
             hypervisorType, final long guestOSId,
                       final long domainId, final long accountId, final boolean haEnabled, final Long diskOfferingId) {
         this.id = id;
@@ -316,7 +317,7 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State, Virt
     }
 
     @Override
-    public Type getType() {
+    public VirtualMachineType getType() {
         return type;
     }
 

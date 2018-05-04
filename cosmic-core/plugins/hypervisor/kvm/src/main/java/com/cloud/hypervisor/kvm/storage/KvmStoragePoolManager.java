@@ -1,17 +1,17 @@
 package com.cloud.hypervisor.kvm.storage;
 
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.PoolType;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.StoragePoolType;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.PrimaryDataStoreTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.StorageLayer;
-import com.cloud.storage.Volume;
-import com.cloud.storage.to.PrimaryDataStoreTO;
-import com.cloud.storage.to.VolumeObjectTO;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import java.net.URI;
@@ -95,7 +95,7 @@ public class KvmStoragePoolManager {
         final List<DiskTO> disks = Arrays.asList(vmSpec.getDisks());
 
         for (final DiskTO disk : disks) {
-            if (disk.getType() != Volume.Type.ISO) {
+            if (disk.getType() != VolumeType.ISO) {
                 final VolumeObjectTO vol = (VolumeObjectTO) disk.getData();
                 final PrimaryDataStoreTO store = (PrimaryDataStoreTO) vol.getDataStore();
                 final KvmStoragePool pool = getStoragePool(store.getPoolType(), store.getUuid());
@@ -177,12 +177,12 @@ public class KvmStoragePoolManager {
 
     public boolean disconnectPhysicalDisksViaVmSpec(final VirtualMachineTO vmSpec) {
         if (vmSpec == null) {
-      /*
-       * CloudStack often tries to stop VMs that shouldn't be running, to ensure a known state, for example if we lose
-       * communication with the agent and the VM is brought up elsewhere. We may not know about these yet. This might
-       * mean that we can't use the vmspec map, because when we restart the agent we lose all of the info about running
-       * VMs.
-       */
+            /*
+             * CloudStack often tries to stop VMs that shouldn't be running, to ensure a known state, for example if we lose
+             * communication with the agent and the VM is brought up elsewhere. We may not know about these yet. This might
+             * mean that we can't use the vmspec map, because when we restart the agent we lose all of the info about running
+             * VMs.
+             */
 
             s_logger.debug("disconnectPhysicalDiskViaVmSpec: Attempted to stop a VM that is not yet in our hash map");
 
@@ -196,7 +196,7 @@ public class KvmStoragePoolManager {
         final List<DiskTO> disks = Arrays.asList(vmSpec.getDisks());
 
         for (final DiskTO disk : disks) {
-            if (disk.getType() != Volume.Type.ISO) {
+            if (disk.getType() != VolumeType.ISO) {
                 s_logger.debug("Disconnecting disk " + disk.getPath());
 
                 final VolumeObjectTO vol = (VolumeObjectTO) disk.getData();
@@ -309,13 +309,13 @@ public class KvmStoragePoolManager {
     }
 
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name,
-                                                  final Storage.ProvisioningType provisioningType,
+                                                  final StorageProvisioningType provisioningType,
                                                   final KvmStoragePool destPool, final int timeout) {
         return createDiskFromTemplate(template, name, provisioningType, destPool, template.getSize(), timeout);
     }
 
     public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name,
-                                                  final Storage.ProvisioningType provisioningType,
+                                                  final StorageProvisioningType provisioningType,
                                                   final KvmStoragePool destPool, final long size, final int timeout) {
         final StorageAdaptor adaptor = getStorageAdaptor(destPool.getType());
 

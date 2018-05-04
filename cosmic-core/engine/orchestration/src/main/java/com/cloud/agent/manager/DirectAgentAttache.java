@@ -1,15 +1,15 @@
 package com.cloud.agent.manager;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.CronCommand;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.StartupAnswer;
-import com.cloud.agent.transport.Request;
-import com.cloud.agent.transport.Response;
-import com.cloud.exception.AgentUnavailableException;
+import com.cloud.common.transport.Request;
+import com.cloud.common.transport.Response;
 import com.cloud.framework.config.ConfigKey;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.StartupAnswer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.CronCommand;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.resource.ServerResource;
 
@@ -87,7 +87,7 @@ public class DirectAgentAttache extends AgentAttache {
     }
 
     @Override
-    public void disconnect(final Status state) {
+    public void disconnect(final HostStatus state) {
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Processing disconnect " + _id + "(" + _name + ")");
         }
@@ -131,7 +131,7 @@ public class DirectAgentAttache extends AgentAttache {
             synchronized (this) {
                 if (_resource != null) {
                     s_logger.warn("Lost attache for " + _id + "(" + _name + ")");
-                    disconnect(Status.Alert);
+                    disconnect(HostStatus.Alert);
                 }
             }
         } finally {

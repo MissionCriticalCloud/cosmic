@@ -14,19 +14,20 @@ import com.cloud.api.response.VMSnapshotResponse;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.VMSnapshot;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.snapshot.VMSnapshot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createSnapshotFromVMSnapshot", group = APICommandGroup.SnapshotService, description = "Creates an instant snapshot of a volume from existing vm snapshot.", responseObject = SnapshotResponse.class,
+@APICommand(name = "createSnapshotFromVMSnapshot", group = APICommandGroup.SnapshotService, description = "Creates an instant snapshot of a volume from existing vm snapshot.", responseObject =
+        SnapshotResponse.class,
         entityType = {Snapshot.class}, requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateSnapshotFromVMSnapshotCmd extends BaseAsyncCreateCmd {
 
@@ -81,9 +82,9 @@ public class CreateSnapshotFromVMSnapshotCmd extends BaseAsyncCreateCmd {
         }
         final UserVm vm = _entityMgr.findById(UserVm.class, vmsnapshot.getVmId());
         if (vm != null) {
-            if(vm.getHostId() != null) {
+            if (vm.getHostId() != null) {
                 return vm.getHostId();
-            } else if(vm.getLastHostId() != null) {
+            } else if (vm.getLastHostId() != null) {
                 return vm.getLastHostId();
             }
         }
@@ -156,7 +157,7 @@ public class CreateSnapshotFromVMSnapshotCmd extends BaseAsyncCreateCmd {
     @Override
     public void execute() {
         s_logger.info("CreateSnapshotFromVMSnapshotCmd with vm snapshot id:" + getVMSnapshotId() + " and snapshot id:" + getEntityId() + " starts:" + System.currentTimeMillis());
-        CallContext.current().setEventDetails("Vm Snapshot Id: "+ getVMSnapshotId());
+        CallContext.current().setEventDetails("Vm Snapshot Id: " + getVMSnapshotId());
         Snapshot snapshot = null;
         try {
             snapshot = _snapshotService.backupSnapshotFromVmSnapshot(getEntityId(), getVmId(), getVolumeId(), getVMSnapshotId());

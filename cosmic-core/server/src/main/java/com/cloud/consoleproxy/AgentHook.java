@@ -1,12 +1,12 @@
 package com.cloud.consoleproxy;
 
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.ConsoleAccessAuthenticationCommand;
-import com.cloud.agent.api.ConsoleProxyLoadReportCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupProxyCommand;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.command.ConsoleAccessAuthenticationCommand;
+import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
 
 public interface AgentHook {
     void onLoadReport(ConsoleProxyLoadReportCommand cmd);
@@ -15,7 +15,7 @@ public interface AgentHook {
 
     void onAgentConnect(Host host, StartupCommand cmd);
 
-    public void onAgentDisconnect(long agentId, Status state);
+    public void onAgentDisconnect(long agentId, HostStatus state);
 
     public void startAgentHttpHandlerInVM(StartupProxyCommand startupCmd);
 }

@@ -1,7 +1,7 @@
 package com.cloud.deploy;
 
-import com.cloud.exception.InsufficientServerCapacityException;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.vm.VirtualMachineProfile;
 
 import java.util.List;

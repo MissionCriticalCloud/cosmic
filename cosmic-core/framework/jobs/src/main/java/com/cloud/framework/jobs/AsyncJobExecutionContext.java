@@ -1,17 +1,17 @@
 package com.cloud.framework.jobs;
 
 import com.cloud.context.CallContext;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.jobs.dao.AsyncJobJoinMapDao;
 import com.cloud.framework.jobs.impl.AsyncJobJoinMapVO;
 import com.cloud.framework.jobs.impl.JobSerializerHelper;
 import com.cloud.framework.jobs.impl.SyncQueueItem;
 import com.cloud.jobs.JobInfo;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.managed.threadlocal.ManagedThreadLocal;
-import com.cloud.user.Account;
-import com.cloud.user.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,20 +1,20 @@
 package com.cloud.storage.motion;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.MigrateWithStorageAcrossClustersAnswer;
-import com.cloud.agent.api.MigrateWithStorageAcrossClustersCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
-import com.cloud.agent.api.to.VolumeTO;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.StrategyPriority;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.MigrateWithStorageAcrossClustersAnswer;
+import com.cloud.legacymodel.communication.command.MigrateWithStorageAcrossClustersCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.vm.VMInstanceVO;
 
 import java.util.List;

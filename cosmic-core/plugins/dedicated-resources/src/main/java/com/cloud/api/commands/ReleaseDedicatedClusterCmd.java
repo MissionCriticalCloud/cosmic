@@ -11,7 +11,7 @@ import com.cloud.api.response.ClusterResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
 
 import javax.inject.Inject;
 

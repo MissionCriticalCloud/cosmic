@@ -1,6 +1,5 @@
 package com.cloud.storage.image.store;
 
-import com.cloud.agent.api.to.DataStoreTO;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
@@ -11,16 +10,17 @@ import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.framework.async.AsyncCallFuture;
-import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Upload;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.to.DataStoreTO;
+import com.cloud.legacymodel.to.ImageStoreTO;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.datastore.ObjectInDataStoreManager;
 import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.image.ImageStoreDriver;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
-import com.cloud.storage.to.ImageStoreTO;
 import com.cloud.utils.component.ComponentContext;
 
 import javax.inject.Inject;

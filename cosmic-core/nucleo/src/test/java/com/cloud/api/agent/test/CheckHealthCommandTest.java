@@ -3,7 +3,7 @@ package com.cloud.api.agent.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.CheckHealthCommand;
+import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 
 import org.junit.Test;
 

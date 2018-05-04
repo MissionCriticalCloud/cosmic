@@ -1,9 +1,9 @@
 package com.cloud.vm;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.domain.Domain;
-import com.cloud.user.Account;
-import com.cloud.user.User;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.utils.Journal;
 
 public class ReservationContextImpl implements ReservationContext {

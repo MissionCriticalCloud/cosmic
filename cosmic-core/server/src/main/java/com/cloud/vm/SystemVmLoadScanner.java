@@ -2,8 +2,8 @@ package com.cloud.vm;
 
 import com.cloud.context.CallContext;
 import com.cloud.framework.jobs.AsyncJobExecutionContext;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.utils.Pair;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.GlobalLock;
 

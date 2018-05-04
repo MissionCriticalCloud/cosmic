@@ -10,15 +10,16 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.ldap.LdapManager;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.user.Account;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listDomainLdapLink", group = APICommandGroup.AuthenticationService, description = "list link of domain to group or OU in ldap", responseObject = LinkDomainToLdapResponse.class, since = "5.3.6",
+@APICommand(name = "listDomainLdapLink", group = APICommandGroup.AuthenticationService, description = "list link of domain to group or OU in ldap", responseObject = LinkDomainToLdapResponse.class,
+        since = "5.3.6",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListDomainLdapLinkCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListDomainLdapLinkCmd.class.getName());

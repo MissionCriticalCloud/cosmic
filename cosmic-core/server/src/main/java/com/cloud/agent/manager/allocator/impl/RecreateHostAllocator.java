@@ -1,7 +1,6 @@
 package com.cloud.agent.manager.allocator.impl;
 
 import com.cloud.dc.ClusterVO;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.dc.dao.ClusterDao;
@@ -10,17 +9,18 @@ import com.cloud.dc.dao.HostPodDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
-import com.cloud.utils.Pair;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -60,7 +60,7 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
     }
 
     @Override
-    public List<Host> allocateTo(final VirtualMachineProfile vm, final DeploymentPlan plan, final Type type, final ExcludeList avoid, final int returnUpTo) {
+    public List<Host> allocateTo(final VirtualMachineProfile vm, final DeploymentPlan plan, final HostType type, final ExcludeList avoid, final int returnUpTo) {
 
         List<Host> hosts = super.allocateTo(vm, plan, type, avoid, returnUpTo);
         if (hosts != null && !hosts.isEmpty()) {
@@ -68,8 +68,8 @@ public class RecreateHostAllocator extends FirstFitRoutingAllocator {
         }
 
         s_logger.debug("First fit was unable to find a host");
-        final VirtualMachine.Type vmType = vm.getType();
-        if (vmType == VirtualMachine.Type.User) {
+        final VirtualMachineType vmType = vm.getType();
+        if (vmType == VirtualMachineType.User) {
             s_logger.debug("vm is not a system vm so let's just return empty list");
             return new ArrayList<>();
         }

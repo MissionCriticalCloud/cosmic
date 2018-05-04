@@ -1,11 +1,12 @@
 package com.cloud.engine.subsystem.api.storage;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.offering.DiskOffering.DiskCacheMode;
-import com.cloud.storage.Volume;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
 
 public interface VolumeInfo extends DataObject, Volume {
     boolean isToBeLiveMigrated();

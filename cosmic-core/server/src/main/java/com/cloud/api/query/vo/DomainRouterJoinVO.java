@@ -1,13 +1,13 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Networks.TrafficType;
-import com.cloud.network.router.VirtualRouter;
-import com.cloud.network.router.VirtualRouter.RedundantState;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.VirtualRouter.RedundantState;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.utils.db.GenericDao;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -87,7 +87,7 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     private String hostName;
     @Column(name = "hypervisor_type")
     @Enumerated(value = EnumType.STRING)
-    private Hypervisor.HypervisorType hypervisorType;
+    private HypervisorType hypervisorType;
     @Column(name = "template_id", updatable = true, nullable = true, length = 17)
     private long templateId;
     @Column(name = "template_uuid")
@@ -283,7 +283,7 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
         this.hostName = hostName;
     }
 
-    public void setHypervisorType(final Hypervisor.HypervisorType hypervisorType) {
+    public void setHypervisorType(final HypervisorType hypervisorType) {
         this.hypervisorType = hypervisorType;
     }
 
@@ -539,7 +539,7 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
         return hostName;
     }
 
-    public Hypervisor.HypervisorType getHypervisorType() {
+    public HypervisorType getHypervisorType() {
         return hypervisorType;
     }
 

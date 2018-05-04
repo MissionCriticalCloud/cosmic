@@ -6,8 +6,8 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.ScopedConfigStorage;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.utils.Pair;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

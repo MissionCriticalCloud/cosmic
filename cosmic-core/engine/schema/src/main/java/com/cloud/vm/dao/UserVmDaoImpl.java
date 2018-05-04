@@ -1,9 +1,12 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.tags.dao.ResourceTagDao;
-import com.cloud.user.Account;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;
@@ -12,12 +15,9 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmDetailVO;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.dao.UserVmData.NicData;
 
 import javax.annotation.PostConstruct;
@@ -362,7 +362,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     public Long countAllocatedVMsForAccount(final long accountId) {
         final SearchCriteria<Long> sc = CountByAccount.create();
         sc.setParameters("account", accountId);
-        sc.setParameters("type", VirtualMachine.Type.User);
+        sc.setParameters("type", VirtualMachineType.User);
         sc.setParameters("state", new Object[]{State.Destroyed, State.Error, State.Expunging});
         sc.setParameters("displayVm", 1);
         return customSearch(sc, null).get(0);
@@ -457,9 +457,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     }
 
     @Override
-    public List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> getVmsDetailByNames(final Set<String> vmNames, final String detail) {
+    public List<Pair<Pair<String, VirtualMachineType>, Pair<Long, String>>> getVmsDetailByNames(final Set<String> vmNames, final String detail) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        final List<Pair<Pair<String, VirtualMachine.Type>, Pair<Long, String>>> vmsDetailByNames = new ArrayList<>();
+        final List<Pair<Pair<String, VirtualMachineType>, Pair<Long, String>>> vmsDetailByNames = new ArrayList<>();
 
         try (PreparedStatement pstmt = txn.prepareStatement(VMS_DETAIL_BY_NAME + getQueryBatchAppender(vmNames.size()))) {
             pstmt.setString(1, detail);
@@ -471,7 +471,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     vmsDetailByNames.add(new Pair<>(new Pair<>(
-                            rs.getString("vm_instance.instance_name"), VirtualMachine.Type.valueOf(rs.getString("vm_type"))),
+                            rs.getString("vm_instance.instance_name"), VirtualMachineType.valueOf(rs.getString("vm_type"))),
                             new Pair<>(rs.getLong("vm_instance.id"), rs.getString("user_vm_details.value"))));
                 }
             }

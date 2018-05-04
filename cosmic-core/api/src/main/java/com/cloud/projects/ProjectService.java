@@ -1,10 +1,10 @@
 package com.cloud.projects;
 
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.projects.ProjectAccount.Role;
-import com.cloud.user.Account;
 
 public interface ProjectService {
     /**

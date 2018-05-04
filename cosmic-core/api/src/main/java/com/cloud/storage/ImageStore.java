@@ -1,7 +1,7 @@
 package com.cloud.storage;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
 
 public interface ImageStore extends Identity, InternalIdentity {
 

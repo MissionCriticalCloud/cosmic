@@ -1,30 +1,20 @@
 package com.cloud.storage.secondary;
 
-import static com.cloud.vm.VirtualMachine.State.Migrating;
-import static com.cloud.vm.VirtualMachine.State.Running;
-import static com.cloud.vm.VirtualMachine.State.Starting;
-import static com.cloud.vm.VirtualMachine.State.Stopped;
-import static com.cloud.vm.VirtualMachine.State.Stopping;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Migrating;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Running;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Starting;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopped;
+import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopping;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.RebootCommand;
-import com.cloud.agent.api.SecStorageFirewallCfgCommand;
-import com.cloud.agent.api.SecStorageSetupAnswer;
-import com.cloud.agent.api.SecStorageSetupCommand;
-import com.cloud.agent.api.SecStorageVMSetupCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupSecondaryStorageCommand;
-import com.cloud.agent.api.check.CheckSshAnswer;
-import com.cloud.agent.api.check.CheckSshCommand;
-import com.cloud.agent.api.to.NfsTO;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.consoleproxy.ConsoleProxyManager;
+import com.cloud.consoleproxy.RunningHostInfoAgregator;
+import com.cloud.consoleproxy.RunningHostInfoAgregator.ZoneHostInfo;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.DataCenterVO;
@@ -35,24 +25,43 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.security.keystore.KeystoreManager;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.info.RunningHostInfoAgregator;
-import com.cloud.info.RunningHostInfoAgregator.ZoneHostInfo;
+import com.cloud.legacymodel.auth.Certificates;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
+import com.cloud.legacymodel.communication.answer.SecStorageSetupAnswer;
+import com.cloud.legacymodel.communication.command.CheckSshCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.RebootCommand;
+import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand;
+import com.cloud.legacymodel.communication.command.SecStorageSetupCommand;
+import com.cloud.legacymodel.communication.command.SecStorageVMSetupCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupSecondaryStorageCommand;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managementserver.ManagementServerService;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
-import com.cloud.network.Network;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.StorageNetworkManager;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
@@ -65,10 +74,8 @@ import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
-import com.cloud.storage.Storage;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.SnapshotDao;
@@ -82,15 +89,12 @@ import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.template.TemplateConstants;
 import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.template.TemplateManager;
-import com.cloud.user.Account;
 import com.cloud.user.AccountService;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.GlobalLock;
 import com.cloud.utils.db.QueryBuilder;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.events.SubscriptionMgr;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.NicProfile;
@@ -98,8 +102,6 @@ import com.cloud.vm.ReservationContext;
 import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.SystemVmLoadScanner;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineGuru;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineName;
@@ -269,7 +271,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final SecondaryStorageListener _listener = new SecondaryStorageListener(this);
         _agentMgr.registerForHostEvents(_listener, true, false, true);
 
-        _itMgr.registerGuru(VirtualMachine.Type.SecondaryStorageVm, this);
+        _itMgr.registerGuru(VirtualMachineType.SecondaryStorageVm, this);
 
         //check if there is a default service offering configured
         final String ssvmSrvcOffIdStr = configs.get(Config.SecondaryStorageServiceOffering.key());
@@ -291,7 +293,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             final int ramSize = NumbersUtil.parseInt(_configDao.getValue("ssvm.ram.size"), DEFAULT_SS_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = _offeringDao.createSystemServiceOfferings("System Offering For Secondary Storage VM",
                     ServiceOffering.ssvmDefaultOffUniqueName, 1, ramSize, null, null, false, null,
-                    Storage.ProvisioningType.THIN, true, null, true, VirtualMachine.Type.SecondaryStorageVm, true);
+                    StorageProvisioningType.THIN, true, null, true, VirtualMachineType.SecondaryStorageVm, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {
                 final String msg = "Data integrity problem : System Offering For Secondary Storage VM has been removed?";
@@ -863,7 +865,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         try {
             _itMgr.expunge(ssvm.getUuid());
             _secStorageVmDao.remove(ssvm.getId());
-            final HostVO host = _hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), Host.Type.SecondaryStorageVM);
+            final HostVO host = _hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), HostType.SecondaryStorageVM);
             if (host != null) {
                 logger.debug("Removing host entry for ssvm id=" + vmId);
                 _hostDao.remove(host.getId());
@@ -901,8 +903,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         thiscpc.addPortConfig(thisSecStorageVm.getPublicIpAddress(), copyPort, true, TemplateConstants.DEFAULT_TMPLT_COPY_INTF);
 
         final QueryBuilder<HostVO> sc = QueryBuilder.create(HostVO.class);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.SecondaryStorageVM);
-        sc.and(sc.entity().getStatus(), Op.IN, Status.Up, Status.Connecting);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.SecondaryStorageVM);
+        sc.and(sc.entity().getStatus(), Op.IN, HostStatus.Up, HostStatus.Connecting);
         final List<HostVO> ssvms = sc.list();
         for (final HostVO ssvm : ssvms) {
             if (ssvm.getId() == ssAHostId) {
@@ -939,7 +941,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public boolean generateVMSetupCommand(final Long ssAHostId) {
         final HostVO ssAHost = _hostDao.findById(ssAHostId);
-        if (ssAHost.getType() != Host.Type.SecondaryStorageVM) {
+        if (ssAHost.getType() != HostType.SecondaryStorageVM) {
             return false;
         }
         final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(ssAHost.getName());
@@ -994,7 +996,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     public boolean generateSetupCommand(final Long ssHostId) {
         final HostVO cssHost = _hostDao.findById(ssHostId);
         final Long zoneId = cssHost.getDataCenterId();
-        if (cssHost.getType() == Host.Type.SecondaryStorageVM) {
+        if (cssHost.getType() == HostType.SecondaryStorageVM) {
 
             final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(cssHost.getName());
             if (secStorageVm == null) {
@@ -1012,7 +1014,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 if (!_useSSlCopy) {
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, null);
                 } else {
-                    final KeystoreManager.Certificates certs = _keystoreMgr.getCertificates(ConsoleProxyManager.CERTIFICATE_NAME);
+                    final Certificates certs = _keystoreMgr.getCertificates(ConsoleProxyManager.CERTIFICATE_NAME);
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, certs);
                 }
 
@@ -1045,16 +1047,16 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         if (dcId != null) {
             sc.and(sc.entity().getDataCenterId(), Op.EQ, dcId);
         }
-        sc.and(sc.entity().getState(), Op.IN, Status.Up, Status.Connecting);
-        sc.and(sc.entity().getType(), Op.EQ, Host.Type.SecondaryStorageVM);
+        sc.and(sc.entity().getState(), Op.IN, HostStatus.Up, HostStatus.Connecting);
+        sc.and(sc.entity().getType(), Op.EQ, HostType.SecondaryStorageVM);
         return sc.list();
     }
 
     @Override
     public HostVO pickSsvmHost(final HostVO ssHost) {
-        if (ssHost.getType() == Host.Type.LocalSecondaryStorage) {
+        if (ssHost.getType() == HostType.LocalSecondaryStorage) {
             return ssHost;
-        } else if (ssHost.getType() == Host.Type.SecondaryStorage) {
+        } else if (ssHost.getType() == HostType.SecondaryStorage) {
             final Long dcId = ssHost.getDataCenterId();
             final List<HostVO> ssAHosts = listUpAndConnectingSecondaryStorageVmHost(dcId);
             if (ssAHosts == null || ssAHosts.isEmpty()) {
@@ -1185,7 +1187,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             return null;
         }
 
-        host.setType(com.cloud.host.Host.Type.SecondaryStorageVM);
+        host.setType(HostType.SecondaryStorageVM);
         return host;
     }
 

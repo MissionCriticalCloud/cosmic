@@ -1,16 +1,17 @@
 package com.cloud.network.lb;
 
 import com.cloud.context.CallContext;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.lb.LoadBalancingRule.LbDestination;
-import com.cloud.network.lb.LoadBalancingRule.LbHealthCheckPolicy;
-import com.cloud.network.lb.LoadBalancingRule.LbSslCert;
-import com.cloud.network.lb.LoadBalancingRule.LbStickinessPolicy;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.LoadBalancer;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.LoadBalancingRule;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbDestination;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbHealthCheckPolicy;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbSslCert;
+import com.cloud.legacymodel.network.LoadBalancingRule.LbStickinessPolicy;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.rules.LbStickinessMethod;
-import com.cloud.network.rules.LoadBalancer;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
-import com.cloud.user.Account;
 
 import java.util.List;
 

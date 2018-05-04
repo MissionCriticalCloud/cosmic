@@ -93,11 +93,11 @@ import static com.cloud.utils.CloudConstants.PROPERTY_KEY_ZONE;
 import static com.cloud.utils.PropertiesUtil.parse;
 import static com.cloud.utils.PropertiesUtil.stringSplitDecomposer;
 
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource.BridgeType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.RngDef.RngBackendModel;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogAction;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.WatchDogDef.WatchDogModel;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.PropertiesPojo;
 
 import java.io.File;

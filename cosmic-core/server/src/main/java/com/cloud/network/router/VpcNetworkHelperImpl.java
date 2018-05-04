@@ -1,18 +1,19 @@
 package com.cloud.network.router;
 
 import com.cloud.dc.dao.VlanDao;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.legacymodel.network.vpc.PrivateGateway;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.Networks.IsolationType;
 import com.cloud.network.addr.PublicIp;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.router.deployment.RouterDeploymentDefinition;
-import com.cloud.network.vpc.PrivateGateway;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.service.ServiceOfferingVO;
@@ -126,8 +127,7 @@ public class VpcNetworkHelperImpl extends NetworkHelperImpl {
         }
         if (publicNetwork != null) {
             if (networks.get(publicNetwork) != null) {
-                final
-                List<NicProfile> publicNicProfiles = (List<NicProfile>) networks.get(publicNetwork);
+                final List<NicProfile> publicNicProfiles = (List<NicProfile>) networks.get(publicNetwork);
                 publicNicProfiles.addAll(publicNics);
                 networks.put(publicNetwork, publicNicProfiles);
             } else {

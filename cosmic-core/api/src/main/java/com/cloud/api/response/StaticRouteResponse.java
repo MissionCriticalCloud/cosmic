@@ -3,7 +3,7 @@ package com.cloud.api.response;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
-import com.cloud.network.vpc.StaticRoute;
+import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.serializer.Param;
 
 import java.util.List;

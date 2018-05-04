@@ -1,7 +1,7 @@
 package com.cloud.utils.db;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.component.ComponentContext;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

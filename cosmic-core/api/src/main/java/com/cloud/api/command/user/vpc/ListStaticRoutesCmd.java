@@ -9,9 +9,9 @@ import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.PrivateGatewayResponse;
 import com.cloud.api.response.StaticRouteResponse;
 import com.cloud.api.response.VpcResponse;
-import com.cloud.network.vpc.StaticRoute;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.vpc.StaticRoute;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,5 +90,4 @@ public class ListStaticRoutesCmd extends BaseListTaggedResourcesCmd {
     public String getCommandName() {
         return s_name;
     }
-
 }

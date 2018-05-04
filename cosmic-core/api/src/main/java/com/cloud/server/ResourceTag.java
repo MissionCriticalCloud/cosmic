@@ -1,45 +1,27 @@
 package com.cloud.server;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 
 public interface ResourceTag extends ControlledEntity, Identity, InternalIdentity {
 
-    /**
-     * @return
-     */
     String getKey();
 
-    /**
-     * @return
-     */
     String getValue();
 
-    /**
-     * @return
-     */
     long getResourceId();
 
     void setResourceId(long resourceId);
 
-    /**
-     * @return
-     */
     ResourceObjectType getResourceType();
 
-    /**
-     * @return
-     */
     String getCustomer();
 
-    /**
-     * @return
-     */
     String getResourceUuid();
 
     // FIXME - extract enum to another interface as its used both by resourceTags and resourceMetaData code
-    public enum ResourceObjectType {
+    enum ResourceObjectType {
         UserVm(true, true),
         Template(true, true),
         ISO(true, false),

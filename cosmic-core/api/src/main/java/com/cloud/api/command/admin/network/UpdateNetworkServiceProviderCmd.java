@@ -10,8 +10,8 @@ import com.cloud.api.Parameter;
 import com.cloud.api.ServerApiException;
 import com.cloud.api.response.ProviderResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.PhysicalNetworkServiceProvider;
-import com.cloud.user.Account;
 
 import java.util.List;
 

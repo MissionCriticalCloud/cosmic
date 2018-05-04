@@ -25,7 +25,6 @@ import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DedicatedResourceVO;
-import com.cloud.dc.DedicatedResources;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
@@ -36,23 +35,24 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.DedicatedResources;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.dao.UserVmDao;
 
@@ -733,7 +733,7 @@ public class DedicatedResourceManagerImpl implements DedicatedService {
             throw new InvalidParameterValueException("Unable to find host by id " + hostId);
         } else {
             //check if host is of routing type
-            if (host.getType() != Host.Type.Routing) {
+            if (host.getType() != HostType.Routing) {
                 throw new CloudRuntimeException("Invalid host type for host " + host.getName());
             }
 

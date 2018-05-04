@@ -13,11 +13,11 @@ import com.cloud.api.response.Site2SiteCustomerGatewayResponse;
 import com.cloud.api.response.Site2SiteVpnConnectionResponse;
 import com.cloud.api.response.Site2SiteVpnGatewayResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.Site2SiteVpnGateway;
-import com.cloud.network.vpc.Vpc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

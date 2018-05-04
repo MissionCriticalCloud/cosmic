@@ -1,5 +1,6 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.VpcGateway;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

@@ -15,13 +15,14 @@ import com.cloud.api.response.FirewallRuleResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.network.rules.PortForwardingRule;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.network.PortForwardingRule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deletePortForwardingRule", group = APICommandGroup.FirewallService, description = "Deletes a port forwarding rule", responseObject = SuccessResponse.class, entityType = {PortForwardingRule.class},
+@APICommand(name = "deletePortForwardingRule", group = APICommandGroup.FirewallService, description = "Deletes a port forwarding rule", responseObject = SuccessResponse.class, entityType =
+        {PortForwardingRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class DeletePortForwardingRuleCmd extends BaseAsyncCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(DeletePortForwardingRuleCmd.class.getName());

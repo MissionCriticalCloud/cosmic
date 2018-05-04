@@ -4,9 +4,9 @@ import com.cloud.acl.RoleType;
 import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.serializer.Param;
-import com.cloud.storage.Volume;
 
 import java.util.Date;
 import java.util.LinkedHashSet;

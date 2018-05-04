@@ -1,5 +1,7 @@
 package com.cloud.dc;
 
+import com.cloud.legacymodel.dc.StorageNetworkIpRange;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

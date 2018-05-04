@@ -1,14 +1,14 @@
 package com.cloud.network.rules;
 
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.network.Network;
-import com.cloud.network.router.VirtualRouter;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.topology.NetworkTopologyVisitor;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.UserVmVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.UserVmDao;
@@ -36,7 +36,7 @@ public class DhcpSubNetRules extends RuleApplier {
         final NicDao nicDao = visitor.getVirtualNetworkApplianceFactory().getNicDao();
         // check if this is not the primary subnet.
         final NicVO domrGuestNic = nicDao.findByInstanceIdAndIpAddressAndVmtype(_router.getId(), nicDao.getIpAddress(_nic.getNetworkId(), _router.getId()),
-                VirtualMachine.Type.DomainRouter);
+                VirtualMachineType.DomainRouter);
         // check if the router ip address and the vm ip address belong to same
         // subnet.
         // if they do not belong to same netwoek check for the alias ips. if not

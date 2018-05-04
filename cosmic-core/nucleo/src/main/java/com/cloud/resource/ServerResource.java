@@ -1,11 +1,11 @@
 package com.cloud.resource;
 
-import com.cloud.agent.IAgentControl;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.PingCommand;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.host.Host;
+import com.cloud.common.agent.IAgentControl;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.PingCommand;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.component.Manager;
 
 /**
@@ -15,7 +15,7 @@ public interface ServerResource extends Manager {
     /**
      * @return Host.Type type of the computing server we have.
      */
-    Host.Type getType();
+    HostType getType();
 
     /**
      * Generate a startup command containing information regarding the resource.

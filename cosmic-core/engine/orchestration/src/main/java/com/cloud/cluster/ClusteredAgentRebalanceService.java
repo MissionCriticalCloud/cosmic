@@ -1,8 +1,8 @@
 package com.cloud.cluster;
 
-import com.cloud.exception.AgentUnavailableException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.host.Status.Event;
+import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.model.enumeration.Event;
 
 public interface ClusteredAgentRebalanceService {
     int DEFAULT_TRANSFER_CHECK_INTERVAL = 10000;

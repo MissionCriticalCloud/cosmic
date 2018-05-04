@@ -10,10 +10,10 @@ import com.cloud.api.command.user.network.ListNetworkOfferingsCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.ProviderResponse;
 import com.cloud.api.response.VirtualRouterProviderResponse;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.network.VirtualRouterProvider;
 import com.cloud.network.element.VirtualRouterElementService;
 
@@ -24,7 +24,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "listVirtualRouterElements", group = APICommandGroup.RouterService, description = "Lists all available virtual router elements.", responseObject = VirtualRouterProviderResponse.class,
+@APICommand(name = "listVirtualRouterElements", group = APICommandGroup.RouterService, description = "Lists all available virtual router elements.", responseObject = VirtualRouterProviderResponse
+        .class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ListVirtualRouterElementsCmd extends BaseListCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(ListNetworkOfferingsCmd.class.getName());

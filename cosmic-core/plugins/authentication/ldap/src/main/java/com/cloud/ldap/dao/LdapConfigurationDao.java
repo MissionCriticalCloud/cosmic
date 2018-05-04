@@ -1,7 +1,7 @@
 package com.cloud.ldap.dao;
 
 import com.cloud.ldap.LdapConfigurationVO;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.db.GenericDao;
 
 import java.util.List;

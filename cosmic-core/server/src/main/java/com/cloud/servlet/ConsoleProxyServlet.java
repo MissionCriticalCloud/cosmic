@@ -1,21 +1,22 @@
 package com.cloud.servlet;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.exception.PermissionDeniedException;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.host.HostVO;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.server.ManagementServer;
 import com.cloud.storage.GuestOSVO;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
-import com.cloud.user.User;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.ConstantTimeComparator;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.vm.UserVmDetailVO;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.dao.UserVmDetailsDao;
 
@@ -335,7 +336,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         }
 
         String vmName = vm.getHostName();
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             final UserVm userVm = _entityMgr.findById(UserVm.class, vmId);
             final String displayName = userVm.getDisplayName();
             if (displayName != null && !displayName.isEmpty() && !displayName.equals(vmName)) {

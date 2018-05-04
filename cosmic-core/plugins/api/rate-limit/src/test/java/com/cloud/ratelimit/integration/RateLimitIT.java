@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import com.cloud.api.response.ApiLimitResponse;
 import com.cloud.api.response.SuccessResponse;
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;

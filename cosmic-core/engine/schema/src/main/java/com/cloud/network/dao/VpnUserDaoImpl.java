@@ -1,6 +1,6 @@
 package com.cloud.network.dao;
 
-import com.cloud.network.VpnUser.State;
+import com.cloud.legacymodel.network.VpnUser.State;
 import com.cloud.network.VpnUserVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.GenericSearchBuilder;

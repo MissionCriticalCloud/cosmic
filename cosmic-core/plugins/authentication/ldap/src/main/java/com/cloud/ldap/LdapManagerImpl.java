@@ -15,12 +15,12 @@ import com.cloud.api.command.ListDomainLdapLinkCmd;
 import com.cloud.api.response.LdapConfigurationResponse;
 import com.cloud.api.response.LdapUserResponse;
 import com.cloud.api.response.LinkDomainToLdapResponse;
-import com.cloud.domain.Domain;
 import com.cloud.ldap.dao.LdapConfigurationDao;
 import com.cloud.ldap.dao.LdapTrustMapDao;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.user.DomainManager;
-import com.cloud.utils.Pair;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import javax.ejb.Local;
 import javax.inject.Inject;
@@ -227,7 +227,7 @@ public class LdapManagerImpl implements LdapManager, LdapValidator {
         Validate.notNull(type, "type cannot be null. It should either be GROUP or OU");
         Validate.notNull(domainId, "domainId cannot be null.");
         Validate.notEmpty(name, "GROUP or OU name cannot be empty");
-        //Account type should be 0 or 2. check the constants in com.cloud.user.Account
+        //Account type should be 0 or 2. check the constants in com.cloud.legacymodel.user.Account
         Validate.isTrue(accountType == 0 || accountType == 2, "accountype should be either 0(normal user) or 2(domain admin)");
         final Domain domain = _domainManager.getDomain(domainId);
         final LinkType linkType = LdapManager.LinkType.valueOf(type.toUpperCase());
@@ -243,7 +243,7 @@ public class LdapManagerImpl implements LdapManager, LdapValidator {
         final Domain domain = _domainManager.getDomain(domainId);
         final LinkDomainToLdapResponse response;
 
-        if (! _ldapManager.isLdapEnabled()) {
+        if (!_ldapManager.isLdapEnabled()) {
             return new LinkDomainToLdapResponse(domain.getUuid());
         }
 

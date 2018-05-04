@@ -3,9 +3,9 @@ package com.cloud.api.command.admin.account;
 import com.cloud.api.ApiErrorCode;
 import com.cloud.api.ServerApiException;
 import com.cloud.context.CallContext;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.user.AccountService;
-import com.cloud.user.User;
 
 import org.junit.After;
 import org.junit.Assert;

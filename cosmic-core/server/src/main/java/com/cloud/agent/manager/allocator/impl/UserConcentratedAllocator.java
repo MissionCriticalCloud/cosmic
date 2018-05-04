@@ -4,26 +4,26 @@ import com.cloud.agent.manager.allocator.PodAllocator;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDao;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -142,9 +142,9 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
     private boolean templateAvailableInPod(final long templateId, final long dcId, final long podId) {
         return true;
         /*
-         * List<VMTemplateHostVO> thvoList = _templateHostDao.listByTemplateStatus(templateId, dcId, podId, Status.DOWNLOADED);
+         * List<VMTemplateHostVO> thvoList = _templateHostDao.listByTemplateStatus(templateId, dcId, podId, HostStatus.DOWNLOADED);
          * List<VMTemplateStoragePoolVO> tpvoList = _templatePoolDao.listByTemplateStatus(templateId, dcId, podId,
-         * Status.DOWNLOADED);
+         * HostStatus.DOWNLOADED);
          *
          * if (thvoList != null && thvoList.size() > 0) { if (s_logger.isDebugEnabled()) { s_logger.debug("Found " +
          * thvoList.size() + " storage hosts in pod " + podId + " with template " + templateId); } return true; } else if
@@ -210,7 +210,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
 
                 final ServiceOffering so;
 
-                if (vm.getType() == VirtualMachine.Type.User) {
+                if (vm.getType() == VirtualMachineType.User) {
                     final UserVmVO userVm = _vmDao.findById(vm.getId());
                     if (userVm == null) {
                         continue;
@@ -246,7 +246,7 @@ public class UserConcentratedAllocator extends AdapterBase implements PodAllocat
             return true;
         }
 
-        if (vm.getState() == State.Destroyed && vm.getType() != VirtualMachine.Type.User) {
+        if (vm.getState() == State.Destroyed && vm.getType() != VirtualMachineType.User) {
             return true;
         }
 

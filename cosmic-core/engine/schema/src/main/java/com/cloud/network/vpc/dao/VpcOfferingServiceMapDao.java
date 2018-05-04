@@ -1,6 +1,6 @@
 package com.cloud.network.vpc.dao;
 
-import com.cloud.network.Network.Service;
+import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.network.vpc.VpcOfferingServiceMapVO;
 import com.cloud.utils.db.GenericDao;
 

@@ -9,8 +9,8 @@ import com.cloud.api.response.DedicateHostResponse;
 import com.cloud.api.response.DedicatePodResponse;
 import com.cloud.api.response.DedicateZoneResponse;
 import com.cloud.dc.DedicatedResourceVO;
-import com.cloud.dc.DedicatedResources;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.dc.DedicatedResources;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.component.PluggableService;
 
 import java.util.List;

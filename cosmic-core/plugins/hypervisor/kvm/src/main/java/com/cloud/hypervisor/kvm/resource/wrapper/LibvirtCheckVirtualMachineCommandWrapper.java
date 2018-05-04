@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckVirtualMachineAnswer;
-import com.cloud.agent.api.CheckVirtualMachineCommand;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
+import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
+import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.vm.VirtualMachine.PowerState;
 
 import org.libvirt.Connect;
 import org.libvirt.LibvirtException;

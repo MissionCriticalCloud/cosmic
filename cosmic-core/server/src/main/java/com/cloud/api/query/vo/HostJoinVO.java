@@ -1,12 +1,12 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.host.Host.Type;
-import com.cloud.host.Status;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.org.Cluster;
-import com.cloud.resource.ResourceState;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -37,10 +37,10 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
     @Column(name = "name")
     private String name;
     @Column(name = "status")
-    private Status status = null;
+    private HostStatus status = null;
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
-    private Type type;
+    private HostType type;
     @Column(name = "private_ip_address")
     private String privateIpAddress;
     @Column(name = "disconnected")
@@ -145,11 +145,11 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
         this.name = name;
     }
 
-    public void setStatus(final Status status) {
+    public void setStatus(final HostStatus status) {
         this.status = status;
     }
 
-    public void setType(final Type type) {
+    public void setType(final HostType type) {
         this.type = type;
     }
 
@@ -319,11 +319,11 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
         return name;
     }
 
-    public Status getStatus() {
+    public HostStatus getStatus() {
         return status;
     }
 
-    public Type getType() {
+    public HostType getType() {
         return type;
     }
 

@@ -40,28 +40,28 @@ import com.cloud.api.command.user.vm.GetVMPasswordCmd;
 import com.cloud.api.command.user.vmgroup.UpdateVMGroupCmd;
 import com.cloud.capacity.Capacity;
 import com.cloud.config.Configuration;
-import com.cloud.dc.Pod;
-import com.cloud.dc.Vlan;
-import com.cloud.domain.Domain;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ManagementServerException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.VirtualMachineMigrationException;
-import com.cloud.host.Host;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ManagementServerException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.user.SSHKeyPair;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
-import com.cloud.org.Cluster;
 import com.cloud.storage.GuestOS;
 import com.cloud.storage.GuestOSHypervisor;
 import com.cloud.storage.GuestOsCategory;
-import com.cloud.storage.StoragePool;
-import com.cloud.user.SSHKeyPair;
-import com.cloud.utils.Pair;
-import com.cloud.utils.Ternary;
 import com.cloud.vm.InstanceGroup;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -363,7 +363,7 @@ public interface ManagementService {
      */
     String getVMPassword(GetVMPasswordCmd cmd);
 
-    Type findSystemVMTypeById(long instanceId);
+    VirtualMachineType findSystemVMTypeById(long instanceId);
 
     /**
      * List hosts for migrating the given VM. The API returns list of all hosts in the VM's cluster minus the current

@@ -8,7 +8,7 @@ import com.cloud.ldap.LdapConfiguration
 import com.cloud.ldap.LdapConfigurationVO
 import com.cloud.ldap.LdapUserManager
 import com.cloud.ldap.dao.LdapConfigurationDao
-import com.cloud.utils.Pair
+import com.cloud.legacymodel.utils.Pair
 
 import javax.naming.directory.SearchControls
 

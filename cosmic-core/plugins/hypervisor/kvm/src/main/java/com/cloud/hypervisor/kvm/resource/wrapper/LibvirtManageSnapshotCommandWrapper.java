@@ -1,16 +1,16 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.ManageSnapshotAnswer;
-import com.cloud.agent.api.ManageSnapshotCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ManageSnapshotAnswer;
+import com.cloud.legacymodel.communication.command.ManageSnapshotCommand;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.utils.script.Script;
 
 import java.io.File;
@@ -75,9 +75,9 @@ public final class LibvirtManageSnapshotCommandWrapper
                     snap.delete(0);
                 }
 
-        /*
-         * libvirt on RHEL6 doesn't handle resume event emitted from qemu
-         */
+                /*
+                 * libvirt on RHEL6 doesn't handle resume event emitted from qemu
+                 */
                 vm = libvirtComputingResource.getDomain(conn, command.getVmName());
                 state = vm.getInfo().state;
                 if (state == DomainState.VIR_DOMAIN_PAUSED) {
@@ -112,7 +112,7 @@ public final class LibvirtManageSnapshotCommandWrapper
                                 "A RBD snapshot operation on " + disk.getName() + " failed. The error was: " + e.getMessage());
                     }
                 } else {
-          /* VM is not running, create a snapshot by ourself */
+                    /* VM is not running, create a snapshot by ourself */
                     final int cmdsTimeout = libvirtComputingResource.getCmdsTimeout();
                     final String manageSnapshotPath = libvirtComputingResource.manageSnapshotPath();
 

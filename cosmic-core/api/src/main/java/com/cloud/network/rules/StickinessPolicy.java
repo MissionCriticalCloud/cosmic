@@ -1,9 +1,9 @@
 package com.cloud.network.rules;
 
-import com.cloud.api.Displayable;
-import com.cloud.api.Identity;
-import com.cloud.api.InternalIdentity;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.Displayable;
+import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;
 

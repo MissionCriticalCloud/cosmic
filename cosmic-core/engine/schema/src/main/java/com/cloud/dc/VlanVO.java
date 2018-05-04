@@ -1,5 +1,6 @@
 package com.cloud.dc;
 
+import com.cloud.legacymodel.dc.Vlan;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

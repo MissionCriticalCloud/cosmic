@@ -3,9 +3,9 @@ package com.cloud.api.agent.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.BackupSnapshotAnswer;
-import com.cloud.agent.api.BackupSnapshotCommand;
-import com.cloud.storage.StoragePool;
+import com.cloud.legacymodel.communication.answer.BackupSnapshotAnswer;
+import com.cloud.legacymodel.communication.command.BackupSnapshotCommand;
+import com.cloud.legacymodel.storage.StoragePool;
 
 import org.junit.Before;
 import org.junit.Test;

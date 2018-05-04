@@ -1,11 +1,11 @@
 package com.cloud.dc.dao;
 
 import com.cloud.dc.PodVlanVO;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

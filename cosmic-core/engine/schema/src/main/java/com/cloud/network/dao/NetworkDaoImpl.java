@@ -1,15 +1,15 @@
 package com.cloud.network.dao;
 
-import com.cloud.acl.ControlledEntity.ACLType;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Event;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
-import com.cloud.network.Network.State;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.Mode;
-import com.cloud.network.Networks.TrafficType;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Event;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Network.State;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DHCPMode;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.TrafficType;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
@@ -228,7 +228,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
         IdAndDomainSearch.done();
     }
 
-    public List<NetworkVO> findBy(final TrafficType trafficType, final Mode mode, final BroadcastDomainType broadcastType, final long networkOfferingId, final long dataCenterId) {
+    public List<NetworkVO> findBy(final TrafficType trafficType, final DHCPMode mode, final BroadcastDomainType broadcastType, final long networkOfferingId, final long dataCenterId) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("trafficType", trafficType);
         sc.setParameters("broadcastType", broadcastType);
@@ -247,7 +247,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
-    public List<NetworkVO> listByGuestType(final Network.GuestType type) {
+    public List<NetworkVO> listByGuestType(final GuestType type) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("guestType", type);
         return listBy(sc, null);
@@ -277,7 +277,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
-    public List<NetworkVO> listByZoneAndGuestType(final long accountId, final long dataCenterId, final Network.GuestType type, final Boolean isSystem) {
+    public List<NetworkVO> listByZoneAndGuestType(final long accountId, final long dataCenterId, final GuestType type, final Boolean isSystem) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("datacenter", dataCenterId);
         sc.setParameters("account", accountId);
@@ -425,7 +425,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
-    public List<NetworkVO> listBy(final long accountId, final long dataCenterId, final Network.GuestType type, final TrafficType trafficType) {
+    public List<NetworkVO> listBy(final long accountId, final long dataCenterId, final GuestType type, final TrafficType trafficType) {
         final SearchCriteria<NetworkVO> sc = AllFieldsSearch.create();
         sc.setParameters("datacenter", dataCenterId);
         sc.setParameters("account", accountId);
@@ -513,7 +513,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
-    public List<NetworkVO> listSourceNATEnabledNetworks(final long accountId, final long dataCenterId, final Network.GuestType type) {
+    public List<NetworkVO> listSourceNATEnabledNetworks(final long accountId, final long dataCenterId, final GuestType type) {
         final SearchCriteria<NetworkVO> sc = SourceNATSearch.create();
         sc.setParameters("datacenter", dataCenterId);
         sc.setParameters("account", accountId);
@@ -591,7 +591,7 @@ public class NetworkDaoImpl extends GenericDaoBase<NetworkVO, Long> implements N
     }
 
     @Override
-    public List<NetworkVO> listNetworksByAccount(final long accountId, final long zoneId, final Network.GuestType type, final boolean isSystem) {
+    public List<NetworkVO> listNetworksByAccount(final long accountId, final long zoneId, final GuestType type, final boolean isSystem) {
         final SearchCriteria<NetworkVO> sc = OfferingAccountNetworkSearch.create();
         sc.setJoinParameters("ntwkOfferingSearch", "isSystem", isSystem);
         sc.setJoinParameters("ntwkAccountSearch", "accountId", accountId);

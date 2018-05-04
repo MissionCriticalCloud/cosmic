@@ -7,8 +7,8 @@ import com.cloud.api.BaseListCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.VpcOfferingResponse;
-import com.cloud.network.vpc.VpcOffering;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.network.vpc.VpcOffering;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -17,12 +17,14 @@ import com.cloud.domain.dao.DomainDao;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.gpu.VGPUTypesVO;
-import com.cloud.host.Host;
-import com.cloud.host.HostStats;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.storage.StorageStats;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStats;
+import com.cloud.legacymodel.storage.StorageStats;
+import com.cloud.model.enumeration.Event;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.user.AccountVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.db.GenericDaoBase;
@@ -159,7 +161,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         }
 
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        if (host.getType() == Host.Type.Routing) {
+        if (host.getType() == HostType.Routing) {
             if (details.contains(HostDetails.all) || details.contains(HostDetails.capacity)) {
                 // set allocated capacities
                 final Long mem = host.getMemReservedCapacity() + host.getMemUsedCapacity();
@@ -204,7 +206,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                 }
             }
 
-            if (details.contains(HostDetails.all) && host.getHypervisorType() == Hypervisor.HypervisorType.KVM) {
+            if (details.contains(HostDetails.all) && host.getHypervisorType() == HypervisorType.KVM) {
                 //only kvm has the requirement to return host details
                 try {
                     final HostVO h = hostDao.findById(host.getId());
@@ -217,7 +219,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                     s_logger.debug("failed to get host details", e);
                 }
             }
-        } else if (host.getType() == Host.Type.SecondaryStorage) {
+        } else if (host.getType() == HostType.SecondaryStorage) {
             final StorageStats secStorageStats = ApiDBUtils.getSecondaryStorageStatistics(host.getId());
             if (secStorageStats != null) {
                 hostResponse.setDiskSizeTotal(secStorageStats.getCapacityBytes());
@@ -228,12 +230,12 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setLocalStorageActive(ApiDBUtils.isLocalStorageActiveOnHost(host.getId()));
 
         if (details.contains(HostDetails.all) || details.contains(HostDetails.events)) {
-            final Set<com.cloud.host.Status.Event> possibleEvents = host.getStatus().getPossibleEvents();
+            final Set<Event> possibleEvents = host.getStatus().getPossibleEvents();
             if ((possibleEvents != null) && !possibleEvents.isEmpty()) {
                 String events = "";
-                final Iterator<com.cloud.host.Status.Event> iter = possibleEvents.iterator();
+                final Iterator<Event> iter = possibleEvents.iterator();
                 while (iter.hasNext()) {
-                    final com.cloud.host.Status.Event event = iter.next();
+                    final Event event = iter.next();
                     events += event.toString();
                     if (iter.hasNext()) {
                         events += "; ";
@@ -326,7 +328,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         }
 
         final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        if (host.getType() == Host.Type.Routing) {
+        if (host.getType() == HostType.Routing) {
             if (details.contains(HostDetails.all) || details.contains(HostDetails.capacity)) {
                 // set allocated capacities
                 final Long mem = host.getMemReservedCapacity() + host.getMemUsedCapacity();
@@ -370,7 +372,7 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
                     hostResponse.setNetworkKbsWrite((new Double(hostStats.getNetworkWriteKBs())).longValue());
                 }
             }
-        } else if (host.getType() == Host.Type.SecondaryStorage) {
+        } else if (host.getType() == HostType.SecondaryStorage) {
             final StorageStats secStorageStats = ApiDBUtils.getSecondaryStorageStatistics(host.getId());
             if (secStorageStats != null) {
                 hostResponse.setDiskSizeTotal(secStorageStats.getCapacityBytes());
@@ -381,12 +383,12 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setLocalStorageActive(ApiDBUtils.isLocalStorageActiveOnHost(host.getId()));
 
         if (details.contains(HostDetails.all) || details.contains(HostDetails.events)) {
-            final Set<com.cloud.host.Status.Event> possibleEvents = host.getStatus().getPossibleEvents();
+            final Set<Event> possibleEvents = host.getStatus().getPossibleEvents();
             if ((possibleEvents != null) && !possibleEvents.isEmpty()) {
                 String events = "";
-                final Iterator<com.cloud.host.Status.Event> iter = possibleEvents.iterator();
+                final Iterator<Event> iter = possibleEvents.iterator();
                 while (iter.hasNext()) {
-                    final com.cloud.host.Status.Event event = iter.next();
+                    final Event event = iter.next();
                     events += event.toString();
                     if (iter.hasNext()) {
                         events += "; ";

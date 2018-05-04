@@ -14,12 +14,12 @@ import com.cloud.api.response.FirewallResponse;
 import com.cloud.api.response.IPAddressResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.IpAddress;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 
 import java.util.ArrayList;
@@ -28,7 +28,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "createFirewallRule", group = APICommandGroup.FirewallService, description = "Creates a firewall rule for a given IP address", responseObject = FirewallResponse.class, entityType = {FirewallRule.class},
+@APICommand(name = "createFirewallRule", group = APICommandGroup.FirewallService, description = "Creates a firewall rule for a given IP address", responseObject = FirewallResponse.class, entityType
+        = {FirewallRule.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateFirewallRuleCmd extends BaseAsyncCreateCmd implements FirewallRule {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateFirewallRuleCmd.class.getName());

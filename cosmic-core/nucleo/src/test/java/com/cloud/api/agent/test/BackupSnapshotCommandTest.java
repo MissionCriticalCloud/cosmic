@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.agent.api.BackupSnapshotCommand;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.StoragePoolStatus;
+import com.cloud.legacymodel.communication.command.BackupSnapshotCommand;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StoragePoolType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -127,7 +127,7 @@ public class BackupSnapshotCommandTest {
         }
 
         @Override
-        public Hypervisor.HypervisorType getHypervisor() {
+        public HypervisorType getHypervisor() {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 

@@ -8,8 +8,8 @@ import com.cloud.api.BaseAsyncCmd;
 import com.cloud.api.Parameter;
 import com.cloud.api.response.PhysicalNetworkResponse;
 import com.cloud.event.EventTypes;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.network.PhysicalNetwork;
-import com.cloud.user.Account;
 
 import java.util.List;
 

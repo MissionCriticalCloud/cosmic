@@ -2,9 +2,9 @@ package com.cloud.user;
 
 import com.cloud.api.command.admin.domain.ListDomainChildrenCmd;
 import com.cloud.api.command.admin.domain.ListDomainsCmd;
-import com.cloud.domain.Domain;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.utils.Pair;
 
 import java.util.List;
 

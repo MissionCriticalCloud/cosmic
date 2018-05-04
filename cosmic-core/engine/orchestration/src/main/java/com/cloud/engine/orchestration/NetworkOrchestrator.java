@@ -1,28 +1,15 @@
 package com.cloud.engine.orchestration;
 
-import com.cloud.acl.ControlledEntity.ACLType;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.api.AgentControlAnswer;
-import com.cloud.agent.api.AgentControlCommand;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckNetworkAnswer;
-import com.cloud.agent.api.CheckNetworkCommand;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.StartupCommand;
-import com.cloud.agent.api.StartupRoutingCommand;
-import com.cloud.agent.api.to.NicTO;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.ConfigurationManager;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVnetVO;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.DataCenterVnetDao;
 import com.cloud.dc.dao.PodVlanMapDao;
@@ -30,47 +17,77 @@ import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
-import com.cloud.domain.Domain;
 import com.cloud.engine.cloud.entity.api.db.VMNetworkMapVO;
 import com.cloud.engine.cloud.entity.api.db.dao.VMNetworkMapDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ConnectionException;
-import com.cloud.exception.IllegalVirtualMachineException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.InsufficientVirtualNetworkCapacityException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.UnsupportedServiceException;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.ConfigKey.Scope;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
-import com.cloud.host.Host;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CheckNetworkAnswer;
+import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ConnectionException;
+import com.cloud.legacymodel.exceptions.IllegalVirtualMachineException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientVirtualNetworkCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.UnsupportedServiceException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.FirewallRule.Purpose;
+import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.Network.Capability;
+import com.cloud.legacymodel.network.Network.Event;
+import com.cloud.legacymodel.network.Network.Provider;
+import com.cloud.legacymodel.network.Network.Service;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.network.Nic.ReservationStrategy;
+import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.network.StaticNatRule;
+import com.cloud.legacymodel.network.VirtualRouter.RedundantState;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.statemachine.StateMachine2;
+import com.cloud.legacymodel.to.NicTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.GuestType;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
-import com.cloud.network.Network.Capability;
-import com.cloud.network.Network.Event;
-import com.cloud.network.Network.GuestType;
-import com.cloud.network.Network.Provider;
-import com.cloud.network.Network.Service;
 import com.cloud.network.NetworkMigrationResponder;
 import com.cloud.network.NetworkModel;
 import com.cloud.network.NetworkProfile;
 import com.cloud.network.Networks;
-import com.cloud.network.Networks.BroadcastDomainType;
-import com.cloud.network.Networks.TrafficType;
 import com.cloud.network.PhysicalNetwork;
-import com.cloud.network.PhysicalNetworkSetupInfo;
 import com.cloud.network.RemoteAccessVpn;
 import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.addr.PublicIp;
@@ -101,19 +118,13 @@ import com.cloud.network.element.StaticNatServiceProvider;
 import com.cloud.network.element.UserDataServiceProvider;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.lb.LoadBalancingRulesManager;
-import com.cloud.network.router.VirtualRouter.RedundantState;
 import com.cloud.network.rules.FirewallManager;
-import com.cloud.network.rules.FirewallRule;
-import com.cloud.network.rules.FirewallRule.Purpose;
 import com.cloud.network.rules.FirewallRuleVO;
-import com.cloud.network.rules.LoadBalancerContainer.Scheme;
 import com.cloud.network.rules.PortForwardingRuleVO;
 import com.cloud.network.rules.RulesManager;
-import com.cloud.network.rules.StaticNatRule;
 import com.cloud.network.rules.StaticNatRuleImpl;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
 import com.cloud.network.vpc.NetworkACLManager;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.network.vpc.VpcManager;
 import com.cloud.network.vpc.dao.PrivateIpDao;
 import com.cloud.network.vpn.RemoteAccessVpnService;
@@ -123,12 +134,9 @@ import com.cloud.offerings.NetworkOfferingVO;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.offerings.dao.NetworkOfferingDetailsDao;
 import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
-import com.cloud.user.Account;
 import com.cloud.user.ResourceLimitService;
-import com.cloud.user.User;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -142,22 +150,15 @@ import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionCallbackWithExceptionNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.utils.fsm.NoTransitionException;
-import com.cloud.utils.fsm.StateMachine2;
+import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
-import com.cloud.vm.Nic;
-import com.cloud.vm.Nic.ReservationStrategy;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
 import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.Type;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
@@ -633,7 +634,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         });
 
         for (final NicVO nic : nics) {
-            final Pair<NetworkGuru, NetworkVO> implemented = implementNetwork(nic.getNetworkId(), dest, context, vmProfile.getVirtualMachine().getType() == Type.DomainRouter);
+            final Pair<NetworkGuru, NetworkVO> implemented = implementNetwork(nic.getNetworkId(), dest, context, vmProfile.getVirtualMachine().getType() == VirtualMachineType.DomainRouter);
             if (implemented == null || implemented.first() == null) {
                 s_logger.warn("Failed to implement network id=" + nic.getNetworkId() + " as a part of preparing nic id=" + nic.getId());
                 throw new CloudRuntimeException("Failed to implement network id=" + nic.getNetworkId() + " as a part preparing nic id=" + nic.getId());
@@ -670,13 +671,13 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             public void doInTransactionWithoutResult(final TransactionStatus status) {
                 _nicDao.update(nic.getId(), nic);
 
-                if (nic.getVmType() == VirtualMachine.Type.User) {
+                if (nic.getVmType() == VirtualMachineType.User) {
                     s_logger.debug("Changing active number of nics for network id=" + networkId + " on " + count);
                     _networksDao.changeActiveNicsBy(networkId, count);
                 }
 
-                if (nic.getVmType() == VirtualMachine.Type.User
-                        || nic.getVmType() == VirtualMachine.Type.DomainRouter && _networksDao.findById(networkId).getTrafficType() == TrafficType.Guest) {
+                if (nic.getVmType() == VirtualMachineType.User
+                        || nic.getVmType() == VirtualMachineType.DomainRouter && _networksDao.findById(networkId).getTrafficType() == TrafficType.Guest) {
                     _networksDao.setCheckForGc(networkId);
                 }
             }
@@ -702,7 +703,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             s_logger.warn(e.getMessage());
         }
 
-        if (vmProfile.getType() == Type.User && element.getProvider() != null) {
+        if (vmProfile.getType() == VirtualMachineType.User && element.getProvider() != null) {
             if (_networkModel.areServicesSupportedInNetwork(network.getId(), Service.Dhcp)
                     && _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Dhcp, element.getProvider()) && element instanceof DhcpServiceProvider) {
                 final DhcpServiceProvider sp = (DhcpServiceProvider) element;
@@ -752,7 +753,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     protected boolean stateTransitTo(final NetworkVO network, final Network.Event e) throws NoTransitionException {
-        return _stateMachine.transitTo(network, e, null, _networksDao);
+        return new StateMachine2Transitions(_stateMachine).transitTo(network, e, null, _networksDao);
     }
 
     protected boolean isSharedNetworkOfferingWithServices(final long networkOfferingId) {
@@ -1072,7 +1073,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         });
 
         // cleanup the entry in vm_network_map
-        if (vmProfile.getType().equals(VirtualMachine.Type.User)) {
+        if (vmProfile.getType().equals(VirtualMachineType.User)) {
             final NicVO nic = _nicDao.findById(nicId);
             if (nic != null) {
                 final NetworkVO vmNetwork = _networksDao.findById(nic.getNetworkId());
@@ -1255,7 +1256,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     @Override
     public void prepareNicForMigration(final VirtualMachineProfile vm, final DeployDestination dest) {
-        if (vm.getType().equals(VirtualMachine.Type.DomainRouter) && vm.getHypervisorType().equals(HypervisorType.KVM)) {
+        if (vm.getType().equals(VirtualMachineType.DomainRouter) && vm.getHypervisorType().equals(HypervisorType.KVM)) {
             //Include nics hot plugged and not stored in DB
             prepareAllNicsForMigration(vm, dest);
             return;
@@ -1554,7 +1555,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         //In Basic zone, make sure that there are no non-removed console proxies and SSVMs using the network
         final Zone zone = _zoneRepository.findById(network.getDataCenterId()).orElse(null);
         if (zone.getNetworkType() == com.cloud.model.enumeration.NetworkType.Basic) {
-            final List<VMInstanceVO> systemVms = _vmDao.listNonRemovedVmsByTypeAndNetwork(network.getId(), Type.ConsoleProxy, Type.SecondaryStorageVm);
+            final List<VMInstanceVO> systemVms = _vmDao.listNonRemovedVmsByTypeAndNetwork(network.getId(), VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
             if (systemVms != null && !systemVms.isEmpty()) {
                 s_logger.warn("Can't delete the network, not all consoleProxy/secondaryStorage vms are expunged");
                 return false;
@@ -2157,7 +2158,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         NicProfile nic = getNicProfileForVm(network, requested, vm);
 
         //1) allocate nic (if needed) Always allocate if it is a user vm
-        if (nic == null || vmProfile.getType() == VirtualMachine.Type.User) {
+        if (nic == null || vmProfile.getType() == VirtualMachineType.User) {
             nic = allocateNic(requested, network, false, vmProfile);
 
             if (nic == null) {
@@ -2165,7 +2166,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             }
 
             //Update vm_network_map table
-            if (vmProfile.getType() == VirtualMachine.Type.User) {
+            if (vmProfile.getType() == VirtualMachineType.User) {
                 final VMNetworkMapVO vno = new VMNetworkMapVO(vm.getId(), network.getId());
                 _vmNetworkMapDao.persist(vno);
             }
@@ -2174,7 +2175,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
         //2) prepare nic
         if (prepare) {
-            final Pair<NetworkGuru, NetworkVO> implemented = implementNetwork(nic.getNetworkId(), dest, context, vmProfile.getVirtualMachine().getType() == Type.DomainRouter);
+            final Pair<NetworkGuru, NetworkVO> implemented = implementNetwork(nic.getNetworkId(), dest, context, vmProfile.getVirtualMachine().getType() == VirtualMachineType.DomainRouter);
             if (implemented == null || implemented.first() == null) {
                 s_logger.warn("Failed to implement network id=" + nic.getNetworkId() + " as a part of preparing nic id=" + nic.getId());
                 throw new CloudRuntimeException("Failed to implement network id=" + nic.getNetworkId() + " as a part preparing nic id=" + nic.getId());
@@ -2605,7 +2606,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     @Override
-    public NicVO savePlaceholderNic(final Network network, final String ip4Address, final String ip6Address, final Type vmType) {
+    public NicVO savePlaceholderNic(final Network network, final String ip4Address, final String ip6Address, final VirtualMachineType vmType) {
         final NicVO nic = new NicVO(null, null, network.getId(), null);
         nic.setIPv4Address(ip4Address);
         nic.setIPv6Address(ip6Address);
@@ -2791,7 +2792,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     private boolean isLastNicInSubnet(final NicVO nic) {
-        if (_nicDao.listByNetworkIdTypeAndGatewayAndBroadcastUri(nic.getNetworkId(), VirtualMachine.Type.User, nic.getIPv4Gateway(), nic.getBroadcastUri()).size() > 1) {
+        if (_nicDao.listByNetworkIdTypeAndGatewayAndBroadcastUri(nic.getNetworkId(), VirtualMachineType.User, nic.getIPv4Gateway(), nic.getBroadcastUri()).size() > 1) {
             return false;
         }
         return true;
@@ -3090,7 +3091,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     @Override
-    public boolean processDisconnect(final long agentId, final Status state) {
+    public boolean processDisconnect(final long agentId, final HostStatus state) {
         return false;
     }
 

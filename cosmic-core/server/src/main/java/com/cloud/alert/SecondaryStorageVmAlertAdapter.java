@@ -2,11 +2,11 @@ package com.cloud.alert;
 
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.storage.secondary.SecStorageVmAlertEventArgs;
 import com.cloud.storage.secondary.SecondaryStorageVmManager;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.events.SubscriptionMgr;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.dao.SecondaryStorageVmDao;
 

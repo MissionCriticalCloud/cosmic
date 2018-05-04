@@ -3,10 +3,10 @@ package com.cloud.api;
 import com.cloud.api.auth.APIAuthenticationManager;
 import com.cloud.api.auth.APIAuthenticationType;
 import com.cloud.api.auth.APIAuthenticator;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
 import com.cloud.server.ManagementServer;
-import com.cloud.user.Account;
 import com.cloud.user.AccountService;
-import com.cloud.user.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

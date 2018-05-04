@@ -1,8 +1,8 @@
 package com.cloud.network;
 
-import com.cloud.acl.ControlledEntity;
-import com.cloud.api.Displayable;
-import com.cloud.api.InternalIdentity;
+import com.cloud.legacymodel.Displayable;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.acl.ControlledEntity;
 
 import java.util.Date;
 

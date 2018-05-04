@@ -17,11 +17,8 @@ import com.cloud.agent.api.DeleteLogicalSwitchPortAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
 import com.cloud.agent.api.FindLogicalSwitchPortAnswer;
 import com.cloud.agent.api.FindLogicalSwitchPortCommand;
-import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupNiciraNvpCommand;
 import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
-import com.cloud.agent.api.to.PortForwardingRuleTO;
-import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.commands.AddNiciraNvpDeviceCmd;
 import com.cloud.api.commands.DeleteNiciraNvpDeviceCmd;
@@ -29,27 +26,37 @@ import com.cloud.api.commands.ListNiciraNvpDeviceNetworksCmd;
 import com.cloud.api.commands.ListNiciraNvpDevicesCmd;
 import com.cloud.api.response.NiciraNvpDeviceResponse;
 import com.cloud.configuration.ConfigurationManager;
-import com.cloud.dc.Vlan;
 import com.cloud.dc.dao.VlanDao;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.IllegalVirtualMachineException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.NicPreparationException;
-import com.cloud.exception.ResourceUnavailableException;
 import com.cloud.host.DetailVO;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.IllegalVirtualMachineException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.NicPreparationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.PortForwardingRule;
+import com.cloud.legacymodel.resource.ResourceState;
+import com.cloud.legacymodel.to.PortForwardingRuleTO;
+import com.cloud.legacymodel.to.StaticNatRuleTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.network.ExternalNetworkDeviceManager.NetworkDevice;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
-import com.cloud.network.Network;
 import com.cloud.network.NetworkModel;
-import com.cloud.network.Networks;
-import com.cloud.network.Networks.BroadcastDomainType;
 import com.cloud.network.NiciraNvpDeviceVO;
 import com.cloud.network.NiciraNvpNicMappingVO;
 import com.cloud.network.NiciraNvpRouterMappingVO;
@@ -68,28 +75,21 @@ import com.cloud.network.dao.PhysicalNetworkServiceProviderDao;
 import com.cloud.network.dao.PhysicalNetworkServiceProviderVO;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.resource.NiciraNvpResource;
-import com.cloud.network.rules.PortForwardingRule;
 import com.cloud.network.rules.StaticNat;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.resource.ResourceManager;
-import com.cloud.resource.ResourceState;
 import com.cloud.resource.ResourceStateAdapter;
 import com.cloud.resource.ServerResource;
-import com.cloud.resource.UnableDeleteHostException;
 import com.cloud.storage.dao.GuestOSDao;
-import com.cloud.user.Account;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallback;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.NicDao;
 
@@ -537,7 +537,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         try {
             resource.configure(cmd.getHost(), hostdetails);
 
-            final Host host = resourceMgr.addHost(zoneId, resource, Host.Type.L2Networking, params);
+            final Host host = resourceMgr.addHost(zoneId, resource, HostType.L2Networking, params);
             if (host != null) {
                 return Transaction.execute(new TransactionCallback<NiciraNvpDeviceVO>() {
                     @Override
@@ -597,7 +597,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
             if (networkList != null) {
                 // Networks with broadcast type lswitch are ours
                 for (final NetworkVO network : networkList) {
-                    if (network.getBroadcastDomainType() == Networks.BroadcastDomainType.Lswitch) {
+                    if (network.getBroadcastDomainType() == BroadcastDomainType.Lswitch) {
                         if (network.getState() != Network.State.Shutdown && network.getState() != Network.State.Destroy) {
                             throw new CloudRuntimeException("This Nicira Nvp device can not be deleted as there are one or more logical networks provisioned by cloudstack.");
                         }
@@ -642,7 +642,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         // Networks with broadcast type lswitch are ours
         final List<NetworkVO> responseList = new ArrayList<>();
         for (final NetworkVO network : networkList) {
-            if (network.getBroadcastDomainType() == Networks.BroadcastDomainType.Lswitch) {
+            if (network.getBroadcastDomainType() == BroadcastDomainType.Lswitch) {
                 responseList.add(network);
             }
         }
@@ -689,13 +689,13 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         if (!(startup[0] instanceof StartupNiciraNvpCommand)) {
             return null;
         }
-        host.setType(Host.Type.L2Networking);
+        host.setType(HostType.L2Networking);
         return host;
     }
 
     @Override
     public DeleteHostAnswer deleteHost(final HostVO host, final boolean isForced, final boolean isForceDeleteStorage) throws UnableDeleteHostException {
-        if (!(host.getType() == Host.Type.L2Networking)) {
+        if (!(host.getType() == HostType.L2Networking)) {
             return null;
         }
         return new DeleteHostAnswer(true);

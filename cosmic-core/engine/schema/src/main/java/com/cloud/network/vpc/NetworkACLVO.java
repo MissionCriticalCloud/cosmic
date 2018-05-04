@@ -1,5 +1,7 @@
 package com.cloud.network.vpc;
 
+import com.cloud.legacymodel.network.vpc.NetworkACL;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

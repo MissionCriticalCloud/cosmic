@@ -1,12 +1,13 @@
 package com.cloud.agent.resource.virtualnetwork.facade;
 
-import com.cloud.agent.api.routing.NetworkElementCommand;
-import com.cloud.agent.api.routing.SetStaticNatRulesCommand;
-import com.cloud.agent.api.to.StaticNatRuleTO;
 import com.cloud.agent.resource.virtualnetwork.ConfigItem;
 import com.cloud.agent.resource.virtualnetwork.VRScripts;
 import com.cloud.agent.resource.virtualnetwork.model.StaticNatRule;
 import com.cloud.agent.resource.virtualnetwork.model.StaticNatRules;
+import com.cloud.legacymodel.communication.command.NetworkElementCommand;
+import com.cloud.legacymodel.communication.command.SetStaticNatRulesCommand;
+import com.cloud.legacymodel.to.StaticNatRuleTO;
+import com.cloud.utils.net.NetUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,12 +20,20 @@ public class SetStaticNatRulesConfigItem extends AbstractConfigItemFacade {
 
         final LinkedList<StaticNatRule> rules = new LinkedList<>();
         for (final StaticNatRuleTO rule : command.getRules()) {
-            final StaticNatRule staticNatRule = new StaticNatRule(rule.revoked(), rule.getProtocol(), rule.getSrcIp(), rule.getStringSrcPortRange(), rule.getDstIp());
+            final StaticNatRule staticNatRule = new StaticNatRule(rule.revoked(), rule.getProtocol(), rule.getSrcIp(), getStringSrcPortRange(rule), rule.getDstIp());
             rules.add(staticNatRule);
         }
         final StaticNatRules staticNatRules = new StaticNatRules(rules);
 
         return generateConfigItems(staticNatRules);
+    }
+
+    public String getStringSrcPortRange(final StaticNatRuleTO rule) {
+        if (rule.getSrcPortRange() == null || rule.getSrcPortRange().length < 2) {
+            return "0:0";
+        } else {
+            return NetUtils.portRangeToString(rule.getSrcPortRange());
+        }
     }
 
     @Override

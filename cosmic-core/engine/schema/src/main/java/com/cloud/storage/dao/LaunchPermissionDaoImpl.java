@@ -1,15 +1,15 @@
 package com.cloud.storage.dao;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.LaunchPermissionVO;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

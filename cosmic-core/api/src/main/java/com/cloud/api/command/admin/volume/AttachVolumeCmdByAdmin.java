@@ -8,13 +8,14 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.volume.AttachVolumeCmd;
 import com.cloud.api.response.VolumeResponse;
 import com.cloud.context.CallContext;
-import com.cloud.storage.Volume;
-import com.cloud.vm.VirtualMachine;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "attachVolume", group = APICommandGroup.VolumeService, description = "Attaches a disk volume to a virtual machine.", responseObject = VolumeResponse.class, responseView = ResponseView.Full,
+@APICommand(name = "attachVolume", group = APICommandGroup.VolumeService, description = "Attaches a disk volume to a virtual machine.", responseObject = VolumeResponse.class, responseView =
+        ResponseView.Full,
         entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AttachVolumeCmdByAdmin extends AttachVolumeCmd {

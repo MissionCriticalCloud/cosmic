@@ -14,11 +14,11 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Collection;
 import java.util.Map;

@@ -1,5 +1,6 @@
 package com.cloud.dc;
 
+import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.utils.NumbersUtil;

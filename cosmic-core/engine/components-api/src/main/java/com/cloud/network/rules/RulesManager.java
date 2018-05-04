@@ -1,13 +1,14 @@
 package com.cloud.network.rules;
 
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.NetworkRuleConflictException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.FirewallRule;
+import com.cloud.legacymodel.network.Nic;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.network.IpAddress;
-import com.cloud.user.Account;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.Nic;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.List;
 

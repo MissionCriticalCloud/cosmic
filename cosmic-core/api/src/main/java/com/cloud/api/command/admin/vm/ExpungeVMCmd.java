@@ -14,18 +14,19 @@ import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
-import com.cloud.vm.VirtualMachine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "expungeVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Expunge a virtual machine. Once expunged, it cannot be recoverd.", responseObject = SuccessResponse.class, entityType
+@APICommand(name = "expungeVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Expunge a virtual machine. Once expunged, it cannot be recoverd.", responseObject =
+        SuccessResponse.class, entityType
         = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ExpungeVMCmd extends BaseAsyncCmd {

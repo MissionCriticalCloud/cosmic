@@ -1,6 +1,6 @@
 package com.cloud.utils.qemu;
 
-import com.cloud.storage.Storage;
+import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
 
@@ -38,7 +38,7 @@ public class QemuImg {
         this.create(file, null, null);
     }
 
-  /* These are all methods supported by the qemu-img tool */
+    /* These are all methods supported by the qemu-img tool */
 
     public void create(final QemuImgFile file, final QemuImgFile backingFile, final Map<String, String> options)
             throws QemuImgException {
@@ -60,10 +60,10 @@ public class QemuImg {
             s.add(optionsStr.toString());
         }
 
-    /*
-     * -b for a backing file does not show up in the docs, but it works. Shouldn't this be -o backing_file=filename
-     * instead?
-     */
+        /*
+         * -b for a backing file does not show up in the docs, but it works. Shouldn't this be -o backing_file=filename
+         * instead?
+         */
         s.add("-f");
         if (backingFile != null) {
             s.add(backingFile.getFormat().toString());
@@ -233,7 +233,7 @@ public class QemuImg {
             this.preallocationType = preallocationType;
         }
 
-        public static PreallocationType getPreallocationType(final Storage.ProvisioningType provisioningType) {
+        public static PreallocationType getPreallocationType(final StorageProvisioningType provisioningType) {
             switch (provisioningType) {
                 case THIN:
                     return PreallocationType.Off;

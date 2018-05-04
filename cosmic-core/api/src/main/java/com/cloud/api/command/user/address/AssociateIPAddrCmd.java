@@ -18,29 +18,30 @@ import com.cloud.api.response.ProjectResponse;
 import com.cloud.api.response.VpcResponse;
 import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
-import com.cloud.dc.DataCenter;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.InsufficientAddressCapacityException;
-import com.cloud.exception.InsufficientCapacityException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.ResourceUnavailableException;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InsufficientAddressCapacityException;
+import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.network.IpAddress;
-import com.cloud.network.Network;
-import com.cloud.network.vpc.Vpc;
 import com.cloud.offering.NetworkOffering;
 import com.cloud.projects.Project;
-import com.cloud.user.Account;
-import com.cloud.utils.exception.InvalidParameterValueException;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "associateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse.class, responseView =
+@APICommand(name = "associateIpAddress", group = APICommandGroup.PublicIPAddressService, description = "Acquires and associates a public IP to an account.", responseObject = IPAddressResponse
+        .class, responseView =
         ResponseView.Restricted,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class AssociateIPAddrCmd extends BaseAsyncCreateCmd {

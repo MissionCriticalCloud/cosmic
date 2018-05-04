@@ -1,12 +1,12 @@
 package com.cloud.storage.datastore.db;
 
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.storage.DataStoreRole;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
 

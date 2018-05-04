@@ -1,7 +1,7 @@
 package com.cloud.utils.db;
 
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.DateUtil;
-import com.cloud.utils.exception.CloudRuntimeException;
 import com.cloud.utils.mgmt.JmxUtil;
 import com.cloud.utils.time.InaccurateClock;
 

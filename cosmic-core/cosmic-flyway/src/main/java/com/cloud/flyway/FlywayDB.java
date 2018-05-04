@@ -1,6 +1,6 @@
 package com.cloud.flyway;
 
-import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;

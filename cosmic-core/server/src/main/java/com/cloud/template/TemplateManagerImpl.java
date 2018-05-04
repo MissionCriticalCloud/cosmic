@@ -2,13 +2,6 @@ package com.cloud.template;
 
 import com.cloud.acl.SecurityChecker.AccessType;
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.Command;
-import com.cloud.agent.api.ComputeChecksumCommand;
-import com.cloud.agent.api.storage.DestroyCommand;
-import com.cloud.agent.api.to.DataTO;
-import com.cloud.agent.api.to.DiskTO;
-import com.cloud.agent.api.to.NfsTO;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.ApiResponseHelper;
 import com.cloud.api.BaseListTemplateOrIsoPermissionsCmd;
@@ -33,12 +26,9 @@ import com.cloud.api.query.dao.UserVmJoinDao;
 import com.cloud.api.query.vo.UserVmJoinVO;
 import com.cloud.api.response.GetUploadParamsResponse;
 import com.cloud.configuration.Config;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.context.CallContext;
-import com.cloud.dc.DataCenter;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.dao.DataCenterDao;
-import com.cloud.domain.Domain;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -61,9 +51,6 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.ZoneScope;
 import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.exception.StorageUnavailableException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
@@ -72,38 +59,58 @@ import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
+import com.cloud.legacymodel.communication.command.Command;
+import com.cloud.legacymodel.communication.command.ComputeChecksumCommand;
+import com.cloud.legacymodel.communication.command.DestroyCommand;
+import com.cloud.legacymodel.communication.command.DettachCommand;
+import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.exceptions.StorageUnavailableException;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.TemplateType;
+import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.to.DataTO;
+import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.NfsTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.VolumeType;
 import com.cloud.projects.Project;
 import com.cloud.projects.ProjectManager;
-import com.cloud.storage.DataStoreRole;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.ImageStoreUploadMonitorImpl;
 import com.cloud.storage.LaunchPermissionVO;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
-import com.cloud.storage.Storage;
-import com.cloud.storage.Storage.ImageFormat;
-import com.cloud.storage.Storage.TemplateType;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.StoragePoolHostVO;
-import com.cloud.storage.StoragePoolStatus;
 import com.cloud.storage.TemplateProfile;
-import com.cloud.storage.Upload;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStoragePoolVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.VMTemplateZoneVO;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
-import com.cloud.storage.command.AttachCommand;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.DettachCommand;
-import com.cloud.storage.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.LaunchPermissionDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -120,10 +127,7 @@ import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
-import com.cloud.storage.to.TemplateObjectTO;
 import com.cloud.template.TemplateAdapter.TemplateAdapterType;
-import com.cloud.template.VirtualMachineTemplate.BootloaderType;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
 import com.cloud.user.AccountVO;
@@ -133,7 +137,6 @@ import com.cloud.uservm.UserVm;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.EnumUtils;
-import com.cloud.utils.Pair;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -142,12 +145,9 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
@@ -507,7 +507,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             return null;
         }
 
-        final List<StoragePoolHostVO> vos = _poolHostDao.listByHostStatus(poolId, com.cloud.host.Status.Up);
+        final List<StoragePoolHostVO> vos = _poolHostDao.listByHostStatus(poolId, HostStatus.Up);
         if (vos == null || vos.isEmpty()) {
             throw new CloudRuntimeException("Cannot download " + templateId + " to poolId " + poolId + " since there is no host in the Up state connected to this pool");
         }
@@ -901,12 +901,12 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
             final TemplateObjectTO iso = (TemplateObjectTO) template.getTO();
             iso.setGuestOsType(displayName);
-            final DiskTO disk = new DiskTO(iso, 3L, null, Volume.Type.ISO);
+            final DiskTO disk = new DiskTO(iso, 3L, null, VolumeType.ISO);
             profile.addDisk(disk);
         } else {
             final TemplateObjectTO iso = new TemplateObjectTO();
             iso.setFormat(ImageFormat.ISO);
-            final DiskTO disk = new DiskTO(iso, 3L, null, Volume.Type.ISO);
+            final DiskTO disk = new DiskTO(iso, 3L, null, VolumeType.ISO);
             profile.addDisk(disk);
         }
     }
@@ -981,7 +981,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             throw new InvalidParameterValueException("Please specify a VM that is either Stopped or Running.");
         }
 
-        if ("xen-pv-drv-iso".equals(iso.getDisplayText()) && vm.getHypervisorType() != Hypervisor.HypervisorType.XenServer) {
+        if ("xen-pv-drv-iso".equals(iso.getDisplayText()) && vm.getHypervisorType() != HypervisorType.XenServer) {
             throw new InvalidParameterValueException("Cannot attach Xenserver PV drivers to incompatible hypervisor " + vm.getHypervisorType());
         }
 
@@ -1417,7 +1417,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         Long sourceTemplateId = null;
         if (volume != null) {
             final VMTemplateVO template = ApiDBUtils.findTemplateById(volume.getTemplateId());
-            isExtractable = template != null && template.isExtractable() && template.getTemplateType() != Storage.TemplateType.SYSTEM;
+            isExtractable = template != null && template.isExtractable() && template.getTemplateType() != TemplateType.SYSTEM;
             if (volume.getIsoId() != null && volume.getIsoId() != 0) {
                 sourceTemplateId = volume.getIsoId();
             } else if (volume.getTemplateId() != null) {
@@ -1778,9 +1778,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             throw new InvalidParameterValueException("Unable to find " + desc + " with id " + templateId);
         }
 
-        if (template.getTemplateType() == Storage.TemplateType.SYSTEM) {
+        if (template.getTemplateType() == TemplateType.SYSTEM) {
             throw new InvalidParameterValueException("Unable to extract the " + desc + " " + template.getName() + " as it is a default System template");
-        } else if (template.getTemplateType() == Storage.TemplateType.PERHOST) {
+        } else if (template.getTemplateType() == TemplateType.PERHOST) {
             throw new InvalidParameterValueException("Unable to extract the " + desc + " " + template.getName() + " as it resides on host and not on SSVM");
         }
 
@@ -1812,7 +1812,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             for (final DataStore store : ssStores) {
                 tmpltStoreRef = _tmplStoreDao.findByStoreTemplate(store.getId(), templateId);
                 if (tmpltStoreRef != null) {
-                    if (tmpltStoreRef.getDownloadState() == com.cloud.storage.VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
+                    if (tmpltStoreRef.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
                         tmpltStore = (ImageStoreEntity) store;
                         break;
                     }
@@ -1877,7 +1877,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         }
 
         final DataTO isoTO = tmplt.getTO();
-        final DiskTO disk = new DiskTO(isoTO, null, null, Volume.Type.ISO);
+        final DiskTO disk = new DiskTO(isoTO, null, null, VolumeType.ISO);
         final Command cmd;
         if (attach) {
             cmd = new AttachCommand(disk, vmName);

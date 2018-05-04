@@ -23,8 +23,8 @@ import com.cloud.ldap.LdapUserManagerFactory
 import com.cloud.ldap.NoLdapUserMatchingQueryException
 import com.cloud.ldap.dao.LdapConfigurationDaoImpl
 import com.cloud.ldap.dao.LdapTrustMapDao
-import com.cloud.utils.Pair
-import com.cloud.utils.exception.InvalidParameterValueException
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException
+import com.cloud.legacymodel.utils.Pair
 
 import javax.naming.NamingException
 import javax.naming.ldap.InitialLdapContext

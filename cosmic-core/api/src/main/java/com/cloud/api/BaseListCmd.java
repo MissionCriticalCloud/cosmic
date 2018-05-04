@@ -1,7 +1,7 @@
 package com.cloud.api;
 
-import com.cloud.utils.exception.CSExceptionErrorCode;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.CSExceptionErrorCode;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 
 import java.util.Map;
 

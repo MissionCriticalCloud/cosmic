@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
+import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.server.auth.SHA256SaltedUserAuthenticator;
-import com.cloud.user.UserAccount;
 import com.cloud.user.dao.UserAccountDao;
 
 import javax.naming.ConfigurationException;

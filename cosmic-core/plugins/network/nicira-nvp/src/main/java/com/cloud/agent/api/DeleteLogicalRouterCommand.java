@@ -1,5 +1,7 @@
 package com.cloud.agent.api;
 
+import com.cloud.legacymodel.communication.command.Command;
+
 /**
  *
  */
@@ -12,7 +14,7 @@ public class DeleteLogicalRouterCommand extends Command {
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.agent.api.Command#executeInSequence()
+     * @see com.cloud.legacymodel.communication.command.Command#executeInSequence()
      */
     @Override
     public boolean executeInSequence() {

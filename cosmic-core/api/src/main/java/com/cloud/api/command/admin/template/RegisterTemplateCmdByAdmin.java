@@ -8,8 +8,8 @@ import com.cloud.api.ServerApiException;
 import com.cloud.api.command.user.template.RegisterTemplateCmd;
 import com.cloud.api.response.ListResponse;
 import com.cloud.api.response.TemplateResponse;
-import com.cloud.exception.ResourceAllocationException;
-import com.cloud.template.VirtualMachineTemplate;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -17,8 +17,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "registerTemplate", group = APICommandGroup.TemplateService, description = "Registers an existing template into the CloudStack cloud.", responseObject = TemplateResponse.class, responseView =
-        ResponseView.Full,
+@APICommand(name = "registerTemplate", group = APICommandGroup.TemplateService, description = "Registers an existing template into the CloudStack cloud.", responseObject = TemplateResponse.class,
+        responseView =
+                ResponseView.Full,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class RegisterTemplateCmdByAdmin extends RegisterTemplateCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(RegisterTemplateCmdByAdmin.class.getName());

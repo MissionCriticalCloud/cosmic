@@ -11,10 +11,10 @@ import com.cloud.api.response.DedicateHostResponse;
 import com.cloud.api.response.DomainResponse;
 import com.cloud.api.response.HostResponse;
 import com.cloud.api.response.ListResponse;
-import com.cloud.dc.DedicatedResources;
 import com.cloud.dedicated.DedicatedService;
 import com.cloud.event.EventTypes;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.dc.DedicatedResources;
+import com.cloud.legacymodel.user.Account;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

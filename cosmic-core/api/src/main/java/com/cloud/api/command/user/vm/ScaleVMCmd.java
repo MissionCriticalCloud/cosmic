@@ -15,13 +15,13 @@ import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.api.response.SuccessResponse;
 import com.cloud.api.response.UserVmResponse;
 import com.cloud.event.EventTypes;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ManagementServerException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.VirtualMachineMigrationException;
-import com.cloud.user.Account;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ManagementServerException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.uservm.UserVm;
-import com.cloud.vm.VirtualMachine;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +32,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "scaleVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Scales the virtual machine to a new service offering.", responseObject = SuccessResponse.class, responseView =
+@APICommand(name = "scaleVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Scales the virtual machine to a new service offering.", responseObject = SuccessResponse
+        .class, responseView =
         ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class ScaleVMCmd extends BaseAsyncCmd {

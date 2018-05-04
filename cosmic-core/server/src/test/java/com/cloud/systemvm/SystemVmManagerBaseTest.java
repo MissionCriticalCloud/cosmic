@@ -5,7 +5,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
 import com.cloud.managementserver.ManagementServerService;
-import com.cloud.utils.Pair;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.vm.AfterScanAction;
 
 import java.util.stream.Stream;

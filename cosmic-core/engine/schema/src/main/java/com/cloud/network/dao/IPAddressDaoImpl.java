@@ -1,8 +1,9 @@
 package com.cloud.network.dao;
 
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.VlanDao;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.network.Ip;
 import com.cloud.network.IpAddress.State;
 import com.cloud.resourcedetail.dao.UserIpAddressDetailsDao;
 import com.cloud.tags.dao.ResourceTagDao;
@@ -15,7 +16,6 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.SearchCriteria.Func;
 import com.cloud.utils.db.SearchCriteria.Op;
 import com.cloud.utils.db.TransactionLegacy;
-import com.cloud.utils.net.Ip;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

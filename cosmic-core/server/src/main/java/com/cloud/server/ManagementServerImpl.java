@@ -1,11 +1,8 @@
 package com.cloud.server;
 
-import com.cloud.acl.ControlledEntity;
 import com.cloud.affinity.AffinityGroupProcessor;
 import com.cloud.affinity.dao.AffinityGroupVMMapDao;
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.GetVncPortAnswer;
-import com.cloud.agent.api.GetVncPortCommand;
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.alert.Alert;
 import com.cloud.alert.AlertManager;
@@ -415,6 +412,7 @@ import com.cloud.capacity.dao.CapacityDaoImpl.SummedCapacity;
 import com.cloud.cluster.ClusterManager;
 import com.cloud.config.Configuration;
 import com.cloud.configuration.Config;
+import com.cloud.consoleproxy.ConsoleProxyInfo;
 import com.cloud.consoleproxy.ConsoleProxyManagementState;
 import com.cloud.consoleproxy.ConsoleProxyManager;
 import com.cloud.context.CallContext;
@@ -423,10 +421,7 @@ import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
 import com.cloud.dc.DedicatedResourceVO;
 import com.cloud.dc.HostPodVO;
-import com.cloud.dc.Pod;
 import com.cloud.dc.PodVlanMapVO;
-import com.cloud.dc.Vlan;
-import com.cloud.dc.Vlan.VlanType;
 import com.cloud.dc.VlanVO;
 import com.cloud.dc.dao.AccountVlanMapDao;
 import com.cloud.dc.dao.ClusterDao;
@@ -439,7 +434,6 @@ import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
 import com.cloud.deploy.DeploymentPlanningManager;
-import com.cloud.domain.Domain;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
@@ -450,12 +444,6 @@ import com.cloud.event.ActionEventUtils;
 import com.cloud.event.EventTypes;
 import com.cloud.event.EventVO;
 import com.cloud.event.dao.EventDao;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ManagementServerException;
-import com.cloud.exception.OperationTimedoutException;
-import com.cloud.exception.PermissionDeniedException;
-import com.cloud.exception.ResourceUnavailableException;
-import com.cloud.exception.VirtualMachineMigrationException;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
@@ -465,27 +453,52 @@ import com.cloud.framework.security.keystore.KeystoreManager;
 import com.cloud.gpu.GPU;
 import com.cloud.ha.HighAvailabilityManager;
 import com.cloud.host.DetailVO;
-import com.cloud.host.Host;
-import com.cloud.host.Host.Type;
 import com.cloud.host.HostTagVO;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.host.dao.HostDetailsDao;
 import com.cloud.host.dao.HostTagsDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.hypervisor.HypervisorCapabilities;
 import com.cloud.hypervisor.HypervisorCapabilitiesVO;
 import com.cloud.hypervisor.dao.HypervisorCapabilitiesDao;
-import com.cloud.info.ConsoleProxyInfo;
+import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.legacymodel.communication.answer.GetVncPortAnswer;
+import com.cloud.legacymodel.communication.command.GetVncPortCommand;
+import com.cloud.legacymodel.dc.Cluster;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.Pod;
+import com.cloud.legacymodel.dc.Vlan;
+import com.cloud.legacymodel.dc.Vlan.VlanType;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.ManagementServerException;
+import com.cloud.legacymodel.exceptions.OperationTimedoutException;
+import com.cloud.legacymodel.exceptions.PermissionDeniedException;
+import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.legacymodel.exceptions.VirtualMachineMigrationException;
+import com.cloud.legacymodel.storage.DiskProfile;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.SSHKeyPair;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.utils.Ternary;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.HostType;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
 import com.cloud.network.dao.LoadBalancerDao;
 import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
-import com.cloud.org.Cluster;
 import com.cloud.projects.Project;
 import com.cloud.projects.Project.ListProjectResourcesCriteria;
 import com.cloud.projects.ProjectManager;
@@ -504,8 +517,6 @@ import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
 import com.cloud.storage.GuestOsCategory;
 import com.cloud.storage.StorageManager;
-import com.cloud.storage.StoragePool;
-import com.cloud.storage.Volume;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
@@ -520,20 +531,15 @@ import com.cloud.storage.secondary.SecondaryStorageVmManager;
 import com.cloud.tags.ResourceTagVO;
 import com.cloud.tags.dao.ResourceTagDao;
 import com.cloud.template.TemplateManager;
-import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
-import com.cloud.user.SSHKeyPair;
 import com.cloud.user.SSHKeyPairVO;
-import com.cloud.user.User;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.SSHKeyPairDao;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.PasswordGenerator;
-import com.cloud.utils.Ternary;
 import com.cloud.utils.component.ComponentLifecycle;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -548,21 +554,16 @@ import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.Transaction;
 import com.cloud.utils.db.TransactionCallbackNoReturn;
 import com.cloud.utils.db.TransactionStatus;
-import com.cloud.utils.exception.CloudRuntimeException;
-import com.cloud.utils.exception.InvalidParameterValueException;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.net.MacAddress;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.ssh.SSHKeysHelper;
 import com.cloud.vm.ConsoleProxyVO;
-import com.cloud.vm.DiskProfile;
 import com.cloud.vm.InstanceGroupVO;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.UserVmManager;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
-import com.cloud.vm.VirtualMachine;
-import com.cloud.vm.VirtualMachine.State;
 import com.cloud.vm.VirtualMachineManager;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.VirtualMachineProfileImpl;
@@ -1706,7 +1707,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final Long id = cmd.getId();
 
         // verify parameters
-        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(id, VirtualMachine.Type.ConsoleProxy, VirtualMachine.Type.SecondaryStorageVm);
+        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(id, VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
         if (systemVm == null) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("unable to find a system vm with specified vmId");
             ex.addProxyObject(id.toString(), "vmId");
@@ -1714,10 +1715,10 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
 
         try {
-            if (systemVm.getType() == VirtualMachine.Type.ConsoleProxy) {
+            if (systemVm.getType() == VirtualMachineType.ConsoleProxy) {
                 ActionEventUtils.startNestedActionEvent(EventTypes.EVENT_PROXY_STOP, "stopping console proxy Vm");
                 return stopConsoleProxy(systemVm, cmd.isForced());
-            } else if (systemVm.getType() == VirtualMachine.Type.SecondaryStorageVm) {
+            } else if (systemVm.getType() == VirtualMachineType.SecondaryStorageVm) {
                 ActionEventUtils.startNestedActionEvent(EventTypes.EVENT_SSVM_STOP, "stopping secondary storage Vm");
                 return stopSecondaryStorageVm(systemVm, cmd.isForced());
             }
@@ -1745,17 +1746,17 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     @ActionEvent(eventType = "", eventDescription = "", async = true)
     public VirtualMachine startSystemVM(final long vmId) {
 
-        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(vmId, VirtualMachine.Type.ConsoleProxy, VirtualMachine.Type.SecondaryStorageVm);
+        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(vmId, VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
         if (systemVm == null) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("unable to find a system vm with specified vmId");
             ex.addProxyObject(String.valueOf(vmId), "vmId");
             throw ex;
         }
 
-        if (systemVm.getType() == VirtualMachine.Type.ConsoleProxy) {
+        if (systemVm.getType() == VirtualMachineType.ConsoleProxy) {
             ActionEventUtils.startNestedActionEvent(EventTypes.EVENT_PROXY_START, "starting console proxy Vm");
             return startConsoleProxy(vmId);
-        } else if (systemVm.getType() == VirtualMachine.Type.SecondaryStorageVm) {
+        } else if (systemVm.getType() == VirtualMachineType.SecondaryStorageVm) {
             ActionEventUtils.startNestedActionEvent(EventTypes.EVENT_SSVM_START, "starting secondary storage Vm");
             return startSecondaryStorageVm(vmId);
         } else {
@@ -1775,7 +1776,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
     @Override
     public VMInstanceVO rebootSystemVM(final RebootSystemVmCmd cmd) {
-        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(cmd.getId(), VirtualMachine.Type.ConsoleProxy, VirtualMachine.Type.SecondaryStorageVm);
+        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(cmd.getId(), VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
 
         if (systemVm == null) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("unable to find a system vm with specified vmId");
@@ -1783,7 +1784,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             throw ex;
         }
 
-        if (systemVm.getType().equals(VirtualMachine.Type.ConsoleProxy)) {
+        if (systemVm.getType().equals(VirtualMachineType.ConsoleProxy)) {
             ActionEventUtils.startNestedActionEvent(EventTypes.EVENT_PROXY_REBOOT, "rebooting console proxy Vm");
             return rebootConsoleProxy(cmd.getId());
         } else {
@@ -1805,7 +1806,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     @Override
     @ActionEvent(eventType = "", eventDescription = "", async = true)
     public VMInstanceVO destroySystemVM(final DestroySystemVmCmd cmd) {
-        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(cmd.getId(), VirtualMachine.Type.ConsoleProxy, VirtualMachine.Type.SecondaryStorageVm);
+        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(cmd.getId(), VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
 
         if (systemVm == null) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("unable to find a system vm with specified vmId");
@@ -1813,7 +1814,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             throw ex;
         }
 
-        if (systemVm.getType().equals(VirtualMachine.Type.ConsoleProxy)) {
+        if (systemVm.getType().equals(VirtualMachineType.ConsoleProxy)) {
             ActionEventUtils.startNestedActionEvent(EventTypes.EVENT_PROXY_DESTROY, "destroying console proxy Vm");
             return destroyConsoleProxy(cmd.getId());
         } else {
@@ -2161,7 +2162,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         if (type != null) {
             sc.setParameters("type", type);
         } else {
-            sc.setParameters("nulltype", VirtualMachine.Type.SecondaryStorageVm, VirtualMachine.Type.ConsoleProxy);
+            sc.setParameters("nulltype", VirtualMachineType.SecondaryStorageVm, VirtualMachineType.ConsoleProxy);
         }
 
         if (storageId != null) {
@@ -2700,8 +2701,8 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     }
 
     @Override
-    public VirtualMachine.Type findSystemVMTypeById(final long instanceId) {
-        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(instanceId, VirtualMachine.Type.ConsoleProxy, VirtualMachine.Type.SecondaryStorageVm);
+    public VirtualMachineType findSystemVMTypeById(final long instanceId) {
+        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(instanceId, VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
         if (systemVm == null) {
             final InvalidParameterValueException ex = new InvalidParameterValueException("Unable to find a system vm of specified instanceId");
             ex.addProxyObject(String.valueOf(instanceId), "instanceId");
@@ -2764,7 +2765,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         // Check if the vm can be migrated with storage.
         boolean canMigrateWithStorage = false;
 
-        if (vm.getType() == VirtualMachine.Type.User) {
+        if (vm.getType() == VirtualMachineType.User) {
             final HypervisorCapabilitiesVO capabilities = _hypervisorCapabilitiesDao.findByHypervisorTypeAndVersion(srcHost.getHypervisorType(), srcHost.getHypervisorVersion());
             if (capabilities != null) {
                 canMigrateWithStorage = capabilities.isStorageMotionSupported();
@@ -2788,7 +2789,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
             throw new InvalidParameterValueException("Unsupported operation, VM uses Local storage, cannot migrate");
         }
 
-        final Type hostType = srcHost.getType();
+        final HostType hostType = srcHost.getType();
         final Pair<List<HostVO>, Integer> allHostsPair;
         final List<HostVO> allHosts;
         final Map<Host, Boolean> requiresStorageMotion = new HashMap<>();
@@ -2857,9 +2858,9 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
 
         for (final HostAllocator allocator : hostAllocators) {
             if (canMigrateWithStorage) {
-                suitableHosts = allocator.allocateTo(vmProfile, plan, Host.Type.Routing, excludes, allHosts, HostAllocator.RETURN_UPTO_ALL, false);
+                suitableHosts = allocator.allocateTo(vmProfile, plan, HostType.Routing, excludes, allHosts, HostAllocator.RETURN_UPTO_ALL, false);
             } else {
-                suitableHosts = allocator.allocateTo(vmProfile, plan, Host.Type.Routing, excludes, HostAllocator.RETURN_UPTO_ALL, false);
+                suitableHosts = allocator.allocateTo(vmProfile, plan, HostType.Routing, excludes, HostAllocator.RETURN_UPTO_ALL, false);
             }
 
             if (suitableHosts != null && !suitableHosts.isEmpty()) {
@@ -3332,7 +3333,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
     private VirtualMachine upgradeStoppedSystemVm(final Long systemVmId, final Long serviceOfferingId, final Map<String, String> customparameters) {
         final Account caller = getCaller();
 
-        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(systemVmId, VirtualMachine.Type.ConsoleProxy, VirtualMachine.Type.SecondaryStorageVm);
+        final VMInstanceVO systemVm = _vmInstanceDao.findByIdTypes(systemVmId, VirtualMachineType.ConsoleProxy, VirtualMachineType.SecondaryStorageVm);
         if (systemVm == null) {
             throw new InvalidParameterValueException("Unable to find SystemVm with id " + systemVmId);
         }

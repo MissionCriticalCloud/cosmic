@@ -1,7 +1,7 @@
 package com.cloud.network.dao;
 
-import com.cloud.api.InternalIdentity;
-import com.cloud.user.OwnedBy;
+import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.legacymodel.user.OwnedBy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

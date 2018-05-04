@@ -1,10 +1,10 @@
 package com.cloud.vm;
 
-import com.cloud.domain.Domain;
-import com.cloud.domain.PartOf;
-import com.cloud.user.Account;
-import com.cloud.user.OwnedBy;
-import com.cloud.user.User;
+import com.cloud.legacymodel.domain.Domain;
+import com.cloud.legacymodel.domain.PartOf;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.OwnedBy;
+import com.cloud.legacymodel.user.User;
 import com.cloud.utils.Journal;
 
 /**

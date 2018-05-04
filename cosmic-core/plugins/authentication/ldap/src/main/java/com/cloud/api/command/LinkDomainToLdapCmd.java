@@ -12,10 +12,10 @@ import com.cloud.api.response.LinkDomainToLdapResponse;
 import com.cloud.ldap.LdapManager;
 import com.cloud.ldap.LdapUser;
 import com.cloud.ldap.NoLdapUserMatchingQueryException;
-import com.cloud.user.Account;
-import com.cloud.user.User;
-import com.cloud.user.UserAccount;
-import com.cloud.utils.exception.InvalidParameterValueException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.user.Account;
+import com.cloud.legacymodel.user.User;
+import com.cloud.legacymodel.user.UserAccount;
 
 import javax.inject.Inject;
 import java.util.UUID;
@@ -23,7 +23,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "linkDomainToLdap", group = APICommandGroup.AuthenticationService, description = "link an existing cloudstack domain to group or OU in ldap", responseObject = LinkDomainToLdapResponse.class, since = "4.6.0",
+@APICommand(name = "linkDomainToLdap", group = APICommandGroup.AuthenticationService, description = "link an existing cloudstack domain to group or OU in ldap", responseObject =
+        LinkDomainToLdapResponse.class, since = "4.6.0",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class LinkDomainToLdapCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(LinkDomainToLdapCmd.class.getName());

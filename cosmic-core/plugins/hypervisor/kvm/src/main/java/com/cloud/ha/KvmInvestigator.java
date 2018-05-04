@@ -1,13 +1,14 @@
 package com.cloud.ha;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.CheckOnHostCommand;
-import com.cloud.host.Host;
 import com.cloud.host.HostVO;
-import com.cloud.host.Status;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.utils.component.AdapterBase;
 
@@ -29,12 +30,12 @@ public class KvmInvestigator extends AdapterBase implements Investigator {
     ResourceManager resourceMgr;
 
     @Override
-    public boolean isVmAlive(final com.cloud.vm.VirtualMachine vm, final Host host) throws UnknownVM {
-        final Status status = isAgentAlive(host);
+    public boolean isVmAlive(final VirtualMachine vm, final Host host) throws UnknownVM {
+        final HostStatus status = isAgentAlive(host);
         if (status == null) {
             throw new UnknownVM();
         }
-        if (status == Status.Up) {
+        if (status == HostStatus.Up) {
             return true;
         } else {
             throw new UnknownVM();
@@ -42,39 +43,39 @@ public class KvmInvestigator extends AdapterBase implements Investigator {
     }
 
     @Override
-    public Status isAgentAlive(final Host agent) {
-        if (agent.getHypervisorType() != Hypervisor.HypervisorType.KVM) {
+    public HostStatus isAgentAlive(final Host agent) {
+        if (agent.getHypervisorType() != HypervisorType.KVM) {
             return null;
         }
-        Status hostStatus = null;
-        Status neighbourStatus = null;
+        HostStatus hostStatus = null;
+        HostStatus neighbourStatus = null;
         final CheckOnHostCommand cmd = new CheckOnHostCommand(agent);
 
         try {
             final Answer answer = agentMgr.easySend(agent.getId(), cmd);
             if (answer != null) {
-                hostStatus = answer.getResult() ? Status.Down : Status.Up;
+                hostStatus = answer.getResult() ? HostStatus.Down : HostStatus.Up;
             }
         } catch (final Exception e) {
             logger.debug("Failed to send command to host: " + agent.getId());
         }
         if (hostStatus == null) {
-            hostStatus = Status.Disconnected;
+            hostStatus = HostStatus.Disconnected;
         }
 
-        final List<HostVO> neighbors = resourceMgr.listHostsInClusterByStatus(agent.getClusterId(), Status.Up);
+        final List<HostVO> neighbors = resourceMgr.listHostsInClusterByStatus(agent.getClusterId(), HostStatus.Up);
         for (final HostVO neighbor : neighbors) {
-            if (neighbor.getId() == agent.getId() || neighbor.getHypervisorType() != Hypervisor.HypervisorType.KVM) {
+            if (neighbor.getId() == agent.getId() || neighbor.getHypervisorType() != HypervisorType.KVM) {
                 continue;
             }
             logger.debug("Investigating host:" + agent.getId() + " via neighbouring host:" + neighbor.getId());
             try {
                 final Answer answer = agentMgr.easySend(neighbor.getId(), cmd);
                 if (answer != null) {
-                    neighbourStatus = answer.getResult() ? Status.Down : Status.Up;
+                    neighbourStatus = answer.getResult() ? HostStatus.Down : HostStatus.Up;
                     logger.debug("Neighbouring host:" + neighbor.getId() + " returned status:" + neighbourStatus
                             + " for the investigated host:" + agent.getId());
-                    if (neighbourStatus == Status.Up) {
+                    if (neighbourStatus == HostStatus.Up) {
                         break;
                     }
                 }
@@ -82,11 +83,11 @@ public class KvmInvestigator extends AdapterBase implements Investigator {
                 logger.debug("Failed to send command to host: " + neighbor.getId());
             }
         }
-        if (neighbourStatus == Status.Up && (hostStatus == Status.Disconnected || hostStatus == Status.Down)) {
-            hostStatus = Status.Disconnected;
+        if (neighbourStatus == HostStatus.Up && (hostStatus == HostStatus.Disconnected || hostStatus == HostStatus.Down)) {
+            hostStatus = HostStatus.Disconnected;
         }
-        if (neighbourStatus == Status.Down && (hostStatus == Status.Disconnected || hostStatus == Status.Down)) {
-            hostStatus = Status.Down;
+        if (neighbourStatus == HostStatus.Down && (hostStatus == HostStatus.Disconnected || hostStatus == HostStatus.Down)) {
+            hostStatus = HostStatus.Down;
         }
         return hostStatus;
     }

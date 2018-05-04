@@ -1,10 +1,11 @@
 package com.cloud.agent.api;
 
-import com.cloud.host.Host;
+import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.model.enumeration.HostType;
 
 public class StartupNiciraNvpCommand extends StartupCommand {
 
     public StartupNiciraNvpCommand() {
-        super(Host.Type.L2Networking);
+        super(HostType.L2Networking);
     }
 }

@@ -1,14 +1,7 @@
 package com.cloud.storage.volume;
 
-import com.cloud.agent.api.Answer;
-import com.cloud.agent.api.storage.ListVolumeAnswer;
-import com.cloud.agent.api.storage.ListVolumeCommand;
-import com.cloud.agent.api.storage.ResizeVolumeCommand;
-import com.cloud.agent.api.to.StorageFilerTO;
-import com.cloud.agent.api.to.VirtualMachineTO;
 import com.cloud.alert.AlertManager;
 import com.cloud.configuration.Config;
-import com.cloud.configuration.Resource.ResourceType;
 import com.cloud.engine.subsystem.api.storage.ChapInfo;
 import com.cloud.engine.subsystem.api.storage.CopyCommandResult;
 import com.cloud.engine.subsystem.api.storage.CreateCmdResult;
@@ -18,8 +11,6 @@ import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.engine.subsystem.api.storage.EndPointSelector;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine;
-import com.cloud.engine.subsystem.api.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStore;
 import com.cloud.engine.subsystem.api.storage.PrimaryDataStoreDriver;
 import com.cloud.engine.subsystem.api.storage.Scope;
@@ -28,48 +19,58 @@ import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeService;
-import com.cloud.exception.ConcurrentOperationException;
-import com.cloud.exception.ResourceAllocationException;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.async.AsyncCallbackDispatcher;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.framework.async.AsyncRpcContext;
 import com.cloud.framework.config.dao.ConfigurationDao;
-import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
-import com.cloud.hypervisor.Hypervisor.HypervisorType;
-import com.cloud.offering.DiskOffering;
-import com.cloud.storage.DataStoreRole;
+import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.CopyCmdAnswer;
+import com.cloud.legacymodel.communication.answer.ListVolumeAnswer;
+import com.cloud.legacymodel.communication.command.DeleteCommand;
+import com.cloud.legacymodel.communication.command.ListVolumeCommand;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
+import com.cloud.legacymodel.configuration.Resource;
+import com.cloud.legacymodel.configuration.Resource.ResourceType;
+import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
+import com.cloud.legacymodel.exceptions.ResourceAllocationException;
+import com.cloud.legacymodel.storage.DiskOffering;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
+import com.cloud.legacymodel.storage.StoragePool;
+import com.cloud.legacymodel.storage.TemplateProp;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.Volume;
+import com.cloud.legacymodel.storage.Volume.State;
+import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.to.TemplateObjectTO;
+import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.DataStoreRole;
+import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.RegisterVolumePayload;
 import com.cloud.storage.RemoteHostEndPoint;
 import com.cloud.storage.ScopeType;
-import com.cloud.storage.Storage.StoragePoolType;
-import com.cloud.storage.StoragePool;
 import com.cloud.storage.VMTemplateStoragePoolVO;
-import com.cloud.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.storage.Volume;
-import com.cloud.storage.Volume.State;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.storage.command.CopyCmdAnswer;
-import com.cloud.storage.command.DeleteCommand;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.PrimaryDataStoreProviderManager;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
 import com.cloud.storage.snapshot.SnapshotManager;
-import com.cloud.storage.template.TemplateProp;
-import com.cloud.storage.to.TemplateObjectTO;
-import com.cloud.storage.to.VolumeObjectTO;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.GlobalLock;
-import com.cloud.utils.exception.CloudRuntimeException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -1404,14 +1405,14 @@ public class VolumeServiceImpl implements VolumeService {
                                 if (volInfo.getSize() > 0) {
                                     try {
                                         _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(volume.getAccountId()),
-                                                com.cloud.configuration.Resource.ResourceType.secondary_storage, volInfo.getSize() - volInfo.getPhysicalSize());
+                                                Resource.ResourceType.secondary_storage, volInfo.getSize() - volInfo.getPhysicalSize());
                                     } catch (final ResourceAllocationException e) {
                                         s_logger.warn(e.getMessage());
                                         _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_RESOURCE_LIMIT_EXCEEDED, volume.getDataCenterId(), volume.getPodId(), e.getMessage
                                                 (), e.getMessage());
                                     } finally {
                                         _resourceLimitMgr.recalculateResourceCount(volume.getAccountId(), volume.getDomainId(),
-                                                com.cloud.configuration.Resource.ResourceType.secondary_storage.getOrdinal());
+                                                Resource.ResourceType.secondary_storage.getOrdinal());
                                     }
                                 }
                             }
