@@ -149,7 +149,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1585,9 +1584,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
 
             if (networkOfferingId != oldNetworkOfferingId) {
-                final Collection<String> newProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(networkOffering, network.getPhysicalNetworkId()).values();
-                final Collection<String> oldProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(oldNtwkOff, network.getPhysicalNetworkId()).values();
-
                 if (changeCidr) {
                     if (!checkForNonStoppedVmInNetwork(network.getId())) {
                         final InvalidParameterValueException ex = new InvalidParameterValueException("All user vm of network of specified id should be stopped before changing " +
@@ -1601,7 +1597,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     throw new InvalidParameterValueException("Can't upgrade from network offering " + oldNtwkOff.getUuid() + " to " + networkOffering.getUuid()
                             + "; check logs for more information");
                 }
-                restartNetwork = true;
                 networkOfferingChanged = true;
 
                 //Setting the new network's isRedundant to the new network offering's RedundantRouter.
@@ -1635,8 +1630,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
 
             network.setNetworkDomain(domainSuffix);
-            // have to restart the network
-            restartNetwork = true;
         }
 
         //IP reservation checks
@@ -1652,7 +1645,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 throw new InvalidParameterValueException("Can only allow IP Reservation in networks with guest type " + GuestType.Isolated);
             }
             if (networkOfferingChanged == true) {
-                throw new InvalidParameterValueException("Cannot specify this nework offering change and guestVmCidr at same time. Specify only one.");
+                throw new InvalidParameterValueException("Cannot specify this network offering change and guestVmCidr at same time. Specify only one.");
             }
             if (!(network.getState() == Network.State.Implemented)) {
                 throw new InvalidParameterValueException("The network must be in " + Network.State.Implemented + " state. IP Reservation cannot be applied in "
