@@ -1,5 +1,6 @@
 package com.cloud.storage.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
@@ -20,7 +21,6 @@ import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.StorageResourceType;
-import com.cloud.resource.ServerResource;
 import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -71,22 +71,22 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
 
         cmd.setResourceType(StorageResourceType.SECONDARY_STORAGE);
         cmd.setIqn(null);
-        cmd.setNfsShare(_guid);
+        cmd.setNfsShare(this._guid);
 
         fillNetworkInformation(cmd);
-        cmd.setDataCenter(_dc);
-        cmd.setPod(_pod);
-        cmd.setGuid(_guid);
+        cmd.setDataCenter(this._dc);
+        cmd.setPod(this._pod);
+        cmd.setGuid(this._guid);
 
-        cmd.setName(_guid);
+        cmd.setName(this._guid);
         cmd.setVersion(DummySecondaryStorageResource.class.getPackage().getImplementationVersion());
         /* gather TemplateInfo in second storage */
         cmd.setTemplateInfo(getDefaultSystemVmTemplateInfo());
         cmd.getHostDetails().put("mount.parent", "dummy");
         cmd.getHostDetails().put("mount.path", "dummy");
-        cmd.getHostDetails().put("orig.url", _guid);
+        cmd.getHostDetails().put("orig.url", this._guid);
 
-        final String[] tok = _dummyPath.split(":");
+        final String[] tok = this._dummyPath.split(":");
         cmd.setPrivateIpAddress(tok[0]);
         return new StartupCommand[]{cmd};
     }
@@ -119,7 +119,7 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
     }
 
     public Map<String, TemplateProp> getDefaultSystemVmTemplateInfo() {
-        final List<VMTemplateVO> tmplts = _tmpltDao.listAllSystemVMTemplates();
+        final List<VMTemplateVO> tmplts = this._tmpltDao.listAllSystemVMTemplates();
         final Map<String, TemplateProp> tmpltInfo = new HashMap<>();
         if (tmplts != null) {
             for (final VMTemplateVO tmplt : tmplts) {
@@ -135,19 +135,19 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
 
-        _guid = (String) params.get("guid");
-        if (_guid == null) {
+        this._guid = (String) params.get("guid");
+        if (this._guid == null) {
             throw new ConfigurationException("Unable to find the guid");
         }
 
-        _dc = (String) params.get("zone");
-        if (_dc == null) {
+        this._dc = (String) params.get("zone");
+        if (this._dc == null) {
             throw new ConfigurationException("Unable to find the zone");
         }
-        _pod = (String) params.get("pod");
+        this._pod = (String) params.get("pod");
 
-        _dummyPath = (String) params.get("mount.path");
-        if (_dummyPath == null) {
+        this._dummyPath = (String) params.get("mount.path");
+        if (this._dummyPath == null) {
             throw new ConfigurationException("Unable to find mount.path");
         }
 
@@ -160,7 +160,7 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
     }
 
     public boolean useServiceVm() {
-        return _useServiceVm;
+        return this._useServiceVm;
     }
 
     @Override

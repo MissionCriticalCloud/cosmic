@@ -3,7 +3,7 @@ package com.cloud.storage.template;
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
 import com.cloud.legacymodel.network.Proxy;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.storage.StorageLayer;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.imagestore.ImageStoreUtil;

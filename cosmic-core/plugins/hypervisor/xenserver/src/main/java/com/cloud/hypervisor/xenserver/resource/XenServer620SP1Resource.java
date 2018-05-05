@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.xenserver.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.command.StartCommand;
 import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.legacymodel.to.GPUDeviceTO;
 import com.cloud.legacymodel.vm.VgpuTypesInfo;
-import com.cloud.resource.ServerResource;
 
 import javax.ejb.Local;
 import java.util.HashMap;
@@ -80,7 +80,7 @@ public class XenServer620SP1Resource extends XenServer620Resource {
     @Override
     public HashMap<String, HashMap<String, VgpuTypesInfo>> getGPUGroupDetails(final Connection conn) throws XenAPIException, XmlRpcException {
         final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = new HashMap<>();
-        final Host host = Host.getByUuid(conn, _host.getUuid());
+        final Host host = Host.getByUuid(conn, this._host.getUuid());
         final Set<PGPU> pgpus = host.getPGPUs(conn);
         final Iterator<PGPU> iter = pgpus.iterator();
         while (iter.hasNext()) {

@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ServerResource;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,5 +1,7 @@
 package com.cloud.storage;
 
+import com.cloud.common.managed.context.ManagedContextRunnable;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.framework.async.AsyncCompletionCallback;
@@ -10,8 +12,6 @@ import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.DownloadCommand;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
-import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.resource.ServerResource;
 import com.cloud.storage.resource.LocalNfsSecondaryStorageResource;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.net.NetUtils;
@@ -41,14 +41,14 @@ public class LocalHostEndpoint implements EndPoint {
     private void configure() {
         // get mount parent folder configured in global setting, if set, this will overwrite _parent in NfsSecondaryStorageResource to work
         // around permission issue for default /mnt folder
-        final String mountParent = configDao.getValue(Config.MountParent.key());
+        final String mountParent = this.configDao.getValue(Config.MountParent.key());
 
         final String path = mountParent + File.separator + "secStorage";
 
         final LocalNfsSecondaryStorageResource localResource = new LocalNfsSecondaryStorageResource();
         localResource.setParentPath(path);
-        resource = localResource;
-        executor = Executors.newScheduledThreadPool(10);
+        this.resource = localResource;
+        this.executor = Executors.newScheduledThreadPool(10);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class LocalHostEndpoint implements EndPoint {
     @Override
     public Answer sendMessage(final Command cmd) {
         if ((cmd instanceof CopyCommand) || (cmd instanceof DownloadCommand)) {
-            return resource.executeRequest(cmd);
+            return this.resource.executeRequest(cmd);
         }
         // TODO Auto-generated method stub
         return new Answer(cmd, false, "unsupported command:" + cmd.toString());
@@ -88,11 +88,11 @@ public class LocalHostEndpoint implements EndPoint {
 
     @Override
     public void sendMessageAsync(final Command cmd, final AsyncCompletionCallback<Answer> callback) {
-        executor.schedule(new CmdRunner(cmd, callback), 10, TimeUnit.SECONDS);
+        this.executor.schedule(new CmdRunner(cmd, callback), 10, TimeUnit.SECONDS);
     }
 
     public ServerResource getResource() {
-        return resource;
+        return this.resource;
     }
 
     public void setResource(final ServerResource resource) {
@@ -110,8 +110,8 @@ public class LocalHostEndpoint implements EndPoint {
 
         @Override
         protected void runInContext() {
-            final Answer answer = sendMessage(cmd);
-            callback.complete(answer);
+            final Answer answer = sendMessage(this.cmd);
+            this.callback.complete(answer);
         }
     }
 }

@@ -28,7 +28,7 @@ import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.Upload.Status;
 import com.cloud.legacymodel.storage.Upload.Type;
-import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.dao.UploadDao;

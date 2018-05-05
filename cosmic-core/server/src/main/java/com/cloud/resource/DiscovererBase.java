@@ -1,5 +1,6 @@
 package com.cloud.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
@@ -40,7 +41,7 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _params = _configDao.getConfiguration(params);
+        this._params = this._configDao.getConfiguration(params);
 
         return true;
     }
@@ -63,10 +64,10 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
 
     @Override
     public void putParam(final Map<String, String> params) {
-        if (_params == null) {
-            _params = new HashMap<>();
+        if (this._params == null) {
+            this._params = new HashMap<>();
         }
-        _params.putAll(params);
+        this._params.putAll(params);
     }
 
     @Override
@@ -75,7 +76,7 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
         final ServerResource resource = getResource(resourceName);
 
         if (resource != null) {
-            _hostDao.loadDetails(host);
+            this._hostDao.loadDetails(host);
             updateNetworkLabels(host);
 
             final HashMap<String, Object> params = buildConfigParams(host);
@@ -121,8 +122,8 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
     private void updateNetworkLabels(final HostVO host) {
         //check if networkLabels need to be updated in details
         //we send only private and storage network label to the resource.
-        final String privateNetworkLabel = _networkMgr.getDefaultManagementTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
-        final String storageNetworkLabel = _networkMgr.getDefaultStorageTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
+        final String privateNetworkLabel = this._networkMgr.getDefaultManagementTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
+        final String storageNetworkLabel = this._networkMgr.getDefaultStorageTrafficLabel(host.getDataCenterId(), host.getHypervisorType());
 
         final String privateDevice = host.getDetail("private.network.device");
         final String storageDevice = host.getDetail("storage.network.device1");
@@ -138,7 +139,7 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
             update = true;
         }
         if (update) {
-            _hostDao.saveDetails(host);
+            this._hostDao.saveDetails(host);
         }
     }
 
@@ -154,7 +155,7 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
         if (host.getClusterId() != null) {
             params.put("cluster", Long.toString(host.getClusterId()));
             String guid = null;
-            final ClusterVO cluster = _clusterDao.findById(host.getClusterId());
+            final ClusterVO cluster = this._clusterDao.findById(host.getClusterId());
             if (cluster.getGuid() == null) {
                 guid = host.getDetail("pool");
             } else {
@@ -167,12 +168,12 @@ public abstract class DiscovererBase extends AdapterBase implements Discoverer {
 
         params.put("ipaddress", host.getPrivateIpAddress());
         params.put("secondary.storage.vm", "false");
-        params.put("max.template.iso.size", _configDao.getValue(Config.MaxTemplateAndIsoSize.toString()));
-        params.put("migratewait", _configDao.getValue(Config.MigrateWait.toString()));
-        params.put(Config.XenServerMaxNics.toString().toLowerCase(), _configDao.getValue(Config.XenServerMaxNics.toString()));
-        params.put(Config.XenServerHeartBeatInterval.toString().toLowerCase(), _configDao.getValue(Config.XenServerHeartBeatInterval.toString()));
-        params.put(Config.XenServerHeartBeatTimeout.toString().toLowerCase(), _configDao.getValue(Config.XenServerHeartBeatTimeout.toString()));
-        params.put("router.aggregation.command.each.timeout", _configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
+        params.put("max.template.iso.size", this._configDao.getValue(Config.MaxTemplateAndIsoSize.toString()));
+        params.put("migratewait", this._configDao.getValue(Config.MigrateWait.toString()));
+        params.put(Config.XenServerMaxNics.toString().toLowerCase(), this._configDao.getValue(Config.XenServerMaxNics.toString()));
+        params.put(Config.XenServerHeartBeatInterval.toString().toLowerCase(), this._configDao.getValue(Config.XenServerHeartBeatInterval.toString()));
+        params.put(Config.XenServerHeartBeatTimeout.toString().toLowerCase(), this._configDao.getValue(Config.XenServerHeartBeatTimeout.toString()));
+        params.put("router.aggregation.command.each.timeout", this._configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
 
         return params;
     }

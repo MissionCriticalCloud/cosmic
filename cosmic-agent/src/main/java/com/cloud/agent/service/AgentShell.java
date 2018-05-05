@@ -2,9 +2,9 @@ package com.cloud.agent.service;
 
 import static java.util.stream.Collectors.toMap;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.ExitStatus;
-import com.cloud.resource.ServerResource;
 import com.cloud.utils.ProcessUtil;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.backoff.BackoffAlgorithm;
@@ -39,27 +39,27 @@ public class AgentShell {
     private BackoffAlgorithm backOff;
 
     public List<String> getHosts() {
-        return agentProperties.getHosts();
+        return this.agentProperties.getHosts();
     }
 
     public int getPort() {
-        return agentProperties.getPort();
+        return this.agentProperties.getPort();
     }
 
     public int getWorkers() {
-        return agentProperties.getWorkers();
+        return this.agentProperties.getWorkers();
     }
 
     public String getGuid() {
-        return agentProperties.getGuid();
+        return this.agentProperties.getGuid();
     }
 
     public String getZone() {
-        return agentProperties.getZone();
+        return this.agentProperties.getZone();
     }
 
     public String getPod() {
-        return agentProperties.getPod();
+        return this.agentProperties.getPod();
     }
 
     public void init(final String[] args) throws ConfigurationException {
@@ -71,8 +71,8 @@ public class AgentShell {
 
     private void configureBackOffAlgorithm() throws ConfigurationException {
         logger.info("Defaulting to the constant time backOff algorithm");
-        backOff = new ConstantTimeBackoff();
-        backOff.configure("ConstantTimeBackoff", new HashMap<>());
+        this.backOff = new ConstantTimeBackoff();
+        this.backOff.configure("ConstantTimeBackoff", new HashMap<>());
     }
 
     public void loadProperties() throws ConfigurationException {
@@ -84,18 +84,18 @@ public class AgentShell {
 
         logger.info("Found {} at {}", FILE_NAME_AGENT_PROPERTIES, file.getAbsolutePath());
         final Properties properties = loadPropertiesFromFile(file);
-        allProperties.putAll(convertPropertiesToStringObjectMap(properties));
-        agentProperties.load(properties);
+        this.allProperties.putAll(convertPropertiesToStringObjectMap(properties));
+        this.agentProperties.load(properties);
     }
 
     protected boolean parseCommand(final String[] args) throws ConfigurationException {
         final Properties commandLineProperties = PropertiesUtil.parse(Arrays.stream(args));
         logPropertiesFound(commandLineProperties);
-        agentProperties.load(commandLineProperties);
-        allProperties.putAll(convertPropertiesToStringObjectMap(commandLineProperties));
+        this.agentProperties.load(commandLineProperties);
+        this.allProperties.putAll(convertPropertiesToStringObjectMap(commandLineProperties));
 
-        final String guid = agentProperties.getGuid();
-        if (guid == null && !agentProperties.isDeveloper()) {
+        final String guid = this.agentProperties.getGuid();
+        if (guid == null && !this.agentProperties.isDeveloper()) {
             throw new ConfigurationException("Unable to find the guid");
         }
 
@@ -122,13 +122,13 @@ public class AgentShell {
     }
 
     private void launchAgent() throws ConfigurationException {
-        final String resourceClassNames = agentProperties.getResource();
+        final String resourceClassNames = this.agentProperties.getResource();
         logger.debug("Launching agent with resource {}", resourceClassNames);
         if (resourceClassNames != null) {
-            final ServerResource serverResource = loadServerResource(agentProperties.getResource());
+            final ServerResource serverResource = loadServerResource(this.agentProperties.getResource());
             configureServerResource(serverResource);
-            agent = new Agent(agentProperties, backOff, serverResource);
-            agent.start();
+            this.agent = new Agent(this.agentProperties, this.backOff, serverResource);
+            this.agent.start();
         } else {
             throw new ConfigurationException("Cannot launch agent without a agent resource class");
         }
@@ -138,7 +138,7 @@ public class AgentShell {
         final String serverResourceName = serverResource.getClass().getSimpleName();
         logger.debug("Configuring agent resource {}", serverResourceName);
 
-        if (!serverResource.configure(serverResourceName, allProperties)) {
+        if (!serverResource.configure(serverResourceName, this.allProperties)) {
             throw new ConfigurationException("Unable to configure " + serverResourceName);
         } else {
             logger.info("Agent resource {} configured", serverResourceName);
@@ -183,8 +183,8 @@ public class AgentShell {
             configureIpStack();
             checkPidFile();
             launchAgent();
-            synchronized (agent) {
-                agent.wait();
+            synchronized (this.agent) {
+                this.agent.wait();
             }
         } catch (final ConfigurationException e) {
             logger.error("Unable to start agent due to bad configuration", e);
@@ -197,11 +197,11 @@ public class AgentShell {
 
     @PreDestroy
     public void stop() throws Exception {
-        agent.stop("Agent shell terminated");
+        this.agent.stop("Agent shell terminated");
     }
 
     private void checkPidFile() throws ConfigurationException {
-        final String pidDir = agentProperties.getPidDir();
+        final String pidDir = this.agentProperties.getPidDir();
         final String pidFileName = getPidFileName();
         logger.debug("Checking if {}/{} exists.", pidDir, pidFileName);
         ProcessUtil.pidCheck(pidDir, pidFileName);
@@ -210,16 +210,16 @@ public class AgentShell {
     private String getPidFileName() {
         final StringBuilder sb = new StringBuilder();
         sb.append("agent");
-        if (agentProperties.hasIntance()) {
-            sb.append(".").append(agentProperties.getInstance());
+        if (this.agentProperties.hasIntance()) {
+            sb.append(".").append(this.agentProperties.getInstance());
         }
         sb.append(".pid");
         return sb.toString();
     }
 
     private void configureIpStack() {
-        final boolean ipv6disabled = agentProperties.isIpv6Disabled();
-        final boolean ipv6prefer = agentProperties.isIpa6Preferred();
+        final boolean ipv6disabled = this.agentProperties.isIpv6Disabled();
+        final boolean ipv6prefer = this.agentProperties.isIpa6Preferred();
         if (ipv6disabled) {
             logger.info("Preferring IPv4 address family for agent connection");
             System.setProperty("java.net.preferIPv4Stack", "true");

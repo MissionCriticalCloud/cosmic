@@ -21,7 +21,7 @@ import com.cloud.legacymodel.storage.Upload.Mode;
 import com.cloud.legacymodel.storage.Upload.Status;
 import com.cloud.legacymodel.storage.Upload.Type;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.ImageFormat;

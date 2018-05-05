@@ -1,6 +1,4 @@
-package com.cloud.managed.context;
-
-import com.cloud.managed.context.impl.DefaultManagedContext;
+package com.cloud.common.managed.context;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

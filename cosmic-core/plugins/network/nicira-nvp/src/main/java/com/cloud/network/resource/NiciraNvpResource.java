@@ -2,6 +2,7 @@ package com.cloud.network.resource;
 
 import com.cloud.agent.api.StartupNiciraNvpCommand;
 import com.cloud.common.agent.IAgentControl;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.PingCommand;
@@ -16,7 +17,6 @@ import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
 import com.cloud.network.nicira.SourceNatRule;
 import com.cloud.network.utils.CommandRetryUtility;
-import com.cloud.resource.ServerResource;
 import com.cloud.utils.nicira.nvp.plugin.NiciraNvpApiVersion;
 import com.cloud.utils.rest.CosmicRESTException;
 import com.cloud.utils.rest.HttpClientHelper;
@@ -43,13 +43,13 @@ public class NiciraNvpResource implements ServerResource {
     private String guid;
     private String zoneId;
 
-    private List<NiciraNvpApi> niciraNvpApis = new ArrayList<>();
+    private final List<NiciraNvpApi> niciraNvpApis = new ArrayList<>();
     private int activeNiciraNvpApi = 0;
     private NiciraNvpUtilities niciraNvpUtilities;
     private CommandRetryUtility retryUtility;
 
     public NiciraNvpApi getNiciraNvpApi() {
-        return niciraNvpApis.get(activeNiciraNvpApi);
+        return this.niciraNvpApis.get(this.activeNiciraNvpApi);
     }
 
     protected NiciraNvpApi createNiciraNvpApi(final String host, final String username, final String password) throws CosmicRESTException {
@@ -65,24 +65,24 @@ public class NiciraNvpResource implements ServerResource {
     }
 
     public NiciraNvpUtilities getNiciraNvpUtilities() {
-        return niciraNvpUtilities;
+        return this.niciraNvpUtilities;
     }
 
     @Override
     public boolean configure(final String ignoredName, final Map<String, Object> params) throws ConfigurationException {
 
-        name = (String) params.get("name");
-        if (name == null) {
+        this.name = (String) params.get("name");
+        if (this.name == null) {
             throw new ConfigurationException("Unable to find name");
         }
 
-        guid = (String) params.get("guid");
-        if (guid == null) {
+        this.guid = (String) params.get("guid");
+        if (this.guid == null) {
             throw new ConfigurationException("Unable to find the guid");
         }
 
-        zoneId = (String) params.get("zoneId");
-        if (zoneId == null) {
+        this.zoneId = (String) params.get("zoneId");
+        if (this.zoneId == null) {
             throw new ConfigurationException("Unable to find zone");
         }
 
@@ -101,13 +101,13 @@ public class NiciraNvpResource implements ServerResource {
             throw new ConfigurationException("Unable to find admin password");
         }
 
-        niciraNvpUtilities = NiciraNvpUtilities.getInstance();
-        retryUtility = CommandRetryUtility.getInstance();
-        retryUtility.setServerResource(this);
+        this.niciraNvpUtilities = NiciraNvpUtilities.getInstance();
+        this.retryUtility = CommandRetryUtility.getInstance();
+        this.retryUtility.setServerResource(this);
 
         try {
-            for (String ip : ips.split(",")) {
-                niciraNvpApis.add(createNiciraNvpApi(ip, adminuser, adminpass));
+            for (final String ip : ips.split(",")) {
+                this.niciraNvpApis.add(createNiciraNvpApi(ip, adminuser, adminpass));
             }
         } catch (final CosmicRESTException e) {
             throw new ConfigurationException("Could not create a Nicira Nvp API client: " + e.getMessage());
@@ -117,12 +117,12 @@ public class NiciraNvpResource implements ServerResource {
     }
 
     public CommandRetryUtility getRetryUtility() {
-        return retryUtility;
+        return this.retryUtility;
     }
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -144,9 +144,9 @@ public class NiciraNvpResource implements ServerResource {
     @Override
     public StartupCommand[] initialize() {
         final StartupNiciraNvpCommand sc = new StartupNiciraNvpCommand();
-        sc.setGuid(guid);
-        sc.setName(name);
-        sc.setDataCenter(zoneId);
+        sc.setGuid(this.guid);
+        sc.setName(this.name);
+        sc.setDataCenter(this.zoneId);
         sc.setPod("");
         sc.setPrivateIpAddress("");
         sc.setStorageIpAddress("");
@@ -182,13 +182,13 @@ public class NiciraNvpResource implements ServerResource {
 
         getNiciraNvpApi().recreate();
 
-        int active = ++activeNiciraNvpApi;
+        int active = ++this.activeNiciraNvpApi;
 
-        if (active >= niciraNvpApis.size()) {
+        if (active >= this.niciraNvpApis.size()) {
             active = 0;
         }
 
-        activeNiciraNvpApi = active;
+        this.activeNiciraNvpApi = active;
     }
 
     private void getApiProviderMajorityVersion(final ControlClusterStatus ccs) {

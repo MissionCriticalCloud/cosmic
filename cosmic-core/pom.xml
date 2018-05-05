@@ -35,7 +35,6 @@
         <module>framework/events</module>
         <module>framework/ipc</module>
         <module>framework/jobs</module>
-        <module>framework/managed-context</module>
         <module>framework/security</module>
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>

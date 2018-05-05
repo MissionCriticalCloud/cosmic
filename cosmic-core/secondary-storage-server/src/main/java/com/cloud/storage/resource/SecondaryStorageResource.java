@@ -1,6 +1,6 @@
 package com.cloud.storage.resource;
 
-import com.cloud.resource.ServerResource;
+import com.cloud.common.resource.ServerResource;
 
 /**
  * SecondaryStorageServerResource is a generic container to execute commands sent

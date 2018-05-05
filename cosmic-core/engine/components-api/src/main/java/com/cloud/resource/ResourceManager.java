@@ -1,5 +1,6 @@
 package com.cloud.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.gpu.HostGpuGroupsVO;

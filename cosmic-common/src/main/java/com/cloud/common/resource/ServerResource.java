@@ -1,4 +1,4 @@
-package com.cloud.resource;
+package com.cloud.common.resource;
 
 import com.cloud.common.agent.IAgentControl;
 import com.cloud.legacymodel.communication.answer.Answer;

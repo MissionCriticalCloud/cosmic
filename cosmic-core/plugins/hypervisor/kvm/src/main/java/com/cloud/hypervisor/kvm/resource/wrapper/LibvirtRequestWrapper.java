@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.RequestWrapper;
-import com.cloud.resource.ServerResource;
 
 import java.util.Hashtable;
 import java.util.Set;
@@ -21,7 +21,7 @@ public class LibvirtRequestWrapper extends RequestWrapper {
     }
 
     Reflections baseWrappers = new Reflections("com.cloud.hypervisor.kvm.resource.wrapper");
-    Set<Class<? extends CommandWrapper>> baseSet = baseWrappers.getSubTypesOf(CommandWrapper.class);
+    Set<Class<? extends CommandWrapper>> baseSet = this.baseWrappers.getSubTypesOf(CommandWrapper.class);
 
     private LibvirtRequestWrapper() {
         init();
@@ -29,9 +29,9 @@ public class LibvirtRequestWrapper extends RequestWrapper {
 
     private void init() {
         // LibvirtComputingResource commands
-        final Hashtable<Class<? extends Command>, CommandWrapper> libvirtCommands = processAnnotations(baseSet);
+        final Hashtable<Class<? extends Command>, CommandWrapper> libvirtCommands = processAnnotations(this.baseSet);
 
-        resources.put(LibvirtComputingResource.class, libvirtCommands);
+        this.resources.put(LibvirtComputingResource.class, libvirtCommands);
     }
 
     public static LibvirtRequestWrapper getInstance() {

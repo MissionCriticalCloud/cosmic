@@ -1,12 +1,12 @@
 package com.cloud.resource.hypervisor;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.RebootAnswer;
 import com.cloud.legacymodel.communication.answer.StartAnswer;
 import com.cloud.legacymodel.communication.answer.StopAnswer;
 import com.cloud.legacymodel.communication.command.RebootCommand;
 import com.cloud.legacymodel.communication.command.StartCommand;
 import com.cloud.legacymodel.communication.command.StopCommand;
-import com.cloud.resource.ServerResource;
 
 /**
  * HypervisorResource specifies all of the commands a hypervisor agent needs

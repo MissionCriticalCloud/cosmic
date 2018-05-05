@@ -1,6 +1,7 @@
 package com.cloud.agent;
 
 import com.cloud.agent.manager.Commands;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -12,7 +13,6 @@ import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.model.enumeration.Event;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.resource.ServerResource;
 
 /**
  * AgentManager manages hosts. It directly coordinates between the DAOs and the connections it manages.

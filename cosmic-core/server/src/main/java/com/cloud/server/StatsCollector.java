@@ -24,7 +24,7 @@ import com.cloud.legacymodel.storage.VolumeStats;
 import com.cloud.legacymodel.vm.VgpuTypesInfo;
 import com.cloud.legacymodel.vm.VmStats;
 import com.cloud.legacymodel.vm.VmStatsEntry;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;

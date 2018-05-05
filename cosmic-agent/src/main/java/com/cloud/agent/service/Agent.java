@@ -2,6 +2,8 @@ package com.cloud.agent.service;
 
 import com.cloud.common.agent.IAgentControl;
 import com.cloud.common.agent.IAgentControlListener;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.common.transport.Request;
 import com.cloud.common.transport.Response;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
@@ -20,8 +22,6 @@ import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NioConnectionException;
 import com.cloud.legacymodel.exceptions.TaskExecutionException;
-import com.cloud.managed.context.ManagedContextTimerTask;
-import com.cloud.resource.ServerResource;
 import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.nio.HandlerFactory;
@@ -88,7 +88,7 @@ public class Agent implements HandlerFactory, IAgentControl {
 
     private StartupTask _startup = null;
     private final long _startupWaitDefault = 180000;
-    private long _startupWait = _startupWaitDefault;
+    private long _startupWait = this._startupWaitDefault;
     private boolean _reconnectAllowed = true;
     private final ExecutorService _executor;
 
@@ -98,49 +98,49 @@ public class Agent implements HandlerFactory, IAgentControl {
         this.resource = resource;
         resource.setAgentControl(this);
 
-        hostRotator.addAll(agentProperties.getHosts());
+        this.hostRotator.addAll(agentProperties.getHosts());
 
         createNioClient(agentProperties);
 
         logger.debug("Adding shutdown hook");
         Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
 
-        _urgentTaskPool = new ThreadPoolExecutor(agentProperties.getPingRetries(), 2 * agentProperties.getPingRetries(), 10, TimeUnit.MINUTES, new SynchronousQueue<>(),
+        this._urgentTaskPool = new ThreadPoolExecutor(agentProperties.getPingRetries(), 2 * agentProperties.getPingRetries(), 10, TimeUnit.MINUTES, new SynchronousQueue<>(),
                 new NamedThreadFactory("UrgentTask"));
 
-        _executor =
+        this._executor =
                 new ThreadPoolExecutor(agentProperties.getWorkers(), 5 * agentProperties.getWorkers(), 1, TimeUnit.DAYS, new LinkedBlockingQueue<>(),
                         new NamedThreadFactory("agentRequest-Handler"));
 
-        logger.info("Agent [id = " + (_id != null ? _id : "new") + " : type = " + getResourceName() + " : zone = " + agentProperties.getZone() + " : pod = "
+        logger.info("Agent [id = " + (this._id != null ? this._id : "new") + " : type = " + getResourceName() + " : zone = " + agentProperties.getZone() + " : pod = "
                 + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHosts() + " : port = " + agentProperties.getPort());
     }
 
     private void createNioClient(final AgentProperties agentProperties) {
         final String host = rotateHost();
         logger.debug("Creating new NIO Client");
-        _connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
+        this._connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
     }
 
     private String rotateHost() {
-        final String host = hostRotator.nextHost();
+        final String host = this.hostRotator.nextHost();
         logger.debug("Rotating management server host to {}", host);
         return host;
     }
 
     public String getResourceName() {
-        return resource.getClass().getSimpleName();
+        return this.resource.getClass().getSimpleName();
     }
 
     public ServerResource getResource() {
-        return resource;
+        return this.resource;
     }
 
     public void start() {
         logger.info("Starting Agent resource");
-        if (!resource.start()) {
-            logger.error("Unable to start the resource: " + resource.getName());
-            throw new CloudRuntimeException("Unable to start the resource: " + resource.getName());
+        if (!this.resource.start()) {
+            logger.error("Unable to start the resource: " + this.resource.getName());
+            throw new CloudRuntimeException("Unable to start the resource: " + this.resource.getName());
         }
 
         try {
@@ -148,10 +148,10 @@ public class Agent implements HandlerFactory, IAgentControl {
         } catch (final NioConnectionException e) {
             logger.warn("Attempted to connect to the  server, but received an unexpected exception, trying again...", e);
         }
-        while (!_connection.isStartup()) {
+        while (!this._connection.isStartup()) {
             logger.info("Backing off for a while before attempting to reconnect to management server");
-            backOffAlgorithm.waitBeforeRetry();
-            createNioClient(agentProperties);
+            this.backOffAlgorithm.waitBeforeRetry();
+            createNioClient(this.agentProperties);
             try {
                 connectToManagementServer();
             } catch (final NioConnectionException e) {
@@ -162,17 +162,17 @@ public class Agent implements HandlerFactory, IAgentControl {
 
     private void connectToManagementServer() throws NioConnectionException {
         logger.info("Opening connection to management server");
-        _connection.start();
+        this._connection.start();
     }
 
     public void stop(final String reason) {
         logger.info("Stopping the agent due to: {}", reason);
-        if (_connection != null) {
+        if (this._connection != null) {
             final ShutdownCommand cmd = new ShutdownCommand(reason);
             try {
-                if (_link != null) {
-                    final Request req = new Request(_id != null ? _id : -1, -1, cmd, false);
-                    _link.send(req.toBytes());
+                if (this._link != null) {
+                    final Request req = new Request(this._id != null ? this._id : -1, -1, cmd, false);
+                    this._link.send(req.toBytes());
                 }
             } catch (final ClosedChannelException e) {
                 logger.warn("Unable to send: " + cmd.toString());
@@ -185,29 +185,29 @@ public class Agent implements HandlerFactory, IAgentControl {
             } catch (final InterruptedException e) {
                 logger.debug("Who the heck interrupted me here?");
             }
-            _connection.stop();
-            _connection = null;
+            this._connection.stop();
+            this._connection = null;
         }
 
-        if (resource != null) {
-            resource.stop();
+        if (this.resource != null) {
+            this.resource.stop();
         }
 
-        _urgentTaskPool.shutdownNow();
+        this._urgentTaskPool.shutdownNow();
         synchronized (this) {
             this.notifyAll();
         }
     }
 
     public void sendStartup(final Link link) {
-        final StartupCommand[] startup = resource.initialize();
+        final StartupCommand[] startup = this.resource.initialize();
         if (startup != null) {
             final Command[] commands = new Command[startup.length];
             for (int i = 0; i < startup.length; i++) {
                 setupStartupCommand(startup[i]);
                 commands[i] = startup[i];
             }
-            final Request request = new Request(_id != null ? _id : -1, -1, commands, false, false);
+            final Request request = new Request(this._id != null ? this._id : -1, -1, commands, false, false);
             request.setSequence(getNextSequence());
 
             if (logger.isDebugEnabled()) {
@@ -240,36 +240,36 @@ public class Agent implements HandlerFactory, IAgentControl {
         if (startup.getName() == null) {
             startup.setName(hostname);
         }
-        startup.setDataCenter(agentProperties.getZone());
-        startup.setPod(agentProperties.getPod());
+        startup.setDataCenter(this.agentProperties.getZone());
+        startup.setPod(this.agentProperties.getPod());
         startup.setGuid(getResourceGuid());
         startup.setResourceName(getResourceName());
         if (startup.getVersion() == null) {
-            startup.setVersion(agentProperties.getVersion());
+            startup.setVersion(this.agentProperties.getVersion());
         }
     }
 
     protected synchronized long getNextSequence() {
-        return _sequence++;
+        return this._sequence++;
     }
 
     public synchronized void lockStartupTask(final Link link) {
-        _startup = new StartupTask(link);
-        _timer.schedule(_startup, _startupWait);
+        this._startup = new StartupTask(link);
+        this._timer.schedule(this._startup, this._startupWait);
     }
 
     public Long getId() {
-        return _id;
+        return this._id;
     }
 
     public String getResourceGuid() {
-        final String guid = agentProperties.getGuid();
+        final String guid = this.agentProperties.getGuid();
         return guid + "-" + getResourceName();
     }
 
     public void setId(final Long id) {
         logger.info("Set agent id " + id);
-        _id = id;
+        this._id = id;
     }
 
     @Override
@@ -278,13 +278,13 @@ public class Agent implements HandlerFactory, IAgentControl {
     }
 
     protected void reconnect(final Link link) {
-        if (!_reconnectAllowed) {
+        if (!this._reconnectAllowed) {
             return;
         }
         synchronized (this) {
-            if (_startup != null) {
-                _startup.cancel();
-                _startup = null;
+            if (this._startup != null) {
+                this._startup.cancel();
+                this._startup = null;
             }
         }
 
@@ -294,59 +294,59 @@ public class Agent implements HandlerFactory, IAgentControl {
         setLink(null);
         cancelTasks();
 
-        resource.disconnected();
+        this.resource.disconnected();
 
         int inProgress = 0;
         do {
-            backOffAlgorithm.waitBeforeRetry();
+            this.backOffAlgorithm.waitBeforeRetry();
 
             logger.info("Lost connection to the server. Dealing with the remaining commands...");
 
-            inProgress = _inProgress.get();
+            inProgress = this._inProgress.get();
             if (inProgress > 0) {
                 logger.info("Cannot connect because we still have " + inProgress + " commands in progress.");
             }
         } while (inProgress > 0);
 
-        _connection.stop();
+        this._connection.stop();
 
         try {
-            _connection.cleanUp();
+            this._connection.cleanUp();
         } catch (final IOException e) {
             logger.warn("Fail to clean up old connection. " + e);
         }
 
-        while (_connection.isStartup()) {
-            backOffAlgorithm.waitBeforeRetry();
+        while (this._connection.isStartup()) {
+            this.backOffAlgorithm.waitBeforeRetry();
         }
 
         do {
-            createNioClient(agentProperties);
+            createNioClient(this.agentProperties);
             logger.info("Reconnecting...");
             try {
-                _connection.start();
+                this._connection.start();
             } catch (final NioConnectionException e) {
                 logger.warn("NIO Connection Exception  " + e);
                 logger.info("Attempted to connect to the server, but received an unexpected exception, trying again...");
             }
-            backOffAlgorithm.waitBeforeRetry();
-        } while (!_connection.isStartup());
+            this.backOffAlgorithm.waitBeforeRetry();
+        } while (!this._connection.isStartup());
         logger.info("Connected to the server");
     }
 
     protected void setLink(final Link link) {
-        _link = link;
+        this._link = link;
     }
 
     protected void cancelTasks() {
-        synchronized (_watchList) {
-            for (final WatchTask task : _watchList) {
+        synchronized (this._watchList) {
+            for (final WatchTask task : this._watchList) {
                 task.cancel();
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("Clearing watch list: " + _watchList.size());
+                logger.debug("Clearing watch list: " + this._watchList.size());
             }
-            _watchList.clear();
+            this._watchList.clear();
         }
     }
 
@@ -382,7 +382,7 @@ public class Agent implements HandlerFactory, IAgentControl {
                     final ShutdownCommand shutdown = (ShutdownCommand) cmd;
                     logger.debug("Received shutdownCommand, due to: " + shutdown.getReason());
                     cancelTasks();
-                    _reconnectAllowed = false;
+                    this._reconnectAllowed = false;
                     answer = new Answer(cmd, true, null);
                 } else if (cmd instanceof ReadyCommand && ((ReadyCommand) cmd).getDetails() != null) {
                     logger.debug("Not ready to connect to mgt server: " + ((ReadyCommand) cmd).getDetails());
@@ -391,12 +391,12 @@ public class Agent implements HandlerFactory, IAgentControl {
                 } else if (cmd instanceof MaintainCommand) {
                     logger.debug("Received maintainCommand");
                     cancelTasks();
-                    _reconnectAllowed = false;
+                    this._reconnectAllowed = false;
                     answer = new MaintainAnswer((MaintainCommand) cmd);
                 } else if (cmd instanceof AgentControlCommand) {
                     answer = null;
-                    synchronized (_controlListeners) {
-                        for (final IAgentControlListener listener : _controlListeners) {
+                    synchronized (this._controlListeners) {
+                        for (final IAgentControlListener listener : this._controlListeners) {
                             answer = listener.processControlRequest(request, (AgentControlCommand) cmd);
                             if (answer != null) {
                                 break;
@@ -412,11 +412,11 @@ public class Agent implements HandlerFactory, IAgentControl {
                     if (cmd instanceof ReadyCommand) {
                         processReadyCommand(cmd);
                     }
-                    _inProgress.incrementAndGet();
+                    this._inProgress.incrementAndGet();
                     try {
-                        answer = resource.executeRequest(cmd);
+                        answer = this.resource.executeRequest(cmd);
                     } finally {
-                        _inProgress.decrementAndGet();
+                        this._inProgress.decrementAndGet();
                     }
                     if (answer == null) {
                         logger.debug("Response: unsupported command" + cmd.toString());
@@ -433,7 +433,7 @@ public class Agent implements HandlerFactory, IAgentControl {
                 }
             }
             response = new Response(request, answers);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             logger.error("Error while handling request: " + e.getMessage());
             logger.error(ExceptionUtils.getRootCauseMessage(e));
         } finally {
@@ -455,13 +455,13 @@ public class Agent implements HandlerFactory, IAgentControl {
     }
 
     public void scheduleWatch(final Link link, final Request request, final long delay, final long period) {
-        synchronized (_watchList) {
+        synchronized (this._watchList) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Adding a watch list");
             }
             final WatchTask task = new WatchTask(link, request, this);
-            _timer.schedule(task, 0, period);
-            _watchList.add(task);
+            this._timer.schedule(task, 0, period);
+            this._watchList.add(task);
         }
     }
 
@@ -485,8 +485,8 @@ public class Agent implements HandlerFactory, IAgentControl {
             processStartupAnswer(answer, response, link);
         } else if (answer instanceof AgentControlAnswer) {
             // Notice, we are doing callback while holding a lock!
-            synchronized (_controlListeners) {
-                for (final IAgentControlListener listener : _controlListeners) {
+            synchronized (this._controlListeners) {
+                for (final IAgentControlListener listener : this._controlListeners) {
                     listener.processControlResponse(response, (AgentControlAnswer) answer);
                 }
             }
@@ -498,9 +498,9 @@ public class Agent implements HandlerFactory, IAgentControl {
     public void processStartupAnswer(final Answer answer, final Response response, final Link link) {
         boolean cancelled = false;
         synchronized (this) {
-            if (_startup != null) {
-                _startup.cancel();
-                _startup = null;
+            if (this._startup != null) {
+                this._startup.cancel();
+                this._startup = null;
             } else {
                 cancelled = true;
             }
@@ -518,30 +518,30 @@ public class Agent implements HandlerFactory, IAgentControl {
         logger.info("Process agent startup answer, agent id = " + startup.getHostId());
 
         setId(startup.getHostId());
-        _pingInterval = (long) startup.getPingInterval() * 1000; // change to ms.
+        this._pingInterval = (long) startup.getPingInterval() * 1000; // change to ms.
 
         setLastPingResponseTime();
-        scheduleWatch(link, response, _pingInterval, _pingInterval);
+        scheduleWatch(link, response, this._pingInterval, this._pingInterval);
 
-        _urgentTaskPool.setKeepAliveTime(2 * _pingInterval, TimeUnit.MILLISECONDS);
+        this._urgentTaskPool.setKeepAliveTime(2 * this._pingInterval, TimeUnit.MILLISECONDS);
 
         logger.info("Startup Response Received: agent id = " + getId());
     }
 
     public synchronized void setLastPingResponseTime() {
-        _lastPingResponseTime = System.currentTimeMillis();
+        this._lastPingResponseTime = System.currentTimeMillis();
     }
 
     public void processOtherTask(final Task task) {
         final Object obj = task.get();
         if (obj instanceof Response) {
-            if (System.currentTimeMillis() - _lastPingResponseTime > _pingInterval * agentProperties.getPingRetries()) {
-                logger.error("Ping Interval has gone past " + _pingInterval * agentProperties.getPingRetries() + ". Won't reconnect to mgt server, as connection is still alive");
+            if (System.currentTimeMillis() - this._lastPingResponseTime > this._pingInterval * this.agentProperties.getPingRetries()) {
+                logger.error("Ping Interval has gone past " + this._pingInterval * this.agentProperties.getPingRetries() + ". Won't reconnect to mgt server, as connection is still alive");
                 return;
             }
 
-            final PingCommand ping = resource.getCurrentStatus(getId());
-            final Request request = new Request(_id, -1, ping, false);
+            final PingCommand ping = this.resource.getCurrentStatus(getId());
+            final Request request = new Request(this._id, -1, ping, false);
             request.setSequence(getNextSequence());
             if (logger.isDebugEnabled()) {
                 logger.debug("Sending ping: " + request.toString());
@@ -561,11 +561,11 @@ public class Agent implements HandlerFactory, IAgentControl {
                 MDC.put("logcontextid", command.getContextParam("logid"));
             }
             Answer answer = null;
-            _inProgress.incrementAndGet();
+            this._inProgress.incrementAndGet();
             try {
-                answer = resource.executeRequest(command);
+                answer = this.resource.executeRequest(command);
             } finally {
-                _inProgress.decrementAndGet();
+                this._inProgress.decrementAndGet();
             }
             if (answer != null) {
                 final Response response = new Response(req, answer);
@@ -589,11 +589,11 @@ public class Agent implements HandlerFactory, IAgentControl {
         private AgentControlAnswer _answer;
 
         public AgentControlListener(final Request request) {
-            _request = request;
+            this._request = request;
         }
 
         public AgentControlAnswer getAnswer() {
-            return _answer;
+            return this._answer;
         }
 
         @Override
@@ -603,8 +603,8 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         @Override
         public void processControlResponse(final Response response, final AgentControlAnswer answer) {
-            if (_request.getSequence() == response.getSequence()) {
-                _answer = answer;
+            if (this._request.getSequence() == response.getSequence()) {
+                this._answer = answer;
                 synchronized (this) {
                     notifyAll();
                 }
@@ -617,19 +617,19 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         public ShutdownThread(final Agent agent) {
             super("AgentShutdownThread");
-            _agent = agent;
+            this._agent = agent;
         }
 
         @Override
         public void run() {
-            _agent.stop(ShutdownCommand.Requested);
+            this._agent.stop(ShutdownCommand.Requested);
         }
     }
 
     @Override
     public void registerControlListener(final IAgentControlListener listener) {
-        synchronized (_controlListeners) {
-            _controlListeners.add(listener);
+        synchronized (this._controlListeners) {
+            this._controlListeners.add(listener);
         }
     }
 
@@ -640,21 +640,21 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         public WatchTask(final Link link, final Request request, final Agent agent) {
             super();
-            _request = request;
-            _link = link;
-            _agent = agent;
+            this._request = request;
+            this._link = link;
+            this._agent = agent;
         }
 
         @Override
         protected void runInContext() {
             if (logger.isTraceEnabled()) {
-                logger.trace("Scheduling " + (_request instanceof Response ? "Ping" : "Watch Task"));
+                logger.trace("Scheduling " + (this._request instanceof Response ? "Ping" : "Watch Task"));
             }
             try {
-                if (_request instanceof Response) {
-                    _urgentTaskPool.submit(new ServerHandler(Task.Type.OTHER, _link, _request));
+                if (this._request instanceof Response) {
+                    Agent.this._urgentTaskPool.submit(new ServerHandler(Task.Type.OTHER, this._link, this._request));
                 } else {
-                    _link.schedule(new ServerHandler(Task.Type.OTHER, _link, _request));
+                    this._link.schedule(new ServerHandler(Task.Type.OTHER, this._link, this._request));
                 }
             } catch (final ClosedChannelException e) {
                 logger.warn("Unable to schedule task because channel is closed");
@@ -668,15 +668,15 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         public StartupTask(final Link link) {
             logger.debug("Startup task created");
-            _link = link;
+            this._link = link;
         }
 
         @Override
         public synchronized boolean cancel() {
             // TimerTask.cancel may fail depends on the calling context
-            if (!cancelled) {
-                cancelled = true;
-                _startupWait = _startupWaitDefault;
+            if (!this.cancelled) {
+                this.cancelled = true;
+                Agent.this._startupWait = Agent.this._startupWaitDefault;
                 logger.debug("Startup task cancelled");
                 return super.cancel();
             }
@@ -685,22 +685,22 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         @Override
         protected synchronized void runInContext() {
-            if (!cancelled) {
+            if (!this.cancelled) {
                 if (logger.isInfoEnabled()) {
                     logger.info("The startup command is now cancelled");
                 }
-                cancelled = true;
-                _startup = null;
-                _startupWait = _startupWaitDefault * 2;
-                reconnect(_link);
+                this.cancelled = true;
+                Agent.this._startup = null;
+                Agent.this._startupWait = Agent.this._startupWaitDefault * 2;
+                reconnect(this._link);
             }
         }
     }
 
     @Override
     public void unregisterControlListener(final IAgentControlListener listener) {
-        synchronized (_controlListeners) {
-            _controlListeners.remove(listener);
+        synchronized (this._controlListeners) {
+            this._controlListeners.remove(listener);
         }
     }
 
@@ -730,7 +730,7 @@ public class Agent implements HandlerFactory, IAgentControl {
         @Override
         public void doTask(final Task task) throws TaskExecutionException {
             if (task.getType() == Task.Type.CONNECT) {
-                backOffAlgorithm.reset();
+                Agent.this.backOffAlgorithm.reset();
                 setLink(task.getLink());
                 sendStartup(task.getLink());
             } else if (task.getType() == Task.Type.DATA) {
@@ -743,7 +743,7 @@ public class Agent implements HandlerFactory, IAgentControl {
                     } else {
                         //put the requests from mgt server into another thread pool, as the request may take a longer time to finish. Don't block the NIO main thread pool
                         //processRequest(request, task.getLink());
-                        _executor.submit(new AgentRequestHandler(getType(), getLink(), request));
+                        Agent.this._executor.submit(new AgentRequestHandler(getType(), getLink(), request));
                     }
                 } catch (final ClassNotFoundException e) {
                     logger.error("Unable to find this request ");
@@ -791,9 +791,9 @@ public class Agent implements HandlerFactory, IAgentControl {
     }
 
     private void postRequest(final Request request) throws AgentControlChannelException {
-        if (_link != null) {
+        if (this._link != null) {
             try {
-                _link.send(request.toBytes());
+                this._link.send(request.toBytes());
             } catch (final ClosedChannelException e) {
                 logger.warn("Unable to post agent control request: " + request.toString());
                 throw new AgentControlChannelException("Unable to post agent control request due to " + e.getMessage());

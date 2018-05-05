@@ -1,5 +1,6 @@
 package com.cloud.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 
@@ -53,11 +54,11 @@ public abstract class RequestWrapper {
 
     protected Hashtable<Class<? extends Command>, CommandWrapper> retrieveResource(final Command command, final Class<? extends ServerResource> resourceClass) {
         Class<? extends ServerResource> keepResourceClass = resourceClass;
-        Hashtable<Class<? extends Command>, CommandWrapper> resource = resources.get(keepResourceClass);
+        Hashtable<Class<? extends Command>, CommandWrapper> resource = this.resources.get(keepResourceClass);
         while (resource == null) {
             try {
                 final Class<? extends ServerResource> keepResourceClass2 = (Class<? extends ServerResource>) keepResourceClass.getSuperclass();
-                resource = resources.get(keepResourceClass2);
+                resource = this.resources.get(keepResourceClass2);
 
                 keepResourceClass = keepResourceClass2;
             } catch (final ClassCastException e) {

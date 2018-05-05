@@ -1,4 +1,4 @@
-package com.cloud.managed.context;
+package com.cloud.common.managed.context;
 
 public class ManagedContextUtils {
 

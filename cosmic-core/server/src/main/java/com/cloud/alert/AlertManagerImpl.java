@@ -26,7 +26,7 @@ import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.dc.Vlan.VlanType;
-import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.CapacityState;
 import com.cloud.model.enumeration.HostType;

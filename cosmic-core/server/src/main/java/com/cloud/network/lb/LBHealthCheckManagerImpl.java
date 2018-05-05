@@ -6,7 +6,7 @@ import com.cloud.configuration.Config;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.LoadBalancerContainer.Scheme;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.Manager;
 import com.cloud.utils.component.ManagerBase;

@@ -5,7 +5,7 @@ import com.cloud.legacymodel.exceptions.CloudAuthenticationException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
-import com.cloud.managed.threadlocal.ManagedThreadLocal;
+import com.cloud.common.managed.threadlocal.ManagedThreadLocal;
 import com.cloud.projects.Project;
 import com.cloud.utils.UuidUtils;
 

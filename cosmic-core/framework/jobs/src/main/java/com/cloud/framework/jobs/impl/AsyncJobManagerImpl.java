@@ -21,7 +21,7 @@ import com.cloud.jobs.JobInfo;
 import com.cloud.jobs.JobInfo.Status;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.StringUtils;

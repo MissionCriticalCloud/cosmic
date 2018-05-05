@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.resource.ServerResource;
+import com.cloud.common.resource.ServerResource;
 
 import javax.ejb.Local;
 

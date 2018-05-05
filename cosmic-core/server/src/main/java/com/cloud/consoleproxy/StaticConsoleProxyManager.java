@@ -1,5 +1,6 @@
 package com.cloud.consoleproxy;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.communication.command.StartupCommand;
@@ -8,7 +9,6 @@ import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
-import com.cloud.resource.ServerResource;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.ConsoleProxyDao;
@@ -34,13 +34,13 @@ public class StaticConsoleProxyManager extends AgentBasedConsoleProxyManager imp
 
     @Override
     public ConsoleProxyInfo assignProxy(final long dataCenterId, final long userVmId) {
-        return new ConsoleProxyInfo(_sslEnabled, _ip, _consoleProxyPort, _consoleProxyUrlPort, _consoleProxyUrlDomain);
+        return new ConsoleProxyInfo(this._sslEnabled, this._ip, this._consoleProxyPort, this._consoleProxyUrlPort, this._consoleProxyUrlDomain);
     }
 
     @Override
     protected HostVO findHost(final VMInstanceVO vm) {
 
-        final List<HostVO> hosts = _resourceMgr.listAllUpAndEnabledHostsInOneZoneByType(HostType.ConsoleProxy, vm.getDataCenterId());
+        final List<HostVO> hosts = this._resourceMgr.listAllUpAndEnabledHostsInOneZoneByType(HostType.ConsoleProxy, vm.getDataCenterId());
 
         return hosts.isEmpty() ? null : hosts.get(0);
     }
@@ -48,22 +48,22 @@ public class StaticConsoleProxyManager extends AgentBasedConsoleProxyManager imp
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
-        _ip = _configDao.getValue("consoleproxy.static.publicIp");
-        if (_ip == null) {
-            _ip = "127.0.0.1";
+        this._ip = this._configDao.getValue("consoleproxy.static.publicIp");
+        if (this._ip == null) {
+            this._ip = "127.0.0.1";
         }
 
         final String value = (String) params.get("consoleproxy.sslEnabled");
         if (value != null && value.equalsIgnoreCase("true")) {
-            _sslEnabled = true;
+            this._sslEnabled = true;
         }
         int defaultPort = 8088;
-        if (_sslEnabled) {
+        if (this._sslEnabled) {
             defaultPort = 8443;
         }
-        _consoleProxyUrlPort = NumbersUtil.parseInt(_configDao.getValue("consoleproxy.static.port"), defaultPort);
+        this._consoleProxyUrlPort = NumbersUtil.parseInt(this._configDao.getValue("consoleproxy.static.port"), defaultPort);
 
-        _resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
+        this._resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
 
         return true;
     }

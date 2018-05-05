@@ -2,6 +2,7 @@ package com.cloud.hypervisor.kvm.discoverer;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.configuration.Config;
 import com.cloud.dc.ClusterVO;
 import com.cloud.host.HostVO;
@@ -25,7 +26,6 @@ import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;
 import com.cloud.resource.DiscovererBase;
 import com.cloud.resource.ResourceStateAdapter;
-import com.cloud.resource.ServerResource;
 import com.cloud.utils.ssh.SSHCmdHelper;
 
 import javax.inject.Inject;
@@ -104,7 +104,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     find(final long dcId, final Long podId, final Long clusterId, final URI uri, final String username, final String password, final List<String> hostTags) throws
             DiscoveryException {
 
-        final ClusterVO cluster = _clusterDao.findById(clusterId);
+        final ClusterVO cluster = this._clusterDao.findById(clusterId);
         if (cluster == null || cluster.getHypervisorType() != getHypervisorType()) {
             if (s_logger.isInfoEnabled()) {
                 s_logger.info("invalid cluster id or cluster is not for " + getHypervisorType() + " hypervisors");
@@ -128,7 +128,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             agentIp = ia.getHostAddress();
             final String guid = UUID.nameUUIDFromBytes(agentIp.getBytes()).toString();
 
-            final List<HostVO> existingHosts = _resourceMgr.listAllHostsInOneZoneByType(HostType.Routing, dcId);
+            final List<HostVO> existingHosts = this._resourceMgr.listAllHostsInOneZoneByType(HostType.Routing, dcId);
             if (existingHosts != null) {
                 for (final HostVO existingHost : existingHosts) {
                     if (existingHost.getGuid().toLowerCase().startsWith(guid.toLowerCase())) {
@@ -160,7 +160,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
                 return null;
             }
 
-            final List<PhysicalNetworkSetupInfo> netInfos = _networkMgr.getPhysicalNetworkInfo(dcId, getHypervisorType());
+            final List<PhysicalNetworkSetupInfo> netInfos = this._networkMgr.getPhysicalNetworkInfo(dcId, getHypervisorType());
             String kvmPrivateNic = null;
             String kvmPublicNic = null;
             String kvmGuestNic = null;
@@ -178,9 +178,9 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             }
 
             if (kvmPrivateNic == null && kvmPublicNic == null && kvmGuestNic == null) {
-                kvmPrivateNic = _kvmPrivateNic;
-                kvmPublicNic = _kvmPublicNic;
-                kvmGuestNic = _kvmGuestNic;
+                kvmPrivateNic = this._kvmPrivateNic;
+                kvmPublicNic = this._kvmPublicNic;
+                kvmGuestNic = this._kvmGuestNic;
             }
 
             if (kvmPublicNic == null) {
@@ -195,7 +195,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
                 kvmGuestNic = (kvmPublicNic != null) ? kvmPublicNic : kvmPrivateNic;
             }
 
-            String parameters = " -m " + _hostIp + " -z " + dcId + " -p " + podId + " -c " + clusterId + " -g " + guid + " -a";
+            String parameters = " -m " + this._hostIp + " -z " + dcId + " -p " + podId + " -c " + clusterId + " -g " + guid + " -a";
 
             parameters += " --pubNic=" + kvmPublicNic;
             parameters += " --prvNic=" + kvmPrivateNic;
@@ -214,7 +214,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             final KvmDummyResourceBase kvmResource = new KvmDummyResourceBase();
             final Map<String, Object> params = new HashMap<>();
 
-            params.put("router.aggregation.command.each.timeout", _configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
+            params.put("router.aggregation.command.each.timeout", this._configDao.getValue(Config.RouterAggregationCommandEachTimeout.toString()));
 
             params.put("zone", Long.toString(dcId));
             params.put("pod", Long.toString(podId));
@@ -234,15 +234,15 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             // place a place holder guid derived from cluster ID
             if (cluster.getGuid() == null) {
                 cluster.setGuid(UUID.nameUUIDFromBytes(String.valueOf(clusterId).getBytes()).toString());
-                _clusterDao.update(clusterId, cluster);
+                this._clusterDao.update(clusterId, cluster);
             }
 
             // save user name and password
-            _hostDao.loadDetails(connectedHost);
+            this._hostDao.loadDetails(connectedHost);
             final Map<String, String> hostDetails = connectedHost.getDetails();
             hostDetails.put("password", password);
             hostDetails.put("username", username);
-            _hostDao.saveDetails(connectedHost);
+            this._hostDao.saveDetails(connectedHost);
             return resources;
         } catch (final ConfigurationException e) {
             s_logger.error("Failed to obtain configuration parameters for KVM host: " + e.getMessage(), e);
@@ -258,8 +258,8 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     }
 
     private HostVO waitForHostConnect(final long dcId, final long podId, final long clusterId, final String guid) {
-        for (int i = 0; i < _waitTime * 2; i++) {
-            final List<HostVO> hosts = _resourceMgr.listAllUpAndEnabledHosts(HostType.Routing, clusterId, podId, dcId);
+        for (int i = 0; i < this._waitTime * 2; i++) {
+            final List<HostVO> hosts = this._resourceMgr.listAllUpAndEnabledHosts(HostType.Routing, clusterId, podId, dcId);
             for (final HostVO host : hosts) {
                 if (host.getGuid().toLowerCase().startsWith(guid.toLowerCase())) {
                     return host;
@@ -272,7 +272,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             }
         }
         s_logger.debug("Timeout, to wait for the host connecting to mgt svr, assuming it is failed");
-        final List<HostVO> hosts = _resourceMgr.findHostByGuid(dcId, guid);
+        final List<HostVO> hosts = this._resourceMgr.findHostByGuid(dcId, guid);
         if (hosts.size() == 1) {
             return hosts.get(0);
         } else {
@@ -302,32 +302,32 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         // _setupAgentPath = Script.findScript(getPatchPath(),
         // "setup_agent.sh");
-        _kvmPrivateNic = _configDao.getValue(Config.KvmPrivateNetwork.key());
-        if (_kvmPrivateNic == null) {
-            _kvmPrivateNic = "cloudbr0";
+        this._kvmPrivateNic = this._configDao.getValue(Config.KvmPrivateNetwork.key());
+        if (this._kvmPrivateNic == null) {
+            this._kvmPrivateNic = "cloudbr0";
         }
 
-        _kvmPublicNic = _configDao.getValue(Config.KvmPublicNetwork.key());
-        if (_kvmPublicNic == null) {
-            _kvmPublicNic = _kvmPrivateNic;
+        this._kvmPublicNic = this._configDao.getValue(Config.KvmPublicNetwork.key());
+        if (this._kvmPublicNic == null) {
+            this._kvmPublicNic = this._kvmPrivateNic;
         }
 
-        _kvmGuestNic = _configDao.getValue(Config.KvmGuestNetwork.key());
-        if (_kvmGuestNic == null) {
-            _kvmGuestNic = _kvmPrivateNic;
+        this._kvmGuestNic = this._configDao.getValue(Config.KvmGuestNetwork.key());
+        if (this._kvmGuestNic == null) {
+            this._kvmGuestNic = this._kvmPrivateNic;
         }
 
-        _hostIp = _configDao.getValue("host");
-        if (_hostIp == null) {
+        this._hostIp = this._configDao.getValue("host");
+        if (this._hostIp == null) {
             throw new ConfigurationException("Can't get host IP");
         }
-        _resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
+        this._resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
         return true;
     }
 
     @Override
     public boolean stop() {
-        _resourceMgr.unregisterResourceStateAdapter(this.getClass().getSimpleName());
+        this._resourceMgr.unregisterResourceStateAdapter(this.getClass().getSimpleName());
         return super.stop();
     }
 
@@ -348,16 +348,16 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
         }
 
         /* KVM requires host are the same in cluster */
-        final ClusterVO clusterVO = _clusterDao.findById(host.getClusterId());
+        final ClusterVO clusterVO = this._clusterDao.findById(host.getClusterId());
         if (clusterVO == null) {
             s_logger.debug("cannot find cluster: " + host.getClusterId());
             throw new IllegalArgumentException("cannot add host, due to can't find cluster: " + host.getClusterId());
         }
 
-        final List<HostVO> hostsInCluster = _resourceMgr.listAllHostsInCluster(clusterVO.getId());
+        final List<HostVO> hostsInCluster = this._resourceMgr.listAllHostsInCluster(clusterVO.getId());
         if (!hostsInCluster.isEmpty()) {
             final HostVO oneHost = hostsInCluster.get(0);
-            _hostDao.loadDetails(oneHost);
+            this._hostDao.loadDetails(oneHost);
             final String hostOsInCluster = oneHost.getDetail("Host.OS");
             final String hostOs = ssCmd.getHostDetails().get("Host.OS");
             if (!hostOsInCluster.equalsIgnoreCase(hostOs)) {
@@ -366,9 +366,9 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             }
         }
 
-        _hostDao.loadDetails(host);
+        this._hostDao.loadDetails(host);
 
-        return _resourceMgr.fillRoutingHostVO(host, ssCmd, getHypervisorType(), host.getDetails(), null);
+        return this._resourceMgr.fillRoutingHostVO(host, ssCmd, getHypervisorType(), host.getDetails(), null);
     }
 
     @Override
@@ -384,10 +384,10 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             return null;
         }
 
-        _resourceMgr.deleteRoutingHost(host, isForced, isForceDeleteStorage);
+        this._resourceMgr.deleteRoutingHost(host, isForced, isForceDeleteStorage);
         try {
             final ShutdownCommand cmd = new ShutdownCommand(ShutdownCommand.DeleteHost, null);
-            _agentMgr.send(host.getId(), cmd);
+            this._agentMgr.send(host.getId(), cmd);
         } catch (final AgentUnavailableException e) {
             s_logger.warn("Sending ShutdownCommand failed: ", e);
         } catch (final OperationTimedoutException e) {

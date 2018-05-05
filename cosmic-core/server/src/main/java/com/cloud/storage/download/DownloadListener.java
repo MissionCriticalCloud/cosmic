@@ -26,7 +26,7 @@ import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;

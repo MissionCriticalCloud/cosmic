@@ -1,6 +1,7 @@
 package com.cloud.resource;
 
 import com.cloud.common.agent.IAgentControl;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.StartupCommand;
@@ -35,12 +36,12 @@ public abstract class ServerResourceBase implements ServerResource {
 
     @Override
     public String getName() {
-        return _name;
+        return this._name;
     }
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
+        this._name = name;
 
         String publicNic = (String) params.get("public.network.device");
         if (publicNic == null) {
@@ -53,12 +54,12 @@ public abstract class ServerResourceBase implements ServerResource {
         final String storageNic = (String) params.get("storage.network.device");
         final String storageNic2 = (String) params.get("storage.network.device.2");
 
-        _privateNic = getNetworkInterface(privateNic);
-        _publicNic = getNetworkInterface(publicNic);
-        _storageNic = getNetworkInterface(storageNic);
-        _storageNic2 = getNetworkInterface(storageNic2);
+        this._privateNic = getNetworkInterface(privateNic);
+        this._publicNic = getNetworkInterface(publicNic);
+        this._storageNic = getNetworkInterface(storageNic);
+        this._storageNic2 = getNetworkInterface(storageNic2);
 
-        if (_privateNic == null) {
+        if (this._privateNic == null) {
             s_logger.warn("Nics are not specified in properties file/db, will try to autodiscover");
 
             Enumeration<NetworkInterface> nics = null;
@@ -81,7 +82,7 @@ public abstract class ServerResourceBase implements ServerResource {
                                 !nicName.startsWith("virbr") && !nicName.contains(":")) {
                     final String[] info = NetUtils.getNicParams(nicName);
                     if (info != null && info[0] != null) {
-                        _privateNic = nic;
+                        this._privateNic = nic;
                         s_logger.info("Designating private to be nic " + nicName);
                         break;
                     }
@@ -92,11 +93,11 @@ public abstract class ServerResourceBase implements ServerResource {
                 s_logger.debug("Skipping nic " + nicName);
             }
 
-            if (_privateNic == null) {
+            if (this._privateNic == null) {
                 throw new ConfigurationException("Private NIC is not configured");
             }
         }
-        final String[] infos = NetUtils.getNetworkParams(_privateNic);
+        final String[] infos = NetUtils.getNetworkParams(this._privateNic);
         if (infos == null) {
             s_logger.warn("Incorrect details for private Nic during initialization of ServerResourceBase");
             return false;
@@ -152,8 +153,8 @@ public abstract class ServerResourceBase implements ServerResource {
 
     protected void fillNetworkInformation(final StartupCommand cmd) {
         String[] info = null;
-        if (_privateNic != null) {
-            info = NetUtils.getNetworkParams(_privateNic);
+        if (this._privateNic != null) {
+            info = NetUtils.getNetworkParams(this._privateNic);
             if (info != null) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Parameters for private nic: " + info[0] + " - " + info[1] + "-" + info[2]);
@@ -164,11 +165,11 @@ public abstract class ServerResourceBase implements ServerResource {
             }
         }
 
-        if (_storageNic != null) {
+        if (this._storageNic != null) {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Storage has its now nic: " + _storageNic.getName());
+                s_logger.debug("Storage has its now nic: " + this._storageNic.getName());
             }
-            info = NetUtils.getNetworkParams(_storageNic);
+            info = NetUtils.getNetworkParams(this._storageNic);
         }
 
         // NOTE: In case you're wondering, this is not here by mistake.
@@ -181,8 +182,8 @@ public abstract class ServerResourceBase implements ServerResource {
             cmd.setStorageNetmask(info[2]);
         }
 
-        if (_publicNic != null) {
-            info = NetUtils.getNetworkParams(_publicNic);
+        if (this._publicNic != null) {
+            info = NetUtils.getNetworkParams(this._publicNic);
             if (info != null) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Parameters for public nic: " + info[0] + " - " + info[1] + "-" + info[2]);
@@ -193,8 +194,8 @@ public abstract class ServerResourceBase implements ServerResource {
             }
         }
 
-        if (_storageNic2 != null) {
-            info = NetUtils.getNetworkParams(_storageNic2);
+        if (this._storageNic2 != null) {
+            info = NetUtils.getNetworkParams(this._storageNic2);
             if (info != null) {
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug("Parameters for storage nic 2: " + info[0] + " - " + info[1] + "-" + info[2]);
@@ -212,12 +213,12 @@ public abstract class ServerResourceBase implements ServerResource {
 
     @Override
     public IAgentControl getAgentControl() {
-        return _agentControl;
+        return this._agentControl;
     }
 
     @Override
     public void setAgentControl(final IAgentControl agentControl) {
-        _agentControl = agentControl;
+        this._agentControl = agentControl;
     }
 
     protected void recordWarning(final String msg) {
@@ -226,8 +227,8 @@ public abstract class ServerResourceBase implements ServerResource {
 
     protected void recordWarning(final String msg, final Throwable th) {
         final String str = getLogStr(msg, th);
-        synchronized (_warnings) {
-            _warnings.add(str);
+        synchronized (this._warnings) {
+            this._warnings.add(str);
         }
     }
 
@@ -242,17 +243,17 @@ public abstract class ServerResourceBase implements ServerResource {
     }
 
     protected List<String> getWarnings() {
-        synchronized (_warnings) {
-            final List<String> results = new LinkedList<>(_warnings);
-            _warnings.clear();
+        synchronized (this._warnings) {
+            final List<String> results = new LinkedList<>(this._warnings);
+            this._warnings.clear();
             return results;
         }
     }
 
     protected List<String> getErrors() {
-        synchronized (_errors) {
-            final List<String> result = new LinkedList<>(_errors);
-            _errors.clear();
+        synchronized (this._errors) {
+            final List<String> result = new LinkedList<>(this._errors);
+            this._errors.clear();
             return result;
         }
     }
@@ -263,8 +264,8 @@ public abstract class ServerResourceBase implements ServerResource {
 
     protected void recordError(final String msg, final Throwable th) {
         final String str = getLogStr(msg, th);
-        synchronized (_errors) {
-            _errors.add(str);
+        synchronized (this._errors) {
+            this._errors.add(str);
         }
     }
 
