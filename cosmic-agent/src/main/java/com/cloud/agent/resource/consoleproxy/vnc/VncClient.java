@@ -36,7 +36,7 @@ public class VncClient {
     private ConsoleProxyClientListener clientListener = null;
 
     public VncClient(final ConsoleProxyClientListener clientListener) {
-        noUI = true;
+        this.noUI = true;
         this.clientListener = clientListener;
     }
 
@@ -51,13 +51,13 @@ public class VncClient {
     public void connectTo(final String host, final int port, final String password) throws UnknownHostException, IOException {
         // Connect to server
         s_logger.info("Connecting to VNC server " + host + ":" + port + "...");
-        socket = new Socket(host, port);
+        this.socket = new Socket(host, port);
         doConnect(password);
     }
 
     private void doConnect(final String password) throws IOException {
-        is = new DataInputStream(socket.getInputStream());
-        os = new DataOutputStream(socket.getOutputStream());
+        this.is = new DataInputStream(this.socket.getInputStream());
+        this.os = new DataOutputStream(this.socket.getOutputStream());
 
         // Initialize connection
         handshake();
@@ -67,27 +67,27 @@ public class VncClient {
         s_logger.info("Connecting to VNC server succeeded, start session");
 
         // Run client-to-server packet sender
-        sender = new VncClientPacketSender(os, screen, this);
+        this.sender = new VncClientPacketSender(this.os, this.screen, this);
 
         // Create buffered image canvas
-        final BufferedImageCanvas canvas = new BufferedImageCanvas(sender, screen.getFramebufferWidth(), screen.getFramebufferHeight());
+        final BufferedImageCanvas canvas = new BufferedImageCanvas(this.sender, this.screen.getFramebufferWidth(), this.screen.getFramebufferHeight());
 
         // Subscribe packet sender to various events
-        canvas.addMouseListener(sender);
-        canvas.addMouseMotionListener(sender);
-        canvas.addKeyListener(sender);
+        canvas.addMouseListener(this.sender);
+        canvas.addMouseMotionListener(this.sender);
+        canvas.addKeyListener(this.sender);
 
         Frame frame = null;
-        if (!noUI) {
-            frame = createVncClientMainWindow(canvas, screen.getDesktopName());
+        if (!this.noUI) {
+            frame = createVncClientMainWindow(canvas, this.screen.getDesktopName());
         }
 
-        new Thread(sender).start();
+        new Thread(this.sender).start();
 
         // Run server-to-client packet receiver
-        receiver = new VncServerPacketReceiver(is, canvas, screen, this, sender, clientListener);
+        this.receiver = new VncServerPacketReceiver(this.is, canvas, this.screen, this, this.sender, this.clientListener);
         try {
-            receiver.run();
+            this.receiver.run();
         } finally {
             if (frame != null) {
                 frame.setVisible(false);
@@ -104,7 +104,7 @@ public class VncClient {
 
         // Read protocol version
         final byte[] buf = new byte[12];
-        is.readFully(buf);
+        this.is.readFully(buf);
         final String rfbProtocol = new String(buf);
 
         // Server should use RFB protocol 3.x
@@ -115,8 +115,8 @@ public class VncClient {
 
         // Send response: we support RFB 3.3 only
         final String ourProtocolString = RfbConstants.RFB_PROTOCOL_VERSION + "\n";
-        os.write(ourProtocolString.getBytes());
-        os.flush();
+        this.os.write(ourProtocolString.getBytes());
+        this.os.flush();
     }
 
     /**
@@ -124,15 +124,15 @@ public class VncClient {
      */
     private void authenticate(final String password) throws IOException {
         // Read security type
-        final int authType = is.readInt();
+        final int authType = this.is.readInt();
 
         switch (authType) {
             case RfbConstants.CONNECTION_FAILED: {
                 // Server forbids to connect. Read reason and throw exception
 
-                final int length = is.readInt();
+                final int length = this.is.readInt();
                 final byte[] buf = new byte[length];
-                is.readFully(buf);
+                this.is.readFully(buf);
                 final String reason = new String(buf, RfbConstants.CHARSET);
 
                 s_logger.error("Authentication to VNC server is failed. Reason: " + reason);
@@ -160,50 +160,50 @@ public class VncClient {
         // Send client initialization message
         {
             // Send shared flag
-            os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
-            os.flush();
+            this.os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
+            this.os.flush();
         }
 
         // Read server initialization message
         {
             // Read frame buffer size
-            final int framebufferWidth = is.readUnsignedShort();
-            final int framebufferHeight = is.readUnsignedShort();
-            screen.setFramebufferSize(framebufferWidth, framebufferHeight);
-            if (clientListener != null) {
-                clientListener.onFramebufferSizeChange(framebufferWidth, framebufferHeight);
+            final int framebufferWidth = this.is.readUnsignedShort();
+            final int framebufferHeight = this.is.readUnsignedShort();
+            this.screen.setFramebufferSize(framebufferWidth, framebufferHeight);
+            if (this.clientListener != null) {
+                this.clientListener.onFramebufferSizeChange(framebufferWidth, framebufferHeight);
             }
         }
 
         // Read pixel format
         {
-            final int bitsPerPixel = is.readUnsignedByte();
-            final int depth = is.readUnsignedByte();
+            final int bitsPerPixel = this.is.readUnsignedByte();
+            final int depth = this.is.readUnsignedByte();
 
-            final int bigEndianFlag = is.readUnsignedByte();
-            final int trueColorFlag = is.readUnsignedByte();
+            final int bigEndianFlag = this.is.readUnsignedByte();
+            final int trueColorFlag = this.is.readUnsignedByte();
 
-            final int redMax = is.readUnsignedShort();
-            final int greenMax = is.readUnsignedShort();
-            final int blueMax = is.readUnsignedShort();
+            final int redMax = this.is.readUnsignedShort();
+            final int greenMax = this.is.readUnsignedShort();
+            final int blueMax = this.is.readUnsignedShort();
 
-            final int redShift = is.readUnsignedByte();
-            final int greenShift = is.readUnsignedByte();
-            final int blueShift = is.readUnsignedByte();
+            final int redShift = this.is.readUnsignedByte();
+            final int greenShift = this.is.readUnsignedByte();
+            final int blueShift = this.is.readUnsignedByte();
 
             // Skip padding
-            is.skipBytes(3);
+            this.is.skipBytes(3);
 
-            screen.setPixelFormat(bitsPerPixel, depth, bigEndianFlag, trueColorFlag, redMax, greenMax, blueMax, redShift, greenShift, blueShift);
+            this.screen.setPixelFormat(bitsPerPixel, depth, bigEndianFlag, trueColorFlag, redMax, greenMax, blueMax, redShift, greenShift, blueShift);
         }
 
         // Read desktop name
         {
-            final int length = is.readInt();
+            final int length = this.is.readInt();
             final byte[] buf = new byte[length];
-            is.readFully(buf);
+            this.is.readFully(buf);
             final String desktopName = new String(buf, RfbConstants.CHARSET);
-            screen.setDesktopName(desktopName);
+            this.screen.setDesktopName(desktopName);
         }
     }
 
@@ -214,7 +214,7 @@ public class VncClient {
         // Use scrolling pane to support screens, which are larger than ours
         final ScrollPane scroller = new ScrollPane(ScrollPane.SCROLLBARS_AS_NEEDED);
         scroller.add(canvas);
-        scroller.setSize(screen.getFramebufferWidth(), screen.getFramebufferHeight());
+        scroller.setSize(this.screen.getFramebufferWidth(), this.screen.getFramebufferHeight());
 
         frame.add(scroller);
         frame.pack();
@@ -232,33 +232,33 @@ public class VncClient {
     }
 
     public void shutdown() {
-        if (sender != null) {
-            sender.closeConnection();
+        if (this.sender != null) {
+            this.sender.closeConnection();
         }
 
-        if (receiver != null) {
-            receiver.closeConnection();
+        if (this.receiver != null) {
+            this.receiver.closeConnection();
         }
 
-        if (is != null) {
+        if (this.is != null) {
             try {
-                is.close();
+                this.is.close();
             } catch (final IOException e) {
                 s_logger.info("[ignored] failed to close resource for input: " + e.getLocalizedMessage());
             }
         }
 
-        if (os != null) {
+        if (this.os != null) {
             try {
-                os.close();
+                this.os.close();
             } catch (final IOException e) {
                 s_logger.info("[ignored] failed to get close resource for output: " + e.getLocalizedMessage());
             }
         }
 
-        if (socket != null) {
+        if (this.socket != null) {
             try {
-                socket.close();
+                this.socket.close();
             } catch (final IOException e) {
                 s_logger.info("[ignored] failed to get close resource for socket: " + e.getLocalizedMessage());
             }
@@ -272,7 +272,7 @@ public class VncClient {
 
         // Read challenge
         final byte[] challenge = new byte[16];
-        is.readFully(challenge);
+        this.is.readFully(challenge);
 
         // Encode challenge with password
         final byte[] response;
@@ -284,11 +284,11 @@ public class VncClient {
         }
 
         // Send encoded challenge
-        os.write(response);
-        os.flush();
+        this.os.write(response);
+        this.os.flush();
 
         // Read security result
-        final int authResult = is.readInt();
+        final int authResult = this.is.readInt();
 
         switch (authResult) {
             case RfbConstants.VNC_AUTH_OK: {
@@ -368,7 +368,7 @@ public class VncClient {
     }
 
     public ConsoleProxyClientListener getClientListener() {
-        return clientListener;
+        return this.clientListener;
     }
 
     public void connectTo(final String host, int port, final String path, final String session, final boolean useSSL, final String sid) throws UnknownHostException, IOException {
@@ -381,13 +381,13 @@ public class VncClient {
         }
 
         final RawHTTP tunnel = new RawHTTP("CONNECT", host, port, path, session, useSSL);
-        socket = tunnel.connect();
+        this.socket = tunnel.connect();
         doConnect(sid);
     }
 
     public FrameBufferCanvas getFrameBufferCanvas() {
-        if (receiver != null) {
-            return receiver.getCanvas();
+        if (this.receiver != null) {
+            return this.receiver.getCanvas();
         }
 
         return null;
@@ -395,21 +395,21 @@ public class VncClient {
 
     public void requestUpdate(final boolean fullUpdate) {
         if (fullUpdate) {
-            sender.requestFullScreenUpdate();
+            this.sender.requestFullScreenUpdate();
         } else {
-            sender.imagePaintedOnScreen();
+            this.sender.imagePaintedOnScreen();
         }
     }
 
     public void sendClientKeyboardEvent(final int event, final int code, final int modifiers) {
-        sender.sendClientPacket(new KeyboardEventPacket(event, code));
+        this.sender.sendClientPacket(new KeyboardEventPacket(event, code));
     }
 
     public void sendClientMouseEvent(final int event, final int x, final int y, final int code, final int modifiers) {
-        sender.sendClientPacket(new MouseEventPacket(event, x, y));
+        this.sender.sendClientPacket(new MouseEventPacket(event, x, y));
     }
 
     public boolean isHostConnected() {
-        return receiver != null && receiver.isConnectionAlive();
+        return this.receiver != null && this.receiver.isConnectionAlive();
     }
 }

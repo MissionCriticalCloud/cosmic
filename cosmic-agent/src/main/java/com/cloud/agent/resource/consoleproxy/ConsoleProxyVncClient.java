@@ -39,8 +39,8 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
     @Override
     public boolean isHostConnected() {
-        if (client != null) {
-            return client.isHostConnected();
+        if (this.client != null) {
+            return this.client.isHostConnected();
         }
 
         return false;
@@ -48,7 +48,7 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
     @Override
     public boolean isFrontEndAlive() {
-        if (workerDone || System.currentTimeMillis() - getClientLastFrontEndActivityTime() > ConsoleProxy.VIEWER_LINGER_SECONDS * 1000) {
+        if (this.workerDone || System.currentTimeMillis() - getClientLastFrontEndActivityTime() > ConsoleProxy.VIEWER_LINGER_SECONDS * 1000) {
             s_logger.info("Front end has been idle for too long");
             return false;
         }
@@ -57,7 +57,7 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
     @Override
     public void sendClientRawKeyboardEvent(final InputEventType event, final int code, final int modifiers) {
-        if (client == null) {
+        if (this.client == null) {
             return;
         }
 
@@ -66,11 +66,11 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
         switch (event) {
             case KEY_DOWN:
                 sendModifierEvents(modifiers);
-                client.sendClientKeyboardEvent(RfbConstants.KEY_DOWN, code, 0);
+                this.client.sendClientKeyboardEvent(RfbConstants.KEY_DOWN, code, 0);
                 break;
 
             case KEY_UP:
-                client.sendClientKeyboardEvent(RfbConstants.KEY_UP, code, 0);
+                this.client.sendClientKeyboardEvent(RfbConstants.KEY_UP, code, 0);
                 sendModifierEvents(0);
                 break;
 
@@ -85,7 +85,7 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
     @Override
     public void sendClientMouseEvent(final InputEventType event, final int x, final int y, final int code, final int modifiers) {
-        if (client == null) {
+        if (this.client == null) {
             return;
         }
 
@@ -93,23 +93,23 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
 
         if (event == InputEventType.MOUSE_DOWN) {
             if (code == 2) {
-                lastPointerMask |= 4;
+                this.lastPointerMask |= 4;
             } else if (code == 0) {
-                lastPointerMask |= 1;
+                this.lastPointerMask |= 1;
             }
         }
 
         if (event == InputEventType.MOUSE_UP) {
             if (code == 2) {
-                lastPointerMask ^= 4;
+                this.lastPointerMask ^= 4;
             } else if (code == 0) {
-                lastPointerMask ^= 1;
+                this.lastPointerMask ^= 1;
             }
         }
 
         sendModifierEvents(modifiers);
-        client.sendClientMouseEvent(lastPointerMask, x, y, code, modifiers);
-        if (lastPointerMask == 0) {
+        this.client.sendClientMouseEvent(this.lastPointerMask, x, y, code, modifiers);
+        if (this.lastPointerMask == 0) {
             sendModifierEvents(0);
         }
     }
@@ -118,8 +118,8 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
     public void initClient(final ConsoleProxyClientParam param) {
         setClientParam(param);
 
-        client = new VncClient(this);
-        worker = new Thread(new Runnable() {
+        this.client = new VncClient(this);
+        this.worker = new Thread(new Runnable() {
             @Override
             public void run() {
                 final String tunnelUrl = getClientParam().getClientTunnelUrl();
@@ -131,7 +131,7 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
                         s_logger.info("Connect to VNC server via tunnel. url: " + tunnelUrl + ", session: " + tunnelSession);
 
                         ConsoleProxy.ensureRoute(uri.getHost());
-                        client.connectTo(
+                        ConsoleProxyVncClient.this.client.connectTo(
                                 uri.getHost(), uri.getPort(),
                                 uri.getPath() + "?" + uri.getQuery(),
                                 tunnelSession, "https".equalsIgnoreCase(uri.getScheme()),
@@ -139,34 +139,34 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
                     } else {
                         s_logger.info("Connect to VNC server directly. host: " + getClientHostAddress() + ", port: " + getClientHostPort());
                         ConsoleProxy.ensureRoute(getClientHostAddress());
-                        client.connectTo(getClientHostAddress(), getClientHostPort(), getClientHostPassword());
+                        ConsoleProxyVncClient.this.client.connectTo(getClientHostAddress(), getClientHostPort(), getClientHostPassword());
                     }
                 } catch (final IOException | URISyntaxException e) {
                     s_logger.error("Unexpected exception", e);
                 }
 
                 s_logger.info("Receiver thread stopped.");
-                workerDone = true;
-                client.getClientListener().onClientClose();
+                ConsoleProxyVncClient.this.workerDone = true;
+                ConsoleProxyVncClient.this.client.getClientListener().onClientClose();
             }
         });
 
-        worker.setDaemon(true);
-        worker.start();
+        this.worker.setDaemon(true);
+        this.worker.start();
     }
 
     @Override
     public void closeClient() {
-        workerDone = true;
-        if (client != null) {
-            client.shutdown();
+        this.workerDone = true;
+        if (this.client != null) {
+            this.client.shutdown();
         }
     }
 
     @Override
     protected FrameBufferCanvas getFrameBufferCavas() {
-        if (client != null) {
-            return client.getFrameBufferCanvas();
+        if (this.client != null) {
+            return this.client.getFrameBufferCanvas();
         }
         return null;
     }
@@ -174,27 +174,27 @@ public class ConsoleProxyVncClient extends ConsoleProxyClientBase {
     @Override
     public void onFramebufferUpdate(final int x, final int y, final int w, final int h) {
         super.onFramebufferUpdate(x, y, w, h);
-        client.requestUpdate(false);
+        this.client.requestUpdate(false);
     }
 
     private void sendModifierEvents(final int modifiers) {
-        if ((modifiers & SHIFT_KEY_MASK) != (lastModifierStates & SHIFT_KEY_MASK)) {
-            client.sendClientKeyboardEvent((modifiers & SHIFT_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_SHIFT, 0);
+        if ((modifiers & SHIFT_KEY_MASK) != (this.lastModifierStates & SHIFT_KEY_MASK)) {
+            this.client.sendClientKeyboardEvent((modifiers & SHIFT_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_SHIFT, 0);
         }
 
-        if ((modifiers & CTRL_KEY_MASK) != (lastModifierStates & CTRL_KEY_MASK)) {
-            client.sendClientKeyboardEvent((modifiers & CTRL_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_CTRL, 0);
+        if ((modifiers & CTRL_KEY_MASK) != (this.lastModifierStates & CTRL_KEY_MASK)) {
+            this.client.sendClientKeyboardEvent((modifiers & CTRL_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_CTRL, 0);
         }
 
-        if ((modifiers & META_KEY_MASK) != (lastModifierStates & META_KEY_MASK)) {
-            client.sendClientKeyboardEvent((modifiers & META_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_META, 0);
+        if ((modifiers & META_KEY_MASK) != (this.lastModifierStates & META_KEY_MASK)) {
+            this.client.sendClientKeyboardEvent((modifiers & META_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_META, 0);
         }
 
-        if ((modifiers & ALT_KEY_MASK) != (lastModifierStates & ALT_KEY_MASK)) {
-            client.sendClientKeyboardEvent((modifiers & ALT_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_ALT, 0);
+        if ((modifiers & ALT_KEY_MASK) != (this.lastModifierStates & ALT_KEY_MASK)) {
+            this.client.sendClientKeyboardEvent((modifiers & ALT_KEY_MASK) != 0 ? RfbConstants.KEY_DOWN : RfbConstants.KEY_UP, X11_KEY_ALT, 0);
         }
 
-        lastModifierStates = modifiers;
+        this.lastModifierStates = modifiers;
     }
 
     @Override

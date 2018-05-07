@@ -18,19 +18,19 @@ public class AjaxFIFOImageCache {
 
     public AjaxFIFOImageCache(final int cacheSize) {
         this.cacheSize = cacheSize;
-        fifoQueue = new ArrayList<>();
-        cache = new HashMap<>();
+        this.fifoQueue = new ArrayList<>();
+        this.cache = new HashMap<>();
     }
 
     public synchronized void clear() {
-        fifoQueue.clear();
-        cache.clear();
+        this.fifoQueue.clear();
+        this.cache.clear();
     }
 
     public synchronized int putImage(final byte[] image) {
-        while (cache.size() >= cacheSize) {
-            final Integer keyToRemove = fifoQueue.remove(0);
-            cache.remove(keyToRemove);
+        while (this.cache.size() >= this.cacheSize) {
+            final Integer keyToRemove = this.fifoQueue.remove(0);
+            this.cache.remove(keyToRemove);
 
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("Remove image from cache, key: " + keyToRemove);
@@ -43,25 +43,25 @@ public class AjaxFIFOImageCache {
             s_logger.trace("Add image to cache, key: " + key);
         }
 
-        cache.put(key, image);
-        fifoQueue.add(key);
+        this.cache.put(key, image);
+        this.fifoQueue.add(key);
         return key;
     }
 
     public synchronized int getNextKey() {
-        return ++nextKey;
+        return ++this.nextKey;
     }
 
     public synchronized byte[] getImage(int key) {
         if (key == 0) {
-            key = nextKey;
+            key = this.nextKey;
         }
-        if (cache.containsKey(key)) {
+        if (this.cache.containsKey(key)) {
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("Retrieve image from cache, key: " + key);
             }
 
-            return cache.get(key);
+            return this.cache.get(key);
         }
 
         if (s_logger.isTraceEnabled()) {

@@ -150,8 +150,8 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
     }
 
     private static void responseFileContent(final HttpExchange t, final File f) throws IOException {
-        try (OutputStream os = t.getResponseBody();
-             FileInputStream fis = new FileInputStream(f)) {
+        try (final OutputStream os = t.getResponseBody();
+             final FileInputStream fis = new FileInputStream(f)) {
             while (true) {
                 final byte[] b = new byte[8192];
                 final int n = fis.read(b);

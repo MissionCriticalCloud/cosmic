@@ -20,11 +20,11 @@ public class ConsoleProxyClientParam {
     private String password;
 
     public ConsoleProxyClientParam() {
-        clientHostPort = 0;
+        this.clientHostPort = 0;
     }
 
     public String getClientHostAddress() {
-        return clientHostAddress;
+        return this.clientHostAddress;
     }
 
     public void setClientHostAddress(final String clientHostAddress) {
@@ -32,7 +32,7 @@ public class ConsoleProxyClientParam {
     }
 
     public int getClientHostPort() {
-        return clientHostPort;
+        return this.clientHostPort;
     }
 
     public void setClientHostPort(final int clientHostPort) {
@@ -40,7 +40,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getClientHostPassword() {
-        return clientHostPassword;
+        return this.clientHostPassword;
     }
 
     public void setClientHostPassword(final String clientHostPassword) {
@@ -48,7 +48,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getClientTag() {
-        return clientTag;
+        return this.clientTag;
     }
 
     public void setClientTag(final String clientTag) {
@@ -56,7 +56,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getTicket() {
-        return ticket;
+        return this.ticket;
     }
 
     public void setTicket(final String ticket) {
@@ -64,7 +64,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getClientTunnelUrl() {
-        return clientTunnelUrl;
+        return this.clientTunnelUrl;
     }
 
     public void setClientTunnelUrl(final String clientTunnelUrl) {
@@ -72,7 +72,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getClientTunnelSession() {
-        return clientTunnelSession;
+        return this.clientTunnelSession;
     }
 
     public void setClientTunnelSession(final String clientTunnelSession) {
@@ -80,7 +80,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getAjaxSessionId() {
-        return ajaxSessionId;
+        return this.ajaxSessionId;
     }
 
     public void setAjaxSessionId(final String ajaxSessionId) {
@@ -88,7 +88,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getLocale() {
-        return locale;
+        return this.locale;
     }
 
     public void setLocale(final String locale) {
@@ -96,15 +96,15 @@ public class ConsoleProxyClientParam {
     }
 
     public String getClientMapKey() {
-        if (clientTag != null && !clientTag.isEmpty()) {
-            return clientTag;
+        if (this.clientTag != null && !this.clientTag.isEmpty()) {
+            return this.clientTag;
         }
 
-        return clientHostAddress + ":" + clientHostPort;
+        return this.clientHostAddress + ":" + this.clientHostPort;
     }
 
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public void setUsername(final String username) {
@@ -112,7 +112,7 @@ public class ConsoleProxyClientParam {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(final String password) {

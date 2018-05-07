@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Kelven Yang
- *         A simple password based encyrptor based on AES/CBC. It can serialize simple POJO object into URL safe string
- *         and deserialize it back.
+ * A simple password based encyrptor based on AES/CBC. It can serialize simple POJO object into URL safe string
+ * and deserialize it back.
  */
 public class ConsoleProxyPasswordBasedEncryptor {
     private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyPasswordBasedEncryptor.class);
@@ -30,8 +30,8 @@ public class ConsoleProxyPasswordBasedEncryptor {
     private final KeyIVPair keyIvPair;
 
     public ConsoleProxyPasswordBasedEncryptor(final String password) {
-        gson = new GsonBuilder().create();
-        keyIvPair = gson.fromJson(password, KeyIVPair.class);
+        this.gson = new GsonBuilder().create();
+        this.keyIvPair = this.gson.fromJson(password, KeyIVPair.class);
     }
 
     public <T> String encryptObject(final Class<?> clz, final T obj) {
@@ -39,7 +39,7 @@ public class ConsoleProxyPasswordBasedEncryptor {
             return null;
         }
 
-        final String json = gson.toJson(obj);
+        final String json = this.gson.toJson(obj);
         return encryptText(json);
     }
 
@@ -50,9 +50,9 @@ public class ConsoleProxyPasswordBasedEncryptor {
 
         try {
             final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            final SecretKeySpec keySpec = new SecretKeySpec(keyIvPair.getKeyBytes(), "AES");
+            final SecretKeySpec keySpec = new SecretKeySpec(this.keyIvPair.getKeyBytes(), "AES");
 
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(keyIvPair.getIvBytes()));
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(this.keyIvPair.getIvBytes()));
 
             final byte[] encryptedBytes = cipher.doFinal(text.getBytes());
             return Base64.encodeBase64URLSafeString(encryptedBytes);
@@ -83,7 +83,7 @@ public class ConsoleProxyPasswordBasedEncryptor {
         }
 
         final String json = decryptText(encrypted);
-        return (T) gson.fromJson(json, clz);
+        return (T) this.gson.fromJson(json, clz);
     }
 
     public String decryptText(final String encryptedText) {
@@ -93,8 +93,8 @@ public class ConsoleProxyPasswordBasedEncryptor {
 
         try {
             final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            final SecretKeySpec keySpec = new SecretKeySpec(keyIvPair.getKeyBytes(), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(keyIvPair.getIvBytes()));
+            final SecretKeySpec keySpec = new SecretKeySpec(this.keyIvPair.getKeyBytes(), "AES");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(this.keyIvPair.getIvBytes()));
 
             final byte[] encryptedBytes = Base64.decodeBase64(encryptedText);
             return new String(cipher.doFinal(encryptedBytes));
@@ -132,19 +132,19 @@ public class ConsoleProxyPasswordBasedEncryptor {
         }
 
         public byte[] getKeyBytes() {
-            return Base64.decodeBase64(base64EncodedKeyBytes);
+            return Base64.decodeBase64(this.base64EncodedKeyBytes);
         }
 
         public void setKeyBytes(final byte[] keyBytes) {
-            base64EncodedKeyBytes = Base64.encodeBase64URLSafeString(keyBytes);
+            this.base64EncodedKeyBytes = Base64.encodeBase64URLSafeString(keyBytes);
         }
 
         public byte[] getIvBytes() {
-            return Base64.decodeBase64(base64EncodedIvBytes);
+            return Base64.decodeBase64(this.base64EncodedIvBytes);
         }
 
         public void setIvBytes(final byte[] ivBytes) {
-            base64EncodedIvBytes = Base64.encodeBase64URLSafeString(ivBytes);
+            this.base64EncodedIvBytes = Base64.encodeBase64URLSafeString(ivBytes);
         }
     }
 }

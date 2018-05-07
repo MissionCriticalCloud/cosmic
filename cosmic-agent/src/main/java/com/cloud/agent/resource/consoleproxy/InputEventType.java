@@ -5,7 +5,7 @@ public enum InputEventType {
 
     int eventCode;
 
-    private InputEventType(final int eventCode) {
+    InputEventType(final int eventCode) {
         this.eventCode = eventCode;
     }
 
@@ -32,6 +32,6 @@ public enum InputEventType {
     }
 
     public int getEventCode() {
-        return eventCode;
+        return this.eventCode;
     }
 }

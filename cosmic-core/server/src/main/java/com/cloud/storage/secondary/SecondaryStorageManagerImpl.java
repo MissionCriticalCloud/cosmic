@@ -381,7 +381,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         buf.append(" workers=").append(this._configDao.getValue("workers"));
 
-        buf.append(" resource=com.cloud.secondarystorage.NfsSecondaryStorageResource");
+        buf.append(" resource=com.cloud.agent.resource.secondarystorage.NfsSecondaryStorageResource");
         buf.append(" instance=SecStorage");
         buf.append(" sslcopy=").append(Boolean.toString(this._useSSlCopy));
         buf.append(" role=").append(vm.getRole().toString());

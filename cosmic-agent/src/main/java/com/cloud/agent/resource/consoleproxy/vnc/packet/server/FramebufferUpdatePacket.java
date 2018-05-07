@@ -45,7 +45,7 @@ public class FramebufferUpdatePacket {
             switch (encodingType) {
 
                 case RfbConstants.ENCODING_RAW: {
-                    rect = new RawRect(screen, x, y, width, height, is);
+                    rect = new RawRect(this.screen, x, y, width, height, is);
                     break;
                 }
 
@@ -55,7 +55,7 @@ public class FramebufferUpdatePacket {
                 }
 
                 case RfbConstants.ENCODING_DESKTOP_SIZE: {
-                    rect = new FrameBufferSizeChangeRequest(canvas, width, height);
+                    rect = new FrameBufferSizeChangeRequest(this.canvas, width, height);
                     if (this.clientListener != null) {
                         this.clientListener.onFramebufferSizeChange(width, height);
                     }
@@ -66,7 +66,7 @@ public class FramebufferUpdatePacket {
                     throw new RuntimeException("Unsupported ecnoding: " + encodingType);
             }
 
-            paint(rect, canvas);
+            paint(rect, this.canvas);
 
             if (this.clientListener != null) {
                 this.clientListener.onFramebufferUpdate(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());

@@ -43,7 +43,7 @@ public class ConsoleProxyClientStatsCollector {
                 conns.add(conn);
             }
         }
-        connections = conns;
+        this.connections = conns;
     }
 
     public String getStatsReport() {

@@ -34,16 +34,16 @@ public class VncServerPacketReceiver implements Runnable {
     }
 
     public BufferedImageCanvas getCanvas() {
-        return canvas;
+        return this.canvas;
     }
 
     @Override
     public void run() {
         try {
-            while (connectionAlive) {
+            while (this.connectionAlive) {
 
                 // Read server message type
-                final int messageType = is.readUnsignedByte();
+                final int messageType = this.is.readUnsignedByte();
 
                 // Invoke packet handler by packet type.
                 switch (messageType) {
@@ -51,9 +51,9 @@ public class VncServerPacketReceiver implements Runnable {
                     case RfbConstants.SERVER_FRAMEBUFFER_UPDATE: {
                         // Notify sender that frame buffer update is received,
                         // so it can send another frame buffer update request
-                        fburListener.frameBufferPacketReceived();
+                        this.fburListener.frameBufferPacketReceived();
                         // Handle frame buffer update
-                        new FramebufferUpdatePacket(canvas, screen, is, clientListener);
+                        new FramebufferUpdatePacket(this.canvas, this.screen, this.is, this.clientListener);
                         break;
                     }
 
@@ -63,7 +63,7 @@ public class VncServerPacketReceiver implements Runnable {
                     }
 
                     case RfbConstants.SERVER_CUT_TEXT: {
-                        serverCutText(is);
+                        serverCutText(this.is);
                         break;
                     }
 
@@ -73,12 +73,12 @@ public class VncServerPacketReceiver implements Runnable {
             }
         } catch (final IOException e) {
             s_logger.error("Unexpected exception: ", e);
-            if (connectionAlive) {
+            if (this.connectionAlive) {
                 closeConnection();
             }
         } finally {
             s_logger.info("Receiving thread exit processing, shutdown connection");
-            vncConnection.shutdown();
+            this.vncConnection.shutdown();
         }
     }
 
@@ -101,10 +101,10 @@ public class VncServerPacketReceiver implements Runnable {
     }
 
     public void closeConnection() {
-        connectionAlive = false;
+        this.connectionAlive = false;
     }
 
     public boolean isConnectionAlive() {
-        return connectionAlive;
+        return this.connectionAlive;
     }
 }

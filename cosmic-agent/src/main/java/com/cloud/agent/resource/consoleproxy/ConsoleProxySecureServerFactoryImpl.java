@@ -49,8 +49,8 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
                 tmf.init(ks);
                 s_logger.info("Trust manager factory is initialized");
 
-                sslContext = SSLContext.getInstance("TLSv1.2");
-                sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+                this.sslContext = SSLContext.getInstance("TLSv1.2");
+                this.sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
                 s_logger.info("SSL context is initialized");
             } catch (final Exception e) {
                 s_logger.error("Unable to init factory due to exception ", e);
@@ -62,7 +62,7 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
     public HttpServer createHttpServerInstance(final int port) throws IOException {
         try {
             final HttpsServer server = HttpsServer.create(new InetSocketAddress(port), 5);
-            server.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
+            server.setHttpsConfigurator(new HttpsConfigurator(ConsoleProxySecureServerFactoryImpl.this.sslContext) {
                 @Override
                 public void configure(final HttpsParameters params) {
                     final SSLContext c = getSSLContext();
@@ -87,7 +87,7 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
     @Override
     public SSLServerSocket createSSLServerSocket(final int port) throws IOException {
         try {
-            final SSLServerSocketFactory ssf = sslContext.getServerSocketFactory();
+            final SSLServerSocketFactory ssf = this.sslContext.getServerSocketFactory();
             final SSLServerSocket srvSock = (SSLServerSocket) ssf.createServerSocket(port);
 
             s_logger.info("create SSL server socket on port: " + port);

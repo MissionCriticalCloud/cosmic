@@ -34,16 +34,16 @@ public class ConsoleProxyGCThread extends Thread {
             bReportLoad = false;
 
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("connMap=" + connMap);
+                s_logger.debug("connMap=" + this.connMap);
             }
-            final Enumeration<String> e = connMap.keys();
+            final Enumeration<String> e = this.connMap.keys();
             while (e.hasMoreElements()) {
                 final String key;
                 final ConsoleProxyClient client;
 
-                synchronized (connMap) {
+                synchronized (this.connMap) {
                     key = e.nextElement();
-                    client = connMap.get(key);
+                    client = this.connMap.get(key);
                 }
 
                 final long seconds_unused = (System.currentTimeMillis() - client.getClientLastFrontEndActivityTime()) / 1000;
@@ -51,8 +51,8 @@ public class ConsoleProxyGCThread extends Thread {
                     continue;
                 }
 
-                synchronized (connMap) {
-                    connMap.remove(key);
+                synchronized (this.connMap) {
+                    this.connMap.remove(key);
                     bReportLoad = true;
                 }
 
@@ -63,7 +63,7 @@ public class ConsoleProxyGCThread extends Thread {
 
             if (bReportLoad || System.currentTimeMillis() - lastReportTick > 5000) {
                 // report load changes
-                final String loadInfo = new ConsoleProxyClientStatsCollector(connMap).getStatsReport();
+                final String loadInfo = new ConsoleProxyClientStatsCollector(this.connMap).getStatsReport();
                 ConsoleProxy.reportLoadInfo(loadInfo);
                 lastReportTick = System.currentTimeMillis();
 
@@ -81,11 +81,11 @@ public class ConsoleProxyGCThread extends Thread {
     }
 
     private void cleanupLogging() {
-        if (lastLogScan != 0 && System.currentTimeMillis() - lastLogScan < 3600000) {
+        if (this.lastLogScan != 0 && System.currentTimeMillis() - this.lastLogScan < 3600000) {
             return;
         }
 
-        lastLogScan = System.currentTimeMillis();
+        this.lastLogScan = System.currentTimeMillis();
 
         final File logDir = new File("./logs");
         final File[] files = logDir.listFiles();

@@ -40,8 +40,8 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
     protected int resizedFramebufferHeight;
 
     public ConsoleProxyClientBase() {
-        tracker = new TileTracker();
-        tracker.initTracking(64, 64, 800, 600);
+        this.tracker = new TileTracker();
+        this.tracker.initTracking(64, 64, 800, 600);
     }
 
     //
@@ -56,7 +56,7 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
     //
     @Override
     public int getClientId() {
-        return clientId;
+        return this.clientId;
     }
 
     @Override
@@ -72,7 +72,7 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
 
     @Override
     public AjaxFIFOImageCache getAjaxImageCache() {
-        return ajaxImageCache;
+        return this.ajaxImageCache;
     }
 
     @Override
@@ -94,20 +94,20 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
         }
 
         synchronized (this) {
-            ajaxSessionId++;
-            framebufferResized = false;
+            this.ajaxSessionId++;
+            this.framebufferResized = false;
         }
 
-        final int tileWidth = tracker.getTileWidth();
-        final int tileHeight = tracker.getTileHeight();
-        final int width = tracker.getTrackWidth();
-        final int height = tracker.getTrackHeight();
+        final int tileWidth = this.tracker.getTileWidth();
+        final int tileHeight = this.tracker.getTileHeight();
+        final int width = this.tracker.getTrackWidth();
+        final int height = this.tracker.getTrackHeight();
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Ajax client start, frame buffer w: " + width + ", " + height);
         }
 
-        final List<TileInfo> tiles = tracker.scan(true);
+        final List<TileInfo> tiles = this.tracker.scan(true);
         final String imgUrl = prepareAjaxImage(tiles, true);
         final String updateUrl = prepareAjaxSession(true);
 
@@ -133,10 +133,10 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
             return onAjaxClientDisconnected();
         }
 
-        synchronized (tileDirtyEvent) {
-            if (!dirtyFlag) {
+        synchronized (this.tileDirtyEvent) {
+            if (!this.dirtyFlag) {
                 try {
-                    tileDirtyEvent.wait(3000);
+                    this.tileDirtyEvent.wait(3000);
                 } catch (final InterruptedException e) {
                     s_logger.debug("[ignored] Console proxy ajax update was interupted while waiting for viewer to become ready.");
                 }
@@ -145,8 +145,8 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
 
         boolean doResize = false;
         synchronized (this) {
-            if (framebufferResized) {
-                framebufferResized = false;
+            if (this.framebufferResized) {
+                this.framebufferResized = false;
                 doResize = true;
             }
         }
@@ -154,11 +154,11 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
         final List<TileInfo> tiles;
 
         if (doResize) {
-            tiles = tracker.scan(true);
+            tiles = this.tracker.scan(true);
         } else {
-            tiles = tracker.scan(false);
+            tiles = this.tracker.scan(false);
         }
-        dirtyFlag = false;
+        this.dirtyFlag = false;
 
         final String imgUrl = prepareAjaxImage(tiles, false);
         final StringBuffer sbTileSequence = new StringBuffer();
@@ -172,8 +172,8 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
             i++;
         }
 
-        return getAjaxViewerUpdatePageContent(sbTileSequence.toString(), imgUrl, doResize, resizedFramebufferWidth, resizedFramebufferHeight, tracker.getTileWidth(),
-                tracker.getTileHeight());
+        return getAjaxViewerUpdatePageContent(sbTileSequence.toString(), imgUrl, doResize, this.resizedFramebufferWidth, this.resizedFramebufferHeight, this.tracker.getTileWidth(),
+                this.tracker.getTileHeight());
     }
 
     @Override
@@ -189,33 +189,33 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
 
     @Override
     public long getClientCreateTime() {
-        return createTime;
+        return this.createTime;
     }
 
     @Override
     public long getClientLastFrontEndActivityTime() {
-        return lastFrontEndActivityTime;
+        return this.lastFrontEndActivityTime;
     }
 
     @Override
     public String getClientHostAddress() {
-        return clientParam.getClientHostAddress();
+        return this.clientParam.getClientHostAddress();
     }
 
     @Override
     public int getClientHostPort() {
-        return clientParam.getClientHostPort();
+        return this.clientParam.getClientHostPort();
     }
 
     @Override
     public String getClientHostPassword() {
-        return clientParam.getClientHostPassword();
+        return this.clientParam.getClientHostPassword();
     }
 
     @Override
     public String getClientTag() {
-        if (clientParam.getClientTag() != null) {
-            return clientParam.getClientTag();
+        if (this.clientParam.getClientTag() != null) {
+            return this.clientParam.getClientTag();
         }
         return "";
     }
@@ -247,7 +247,7 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
     }
 
     public void updateFrontEndActivityTime() {
-        lastFrontEndActivityTime = System.currentTimeMillis();
+        this.lastFrontEndActivityTime = System.currentTimeMillis();
     }
 
     private boolean waitForViewerReady() {
@@ -276,7 +276,7 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
         if (init) {
             imgBits = getFrameBufferJpeg();
         } else {
-            imgBits = getTilesMergedJpeg(tiles, tracker.getTileWidth(), tracker.getTileHeight());
+            imgBits = getTilesMergedJpeg(tiles, this.tracker.getTileWidth(), this.tracker.getTileHeight());
         }
 
         if (imgBits == null) {
@@ -287,9 +287,9 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
             }
         }
 
-        final int key = ajaxImageCache.putImage(imgBits);
+        final int key = this.ajaxImageCache.putImage(imgBits);
         final StringBuffer sb = new StringBuffer();
-        sb.append("/ajaximg?token=").append(clientToken);
+        sb.append("/ajaximg?token=").append(this.clientToken);
         sb.append("&key=").append(key);
         sb.append("&ts=").append(System.currentTimeMillis());
 
@@ -299,12 +299,12 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
     private String prepareAjaxSession(final boolean init) {
         if (init) {
             synchronized (this) {
-                ajaxSessionId++;
+                this.ajaxSessionId++;
             }
         }
 
         final StringBuffer sb = new StringBuffer();
-        sb.append("/ajax?token=").append(clientToken).append("&sess=").append(ajaxSessionId);
+        sb.append("/ajax?token=").append(this.clientToken).append("&sess=").append(this.ajaxSessionId);
         return sb.toString();
     }
 
@@ -385,12 +385,12 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
     //
     @Override
     public void onFramebufferSizeChange(final int w, final int h) {
-        tracker.resize(w, h);
+        this.tracker.resize(w, h);
 
         synchronized (this) {
-            framebufferResized = true;
-            resizedFramebufferWidth = w;
-            resizedFramebufferHeight = h;
+            this.framebufferResized = true;
+            this.resizedFramebufferWidth = w;
+            this.resizedFramebufferHeight = h;
         }
 
         signalTileDirtyEvent();
@@ -401,20 +401,20 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Frame buffer update {" + x + "," + y + "," + w + "," + h + "}");
         }
-        tracker.invalidate(new Rectangle(x, y, w, h));
+        this.tracker.invalidate(new Rectangle(x, y, w, h));
 
         signalTileDirtyEvent();
     }
 
     private void signalTileDirtyEvent() {
-        synchronized (tileDirtyEvent) {
-            dirtyFlag = true;
-            tileDirtyEvent.notifyAll();
+        synchronized (this.tileDirtyEvent) {
+            this.dirtyFlag = true;
+            this.tileDirtyEvent.notifyAll();
         }
     }
 
     public ConsoleProxyClientParam getClientParam() {
-        return clientParam;
+        return this.clientParam;
     }
 
     public void setClientParam(final ConsoleProxyClientParam clientParam) {
