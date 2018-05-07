@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
 

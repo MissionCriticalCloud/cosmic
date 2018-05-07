@@ -1,6 +1,6 @@
 package com.cloud.consoleproxy.vnc;
 
-import com.cloud.consoleproxy.ConsoleProxyClientListener;
+import com.cloud.agent.resource.consoleproxy.ConsoleProxyClientListener;
 import com.cloud.consoleproxy.vnc.packet.server.FramebufferUpdatePacket;
 import com.cloud.consoleproxy.vnc.packet.server.ServerCutText;
 

@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 import com.cloud.consoleproxy.util.TileInfo;
 import com.cloud.consoleproxy.util.TileTracker;

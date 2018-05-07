@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 public interface ConsoleProxyClientListener {
     void onFramebufferSizeChange(int w, int h);

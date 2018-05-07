@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 /**
  * Data object to store parameter info needed by client to connect to its host

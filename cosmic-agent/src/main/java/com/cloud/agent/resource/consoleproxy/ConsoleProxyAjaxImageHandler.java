@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

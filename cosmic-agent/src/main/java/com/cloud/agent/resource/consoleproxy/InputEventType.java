@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 public enum InputEventType {
     MOUSE_MOVE(1), MOUSE_DOWN(2), MOUSE_UP(3), KEY_PRESS(4), KEY_DOWN(5), KEY_UP(6), MOUSE_DBLCLICK(8);

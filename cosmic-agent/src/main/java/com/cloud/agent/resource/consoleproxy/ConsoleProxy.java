@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy;
+package com.cloud.agent.resource.consoleproxy;
 
 import com.cloud.utils.PropertiesUtil;
 
@@ -193,7 +193,7 @@ public class ConsoleProxy {
         if (s != null && s.equalsIgnoreCase("true")) {
             s_logger.info("Premium setting will override settings from consoleproxy.properties, listen at port 443");
             httpListenPort = 443;
-            factoryClzName = "com.cloud.consoleproxy.ConsoleProxySecureServerFactoryImpl";
+            factoryClzName = "com.cloud.agent.resource.consoleproxy.ConsoleProxySecureServerFactoryImpl";
         } else {
             factoryClzName = ConsoleProxyBaseServerFactoryImpl.class.getName();
         }

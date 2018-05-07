@@ -1,6 +1,6 @@
 package com.cloud.consoleproxy.vnc.packet.server;
 
-import com.cloud.consoleproxy.ConsoleProxyClientListener;
+import com.cloud.agent.resource.consoleproxy.ConsoleProxyClientListener;
 import com.cloud.consoleproxy.vnc.BufferedImageCanvas;
 import com.cloud.consoleproxy.vnc.RfbConstants;
 import com.cloud.consoleproxy.vnc.VncScreenDescription;
