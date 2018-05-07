@@ -11,11 +11,11 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.StorageLayer;
 import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;

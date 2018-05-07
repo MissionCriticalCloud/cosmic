@@ -3,9 +3,9 @@ package com.cloud.storage.resource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.JavaStorageLayer;
 import com.cloud.storage.template.DownloadManagerImpl;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.JavaStorageLayer;
 
 import java.net.URI;
 import java.util.concurrent.Executors;
@@ -21,8 +21,8 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
 
     public LocalNfsSecondaryStorageResource() {
         this._dlMgr = new DownloadManagerImpl();
-        ((DownloadManagerImpl) _dlMgr).setThreadPool(Executors.newFixedThreadPool(10));
-        _storage = new JavaStorageLayer();
+        ((DownloadManagerImpl) this._dlMgr).setThreadPool(Executors.newFixedThreadPool(10));
+        this._storage = new JavaStorageLayer();
         this._inSystemVM = false;
     }
 
@@ -36,7 +36,7 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
         try {
             final URI uri = new URI(secUrl);
             final String dir = mountUri(uri);
-            return _parent + "/" + dir;
+            return this._parent + "/" + dir;
         } catch (final Exception e) {
             final String msg = "GetRootDir for " + secUrl + " failed due to " + e.toString();
             s_logger.error(msg, e);
@@ -60,7 +60,7 @@ public class LocalNfsSecondaryStorageResource extends NfsSecondaryStorageResourc
         attemptMount(localRootPath, remoteDevice, uri);
 
         // Change permissions for the mountpoint - seems to bypass authentication
-        final Script script = new Script(true, "chmod", _timeout, s_logger);
+        final Script script = new Script(true, "chmod", this._timeout, s_logger);
         script.add("777", localRootPath);
         final String result = script.execute();
         if (result != null) {

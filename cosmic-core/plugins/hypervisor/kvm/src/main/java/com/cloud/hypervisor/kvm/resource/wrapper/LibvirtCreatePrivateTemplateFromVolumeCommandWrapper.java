@@ -13,7 +13,6 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.StorageLayer;
 import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.QCOW2Processor;
@@ -23,6 +22,7 @@ import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.qemu.QemuImgException;
 import com.cloud.utils.qemu.QemuImgFile;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -121,7 +121,7 @@ public final class LibvirtCreatePrivateTemplateFromVolumeCommandWrapper
                 final Date date = new Date();
                 templateContent += "snapshot.name=" + dateFormat.format(date) + System.getProperty("line.separator");
 
-                try (FileOutputStream templFo = new FileOutputStream(templateProp)) {
+                try (final FileOutputStream templFo = new FileOutputStream(templateProp)) {
                     templFo.write(templateContent.getBytes("UTF-8"));
                     templFo.flush();
                 } catch (final IOException ex) {

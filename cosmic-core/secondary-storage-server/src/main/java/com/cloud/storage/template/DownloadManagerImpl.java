@@ -13,7 +13,6 @@ import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.storage.template.Processor.FormatInfo;
@@ -24,6 +23,7 @@ import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.BufferedReader;
@@ -97,7 +97,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     public void setStorageLayer(final StorageLayer storage) {
-        _storage = storage;
+        this._storage = storage;
     }
 
     /**
@@ -108,7 +108,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
      * @param status the status of the job
      */
     public void setDownloadStatus(final String jobId, final Status status) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj == null) {
             s_logger.warn("setDownloadStatus for jobId: " + jobId + ", status=" + status + " no job found");
             return;
@@ -130,10 +130,10 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             case IN_PROGRESS:
                 s_logger.info("Resuming jobId: " + jobId + ", status=" + status);
                 td.setResume(true);
-                threadPool.execute(td);
+                this.threadPool.execute(td);
                 break;
             case RECOVERABLE_ERROR:
-                threadPool.execute(td);
+                this.threadPool.execute(td);
                 break;
             case DOWNLOAD_FINISHED:
                 // For other TemplateDownloaders where files are locally available,
@@ -163,7 +163,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
      * @throws IOException
      */
     private String postLocalDownload(final String jobId) {
-        final DownloadJob dnld = jobs.get(jobId);
+        final DownloadJob dnld = this.jobs.get(jobId);
         final TemplateDownloader td = dnld.getTemplateDownloader();
         final String resourcePath = dnld.getInstallPathPrefix(); // path with mount
         // directory
@@ -179,11 +179,11 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         }
         dnld.setCheckSum(checkSum);
 
-        int imgSizeGigs = (int) Math.ceil(_storage.getSize(td.getDownloadLocalPath()) * 1.0d / (1024 * 1024 * 1024));
+        int imgSizeGigs = (int) Math.ceil(this._storage.getSize(td.getDownloadLocalPath()) * 1.0d / (1024 * 1024 * 1024));
         imgSizeGigs++; // add one just in case
-        final long timeout = (long) imgSizeGigs * installTimeoutPerGig;
+        final long timeout = (long) imgSizeGigs * this.installTimeoutPerGig;
         Script scr = null;
-        final String script = resourceType == ResourceType.TEMPLATE ? createTmpltScr : createVolScr;
+        final String script = resourceType == ResourceType.TEMPLATE ? this.createTmpltScr : this.createVolScr;
         scr = new Script(script, timeout, s_logger);
         scr.add("-s", Integer.toString(imgSizeGigs));
         scr.add("-S", Long.toString(td.getMaxTemplateSizeInBytes()));
@@ -194,9 +194,9 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         final String extension = dnld.getFormat().getFileExtension();
         String templateName = "";
         if (extension.equals("iso")) {
-            templateName = jobs.get(jobId).getTmpltName().trim().replace(" ", "_");
+            templateName = this.jobs.get(jobId).getTmpltName().trim().replace(" ", "_");
         } else {
-            templateName = java.util.UUID.nameUUIDFromBytes((jobs.get(jobId).getTmpltName() + System.currentTimeMillis()).getBytes(StringUtils.getPreferredCharset())).toString();
+            templateName = java.util.UUID.nameUUIDFromBytes((this.jobs.get(jobId).getTmpltName() + System.currentTimeMillis()).getBytes(StringUtils.getPreferredCharset())).toString();
         }
 
         // run script to mv the temporary template file to the final template
@@ -221,7 +221,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
         // Set permissions for the downloaded template
         final File downloadedTemplate = new File(resourcePath + "/" + templateFilename);
-        _storage.setWorldReadableAndWriteable(downloadedTemplate);
+        this._storage.setWorldReadableAndWriteable(downloadedTemplate);
 
         // Set permissions for template/volume.properties
         String propertiesFile = resourcePath;
@@ -231,9 +231,9 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             propertiesFile += "/volume.properties";
         }
         final File templateProperties = new File(propertiesFile);
-        _storage.setWorldReadableAndWriteable(templateProperties);
+        this._storage.setWorldReadableAndWriteable(templateProperties);
 
-        final TemplateLocation loc = new TemplateLocation(_storage, resourcePath);
+        final TemplateLocation loc = new TemplateLocation(this._storage, resourcePath);
         try {
             loc.create(dnld.getId(), true, dnld.getTmpltName());
         } catch (final IOException e) {
@@ -242,7 +242,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             return "Unable to download due to " + e.getMessage();
         }
 
-        final Iterator<Processor> en = _processors.values().iterator();
+        final Iterator<Processor> en = this._processors.values().iterator();
         while (en.hasNext()) {
             final Processor processor = en.next();
 
@@ -313,13 +313,13 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
         try {
 
-            if (!_storage.mkdirs(tmpDir)) {
+            if (!this._storage.mkdirs(tmpDir)) {
                 s_logger.warn("Unable to create " + tmpDir);
                 return "Unable to create " + tmpDir;
             }
             // TO DO - define constant for volume properties.
             final File file =
-                    ResourceType.TEMPLATE == resourceType ? _storage.getFile(tmpDir + File.separator + TemplateLocation.Filename) : _storage.getFile(tmpDir + File.separator +
+                    ResourceType.TEMPLATE == resourceType ? this._storage.getFile(tmpDir + File.separator + TemplateLocation.Filename) : this._storage.getFile(tmpDir + File.separator +
                             "volume.properties");
             if (file.exists()) {
                 if (!file.delete()) {
@@ -341,11 +341,11 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             final TemplateDownloader td;
             if (uri != null && uri.getScheme() != null) {
                 if (uri.getScheme().equalsIgnoreCase("http") || uri.getScheme().equalsIgnoreCase("https")) {
-                    td = new HttpTemplateDownloader(_storage, url, tmpDir, new Completion(jobId), maxTemplateSizeInBytes, user, password, proxy, resourceType);
+                    td = new HttpTemplateDownloader(this._storage, url, tmpDir, new Completion(jobId), maxTemplateSizeInBytes, user, password, proxy, resourceType);
                 } else if (uri.getScheme().equalsIgnoreCase("file")) {
-                    td = new LocalTemplateDownloader(_storage, url, tmpDir, maxTemplateSizeInBytes, new Completion(jobId));
+                    td = new LocalTemplateDownloader(this._storage, url, tmpDir, maxTemplateSizeInBytes, new Completion(jobId));
                 } else if (uri.getScheme().equalsIgnoreCase("scp")) {
-                    td = new ScpTemplateDownloader(_storage, url, tmpDir, maxTemplateSizeInBytes, new Completion(jobId));
+                    td = new ScpTemplateDownloader(this._storage, url, tmpDir, maxTemplateSizeInBytes, new Completion(jobId));
                 } else if (uri.getScheme().equalsIgnoreCase("nfs") || uri.getScheme().equalsIgnoreCase("cifs")) {
                     td = null;
                     // TODO: implement this.
@@ -363,8 +363,8 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             // secondary storage.
             final DownloadJob dj = new DownloadJob(td, jobId, id, name, format, accountId, descr, cksum, installPathPrefix, resourceType);
             dj.setTmpltPath(templatePath);
-            jobs.put(jobId, dj);
-            threadPool.execute(td);
+            this.jobs.put(jobId, dj);
+            this.threadPool.execute(td);
 
             return jobId;
         } catch (final IOException e) {
@@ -375,12 +375,12 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
     @Override
     public Map<String, Processor> getProcessors() {
-        return _processors;
+        return this._processors;
     }
 
     @Override
     public Status getDownloadStatus(final String jobId) {
-        final DownloadJob job = jobs.get(jobId);
+        final DownloadJob job = this.jobs.get(jobId);
         if (job != null) {
             final TemplateDownloader td = job.getTemplateDownloader();
             if (td != null) {
@@ -397,7 +397,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
     @Override
     public int getDownloadPct(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getTemplateDownloader().getDownloadPercent();
         }
@@ -406,7 +406,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
     @Override
     public String getDownloadError(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getTemplateDownloader().getDownloadError();
         }
@@ -459,21 +459,21 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     @Override
     public Map<String, TemplateProp> gatherTemplateInfo(final String rootDir) {
         final Map<String, TemplateProp> result = new HashMap<>();
-        final String templateDir = rootDir + File.separator + _templateDir;
+        final String templateDir = rootDir + File.separator + this._templateDir;
 
-        if (!_storage.exists(templateDir)) {
-            _storage.mkdirs(templateDir);
+        if (!this._storage.exists(templateDir)) {
+            this._storage.mkdirs(templateDir);
         }
 
         final List<String> publicTmplts = listTemplates(templateDir);
         for (final String tmplt : publicTmplts) {
             final String path = tmplt.substring(0, tmplt.lastIndexOf(File.separator));
-            final TemplateLocation loc = new TemplateLocation(_storage, path);
+            final TemplateLocation loc = new TemplateLocation(this._storage, path);
             try {
                 if (!loc.load()) {
                     s_logger.warn("Post download installation was not completed for " + path);
                     // loc.purge();
-                    _storage.cleanup(path, templateDir);
+                    this._storage.cleanup(path, templateDir);
                     continue;
                 }
             } catch (final IOException e) {
@@ -503,7 +503,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     private List<String> listTemplates(final String rootdir) {
         final List<String> result = new ArrayList<>();
 
-        final Script script = new Script(listTmpltScr, s_logger);
+        final Script script = new Script(this.listTmpltScr, s_logger);
         script.add("-r", rootdir);
         final ZfsPathParser zpp = new ZfsPathParser(rootdir);
         script.execute(zpp);
@@ -515,21 +515,21 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     @Override
     public Map<Long, TemplateProp> gatherVolumeInfo(final String rootDir) {
         final Map<Long, TemplateProp> result = new HashMap<>();
-        final String volumeDir = rootDir + File.separator + _volumeDir;
+        final String volumeDir = rootDir + File.separator + this._volumeDir;
 
-        if (!_storage.exists(volumeDir)) {
-            _storage.mkdirs(volumeDir);
+        if (!this._storage.exists(volumeDir)) {
+            this._storage.mkdirs(volumeDir);
         }
 
         final List<String> vols = listVolumes(volumeDir);
         for (final String vol : vols) {
             final String path = vol.substring(0, vol.lastIndexOf(File.separator));
-            final TemplateLocation loc = new TemplateLocation(_storage, path);
+            final TemplateLocation loc = new TemplateLocation(this._storage, path);
             try {
                 if (!loc.load()) {
                     s_logger.warn("Post download installation was not completed for " + path);
                     // loc.purge();
-                    _storage.cleanup(path, volumeDir);
+                    this._storage.cleanup(path, volumeDir);
                     continue;
                 }
             } catch (final IOException e) {
@@ -548,7 +548,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     private List<String> listVolumes(final String rootdir) {
         final List<String> result = new ArrayList<>();
 
-        final Script script = new Script(listVolScr, s_logger);
+        final Script script = new Script(this.listVolScr, s_logger);
         script.add("-r", rootdir);
         final ZfsPathParser zpp = new ZfsPathParser(rootdir);
         script.execute(zpp);
@@ -558,7 +558,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     public long getDownloadTemplateSize(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getTemplatesize();
         }
@@ -566,7 +566,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     public String getDownloadCheckSum(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getChecksum();
         }
@@ -574,7 +574,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     public long getDownloadTemplatePhysicalSize(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getTemplatePhysicalSize();
         }
@@ -583,7 +583,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
     // @Override
     public String getDownloadLocalPath(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getTemplateDownloader().getDownloadLocalPath();
         }
@@ -603,7 +603,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         final DownloadAnswer answer;
         DownloadJob dj = null;
         if (jobId != null) {
-            dj = jobs.get(jobId);
+            dj = this.jobs.get(jobId);
         }
         if (dj == null) {
             if (cmd.getRequest() == RequestType.GET_OR_RESTART) {
@@ -624,14 +624,14 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             case RESTART:
                 td.stopDownload();
                 sleep();
-                threadPool.execute(td);
+                this.threadPool.execute(td);
                 break;
             case PURGE:
                 td.stopDownload();
                 answer =
                         new DownloadAnswer(jobId, getDownloadPct(jobId), getDownloadError(jobId), getDownloadStatus2(jobId), getDownloadLocalPath(jobId),
                                 getInstallPath(jobId), getDownloadTemplateSize(jobId), getDownloadTemplatePhysicalSize(jobId), getDownloadCheckSum(jobId));
-                jobs.remove(jobId);
+                this.jobs.remove(jobId);
                 return answer;
             default:
                 break; // TODO
@@ -641,7 +641,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     private String getInstallPath(final String jobId) {
-        final DownloadJob dj = jobs.get(jobId);
+        final DownloadJob dj = this.jobs.get(jobId);
         if (dj != null) {
             return dj.getTmpltPath();
         }
@@ -650,17 +650,17 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
     @Override
     public String getName() {
-        return _name;
+        return this._name;
     }
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
+        this._name = name;
 
         String value = null;
 
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             value = (String) params.get(StorageLayer.ClassConfigKey);
             if (value == null) {
                 throw new ConfigurationException("Unable to find the storage layer");
@@ -669,7 +669,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             final Class<StorageLayer> clazz;
             try {
                 clazz = (Class<StorageLayer>) Class.forName(value);
-                _storage = clazz.newInstance();
+                this._storage = clazz.newInstance();
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException("Unable to instantiate " + value);
             } catch (final InstantiationException e) {
@@ -680,7 +680,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         }
 
         value = (String) params.get("install.timeout.pergig");
-        installTimeoutPerGig = NumbersUtil.parseInt(value, 15 * 60) * 1000;
+        this.installTimeoutPerGig = NumbersUtil.parseInt(value, 15 * 60) * 1000;
 
         value = (String) params.get("install.numthreads");
         final int numInstallThreads = NumbersUtil.parseInt(value, 10);
@@ -690,60 +690,60 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             scriptsDir = "scripts/storage/secondary";
         }
 
-        listTmpltScr = Script.findScript(scriptsDir, "listvmtmplt.sh");
-        if (listTmpltScr == null) {
+        this.listTmpltScr = Script.findScript(scriptsDir, "listvmtmplt.sh");
+        if (this.listTmpltScr == null) {
             throw new ConfigurationException("Unable to find the listvmtmplt.sh");
         }
-        s_logger.info("listvmtmplt.sh found in " + listTmpltScr);
+        s_logger.info("listvmtmplt.sh found in " + this.listTmpltScr);
 
-        createTmpltScr = Script.findScript(scriptsDir, "createtmplt.sh");
-        if (createTmpltScr == null) {
+        this.createTmpltScr = Script.findScript(scriptsDir, "createtmplt.sh");
+        if (this.createTmpltScr == null) {
             throw new ConfigurationException("Unable to find createtmplt.sh");
         }
-        s_logger.info("createtmplt.sh found in " + createTmpltScr);
+        s_logger.info("createtmplt.sh found in " + this.createTmpltScr);
 
-        listVolScr = Script.findScript(scriptsDir, "listvolume.sh");
-        if (listVolScr == null) {
+        this.listVolScr = Script.findScript(scriptsDir, "listvolume.sh");
+        if (this.listVolScr == null) {
             throw new ConfigurationException("Unable to find the listvolume.sh");
         }
-        s_logger.info("listvolume.sh found in " + listVolScr);
+        s_logger.info("listvolume.sh found in " + this.listVolScr);
 
-        createVolScr = Script.findScript(scriptsDir, "createvolume.sh");
-        if (createVolScr == null) {
+        this.createVolScr = Script.findScript(scriptsDir, "createvolume.sh");
+        if (this.createVolScr == null) {
             throw new ConfigurationException("Unable to find createvolume.sh");
         }
-        s_logger.info("createvolume.sh found in " + createVolScr);
+        s_logger.info("createvolume.sh found in " + this.createVolScr);
 
-        _processors = new HashMap<>();
+        this._processors = new HashMap<>();
 
         Processor processor = new VhdProcessor();
         processor.configure("VHD Processor", params);
-        _processors.put("VHD Processor", processor);
+        this._processors.put("VHD Processor", processor);
 
         processor = new IsoProcessor();
         processor.configure("ISO Processor", params);
-        _processors.put("ISO Processor", processor);
+        this._processors.put("ISO Processor", processor);
 
         processor = new QCOW2Processor();
         processor.configure("QCOW2 Processor", params);
-        _processors.put("QCOW2 Processor", processor);
+        this._processors.put("QCOW2 Processor", processor);
 
         processor = new RawImageProcessor();
         processor.configure("Raw Image Processor", params);
-        _processors.put("Raw Image Processor", processor);
+        this._processors.put("Raw Image Processor", processor);
 
         processor = new TARProcessor();
         processor.configure("TAR Processor", params);
-        _processors.put("TAR Processor", processor);
+        this._processors.put("TAR Processor", processor);
 
-        _templateDir = (String) params.get("public.templates.root.dir");
-        if (_templateDir == null) {
-            _templateDir = TemplateConstants.DEFAULT_TMPLT_ROOT_DIR;
+        this._templateDir = (String) params.get("public.templates.root.dir");
+        if (this._templateDir == null) {
+            this._templateDir = TemplateConstants.DEFAULT_TMPLT_ROOT_DIR;
         }
-        _templateDir += File.separator + TemplateConstants.DEFAULT_TMPLT_FIRST_LEVEL_DIR;
-        _volumeDir = TemplateConstants.DEFAULT_VOLUME_ROOT_DIR + File.separator;
+        this._templateDir += File.separator + TemplateConstants.DEFAULT_TMPLT_FIRST_LEVEL_DIR;
+        this._volumeDir = TemplateConstants.DEFAULT_VOLUME_ROOT_DIR + File.separator;
         // Add more processors here.
-        threadPool = Executors.newFixedThreadPool(numInstallThreads);
+        this.threadPool = Executors.newFixedThreadPool(numInstallThreads);
         return true;
     }
 
@@ -776,44 +776,44 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             this.td = td;
             this.tmpltName = tmpltName;
             this.format = format;
-            description = descr;
-            checksum = cksum;
+            this.description = descr;
+            this.checksum = cksum;
             this.installPathPrefix = installPathPrefix;
-            templatesize = 0;
+            this.templatesize = 0;
             this.id = id;
             this.resourceType = resourceType;
         }
 
         public String getDescription() {
-            return description;
+            return this.description;
         }
 
         public String getChecksum() {
-            return checksum;
+            return this.checksum;
         }
 
         public TemplateDownloader getTemplateDownloader() {
-            return td;
+            return this.td;
         }
 
         public String getTmpltName() {
-            return tmpltName;
+            return this.tmpltName;
         }
 
         public ImageFormat getFormat() {
-            return format;
+            return this.format;
         }
 
         public long getId() {
-            return id;
+            return this.id;
         }
 
         public ResourceType getResourceType() {
-            return resourceType;
+            return this.resourceType;
         }
 
         public String getTmpltPath() {
-            return tmpltPath;
+            return this.tmpltPath;
         }
 
         public void setTmpltPath(final String tmpltPath) {
@@ -821,12 +821,12 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         }
 
         public String getInstallPathPrefix() {
-            return installPathPrefix;
+            return this.installPathPrefix;
         }
 
         public void cleanup() {
-            if (td != null) {
-                final String dnldPath = td.getDownloadLocalPath();
+            if (this.td != null) {
+                final String dnldPath = this.td.getDownloadLocalPath();
                 if (dnldPath != null) {
                     final File f = new File(dnldPath);
                     final File dir = f.getParentFile();
@@ -839,7 +839,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         }
 
         public long getTemplatesize() {
-            return templatesize;
+            return this.templatesize;
         }
 
         public void setTemplatesize(final long templatesize) {
@@ -847,7 +847,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         }
 
         public long getTemplatePhysicalSize() {
-            return templatePhysicalSize;
+            return this.templatePhysicalSize;
         }
 
         public void setTemplatePhysicalSize(final long templatePhysicalSize) {
@@ -864,11 +864,11 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         List<String> paths = new ArrayList<>();
 
         public ZfsPathParser(final String parent) {
-            _parent = parent;
+            this._parent = parent;
         }
 
         public List<String> getPaths() {
-            return paths;
+            return this.paths;
         }
 
         @Override
@@ -880,7 +880,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         public String interpret(final BufferedReader reader) throws IOException {
             String line = null;
             while ((line = reader.readLine()) != null) {
-                paths.add(line);
+                this.paths.add(line);
             }
             return null;
         }
@@ -895,7 +895,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
         @Override
         public void downloadComplete(final Status status) {
-            setDownloadStatus(jobId, status);
+            setDownloadStatus(this.jobId, status);
         }
     }
 }

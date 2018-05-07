@@ -1,6 +1,7 @@
 package com.cloud.storage.resource;
 
 import com.cloud.common.resource.ServerResource;
+import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
@@ -21,7 +22,6 @@ import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.StorageResourceType;
-import com.cloud.resource.ServerResourceBase;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.template.TemplateConstants;

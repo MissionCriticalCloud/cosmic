@@ -1,13 +1,16 @@
 package com.cloud.storage.resource;
 
-import com.cloud.legacymodel.communication.answer.ListTemplateAnswer;
-import com.cloud.legacymodel.communication.command.ListTemplateCommand;
+import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
+import com.cloud.legacymodel.communication.answer.ListTemplateAnswer;
 import com.cloud.legacymodel.communication.answer.ReadyAnswer;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.ComputeChecksumCommand;
+import com.cloud.legacymodel.communication.command.DownloadCommand;
+import com.cloud.legacymodel.communication.command.DownloadProgressCommand;
+import com.cloud.legacymodel.communication.command.ListTemplateCommand;
 import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.communication.command.PingStorageCommand;
 import com.cloud.legacymodel.communication.command.ReadyCommand;
@@ -19,13 +22,10 @@ import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.StorageResourceType;
-import com.cloud.resource.ServerResourceBase;
-import com.cloud.storage.StorageLayer;
-import com.cloud.legacymodel.communication.command.DownloadCommand;
-import com.cloud.legacymodel.communication.command.DownloadProgressCommand;
 import com.cloud.storage.template.DownloadManager;
 import com.cloud.storage.template.DownloadManagerImpl;
 import com.cloud.utils.component.ComponentContext;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;
@@ -55,7 +55,7 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     }
 
     public String getRootDir() {
-        return _parent;
+        return this._parent;
     }
 
     @Override
@@ -67,14 +67,14 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     public StartupCommand[] initialize() {
 
         final StartupStorageCommand cmd =
-                new StartupStorageCommand(_parent, StoragePoolType.Filesystem, 1024l * 1024l * 1024l * 1024l, _dlMgr.gatherTemplateInfo(_parent));
+                new StartupStorageCommand(this._parent, StoragePoolType.Filesystem, 1024l * 1024l * 1024l * 1024l, this._dlMgr.gatherTemplateInfo(this._parent));
         cmd.setResourceType(StorageResourceType.LOCAL_SECONDARY_STORAGE);
         cmd.setIqn("local://");
         fillNetworkInformation(cmd);
-        cmd.setDataCenter(_dc);
-        cmd.setPod(_pod);
-        cmd.setGuid(_guid);
-        cmd.setName(_guid);
+        cmd.setDataCenter(this._dc);
+        cmd.setPod(this._pod);
+        cmd.setGuid(this._guid);
+        cmd.setName(this._guid);
         cmd.setVersion(LocalSecondaryStorageResource.class.getPackage().getImplementationVersion());
 
         return new StartupCommand[]{cmd};
@@ -88,9 +88,9 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     @Override
     public Answer executeRequest(final Command cmd) {
         if (cmd instanceof DownloadProgressCommand) {
-            return _dlMgr.handleDownloadCommand(this, (DownloadProgressCommand) cmd);
+            return this._dlMgr.handleDownloadCommand(this, (DownloadProgressCommand) cmd);
         } else if (cmd instanceof DownloadCommand) {
-            return _dlMgr.handleDownloadCommand(this, (DownloadCommand) cmd);
+            return this._dlMgr.handleDownloadCommand(this, (DownloadCommand) cmd);
         } else if (cmd instanceof CheckHealthCommand) {
             return new CheckHealthAnswer((CheckHealthCommand) cmd, true);
         } else if (cmd instanceof SecStorageSetupCommand) {
@@ -108,7 +108,7 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
 
     private Answer execute(final ListTemplateCommand cmd) {
         final String root = getRootDir();
-        final Map<String, TemplateProp> templateInfos = _dlMgr.gatherTemplateInfo(root);
+        final Map<String, TemplateProp> templateInfos = this._dlMgr.gatherTemplateInfo(root);
         return new ListTemplateAnswer(((NfsTO) cmd.getDataStore()).getUrl(), templateInfos);
     }
 
@@ -120,51 +120,51 @@ public class LocalSecondaryStorageResource extends ServerResourceBase implements
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         super.configure(name, params);
 
-        _guid = (String) params.get("guid");
-        if (_guid == null) {
+        this._guid = (String) params.get("guid");
+        if (this._guid == null) {
             throw new ConfigurationException("Unable to find the guid");
         }
 
-        _dc = (String) params.get("zone");
-        if (_dc == null) {
+        this._dc = (String) params.get("zone");
+        if (this._dc == null) {
             throw new ConfigurationException("Unable to find the zone");
         }
-        _pod = (String) params.get("pod");
+        this._pod = (String) params.get("pod");
 
-        _instance = (String) params.get("instance");
+        this._instance = (String) params.get("instance");
 
-        _parent = (String) params.get("mount.path");
-        if (_parent == null) {
+        this._parent = (String) params.get("mount.path");
+        if (this._parent == null) {
             throw new ConfigurationException("No directory specified.");
         }
 
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             String value = (String) params.get(StorageLayer.ClassConfigKey);
             if (value == null) {
-                value = "com.cloud.storage.JavaStorageLayer";
+                value = "com.cloud.utils.storage.JavaStorageLayer";
             }
 
             try {
                 final Class<StorageLayer> clazz = (Class<StorageLayer>) Class.forName(value);
-                _storage = ComponentContext.inject(clazz);
+                this._storage = ComponentContext.inject(clazz);
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException("Unable to find class " + value);
             }
         }
 
-        if (!_storage.mkdirs(_parent)) {
-            s_logger.warn("Unable to create the directory " + _parent);
-            throw new ConfigurationException("Unable to create the directory " + _parent);
+        if (!this._storage.mkdirs(this._parent)) {
+            s_logger.warn("Unable to create the directory " + this._parent);
+            throw new ConfigurationException("Unable to create the directory " + this._parent);
         }
 
-        s_logger.info("Mount point established at " + _parent);
+        s_logger.info("Mount point established at " + this._parent);
 
-        params.put("template.parent", _parent);
-        params.put(StorageLayer.InstanceConfigKey, _storage);
+        params.put("template.parent", this._parent);
+        params.put(StorageLayer.InstanceConfigKey, this._storage);
 
-        _dlMgr = new DownloadManagerImpl();
-        _dlMgr.configure("DownloadManager", params);
+        this._dlMgr = new DownloadManagerImpl();
+        this._dlMgr.configure("DownloadManager", params);
 
         return true;
     }

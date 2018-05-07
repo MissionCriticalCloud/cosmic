@@ -1,7 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.StorageLayer;
+import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
 import java.net.URI;
@@ -20,33 +20,33 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
 
         final URI uri;
         try {
-            uri = new URI(_downloadUrl);
+            uri = new URI(this._downloadUrl);
         } catch (final URISyntaxException e) {
-            s_logger.warn("URI syntax error: " + _downloadUrl);
-            _status = Status.UNRECOVERABLE_ERROR;
+            s_logger.warn("URI syntax error: " + this._downloadUrl);
+            this._status = Status.UNRECOVERABLE_ERROR;
             return;
         }
 
         final String path = uri.getPath();
         final String filename = path.substring(path.lastIndexOf("/") + 1);
-        _toFile = toDir + File.separator + filename;
+        this._toFile = toDir + File.separator + filename;
     }
 
     @Override
     public long download(final boolean resume, final DownloadCompleteCallback callback) {
-        if (_status == Status.ABORTED || _status == Status.UNRECOVERABLE_ERROR || _status == Status.DOWNLOAD_FINISHED) {
+        if (this._status == Status.ABORTED || this._status == Status.UNRECOVERABLE_ERROR || this._status == Status.DOWNLOAD_FINISHED) {
             return 0;
         }
 
-        _resume = resume;
+        this._resume = resume;
 
-        _start = System.currentTimeMillis();
+        this._start = System.currentTimeMillis();
 
         final URI uri;
         try {
-            uri = new URI(_downloadUrl);
+            uri = new URI(this._downloadUrl);
         } catch (final URISyntaxException e1) {
-            _status = Status.UNRECOVERABLE_ERROR;
+            this._status = Status.UNRECOVERABLE_ERROR;
             return 0;
         }
 
@@ -67,13 +67,13 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
         if (port == -1) {
             port = 22;
         }
-        final File file = new File(_toFile);
+        final File file = new File(this._toFile);
 
         final com.trilead.ssh2.Connection sshConnection = new com.trilead.ssh2.Connection(uri.getHost(), port);
         try {
-            if (_storage != null) {
+            if (this._storage != null) {
                 file.createNewFile();
-                _storage.setWorldReadableAndWriteable(file);
+                this._storage.setWorldReadableAndWriteable(file);
             }
 
             sshConnection.connect(null, 60000, 60000);
@@ -85,45 +85,45 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
 
             final String src = uri.getPath();
 
-            _status = Status.IN_PROGRESS;
-            scp.get(src, _toDir);
+            this._status = Status.IN_PROGRESS;
+            scp.get(src, this._toDir);
 
             if (!file.exists()) {
-                _status = Status.UNRECOVERABLE_ERROR;
-                s_logger.debug("unable to scp the file " + _downloadUrl);
+                this._status = Status.UNRECOVERABLE_ERROR;
+                s_logger.debug("unable to scp the file " + this._downloadUrl);
                 return 0;
             }
 
-            _status = Status.DOWNLOAD_FINISHED;
+            this._status = Status.DOWNLOAD_FINISHED;
 
-            _totalBytes = file.length();
+            this._totalBytes = file.length();
 
             final String downloaded = "(download complete)";
 
-            _errorString = "Downloaded " + _remoteSize + " bytes " + downloaded;
-            _downloadTime += System.currentTimeMillis() - _start;
-            return _totalBytes;
+            this._errorString = "Downloaded " + this._remoteSize + " bytes " + downloaded;
+            this._downloadTime += System.currentTimeMillis() - this._start;
+            return this._totalBytes;
         } catch (final Exception e) {
-            s_logger.warn("Unable to download " + _downloadUrl, e);
-            _status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
-            _errorString = e.getMessage();
+            s_logger.warn("Unable to download " + this._downloadUrl, e);
+            this._status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this._errorString = e.getMessage();
             return 0;
         } finally {
             sshConnection.close();
-            if (_status == Status.UNRECOVERABLE_ERROR && file.exists()) {
+            if (this._status == Status.UNRECOVERABLE_ERROR && file.exists()) {
                 file.delete();
             }
             if (callback != null) {
-                callback.downloadComplete(_status);
+                callback.downloadComplete(this._status);
             }
         }
     }
 
     @Override
     public int getDownloadPercent() {
-        if (_status == Status.DOWNLOAD_FINISHED) {
+        if (this._status == Status.DOWNLOAD_FINISHED) {
             return 100;
-        } else if (_status == Status.IN_PROGRESS) {
+        } else if (this._status == Status.IN_PROGRESS) {
             return 50;
         } else {
             return 0;

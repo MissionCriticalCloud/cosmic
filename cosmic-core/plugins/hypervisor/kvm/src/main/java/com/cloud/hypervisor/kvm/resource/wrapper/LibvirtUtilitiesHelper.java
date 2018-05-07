@@ -3,11 +3,11 @@ package com.cloud.hypervisor.kvm.resource.wrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.legacymodel.to.VMSnapshotTO;
-import com.cloud.storage.StorageLayer;
 import com.cloud.storage.template.Processor;
 import com.cloud.storage.template.QCOW2Processor;
 import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;

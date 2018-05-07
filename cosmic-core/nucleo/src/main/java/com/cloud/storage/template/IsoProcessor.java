@@ -1,8 +1,8 @@
 package com.cloud.storage.template;
 
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.utils.component.AdapterBase;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -25,7 +25,7 @@ public class IsoProcessor extends AdapterBase implements Processor {
 
         final String isoPath = templatePath + File.separator + templateName + "." + ImageFormat.ISO.getFileExtension();
 
-        if (!_storage.exists(isoPath)) {
+        if (!this._storage.exists(isoPath)) {
             s_logger.debug("Unable to find the iso file: " + isoPath);
             return null;
         }
@@ -33,7 +33,7 @@ public class IsoProcessor extends AdapterBase implements Processor {
         final FormatInfo info = new FormatInfo();
         info.format = ImageFormat.ISO;
         info.filename = templateName + "." + ImageFormat.ISO.getFileExtension();
-        info.size = _storage.getSize(isoPath);
+        info.size = this._storage.getSize(isoPath);
         info.virtualSize = info.size;
 
         return info;
@@ -46,8 +46,8 @@ public class IsoProcessor extends AdapterBase implements Processor {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             throw new ConfigurationException("Unable to get storage implementation");
         }
         return true;

@@ -2,7 +2,7 @@ package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
+import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
 import java.io.IOException;

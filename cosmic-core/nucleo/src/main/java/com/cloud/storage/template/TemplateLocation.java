@@ -3,9 +3,9 @@ package com.cloud.storage.template;
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
 import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.utils.NumbersUtil;
+import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,65 +32,65 @@ public class TemplateLocation {
     ArrayList<FormatInfo> _formats;
 
     public TemplateLocation(final StorageLayer storage, final String templatePath) {
-        _storage = storage;
-        _templatePath = templatePath;
-        if (!_templatePath.endsWith(File.separator)) {
-            _templatePath += File.separator;
+        this._storage = storage;
+        this._templatePath = templatePath;
+        if (!this._templatePath.endsWith(File.separator)) {
+            this._templatePath += File.separator;
         }
-        _formats = new ArrayList<>(5);
-        _props = new Properties();
+        this._formats = new ArrayList<>(5);
+        this._props = new Properties();
         //TO DO - remove this hack
-        if (_templatePath.matches(".*" + "volumes" + ".*")) {
-            _file = _storage.getFile(_templatePath + "volume.properties");
-            _resourceType = ResourceType.VOLUME;
+        if (this._templatePath.matches(".*" + "volumes" + ".*")) {
+            this._file = this._storage.getFile(this._templatePath + "volume.properties");
+            this._resourceType = ResourceType.VOLUME;
         } else {
-            _file = _storage.getFile(_templatePath + Filename);
+            this._file = this._storage.getFile(this._templatePath + Filename);
         }
-        _isCorrupted = false;
+        this._isCorrupted = false;
     }
 
     public boolean create(final long id, final boolean isPublic, final String uniqueName) throws IOException {
         final boolean result = load();
-        _props.setProperty("id", Long.toString(id));
-        _props.setProperty("public", Boolean.toString(isPublic));
-        _props.setProperty("uniquename", uniqueName);
+        this._props.setProperty("id", Long.toString(id));
+        this._props.setProperty("public", Boolean.toString(isPublic));
+        this._props.setProperty("uniquename", uniqueName);
 
         return result;
     }
 
     public boolean load() throws IOException {
-        try (FileInputStream strm = new FileInputStream(_file)) {
-            _props.load(strm);
+        try (final FileInputStream strm = new FileInputStream(this._file)) {
+            this._props.load(strm);
         } catch (final IOException e) {
             s_logger.warn("Unable to load the template properties", e);
         }
 
         for (final ImageFormat format : ImageFormat.values()) {
-            final String ext = _props.getProperty(format.getFileExtension());
+            final String ext = this._props.getProperty(format.getFileExtension());
             if (ext != null) {
                 final FormatInfo info = new FormatInfo();
                 info.format = format;
-                info.filename = _props.getProperty(format.getFileExtension() + ".filename");
+                info.filename = this._props.getProperty(format.getFileExtension() + ".filename");
                 if (info.filename == null) {
                     continue;
                 }
-                info.size = NumbersUtil.parseLong(_props.getProperty(format.getFileExtension() + ".size"), -1);
-                _props.setProperty("physicalSize", Long.toString(info.size));
-                info.virtualSize = NumbersUtil.parseLong(_props.getProperty(format.getFileExtension() + ".virtualsize"), -1);
-                _formats.add(info);
+                info.size = NumbersUtil.parseLong(this._props.getProperty(format.getFileExtension() + ".size"), -1);
+                this._props.setProperty("physicalSize", Long.toString(info.size));
+                info.virtualSize = NumbersUtil.parseLong(this._props.getProperty(format.getFileExtension() + ".virtualsize"), -1);
+                this._formats.add(info);
 
                 if (!checkFormatValidity(info)) {
-                    _isCorrupted = true;
+                    this._isCorrupted = true;
                     s_logger.warn("Cleaning up inconsistent information for " + format);
                 }
             }
         }
 
-        if (_props.getProperty("uniquename") == null || _props.getProperty("virtualsize") == null) {
+        if (this._props.getProperty("uniquename") == null || this._props.getProperty("virtualsize") == null) {
             return false;
         }
 
-        return (_formats.size() > 0);
+        return (this._formats.size() > 0);
     }
 
     protected boolean checkFormatValidity(final FormatInfo info) {
@@ -99,9 +99,9 @@ public class TemplateLocation {
 
     public boolean purge() {
         boolean purged = true;
-        final String[] files = _storage.listFiles(_templatePath);
+        final String[] files = this._storage.listFiles(this._templatePath);
         for (final String file : files) {
-            final boolean r = _storage.delete(file);
+            final boolean r = this._storage.delete(file);
             if (!r) {
                 purged = false;
             }
@@ -114,14 +114,14 @@ public class TemplateLocation {
     }
 
     public boolean save() {
-        for (final FormatInfo info : _formats) {
-            _props.setProperty(info.format.getFileExtension(), "true");
-            _props.setProperty(info.format.getFileExtension() + ".filename", info.filename);
-            _props.setProperty(info.format.getFileExtension() + ".size", Long.toString(info.size));
-            _props.setProperty(info.format.getFileExtension() + ".virtualsize", Long.toString(info.virtualSize));
+        for (final FormatInfo info : this._formats) {
+            this._props.setProperty(info.format.getFileExtension(), "true");
+            this._props.setProperty(info.format.getFileExtension() + ".filename", info.filename);
+            this._props.setProperty(info.format.getFileExtension() + ".size", Long.toString(info.size));
+            this._props.setProperty(info.format.getFileExtension() + ".virtualsize", Long.toString(info.virtualSize));
         }
-        try (FileOutputStream strm = new FileOutputStream(_file)) {
-            _props.store(strm, "");
+        try (final FileOutputStream strm = new FileOutputStream(this._file)) {
+            this._props.store(strm, "");
         } catch (final IOException e) {
             s_logger.warn("Unable to save the template properties ", e);
             return false;
@@ -131,28 +131,28 @@ public class TemplateLocation {
 
     public TemplateProp getTemplateInfo() {
         final TemplateProp tmplInfo = new TemplateProp();
-        tmplInfo.setId(Long.parseLong(_props.getProperty("id")));
-        tmplInfo.setInstallPath(_templatePath + _props.getProperty("filename")); // _templatePath endsWith /
-        if (_resourceType == ResourceType.VOLUME) {
+        tmplInfo.setId(Long.parseLong(this._props.getProperty("id")));
+        tmplInfo.setInstallPath(this._templatePath + this._props.getProperty("filename")); // _templatePath endsWith /
+        if (this._resourceType == ResourceType.VOLUME) {
             tmplInfo.setInstallPath(tmplInfo.getInstallPath().substring(tmplInfo.getInstallPath().indexOf("volumes")));
         } else {
             tmplInfo.setInstallPath(tmplInfo.getInstallPath().substring(tmplInfo.getInstallPath().indexOf("template")));
         }
-        tmplInfo.setCorrupted(_isCorrupted);
-        tmplInfo.setPublic(Boolean.parseBoolean(_props.getProperty("public")));
-        tmplInfo.setTemplateName(_props.getProperty("uniquename"));
-        if (_props.getProperty("virtualsize") != null) {
-            tmplInfo.setSize(Long.parseLong(_props.getProperty("virtualsize")));
+        tmplInfo.setCorrupted(this._isCorrupted);
+        tmplInfo.setPublic(Boolean.parseBoolean(this._props.getProperty("public")));
+        tmplInfo.setTemplateName(this._props.getProperty("uniquename"));
+        if (this._props.getProperty("virtualsize") != null) {
+            tmplInfo.setSize(Long.parseLong(this._props.getProperty("virtualsize")));
         }
-        if (_props.getProperty("size") != null) {
-            tmplInfo.setPhysicalSize(Long.parseLong(_props.getProperty("size")));
+        if (this._props.getProperty("size") != null) {
+            tmplInfo.setPhysicalSize(Long.parseLong(this._props.getProperty("size")));
         }
 
         return tmplInfo;
     }
 
     public FormatInfo getFormat(final ImageFormat format) {
-        for (final FormatInfo info : _formats) {
+        for (final FormatInfo info : this._formats) {
             if (info.format == format) {
                 return info;
             }
@@ -171,21 +171,21 @@ public class TemplateLocation {
             return false;
         }
 
-        _props.setProperty("virtualsize", Long.toString(newInfo.virtualSize));
-        _formats.add(newInfo);
+        this._props.setProperty("virtualsize", Long.toString(newInfo.virtualSize));
+        this._formats.add(newInfo);
         return true;
     }
 
     protected FormatInfo deleteFormat(final ImageFormat format) {
-        final Iterator<FormatInfo> it = _formats.iterator();
+        final Iterator<FormatInfo> it = this._formats.iterator();
         while (it.hasNext()) {
             final FormatInfo info = it.next();
             if (info.format == format) {
                 it.remove();
-                _props.remove(format.getFileExtension());
-                _props.remove(format.getFileExtension() + ".filename");
-                _props.remove(format.getFileExtension() + ".size");
-                _props.remove(format.getFileExtension() + ".virtualsize");
+                this._props.remove(format.getFileExtension());
+                this._props.remove(format.getFileExtension() + ".filename");
+                this._props.remove(format.getFileExtension() + ".size");
+                this._props.remove(format.getFileExtension() + ".virtualsize");
                 return info;
             }
         }
@@ -194,6 +194,6 @@ public class TemplateLocation {
     }
 
     public void updateVirtualSize(final long virtualSize) {
-        _props.setProperty("virtualsize", Long.toString(virtualSize));
+        this._props.setProperty("virtualsize", Long.toString(virtualSize));
     }
 }

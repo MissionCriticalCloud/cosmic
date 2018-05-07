@@ -10,7 +10,6 @@ import com.cloud.legacymodel.communication.command.UploadProgressCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.storage.template.TemplateUploader.Status;
@@ -18,6 +17,7 @@ import com.cloud.storage.template.TemplateUploader.UploadCompleteCallback;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -68,7 +68,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
 
     @Override
     public Status getUploadStatus(final String jobId) {
-        final UploadJob job = jobs.get(jobId);
+        final UploadJob job = this.jobs.get(jobId);
         if (job != null) {
             final TemplateUploader tu = job.getTemplateUploader();
             if (tu != null) {
@@ -85,7 +85,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
 
     @Override
     public int getUploadPct(final String jobId) {
-        final UploadJob uj = jobs.get(jobId);
+        final UploadJob uj = this.jobs.get(jobId);
         if (uj != null) {
             return uj.getTemplateUploader().getUploadPercent();
         }
@@ -94,7 +94,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
 
     @Override
     public String getUploadError(final String jobId) {
-        final UploadJob uj = jobs.get(jobId);
+        final UploadJob uj = this.jobs.get(jobId);
         if (uj != null) {
             return uj.getTemplateUploader().getUploadError();
         }
@@ -132,7 +132,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
         final UUID uuid = UUID.randomUUID();
         final String jobId = uuid.toString();
 
-        final String completePath = parentDir + File.separator + installPathPrefix;
+        final String completePath = this.parentDir + File.separator + installPathPrefix;
         s_logger.debug("Starting upload from " + completePath);
 
         final URI uri;
@@ -155,8 +155,8 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
             throw new CloudRuntimeException("Unable to download from URL: " + url);
         }
         final UploadJob uj = new UploadJob(tu, jobId, id, name, format, accountId, descr, cksum, installPathPrefix);
-        jobs.put(jobId, uj);
-        threadPool.execute(tu);
+        this.jobs.put(jobId, uj);
+        this.threadPool.execute(tu);
 
         return jobId;
     }
@@ -225,7 +225,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
             command = new Script("/bin/bash", s_logger);
             command.add("-c");
             command.add("rm -rf /mnt/SecStorage/" + cmd.getParentPath() + File.separator + path);
-            s_logger.warn(" " + parentDir + File.separator + path);
+            s_logger.warn(" " + this.parentDir + File.separator + path);
             result = command.execute();
             if (result != null) {
                 final String errorString = "Error in deleting volume " + path + " : " + result;
@@ -242,7 +242,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
         final UploadAnswer answer;
         UploadJob uj = null;
         if (jobId != null) {
-            uj = jobs.get(jobId);
+            uj = this.jobs.get(jobId);
         }
         if (uj == null) {
             return new UploadAnswer(null, 0, "Cannot find job", com.cloud.storage.UploadVO.Status.UNKNOWN, "", "", 0);
@@ -265,7 +265,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
                 answer =
                         new UploadAnswer(jobId, getUploadPct(jobId), getUploadError(jobId), getUploadStatus2(jobId), getUploadLocalPath(jobId), getInstallPath(jobId),
                                 getUploadTemplateSize(jobId));
-                jobs.remove(jobId);
+                this.jobs.remove(jobId);
                 return answer;
             default:
                 break; // TODO
@@ -293,8 +293,8 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
 
         String value = null;
 
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             value = (String) params.get(StorageLayer.ClassConfigKey);
             if (value == null) {
                 throw new ConfigurationException("Unable to find the storage layer");
@@ -303,7 +303,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
             final Class<StorageLayer> clazz;
             try {
                 clazz = (Class<StorageLayer>) Class.forName(value);
-                _storage = clazz.newInstance();
+                this._storage = clazz.newInstance();
             } catch (final ClassNotFoundException e) {
                 throw new ConfigurationException("Unable to instantiate " + value);
             } catch (final InstantiationException e) {
@@ -329,7 +329,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
         }
 
         // Add more processors here.
-        threadPool = Executors.newFixedThreadPool(numInstallThreads);
+        this.threadPool = Executors.newFixedThreadPool(numInstallThreads);
 
         return true;
     }
@@ -338,24 +338,24 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
 
         Script command = new Script("rm", s_logger);
         command.add("-rf");
-        command.add(extractMountPoint);
+        command.add(this.extractMountPoint);
         String result = command.execute();
         if (result != null) {
-            s_logger.warn("Error in creating file " + extractMountPoint + " ,error: " + result);
+            s_logger.warn("Error in creating file " + this.extractMountPoint + " ,error: " + result);
             return;
         }
 
         command = new Script("touch", s_logger);
-        command.add(extractMountPoint);
+        command.add(this.extractMountPoint);
         result = command.execute();
         if (result != null) {
-            s_logger.warn("Error in creating file " + extractMountPoint + " ,error: " + result);
+            s_logger.warn("Error in creating file " + this.extractMountPoint + " ,error: " + result);
             return;
         }
 
         command = new Script("/bin/bash", s_logger);
         command.add("-c");
-        command.add("ln -sf " + parentDir + " " + extractMountPoint);
+        command.add("ln -sf " + this.parentDir + " " + this.extractMountPoint);
         result = command.execute();
         if (result != null) {
             s_logger.warn("Error in linking  err=" + result);
@@ -370,7 +370,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
      * @param status the status of the job
      */
     public void setUploadStatus(final String jobId, final Status status) {
-        final UploadJob uj = jobs.get(jobId);
+        final UploadJob uj = this.jobs.get(jobId);
         if (uj == null) {
             s_logger.warn("setUploadStatus for jobId: " + jobId + ", status=" + status + " no job found");
             return;
@@ -393,10 +393,10 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
             case IN_PROGRESS:
                 s_logger.info("Resuming jobId: " + jobId + ", status=" + status);
                 tu.setResume(true);
-                threadPool.execute(tu);
+                this.threadPool.execute(tu);
                 break;
             case RECOVERABLE_ERROR:
-                threadPool.execute(tu);
+                this.threadPool.execute(tu);
                 break;
             case UPLOAD_FINISHED:
                 tu.setUploadError("Upload success, starting install ");
@@ -443,12 +443,12 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
         }
 
         public TemplateUploader getTemplateUploader() {
-            return tu;
+            return this.tu;
         }
 
         public void cleanup() {
-            if (tu != null) {
-                final String upldPath = tu.getUploadLocalPath();
+            if (this.tu != null) {
+                final String upldPath = this.tu.getUploadLocalPath();
                 if (upldPath != null) {
                     final File f = new File(upldPath);
                     f.delete();
@@ -466,7 +466,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
 
         @Override
         public void uploadComplete(final Status status) {
-            setUploadStatus(jobId, status);
+            setUploadStatus(this.jobId, status);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.cloud.storage;
+package com.cloud.utils.storage;
 
 import com.cloud.utils.component.Manager;
 
@@ -12,8 +12,8 @@ import java.util.List;
  * 1. Proper synchronization between threads.
  */
 public interface StorageLayer extends Manager {
-    public final static String InstanceConfigKey = "storage.layer.instance";
-    public final static String ClassConfigKey = "storage.layer.implementation";
+    String InstanceConfigKey = "storage.layer.instance";
+    String ClassConfigKey = "storage.layer.implementation";
 
     /**
      * @param path path to the file to get the size.

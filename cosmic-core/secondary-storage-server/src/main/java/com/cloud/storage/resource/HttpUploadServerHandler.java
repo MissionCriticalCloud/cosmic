@@ -6,7 +6,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
-import com.cloud.storage.template.UploadEntity;
+import com.cloud.legacymodel.storage.UploadEntity;
 import com.cloud.utils.imagestore.ImageStoreUtil;
 
 import java.io.IOException;
@@ -67,36 +67,36 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
 
     @Override
     public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
-        if (decoder != null) {
-            decoder.cleanFiles();
+        if (this.decoder != null) {
+            this.decoder.cleanFiles();
         }
-        requestProcessed = false;
+        this.requestProcessed = false;
     }
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-        if (!requestProcessed) {
+        if (!this.requestProcessed) {
             final String message = "file receive failed or connection closed prematurely.";
             logger.error(message);
-            storageResource.updateStateMapWithError(uuid, message);
+            this.storageResource.updateStateMapWithError(this.uuid, message);
         }
     }
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        logger.warn(responseContent.toString(), cause);
-        responseContent.append("\r\nException occurred: ").append(cause.getMessage());
+        logger.warn(this.responseContent.toString(), cause);
+        this.responseContent.append("\r\nException occurred: ").append(cause.getMessage());
         writeResponse(ctx.channel(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
         ctx.channel().close();
     }
 
     private void writeResponse(final Channel channel, final HttpResponseStatus statusCode) {
         // Convert the response content to a ChannelBuffer.
-        final ByteBuf buf = copiedBuffer(responseContent.toString(), CharsetUtil.UTF_8);
-        responseContent.setLength(0);
+        final ByteBuf buf = copiedBuffer(this.responseContent.toString(), CharsetUtil.UTF_8);
+        this.responseContent.setLength(0);
         // Decide whether to close the connection or not.
-        final boolean close = HttpHeaders.Values.CLOSE.equalsIgnoreCase(request.headers().get(CONNECTION)) ||
-                request.getProtocolVersion().equals(HttpVersion.HTTP_1_0) && !HttpHeaders.Values.KEEP_ALIVE.equalsIgnoreCase(request.headers().get(CONNECTION));
+        final boolean close = HttpHeaders.Values.CLOSE.equalsIgnoreCase(this.request.headers().get(CONNECTION)) ||
+                this.request.getProtocolVersion().equals(HttpVersion.HTTP_1_0) && !HttpHeaders.Values.KEEP_ALIVE.equalsIgnoreCase(this.request.headers().get(CONNECTION));
         // Build the response object.
         final FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, statusCode, buf);
         response.headers().set(CONTENT_TYPE, "text/plain; charset=UTF-8");
@@ -116,7 +116,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
     public void channelRead0(final ChannelHandlerContext ctx, final HttpObject msg) throws Exception {
         if (msg instanceof HttpRequest) {
             final HttpRequest request = this.request = (HttpRequest) msg;
-            responseContent.setLength(0);
+            this.responseContent.setLength(0);
 
             if (request.getMethod().equals(HttpMethod.POST)) {
 
@@ -154,27 +154,27 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 logger.info("HEADER: Content-Length=" + contentLength);
                 final QueryStringDecoder decoderQuery = new QueryStringDecoder(uri);
                 final Map<String, List<String>> uriAttributes = decoderQuery.parameters();
-                uuid = uriAttributes.get("uuid").get(0);
-                logger.info("URI: uuid=" + uuid);
+                this.uuid = uriAttributes.get("uuid").get(0);
+                logger.info("URI: uuid=" + this.uuid);
 
                 UploadEntity uploadEntity = null;
                 try {
                     // Validate the request here
-                    storageResource.validatePostUploadRequest(signature, metadata, expires, hostname, contentLength, uuid);
+                    this.storageResource.validatePostUploadRequest(signature, metadata, expires, hostname, contentLength, this.uuid);
                     //create an upload entity. This will fail if entity already exists.
-                    uploadEntity = storageResource.createUploadEntity(uuid, metadata, contentLength);
+                    uploadEntity = this.storageResource.createUploadEntity(this.uuid, metadata, contentLength);
                 } catch (final InvalidParameterValueException ex) {
                     logger.error("post request validation failed", ex);
-                    responseContent.append(ex.getMessage());
+                    this.responseContent.append(ex.getMessage());
                     writeResponse(ctx.channel(), HttpResponseStatus.BAD_REQUEST);
-                    requestProcessed = true;
+                    this.requestProcessed = true;
                     return;
                 }
                 if (uploadEntity == null) {
                     logger.error("Unable to create upload entity. An exception occurred.");
-                    responseContent.append("Internal Server Error");
+                    this.responseContent.append("Internal Server Error");
                     writeResponse(ctx.channel(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
-                    requestProcessed = true;
+                    this.requestProcessed = true;
                     return;
                 }
                 //set the base directory to download the file
@@ -182,34 +182,34 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 logger.info("base directory: " + DiskFileUpload.baseDirectory);
                 try {
                     //initialize the decoder
-                    decoder = new HttpPostRequestDecoder(factory, request);
-                } catch (ErrorDataDecoderException | IncompatibleDataDecoderException e) {
+                    this.decoder = new HttpPostRequestDecoder(factory, request);
+                } catch (final ErrorDataDecoderException | IncompatibleDataDecoderException e) {
                     logger.error("exception while initialising the decoder", e);
-                    responseContent.append(e.getMessage());
+                    this.responseContent.append(e.getMessage());
                     writeResponse(ctx.channel(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
-                    requestProcessed = true;
+                    this.requestProcessed = true;
                     return;
                 }
             } else {
                 logger.warn("received a get request");
-                responseContent.append("only post requests are allowed");
+                this.responseContent.append("only post requests are allowed");
                 writeResponse(ctx.channel(), HttpResponseStatus.BAD_REQUEST);
-                requestProcessed = true;
+                this.requestProcessed = true;
                 return;
             }
         }
         // check if the decoder was constructed before
-        if (decoder != null) {
+        if (this.decoder != null) {
             if (msg instanceof HttpContent) {
                 // New chunk is received
                 final HttpContent chunk = (HttpContent) msg;
                 try {
-                    decoder.offer(chunk);
+                    this.decoder.offer(chunk);
                 } catch (final ErrorDataDecoderException e) {
                     logger.error("data decoding exception", e);
-                    responseContent.append(e.getMessage());
+                    this.responseContent.append(e.getMessage());
                     writeResponse(ctx.channel(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
-                    requestProcessed = true;
+                    this.requestProcessed = true;
                     return;
                 }
                 if (chunk instanceof LastHttpContent) {
@@ -221,30 +221,30 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
     }
 
     private HttpResponseStatus readFileUploadData() throws IOException {
-        while (decoder.hasNext()) {
-            final InterfaceHttpData data = decoder.next();
+        while (this.decoder.hasNext()) {
+            final InterfaceHttpData data = this.decoder.next();
             if (data != null) {
                 try {
                     logger.info("BODY FileUpload: " + data.getHttpDataType().name() + ": " + data);
                     if (data.getHttpDataType() == HttpDataType.FileUpload) {
                         final FileUpload fileUpload = (FileUpload) data;
                         if (fileUpload.isCompleted()) {
-                            requestProcessed = true;
+                            this.requestProcessed = true;
                             final String format = ImageStoreUtil.checkTemplateFormat(fileUpload.getFile().getAbsolutePath(), fileUpload.getFilename());
                             if (StringUtils.isNotBlank(format)) {
                                 final String errorString = "File type mismatch between the sent file and the actual content. Received: " + format;
                                 logger.error(errorString);
-                                responseContent.append(errorString);
-                                storageResource.updateStateMapWithError(uuid, errorString);
+                                this.responseContent.append(errorString);
+                                this.storageResource.updateStateMapWithError(this.uuid, errorString);
                                 return HttpResponseStatus.BAD_REQUEST;
                             }
-                            final String status = storageResource.postUpload(uuid, fileUpload.getFile().getName());
+                            final String status = this.storageResource.postUpload(this.uuid, fileUpload.getFile().getName());
                             if (status != null) {
-                                responseContent.append(status);
-                                storageResource.updateStateMapWithError(uuid, status);
+                                this.responseContent.append(status);
+                                this.storageResource.updateStateMapWithError(this.uuid, status);
                                 return HttpResponseStatus.INTERNAL_SERVER_ERROR;
                             } else {
-                                responseContent.append("upload successful.");
+                                this.responseContent.append("upload successful.");
                                 return HttpResponseStatus.OK;
                             }
                         }
@@ -254,14 +254,14 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 }
             }
         }
-        responseContent.append("received entity is not a file");
+        this.responseContent.append("received entity is not a file");
         return HttpResponseStatus.UNPROCESSABLE_ENTITY;
     }
 
     private void reset() {
-        request = null;
+        this.request = null;
         // destroy the decoder to release all resources
-        decoder.destroy();
-        decoder = null;
+        this.decoder.destroy();
+        this.decoder = null;
     }
 }

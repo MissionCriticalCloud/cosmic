@@ -1,7 +1,6 @@
-package com.cloud.resource;
+package com.cloud.common.resource;
 
 import com.cloud.common.agent.IAgentControl;
-import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.StartupCommand;

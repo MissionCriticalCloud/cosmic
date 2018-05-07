@@ -2,6 +2,7 @@ package com.cloud.agent.resource.consoleproxy;
 
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.common.resource.ServerResource;
+import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
@@ -17,7 +18,6 @@ import com.cloud.legacymodel.communication.command.StartupProxyCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
 import com.cloud.model.enumeration.ExitStatus;
 import com.cloud.model.enumeration.HostType;
-import com.cloud.resource.ServerResourceBase;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;

@@ -10,9 +10,9 @@ import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.storage.StorageLayer;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
+import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
 import java.util.HashMap;
@@ -116,9 +116,9 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
             targetPath = "/mnt" + volumeUuid;
             spd = new LibvirtStoragePoolDef(PoolType.NETFS, volumeUuid, details.get(DiskTO.UUID), pool.getSourceHost(),
                     details.get(DiskTO.MOUNT_POINT), targetPath);
-            storageLayer.mkdir(targetPath);
+            this.storageLayer.mkdir(targetPath);
 
-            logger.debug(spd.toString());
+            this.logger.debug(spd.toString());
             sp = conn.storagePoolCreateXML(spd.toString(), 0);
 
             if (sp == null) {
@@ -146,25 +146,25 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
                 }
             }
         } catch (final LibvirtException e) {
-            logger.error(e.toString());
+            this.logger.error(e.toString());
             // if error is that pool is mounted, try to handle it
             if (e.toString().contains("already mounted")) {
-                logger.error("Attempting to unmount old mount libvirt is unaware of at " + targetPath);
+                this.logger.error("Attempting to unmount old mount libvirt is unaware of at " + targetPath);
                 final String result = Script.runSimpleBashScript("umount -l " + targetPath);
                 if (result == null) {
-                    logger.error("Succeeded in unmounting " + targetPath);
+                    this.logger.error("Succeeded in unmounting " + targetPath);
                     try {
                         conn.storagePoolCreateXML(spd.toString(), 0);
-                        logger.error("Succeeded in redefining storage");
+                        this.logger.error("Succeeded in redefining storage");
                         return true;
                     } catch (final LibvirtException l) {
-                        logger.error("Target was already mounted, unmounted it but failed to redefine storage:" + l);
+                        this.logger.error("Target was already mounted, unmounted it but failed to redefine storage:" + l);
                     }
                 } else {
-                    logger.error("Failed in unmounting and redefining storage");
+                    this.logger.error("Failed in unmounting and redefining storage");
                 }
             } else {
-                logger.error("Internal error occurred when attempting to mount:" + e.getMessage());
+                this.logger.error("Internal error occurred when attempting to mount:" + e.getMessage());
                 // stacktrace for agent.log
                 e.printStackTrace();
                 throw new CloudRuntimeException(e.toString());
@@ -202,7 +202,7 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
 
                 final LibvirtStorageVolumeDef volDef = new LibvirtStorageVolumeDef(volumeUuid, volCapacity, libvirtformat, null,
                         null);
-                logger.debug(volDef.toString());
+                this.logger.debug(volDef.toString());
 
                 vol = virtPool.storageVolCreateXML(volDef.toString(), 0);
             }
@@ -222,15 +222,15 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
         try {
             vol = pool.storageVolLookupByName(volName);
         } catch (final LibvirtException e) {
-            logger.debug("Can't find volume: " + e.toString());
+            this.logger.debug("Can't find volume: " + e.toString());
         }
         if (vol == null) {
             try {
                 refreshPool(pool);
             } catch (final LibvirtException e) {
-                logger.debug("failed to refresh pool: " + e.toString());
+                this.logger.debug("failed to refresh pool: " + e.toString());
             }
-            logger.debug("no volume is present on the pool, creating a new one");
+            this.logger.debug("no volume is present on the pool, creating a new one");
         }
         return vol;
     }

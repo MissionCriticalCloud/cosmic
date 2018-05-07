@@ -2,9 +2,9 @@ package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -30,7 +30,7 @@ public class QCOW2Processor extends AdapterBase implements Processor {
 
         final String qcow2Path = templatePath + File.separator + templateName + "." + ImageFormat.QCOW2.getFileExtension();
 
-        if (!_storage.exists(qcow2Path)) {
+        if (!this._storage.exists(qcow2Path)) {
             s_logger.debug("Unable to find the qcow2 file: " + qcow2Path);
             return null;
         }
@@ -39,9 +39,9 @@ public class QCOW2Processor extends AdapterBase implements Processor {
         info.format = ImageFormat.QCOW2;
         info.filename = templateName + "." + ImageFormat.QCOW2.getFileExtension();
 
-        final File qcow2File = _storage.getFile(qcow2Path);
+        final File qcow2File = this._storage.getFile(qcow2Path);
 
-        info.size = _storage.getSize(qcow2Path);
+        info.size = this._storage.getSize(qcow2Path);
 
         try {
             info.virtualSize = getTemplateVirtualSize(qcow2File);
@@ -66,7 +66,7 @@ public class QCOW2Processor extends AdapterBase implements Processor {
 
     protected long getTemplateVirtualSize(final File file) throws IOException {
         final byte[] b = new byte[8];
-        try (FileInputStream strm = new FileInputStream(file)) {
+        try (final FileInputStream strm = new FileInputStream(file)) {
             if (strm.skip(VIRTUALSIZE_HEADER_LOCATION) != VIRTUALSIZE_HEADER_LOCATION) {
                 throw new IOException("Unable to skip to the virtual size header");
             }
@@ -80,8 +80,8 @@ public class QCOW2Processor extends AdapterBase implements Processor {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             throw new ConfigurationException("Unable to get storage implementation");
         }
 

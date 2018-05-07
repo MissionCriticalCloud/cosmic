@@ -1,4 +1,4 @@
-package com.cloud.storage;
+package com.cloud.utils.storage;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
@@ -17,7 +17,7 @@ public class JavaStorageLayer implements StorageLayer {
 
     public JavaStorageLayer(final boolean makeWorldWriteable) {
         this();
-        _makeWorldWriteable = makeWorldWriteable;
+        this._makeWorldWriteable = makeWorldWriteable;
     }
 
     public JavaStorageLayer() {
@@ -65,7 +65,7 @@ public class JavaStorageLayer implements StorageLayer {
             if (file.exists()) {
                 return file.isDirectory();
             }
-            if (_makeWorldWriteable) {
+            if (this._makeWorldWriteable) {
                 return (file.mkdirs() && setWorldReadableAndWriteable(file));
             } else {
                 return file.mkdirs();
@@ -88,7 +88,7 @@ public class JavaStorageLayer implements StorageLayer {
                 dir = new File(dirPath);
                 if (!dir.exists()) {
                     success = dir.mkdir();
-                    if (_makeWorldWriteable) {
+                    if (this._makeWorldWriteable) {
                         success = success && setWorldReadableAndWriteable(dir);
                     }
                 }
@@ -245,7 +245,7 @@ public class JavaStorageLayer implements StorageLayer {
 
     @Override
     public String getName() {
-        return _name;
+        return this._name;
     }
 
     @Override
@@ -280,7 +280,7 @@ public class JavaStorageLayer implements StorageLayer {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
+        this._name = name;
         return true;
     }
 

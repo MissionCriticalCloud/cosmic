@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.legacymodel.storage;
 
 import com.cloud.model.enumeration.ImageFormat;
 
@@ -41,11 +41,11 @@ public class UploadEntity {
     }
 
     public long getDownloadedsize() {
-        return downloadedsize;
+        return this.downloadedsize;
     }
 
     public String getErrorMessage() {
-        return errorMessage;
+        return this.errorMessage;
     }
 
     public void setErrorMessage(final String errorMessage) {
@@ -53,7 +53,7 @@ public class UploadEntity {
     }
 
     public Status getUploadState() {
-        return uploadState;
+        return this.uploadState;
     }
 
     public void incremetByteCount(final long numberOfBytes) {
@@ -61,7 +61,7 @@ public class UploadEntity {
     }
 
     public String getFilename() {
-        return filename;
+        return this.filename;
     }
 
     public void setFilename(final String filename) {
@@ -69,7 +69,7 @@ public class UploadEntity {
     }
 
     public String getInstallPathPrefix() {
-        return installPathPrefix;
+        return this.installPathPrefix;
     }
 
     public void setInstallPathPrefix(final String absoluteFilePath) {
@@ -77,7 +77,7 @@ public class UploadEntity {
     }
 
     public String getTmpltPath() {
-        return templatePath;
+        return this.templatePath;
     }
 
     public void setTemplatePath(final String templatePath) {
@@ -85,7 +85,7 @@ public class UploadEntity {
     }
 
     public ResourceType getResourceType() {
-        return resourceType;
+        return this.resourceType;
     }
 
     public void setResourceType(final ResourceType resourceType) {
@@ -93,7 +93,7 @@ public class UploadEntity {
     }
 
     public boolean isHvm() {
-        return isHvm;
+        return this.isHvm;
     }
 
     public void setHvm(final boolean isHvm) {
@@ -101,7 +101,7 @@ public class UploadEntity {
     }
 
     public ImageFormat getFormat() {
-        return format;
+        return this.format;
     }
 
     public void setFormat(final ImageFormat format) {
@@ -109,15 +109,15 @@ public class UploadEntity {
     }
 
     public String getUuid() {
-        return uuid;
+        return this.uuid;
     }
 
     public long getEntityId() {
-        return entityId;
+        return this.entityId;
     }
 
     public String getChksum() {
-        return chksum;
+        return this.chksum;
     }
 
     public void setChksum(final String chksum) {
@@ -125,7 +125,7 @@ public class UploadEntity {
     }
 
     public long getVirtualSize() {
-        return virtualSize;
+        return this.virtualSize;
     }
 
     public void setVirtualSize(final long virtualSize) {
@@ -133,7 +133,7 @@ public class UploadEntity {
     }
 
     public boolean isMetaDataPopulated() {
-        return isMetaDataPopulated;
+        return this.isMetaDataPopulated;
     }
 
     public void setMetaDataPopulated(final boolean isMetaDataPopulated) {
@@ -141,7 +141,7 @@ public class UploadEntity {
     }
 
     public long getPhysicalSize() {
-        return physicalSize;
+        return this.physicalSize;
     }
 
     public void setPhysicalSize(final long physicalSize) {
@@ -149,7 +149,7 @@ public class UploadEntity {
     }
 
     public int getMaxSizeInGB() {
-        return maxSizeInGB;
+        return this.maxSizeInGB;
     }
 
     public void setMaxSizeInGB(final int maxSizeInGB) {
@@ -157,7 +157,7 @@ public class UploadEntity {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(final String description) {
@@ -165,18 +165,18 @@ public class UploadEntity {
     }
 
     public long getContentLength() {
-        return contentLength;
+        return this.contentLength;
     }
 
     public void setContentLength(final long contentLength) {
         this.contentLength = contentLength;
     }
 
-    public static enum ResourceType {
+    public enum ResourceType {
         VOLUME, TEMPLATE
     }
 
-    public static enum Status {
+    public enum Status {
         UNKNOWN, IN_PROGRESS, COMPLETED, ERROR
     }
 }

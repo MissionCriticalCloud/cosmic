@@ -2,9 +2,9 @@ package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -38,17 +38,17 @@ public class VhdProcessor extends AdapterBase implements Processor {
         }
 
         final String vhdPath = templatePath + File.separator + templateName + "." + ImageFormat.VHD.getFileExtension();
-        if (!_storage.exists(vhdPath)) {
+        if (!this._storage.exists(vhdPath)) {
             s_logger.debug("Unable to find the vhd file: " + vhdPath);
             return null;
         }
 
-        final File vhdFile = _storage.getFile(vhdPath);
+        final File vhdFile = this._storage.getFile(vhdPath);
 
         final FormatInfo info = new FormatInfo();
         info.format = ImageFormat.VHD;
         info.filename = templateName + "." + ImageFormat.VHD.getFileExtension();
-        info.size = _storage.getSize(vhdPath);
+        info.size = this._storage.getSize(vhdPath);
 
         try {
             info.virtualSize = getTemplateVirtualSize(vhdFile);
@@ -75,8 +75,8 @@ public class VhdProcessor extends AdapterBase implements Processor {
         final byte[] currentSize = new byte[8];
         final byte[] creatorApp = new byte[4];
 
-        try (FileInputStream strm = new FileInputStream(file)) {
-            long skipped = strm.skip(file.length() - vhdFooterSize + vhdFooterCreatorAppOffset);
+        try (final FileInputStream strm = new FileInputStream(file)) {
+            long skipped = strm.skip(file.length() - this.vhdFooterSize + this.vhdFooterCreatorAppOffset);
             if (skipped == -1) {
                 throw new IOException("Unexpected end-of-file");
             }
@@ -84,7 +84,7 @@ public class VhdProcessor extends AdapterBase implements Processor {
             if (read == -1) {
                 throw new IOException("Unexpected end-of-file");
             }
-            skipped = strm.skip(vhdFooterCurrentSizeOffset - vhdFooterCreatorVerOffset);
+            skipped = strm.skip(this.vhdFooterCurrentSizeOffset - this.vhdFooterCreatorVerOffset);
             if (skipped == -1) {
                 throw new IOException("Unexpected end-of-file");
             }
@@ -99,9 +99,9 @@ public class VhdProcessor extends AdapterBase implements Processor {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _name = name;
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._name = name;
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             throw new ConfigurationException("Unable to get storage implementation");
         }
 

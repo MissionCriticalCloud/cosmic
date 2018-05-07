@@ -1,8 +1,8 @@
 package com.cloud.storage.template;
 
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.StorageLayer;
 import com.cloud.utils.component.AdapterBase;
+import com.cloud.utils.storage.StorageLayer;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -25,7 +25,7 @@ public class TARProcessor extends AdapterBase implements Processor {
 
         final String tarPath = templatePath + File.separator + templateName + "." + ImageFormat.TAR.getFileExtension();
 
-        if (!_storage.exists(tarPath)) {
+        if (!this._storage.exists(tarPath)) {
             s_logger.debug("Unable to find the tar file: " + tarPath);
             return null;
         }
@@ -34,9 +34,9 @@ public class TARProcessor extends AdapterBase implements Processor {
         info.format = ImageFormat.TAR;
         info.filename = templateName + "." + ImageFormat.TAR.getFileExtension();
 
-        final File tarFile = _storage.getFile(tarPath);
+        final File tarFile = this._storage.getFile(tarPath);
 
-        info.size = _storage.getSize(tarPath);
+        info.size = this._storage.getSize(tarPath);
 
         info.virtualSize = getVirtualSize(tarFile);
 
@@ -50,8 +50,8 @@ public class TARProcessor extends AdapterBase implements Processor {
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
-        if (_storage == null) {
+        this._storage = (StorageLayer) params.get(StorageLayer.InstanceConfigKey);
+        if (this._storage == null) {
             throw new ConfigurationException("Unable to get storage implementation");
         }
 

@@ -131,258 +131,258 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     @PostConstruct
     public void init() {
 
-        MaintenanceCountSearch = createSearchBuilder();
-        MaintenanceCountSearch.and("cluster", MaintenanceCountSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
-        MaintenanceCountSearch.and("resourceState", MaintenanceCountSearch.entity().getResourceState(), SearchCriteria.Op.IN);
-        MaintenanceCountSearch.done();
+        this.MaintenanceCountSearch = createSearchBuilder();
+        this.MaintenanceCountSearch.and("cluster", this.MaintenanceCountSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
+        this.MaintenanceCountSearch.and("resourceState", this.MaintenanceCountSearch.entity().getResourceState(), SearchCriteria.Op.IN);
+        this.MaintenanceCountSearch.done();
 
-        TypePodDcStatusSearch = createSearchBuilder();
-        final HostVO entity = TypePodDcStatusSearch.entity();
-        TypePodDcStatusSearch.and("type", entity.getType(), SearchCriteria.Op.EQ);
-        TypePodDcStatusSearch.and("pod", entity.getPodId(), SearchCriteria.Op.EQ);
-        TypePodDcStatusSearch.and("dc", entity.getDataCenterId(), SearchCriteria.Op.EQ);
-        TypePodDcStatusSearch.and("cluster", entity.getClusterId(), SearchCriteria.Op.EQ);
-        TypePodDcStatusSearch.and("status", entity.getStatus(), SearchCriteria.Op.EQ);
-        TypePodDcStatusSearch.and("resourceState", entity.getResourceState(), SearchCriteria.Op.EQ);
-        TypePodDcStatusSearch.done();
+        this.TypePodDcStatusSearch = createSearchBuilder();
+        final HostVO entity = this.TypePodDcStatusSearch.entity();
+        this.TypePodDcStatusSearch.and("type", entity.getType(), SearchCriteria.Op.EQ);
+        this.TypePodDcStatusSearch.and("pod", entity.getPodId(), SearchCriteria.Op.EQ);
+        this.TypePodDcStatusSearch.and("dc", entity.getDataCenterId(), SearchCriteria.Op.EQ);
+        this.TypePodDcStatusSearch.and("cluster", entity.getClusterId(), SearchCriteria.Op.EQ);
+        this.TypePodDcStatusSearch.and("status", entity.getStatus(), SearchCriteria.Op.EQ);
+        this.TypePodDcStatusSearch.and("resourceState", entity.getResourceState(), SearchCriteria.Op.EQ);
+        this.TypePodDcStatusSearch.done();
 
-        MsStatusSearch = createSearchBuilder();
-        MsStatusSearch.and("ms", MsStatusSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
-        MsStatusSearch.and("type", MsStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
-        MsStatusSearch.and("resourceState", MsStatusSearch.entity().getResourceState(), SearchCriteria.Op.NIN);
-        MsStatusSearch.done();
+        this.MsStatusSearch = createSearchBuilder();
+        this.MsStatusSearch.and("ms", this.MsStatusSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
+        this.MsStatusSearch.and("type", this.MsStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.MsStatusSearch.and("resourceState", this.MsStatusSearch.entity().getResourceState(), SearchCriteria.Op.NIN);
+        this.MsStatusSearch.done();
 
-        TypeDcSearch = createSearchBuilder();
-        TypeDcSearch.and("type", TypeDcSearch.entity().getType(), SearchCriteria.Op.EQ);
-        TypeDcSearch.and("dc", TypeDcSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        TypeDcSearch.done();
+        this.TypeDcSearch = createSearchBuilder();
+        this.TypeDcSearch.and("type", this.TypeDcSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.TypeDcSearch.and("dc", this.TypeDcSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.TypeDcSearch.done();
 
-        SecondaryStorageVMSearch = createSearchBuilder();
-        SecondaryStorageVMSearch.and("type", SecondaryStorageVMSearch.entity().getType(), SearchCriteria.Op.EQ);
-        SecondaryStorageVMSearch.and("dc", SecondaryStorageVMSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        SecondaryStorageVMSearch.and("status", SecondaryStorageVMSearch.entity().getStatus(), SearchCriteria.Op.EQ);
-        SecondaryStorageVMSearch.done();
+        this.SecondaryStorageVMSearch = createSearchBuilder();
+        this.SecondaryStorageVMSearch.and("type", this.SecondaryStorageVMSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.SecondaryStorageVMSearch.and("dc", this.SecondaryStorageVMSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.SecondaryStorageVMSearch.and("status", this.SecondaryStorageVMSearch.entity().getStatus(), SearchCriteria.Op.EQ);
+        this.SecondaryStorageVMSearch.done();
 
-        TypeDcStatusSearch = createSearchBuilder();
-        TypeDcStatusSearch.and("type", TypeDcStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
-        TypeDcStatusSearch.and("dc", TypeDcStatusSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        TypeDcStatusSearch.and("status", TypeDcStatusSearch.entity().getStatus(), SearchCriteria.Op.EQ);
-        TypeDcStatusSearch.and("resourceState", TypeDcStatusSearch.entity().getResourceState(), SearchCriteria.Op.EQ);
-        TypeDcStatusSearch.done();
+        this.TypeDcStatusSearch = createSearchBuilder();
+        this.TypeDcStatusSearch.and("type", this.TypeDcStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.TypeDcStatusSearch.and("dc", this.TypeDcStatusSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.TypeDcStatusSearch.and("status", this.TypeDcStatusSearch.entity().getStatus(), SearchCriteria.Op.EQ);
+        this.TypeDcStatusSearch.and("resourceState", this.TypeDcStatusSearch.entity().getResourceState(), SearchCriteria.Op.EQ);
+        this.TypeDcStatusSearch.done();
 
-        TypeClusterStatusSearch = createSearchBuilder();
-        TypeClusterStatusSearch.and("type", TypeClusterStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
-        TypeClusterStatusSearch.and("cluster", TypeClusterStatusSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
-        TypeClusterStatusSearch.and("status", TypeClusterStatusSearch.entity().getStatus(), SearchCriteria.Op.EQ);
-        TypeClusterStatusSearch.and("resourceState", TypeClusterStatusSearch.entity().getResourceState(), SearchCriteria.Op.EQ);
-        TypeClusterStatusSearch.done();
+        this.TypeClusterStatusSearch = createSearchBuilder();
+        this.TypeClusterStatusSearch.and("type", this.TypeClusterStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.TypeClusterStatusSearch.and("cluster", this.TypeClusterStatusSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
+        this.TypeClusterStatusSearch.and("status", this.TypeClusterStatusSearch.entity().getStatus(), SearchCriteria.Op.EQ);
+        this.TypeClusterStatusSearch.and("resourceState", this.TypeClusterStatusSearch.entity().getResourceState(), SearchCriteria.Op.EQ);
+        this.TypeClusterStatusSearch.done();
 
-        IdStatusSearch = createSearchBuilder();
-        IdStatusSearch.and("id", IdStatusSearch.entity().getId(), SearchCriteria.Op.EQ);
-        IdStatusSearch.and("states", IdStatusSearch.entity().getStatus(), SearchCriteria.Op.IN);
-        IdStatusSearch.done();
+        this.IdStatusSearch = createSearchBuilder();
+        this.IdStatusSearch.and("id", this.IdStatusSearch.entity().getId(), SearchCriteria.Op.EQ);
+        this.IdStatusSearch.and("states", this.IdStatusSearch.entity().getStatus(), SearchCriteria.Op.IN);
+        this.IdStatusSearch.done();
 
-        DcPrivateIpAddressSearch = createSearchBuilder();
-        DcPrivateIpAddressSearch.and("privateIpAddress", DcPrivateIpAddressSearch.entity().getPrivateIpAddress(), SearchCriteria.Op.EQ);
-        DcPrivateIpAddressSearch.and("dc", DcPrivateIpAddressSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        DcPrivateIpAddressSearch.done();
+        this.DcPrivateIpAddressSearch = createSearchBuilder();
+        this.DcPrivateIpAddressSearch.and("privateIpAddress", this.DcPrivateIpAddressSearch.entity().getPrivateIpAddress(), SearchCriteria.Op.EQ);
+        this.DcPrivateIpAddressSearch.and("dc", this.DcPrivateIpAddressSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.DcPrivateIpAddressSearch.done();
 
-        DcStorageIpAddressSearch = createSearchBuilder();
-        DcStorageIpAddressSearch.and("storageIpAddress", DcStorageIpAddressSearch.entity().getStorageIpAddress(), SearchCriteria.Op.EQ);
-        DcStorageIpAddressSearch.and("dc", DcStorageIpAddressSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        DcStorageIpAddressSearch.done();
+        this.DcStorageIpAddressSearch = createSearchBuilder();
+        this.DcStorageIpAddressSearch.and("storageIpAddress", this.DcStorageIpAddressSearch.entity().getStorageIpAddress(), SearchCriteria.Op.EQ);
+        this.DcStorageIpAddressSearch.and("dc", this.DcStorageIpAddressSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.DcStorageIpAddressSearch.done();
 
-        PublicIpAddressSearch = createSearchBuilder();
-        PublicIpAddressSearch.and("publicIpAddress", PublicIpAddressSearch.entity().getPublicIpAddress(), SearchCriteria.Op.EQ);
-        PublicIpAddressSearch.done();
+        this.PublicIpAddressSearch = createSearchBuilder();
+        this.PublicIpAddressSearch.and("publicIpAddress", this.PublicIpAddressSearch.entity().getPublicIpAddress(), SearchCriteria.Op.EQ);
+        this.PublicIpAddressSearch.done();
 
-        GuidSearch = createSearchBuilder();
-        GuidSearch.and("guid", GuidSearch.entity().getGuid(), SearchCriteria.Op.EQ);
-        GuidSearch.done();
+        this.GuidSearch = createSearchBuilder();
+        this.GuidSearch.and("guid", this.GuidSearch.entity().getGuid(), SearchCriteria.Op.EQ);
+        this.GuidSearch.done();
 
-        DcSearch = createSearchBuilder();
-        DcSearch.and("dc", DcSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        DcSearch.and("type", DcSearch.entity().getType(), Op.EQ);
-        DcSearch.and("status", DcSearch.entity().getStatus(), Op.EQ);
-        DcSearch.and("resourceState", DcSearch.entity().getResourceState(), Op.EQ);
-        DcSearch.done();
+        this.DcSearch = createSearchBuilder();
+        this.DcSearch.and("dc", this.DcSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.DcSearch.and("type", this.DcSearch.entity().getType(), Op.EQ);
+        this.DcSearch.and("status", this.DcSearch.entity().getStatus(), Op.EQ);
+        this.DcSearch.and("resourceState", this.DcSearch.entity().getResourceState(), Op.EQ);
+        this.DcSearch.done();
 
-        ClusterStatusSearch = createSearchBuilder();
-        ClusterStatusSearch.and("cluster", ClusterStatusSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
-        ClusterStatusSearch.and("status", ClusterStatusSearch.entity().getStatus(), SearchCriteria.Op.EQ);
-        ClusterStatusSearch.done();
+        this.ClusterStatusSearch = createSearchBuilder();
+        this.ClusterStatusSearch.and("cluster", this.ClusterStatusSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
+        this.ClusterStatusSearch.and("status", this.ClusterStatusSearch.entity().getStatus(), SearchCriteria.Op.EQ);
+        this.ClusterStatusSearch.done();
 
-        TypeNameZoneSearch = createSearchBuilder();
-        TypeNameZoneSearch.and("name", TypeNameZoneSearch.entity().getName(), SearchCriteria.Op.EQ);
-        TypeNameZoneSearch.and("type", TypeNameZoneSearch.entity().getType(), SearchCriteria.Op.EQ);
-        TypeNameZoneSearch.and("zoneId", TypeNameZoneSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        TypeNameZoneSearch.done();
+        this.TypeNameZoneSearch = createSearchBuilder();
+        this.TypeNameZoneSearch.and("name", this.TypeNameZoneSearch.entity().getName(), SearchCriteria.Op.EQ);
+        this.TypeNameZoneSearch.and("type", this.TypeNameZoneSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.TypeNameZoneSearch.and("zoneId", this.TypeNameZoneSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.TypeNameZoneSearch.done();
 
-        PodSearch = createSearchBuilder();
-        PodSearch.and("podId", PodSearch.entity().getPodId(), SearchCriteria.Op.EQ);
-        PodSearch.done();
+        this.PodSearch = createSearchBuilder();
+        this.PodSearch.and("podId", this.PodSearch.entity().getPodId(), SearchCriteria.Op.EQ);
+        this.PodSearch.done();
 
-        ClusterSearch = createSearchBuilder();
-        ClusterSearch.and("clusterId", ClusterSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
-        ClusterSearch.done();
+        this.ClusterSearch = createSearchBuilder();
+        this.ClusterSearch.and("clusterId", this.ClusterSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
+        this.ClusterSearch.done();
 
-        TypeSearch = createSearchBuilder();
-        TypeSearch.and("type", TypeSearch.entity().getType(), SearchCriteria.Op.EQ);
-        TypeSearch.done();
+        this.TypeSearch = createSearchBuilder();
+        this.TypeSearch.and("type", this.TypeSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.TypeSearch.done();
 
-        StatusSearch = createSearchBuilder();
-        StatusSearch.and("status", StatusSearch.entity().getStatus(), SearchCriteria.Op.IN);
-        StatusSearch.done();
+        this.StatusSearch = createSearchBuilder();
+        this.StatusSearch.and("status", this.StatusSearch.entity().getStatus(), SearchCriteria.Op.IN);
+        this.StatusSearch.done();
 
-        ResourceStateSearch = createSearchBuilder();
-        ResourceStateSearch.and("resourceState", ResourceStateSearch.entity().getResourceState(), SearchCriteria.Op.IN);
-        ResourceStateSearch.done();
+        this.ResourceStateSearch = createSearchBuilder();
+        this.ResourceStateSearch.and("resourceState", this.ResourceStateSearch.entity().getResourceState(), SearchCriteria.Op.IN);
+        this.ResourceStateSearch.done();
 
-        NameLikeSearch = createSearchBuilder();
-        NameLikeSearch.and("name", NameLikeSearch.entity().getName(), SearchCriteria.Op.LIKE);
-        NameLikeSearch.done();
+        this.NameLikeSearch = createSearchBuilder();
+        this.NameLikeSearch.and("name", this.NameLikeSearch.entity().getName(), SearchCriteria.Op.LIKE);
+        this.NameLikeSearch.done();
 
-        NameSearch = createSearchBuilder();
-        NameSearch.and("name", NameSearch.entity().getName(), SearchCriteria.Op.EQ);
-        NameSearch.done();
+        this.NameSearch = createSearchBuilder();
+        this.NameSearch.and("name", this.NameSearch.entity().getName(), SearchCriteria.Op.EQ);
+        this.NameSearch.done();
 
-        SequenceSearch = createSearchBuilder();
-        SequenceSearch.and("id", SequenceSearch.entity().getId(), SearchCriteria.Op.EQ);
+        this.SequenceSearch = createSearchBuilder();
+        this.SequenceSearch.and("id", this.SequenceSearch.entity().getId(), SearchCriteria.Op.EQ);
         // SequenceSearch.addRetrieve("sequence", SequenceSearch.entity().getSequence());
-        SequenceSearch.done();
+        this.SequenceSearch.done();
 
-        DirectlyConnectedSearch = createSearchBuilder();
-        DirectlyConnectedSearch.and("resource", DirectlyConnectedSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        DirectlyConnectedSearch.and("ms", DirectlyConnectedSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
-        DirectlyConnectedSearch.and("statuses", DirectlyConnectedSearch.entity().getStatus(), SearchCriteria.Op.EQ);
-        DirectlyConnectedSearch.and("resourceState", DirectlyConnectedSearch.entity().getResourceState(), SearchCriteria.Op.NOTIN);
-        DirectlyConnectedSearch.done();
+        this.DirectlyConnectedSearch = createSearchBuilder();
+        this.DirectlyConnectedSearch.and("resource", this.DirectlyConnectedSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.DirectlyConnectedSearch.and("ms", this.DirectlyConnectedSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
+        this.DirectlyConnectedSearch.and("statuses", this.DirectlyConnectedSearch.entity().getStatus(), SearchCriteria.Op.EQ);
+        this.DirectlyConnectedSearch.and("resourceState", this.DirectlyConnectedSearch.entity().getResourceState(), SearchCriteria.Op.NOTIN);
+        this.DirectlyConnectedSearch.done();
 
-        UnmanagedDirectConnectSearch = createSearchBuilder();
-        UnmanagedDirectConnectSearch.and("resource", UnmanagedDirectConnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        UnmanagedDirectConnectSearch.and("server", UnmanagedDirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
-        UnmanagedDirectConnectSearch.and("lastPinged", UnmanagedDirectConnectSearch.entity().getLastPinged(), SearchCriteria.Op.LTEQ);
-        UnmanagedDirectConnectSearch.and("resourceStates", UnmanagedDirectConnectSearch.entity().getResourceState(), SearchCriteria.Op.NIN);
-        UnmanagedDirectConnectSearch.and("clusterIn", UnmanagedDirectConnectSearch.entity().getClusterId(), SearchCriteria.Op.IN);
+        this.UnmanagedDirectConnectSearch = createSearchBuilder();
+        this.UnmanagedDirectConnectSearch.and("resource", this.UnmanagedDirectConnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.UnmanagedDirectConnectSearch.and("server", this.UnmanagedDirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
+        this.UnmanagedDirectConnectSearch.and("lastPinged", this.UnmanagedDirectConnectSearch.entity().getLastPinged(), SearchCriteria.Op.LTEQ);
+        this.UnmanagedDirectConnectSearch.and("resourceStates", this.UnmanagedDirectConnectSearch.entity().getResourceState(), SearchCriteria.Op.NIN);
+        this.UnmanagedDirectConnectSearch.and("clusterIn", this.UnmanagedDirectConnectSearch.entity().getClusterId(), SearchCriteria.Op.IN);
         /*
          * UnmanagedDirectConnectSearch.op(SearchCriteria.Op.OR, "managementServerId",
          * UnmanagedDirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
          * UnmanagedDirectConnectSearch.and("lastPinged", UnmanagedDirectConnectSearch.entity().getLastPinged(),
          * SearchCriteria.Op.LTEQ); UnmanagedDirectConnectSearch.cp(); UnmanagedDirectConnectSearch.cp();
          */
-        HostTransferSearch = _hostTransferDao.createSearchBuilder();
-        HostTransferSearch.and("id", HostTransferSearch.entity().getId(), SearchCriteria.Op.NULL);
-        UnmanagedDirectConnectSearch.join("hostTransferSearch", HostTransferSearch, HostTransferSearch.entity().getId(), UnmanagedDirectConnectSearch.entity().getId(),
+        this.HostTransferSearch = this._hostTransferDao.createSearchBuilder();
+        this.HostTransferSearch.and("id", this.HostTransferSearch.entity().getId(), SearchCriteria.Op.NULL);
+        this.UnmanagedDirectConnectSearch.join("hostTransferSearch", this.HostTransferSearch, this.HostTransferSearch.entity().getId(), this.UnmanagedDirectConnectSearch.entity().getId(),
                 JoinType.LEFTOUTER);
-        ClusterManagedSearch = _clusterDao.createSearchBuilder();
-        ClusterManagedSearch.and("managed", ClusterManagedSearch.entity().getManagedState(), SearchCriteria.Op.EQ);
-        UnmanagedDirectConnectSearch.join("ClusterManagedSearch", ClusterManagedSearch, ClusterManagedSearch.entity().getId(), UnmanagedDirectConnectSearch.entity()
-                                                                                                                                                           .getClusterId(),
+        this.ClusterManagedSearch = this._clusterDao.createSearchBuilder();
+        this.ClusterManagedSearch.and("managed", this.ClusterManagedSearch.entity().getManagedState(), SearchCriteria.Op.EQ);
+        this.UnmanagedDirectConnectSearch.join("ClusterManagedSearch", this.ClusterManagedSearch, this.ClusterManagedSearch.entity().getId(), this.UnmanagedDirectConnectSearch.entity()
+                                                                                                                                                                               .getClusterId(),
                 JoinType.INNER);
-        UnmanagedDirectConnectSearch.done();
+        this.UnmanagedDirectConnectSearch.done();
 
-        DirectConnectSearch = createSearchBuilder();
-        DirectConnectSearch.and("resource", DirectConnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        DirectConnectSearch.and("id", DirectConnectSearch.entity().getId(), SearchCriteria.Op.EQ);
-        DirectConnectSearch.and().op("nullserver", DirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
-        DirectConnectSearch.or("server", DirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
-        DirectConnectSearch.cp();
-        DirectConnectSearch.done();
+        this.DirectConnectSearch = createSearchBuilder();
+        this.DirectConnectSearch.and("resource", this.DirectConnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.DirectConnectSearch.and("id", this.DirectConnectSearch.entity().getId(), SearchCriteria.Op.EQ);
+        this.DirectConnectSearch.and().op("nullserver", this.DirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
+        this.DirectConnectSearch.or("server", this.DirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
+        this.DirectConnectSearch.cp();
+        this.DirectConnectSearch.done();
 
-        UnmanagedApplianceSearch = createSearchBuilder();
-        UnmanagedApplianceSearch.and("resource", UnmanagedApplianceSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        UnmanagedApplianceSearch.and("server", UnmanagedApplianceSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
-        UnmanagedApplianceSearch.and("types", UnmanagedApplianceSearch.entity().getType(), SearchCriteria.Op.IN);
-        UnmanagedApplianceSearch.and("lastPinged", UnmanagedApplianceSearch.entity().getLastPinged(), SearchCriteria.Op.LTEQ);
-        UnmanagedApplianceSearch.done();
+        this.UnmanagedApplianceSearch = createSearchBuilder();
+        this.UnmanagedApplianceSearch.and("resource", this.UnmanagedApplianceSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.UnmanagedApplianceSearch.and("server", this.UnmanagedApplianceSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
+        this.UnmanagedApplianceSearch.and("types", this.UnmanagedApplianceSearch.entity().getType(), SearchCriteria.Op.IN);
+        this.UnmanagedApplianceSearch.and("lastPinged", this.UnmanagedApplianceSearch.entity().getLastPinged(), SearchCriteria.Op.LTEQ);
+        this.UnmanagedApplianceSearch.done();
 
-        AvailHypevisorInZone = createSearchBuilder();
-        AvailHypevisorInZone.and("zoneId", AvailHypevisorInZone.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        AvailHypevisorInZone.and("hostId", AvailHypevisorInZone.entity().getId(), SearchCriteria.Op.NEQ);
-        AvailHypevisorInZone.and("type", AvailHypevisorInZone.entity().getType(), SearchCriteria.Op.EQ);
-        AvailHypevisorInZone.groupBy(AvailHypevisorInZone.entity().getHypervisorType());
-        AvailHypevisorInZone.done();
+        this.AvailHypevisorInZone = createSearchBuilder();
+        this.AvailHypevisorInZone.and("zoneId", this.AvailHypevisorInZone.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.AvailHypevisorInZone.and("hostId", this.AvailHypevisorInZone.entity().getId(), SearchCriteria.Op.NEQ);
+        this.AvailHypevisorInZone.and("type", this.AvailHypevisorInZone.entity().getType(), SearchCriteria.Op.EQ);
+        this.AvailHypevisorInZone.groupBy(this.AvailHypevisorInZone.entity().getHypervisorType());
+        this.AvailHypevisorInZone.done();
 
-        HostsInStatusSearch = createSearchBuilder(Long.class);
-        HostsInStatusSearch.selectFields(HostsInStatusSearch.entity().getId());
-        HostsInStatusSearch.and("dc", HostsInStatusSearch.entity().getDataCenterId(), Op.EQ);
-        HostsInStatusSearch.and("pod", HostsInStatusSearch.entity().getPodId(), Op.EQ);
-        HostsInStatusSearch.and("cluster", HostsInStatusSearch.entity().getClusterId(), Op.EQ);
-        HostsInStatusSearch.and("type", HostsInStatusSearch.entity().getType(), Op.EQ);
-        HostsInStatusSearch.and("statuses", HostsInStatusSearch.entity().getStatus(), Op.IN);
-        HostsInStatusSearch.done();
+        this.HostsInStatusSearch = createSearchBuilder(Long.class);
+        this.HostsInStatusSearch.selectFields(this.HostsInStatusSearch.entity().getId());
+        this.HostsInStatusSearch.and("dc", this.HostsInStatusSearch.entity().getDataCenterId(), Op.EQ);
+        this.HostsInStatusSearch.and("pod", this.HostsInStatusSearch.entity().getPodId(), Op.EQ);
+        this.HostsInStatusSearch.and("cluster", this.HostsInStatusSearch.entity().getClusterId(), Op.EQ);
+        this.HostsInStatusSearch.and("type", this.HostsInStatusSearch.entity().getType(), Op.EQ);
+        this.HostsInStatusSearch.and("statuses", this.HostsInStatusSearch.entity().getStatus(), Op.IN);
+        this.HostsInStatusSearch.done();
 
-        CountRoutingByDc = createSearchBuilder(Long.class);
-        CountRoutingByDc.select(null, Func.COUNT, null);
-        CountRoutingByDc.and("dc", CountRoutingByDc.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        CountRoutingByDc.and("type", CountRoutingByDc.entity().getType(), SearchCriteria.Op.EQ);
-        CountRoutingByDc.and("status", CountRoutingByDc.entity().getStatus(), SearchCriteria.Op.EQ);
-        CountRoutingByDc.done();
+        this.CountRoutingByDc = createSearchBuilder(Long.class);
+        this.CountRoutingByDc.select(null, Func.COUNT, null);
+        this.CountRoutingByDc.and("dc", this.CountRoutingByDc.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.CountRoutingByDc.and("type", this.CountRoutingByDc.entity().getType(), SearchCriteria.Op.EQ);
+        this.CountRoutingByDc.and("status", this.CountRoutingByDc.entity().getStatus(), SearchCriteria.Op.EQ);
+        this.CountRoutingByDc.done();
 
-        ManagedDirectConnectSearch = createSearchBuilder();
-        ManagedDirectConnectSearch.and("resource", ManagedDirectConnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        ManagedDirectConnectSearch.and("server", ManagedDirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
-        ManagedDirectConnectSearch.done();
+        this.ManagedDirectConnectSearch = createSearchBuilder();
+        this.ManagedDirectConnectSearch.and("resource", this.ManagedDirectConnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.ManagedDirectConnectSearch.and("server", this.ManagedDirectConnectSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
+        this.ManagedDirectConnectSearch.done();
 
-        ManagedRoutingServersSearch = createSearchBuilder();
-        ManagedRoutingServersSearch.and("server", ManagedRoutingServersSearch.entity().getManagementServerId(), SearchCriteria.Op.NNULL);
-        ManagedRoutingServersSearch.and("type", ManagedRoutingServersSearch.entity().getType(), SearchCriteria.Op.EQ);
-        ManagedRoutingServersSearch.done();
+        this.ManagedRoutingServersSearch = createSearchBuilder();
+        this.ManagedRoutingServersSearch.and("server", this.ManagedRoutingServersSearch.entity().getManagementServerId(), SearchCriteria.Op.NNULL);
+        this.ManagedRoutingServersSearch.and("type", this.ManagedRoutingServersSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.ManagedRoutingServersSearch.done();
 
-        RoutingSearch = createSearchBuilder();
-        RoutingSearch.and("type", RoutingSearch.entity().getType(), SearchCriteria.Op.EQ);
-        RoutingSearch.done();
+        this.RoutingSearch = createSearchBuilder();
+        this.RoutingSearch.and("type", this.RoutingSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.RoutingSearch.done();
 
-        HostsForReconnectSearch = createSearchBuilder();
-        HostsForReconnectSearch.and("resource", HostsForReconnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        HostsForReconnectSearch.and("server", HostsForReconnectSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
-        HostsForReconnectSearch.and("lastPinged", HostsForReconnectSearch.entity().getLastPinged(), SearchCriteria.Op.LTEQ);
-        HostsForReconnectSearch.and("resourceStates", HostsForReconnectSearch.entity().getResourceState(), SearchCriteria.Op.NIN);
-        HostsForReconnectSearch.and("cluster", HostsForReconnectSearch.entity().getClusterId(), SearchCriteria.Op.NNULL);
-        HostsForReconnectSearch.and("status", HostsForReconnectSearch.entity().getStatus(), SearchCriteria.Op.IN);
-        HostsForReconnectSearch.done();
+        this.HostsForReconnectSearch = createSearchBuilder();
+        this.HostsForReconnectSearch.and("resource", this.HostsForReconnectSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.HostsForReconnectSearch.and("server", this.HostsForReconnectSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
+        this.HostsForReconnectSearch.and("lastPinged", this.HostsForReconnectSearch.entity().getLastPinged(), SearchCriteria.Op.LTEQ);
+        this.HostsForReconnectSearch.and("resourceStates", this.HostsForReconnectSearch.entity().getResourceState(), SearchCriteria.Op.NIN);
+        this.HostsForReconnectSearch.and("cluster", this.HostsForReconnectSearch.entity().getClusterId(), SearchCriteria.Op.NNULL);
+        this.HostsForReconnectSearch.and("status", this.HostsForReconnectSearch.entity().getStatus(), SearchCriteria.Op.IN);
+        this.HostsForReconnectSearch.done();
 
-        ClustersOwnedByMSSearch = createSearchBuilder(Long.class);
-        ClustersOwnedByMSSearch.select(null, Func.DISTINCT, ClustersOwnedByMSSearch.entity().getClusterId());
-        ClustersOwnedByMSSearch.and("resource", ClustersOwnedByMSSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        ClustersOwnedByMSSearch.and("cluster", ClustersOwnedByMSSearch.entity().getClusterId(), SearchCriteria.Op.NNULL);
-        ClustersOwnedByMSSearch.and("server", ClustersOwnedByMSSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
-        ClustersOwnedByMSSearch.done();
+        this.ClustersOwnedByMSSearch = createSearchBuilder(Long.class);
+        this.ClustersOwnedByMSSearch.select(null, Func.DISTINCT, this.ClustersOwnedByMSSearch.entity().getClusterId());
+        this.ClustersOwnedByMSSearch.and("resource", this.ClustersOwnedByMSSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.ClustersOwnedByMSSearch.and("cluster", this.ClustersOwnedByMSSearch.entity().getClusterId(), SearchCriteria.Op.NNULL);
+        this.ClustersOwnedByMSSearch.and("server", this.ClustersOwnedByMSSearch.entity().getManagementServerId(), SearchCriteria.Op.EQ);
+        this.ClustersOwnedByMSSearch.done();
 
-        ClustersForHostsNotOwnedByAnyMSSearch = createSearchBuilder(Long.class);
-        ClustersForHostsNotOwnedByAnyMSSearch.select(null, Func.DISTINCT, ClustersForHostsNotOwnedByAnyMSSearch.entity().getClusterId());
-        ClustersForHostsNotOwnedByAnyMSSearch.and("resource", ClustersForHostsNotOwnedByAnyMSSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        ClustersForHostsNotOwnedByAnyMSSearch.and("cluster", ClustersForHostsNotOwnedByAnyMSSearch.entity().getClusterId(), SearchCriteria.Op.NNULL);
-        ClustersForHostsNotOwnedByAnyMSSearch.and("server", ClustersForHostsNotOwnedByAnyMSSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
-        ClustersForHostsNotOwnedByAnyMSSearch.done();
+        this.ClustersForHostsNotOwnedByAnyMSSearch = createSearchBuilder(Long.class);
+        this.ClustersForHostsNotOwnedByAnyMSSearch.select(null, Func.DISTINCT, this.ClustersForHostsNotOwnedByAnyMSSearch.entity().getClusterId());
+        this.ClustersForHostsNotOwnedByAnyMSSearch.and("resource", this.ClustersForHostsNotOwnedByAnyMSSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.ClustersForHostsNotOwnedByAnyMSSearch.and("cluster", this.ClustersForHostsNotOwnedByAnyMSSearch.entity().getClusterId(), SearchCriteria.Op.NNULL);
+        this.ClustersForHostsNotOwnedByAnyMSSearch.and("server", this.ClustersForHostsNotOwnedByAnyMSSearch.entity().getManagementServerId(), SearchCriteria.Op.NULL);
+        this.ClustersForHostsNotOwnedByAnyMSSearch.done();
 
-        AllClustersSearch = _clusterDao.createSearchBuilder(Long.class);
-        AllClustersSearch.select(null, Func.NATIVE, AllClustersSearch.entity().getId());
-        AllClustersSearch.and("managed", AllClustersSearch.entity().getManagedState(), SearchCriteria.Op.EQ);
-        AllClustersSearch.done();
+        this.AllClustersSearch = this._clusterDao.createSearchBuilder(Long.class);
+        this.AllClustersSearch.select(null, Func.NATIVE, this.AllClustersSearch.entity().getId());
+        this.AllClustersSearch.and("managed", this.AllClustersSearch.entity().getManagedState(), SearchCriteria.Op.EQ);
+        this.AllClustersSearch.done();
 
-        HostsInClusterSearch = createSearchBuilder();
-        HostsInClusterSearch.and("resource", HostsInClusterSearch.entity().getResource(), SearchCriteria.Op.NNULL);
-        HostsInClusterSearch.and("cluster", HostsInClusterSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
-        HostsInClusterSearch.and("server", HostsInClusterSearch.entity().getManagementServerId(), SearchCriteria.Op.NNULL);
-        HostsInClusterSearch.done();
+        this.HostsInClusterSearch = createSearchBuilder();
+        this.HostsInClusterSearch.and("resource", this.HostsInClusterSearch.entity().getResource(), SearchCriteria.Op.NNULL);
+        this.HostsInClusterSearch.and("cluster", this.HostsInClusterSearch.entity().getClusterId(), SearchCriteria.Op.EQ);
+        this.HostsInClusterSearch.and("server", this.HostsInClusterSearch.entity().getManagementServerId(), SearchCriteria.Op.NNULL);
+        this.HostsInClusterSearch.done();
 
-        HostIdSearch = createSearchBuilder(Long.class);
-        HostIdSearch.selectFields(HostIdSearch.entity().getId());
-        HostIdSearch.and("dataCenterId", HostIdSearch.entity().getDataCenterId(), Op.EQ);
-        HostIdSearch.done();
+        this.HostIdSearch = createSearchBuilder(Long.class);
+        this.HostIdSearch.selectFields(this.HostIdSearch.entity().getId());
+        this.HostIdSearch.and("dataCenterId", this.HostIdSearch.entity().getDataCenterId(), Op.EQ);
+        this.HostIdSearch.done();
 
-        _statusAttr = _allAttributes.get("status");
-        _msIdAttr = _allAttributes.get("managementServerId");
-        _pingTimeAttr = _allAttributes.get("lastPinged");
-        _resourceStateAttr = _allAttributes.get("resourceState");
+        this._statusAttr = this._allAttributes.get("status");
+        this._msIdAttr = this._allAttributes.get("managementServerId");
+        this._pingTimeAttr = this._allAttributes.get("lastPinged");
+        this._resourceStateAttr = this._allAttributes.get("resourceState");
 
-        assert (_statusAttr != null && _msIdAttr != null && _pingTimeAttr != null) : "Couldn't find one of these attributes";
+        assert (this._statusAttr != null && this._msIdAttr != null && this._pingTimeAttr != null) : "Couldn't find one of these attributes";
     }
 
     @Override
     public long countBy(final long clusterId, final ResourceState... states) {
-        final SearchCriteria<HostVO> sc = MaintenanceCountSearch.create();
+        final SearchCriteria<HostVO> sc = this.MaintenanceCountSearch.create();
 
         sc.setParameters("resourceState", (Object[]) states);
         sc.setParameters("cluster", clusterId);
@@ -393,7 +393,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     public void markHostsAsDisconnected(final long msId, final long lastPing) {
-        SearchCriteria<HostVO> sc = MsStatusSearch.create();
+        SearchCriteria<HostVO> sc = this.MsStatusSearch.create();
         sc.setParameters("ms", msId);
 
         HostVO host = createForUpdate();
@@ -404,7 +404,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
         update(ub, sc, null);
 
-        sc = MsStatusSearch.create();
+        sc = this.MsStatusSearch.create();
         sc.setParameters("ms", msId);
 
         host = createForUpdate();
@@ -424,10 +424,10 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
                         "'Disconnected', 'Connecting') and h.type not in ('ExternalLoadBalancer', 'TrafficMonitor', 'SecondaryStorage', " +
                         "'LocalSecondaryStorage', 'L2Networking') and (h.cluster_id is null or c.managed_state = 'Managed') ;";
         try (
-                TransactionLegacy txn = TransactionLegacy.currentTxn();
-                PreparedStatement pstmt = txn.prepareStatement(sql)) {
+                final TransactionLegacy txn = TransactionLegacy.currentTxn();
+                final PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, timeout);
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (final ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     final long id = rs.getLong(1); //ID column
                     result.add(findById(id));
@@ -462,7 +462,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         List<Long> clusters = findClustersOwnedByManagementServer(managementServerId);
         if (clusters.size() > 0) {
             // handle clusters already owned by @managementServerId
-            final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
+            final SearchCriteria<HostVO> sc = this.UnmanagedDirectConnectSearch.create();
             sc.setParameters("lastPinged", lastPingSecondsAfter);
             sc.setJoinParameters("ClusterManagedSearch", "managed", ManagedState.Managed);
             sc.setParameters("clusterIn", clusters.toArray());
@@ -494,7 +494,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
                 updatedClusters = clusters.subList(0, limit.intValue());
             }
             if (updatedClusters.size() > 0) {
-                final SearchCriteria<HostVO> sc = UnmanagedDirectConnectSearch.create();
+                final SearchCriteria<HostVO> sc = this.UnmanagedDirectConnectSearch.create();
                 sc.setParameters("lastPinged", lastPingSecondsAfter);
                 sc.setJoinParameters("ClusterManagedSearch", "managed", ManagedState.Managed);
                 sc.setParameters("clusterIn", updatedClusters.toArray());
@@ -578,7 +578,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
             s_logger.trace("getNextSequence(), hostId: " + hostId);
         }
 
-        final TableGenerator tg = _tgs.get("host_req_sq");
+        final TableGenerator tg = this._tgs.get("host_req_sq");
         assert tg != null : "how can this be wrong!";
 
         return s_seqFetcher.getNextSequence(Long.class, tg, hostId);
@@ -586,7 +586,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     public void loadDetails(final HostVO host) {
-        final Map<String, String> details = _detailsDao.findDetails(host.getId());
+        final Map<String, String> details = this._detailsDao.findDetails(host.getId());
         host.setDetails(details);
     }
 
@@ -596,19 +596,19 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         if (details == null) {
             return;
         }
-        _detailsDao.persist(host.getId(), details);
+        this._detailsDao.persist(host.getId(), details);
     }
 
     @Override
     public void loadHostTags(final HostVO host) {
-        final List<String> hostTags = _hostTagsDao.gethostTags(host.getId());
+        final List<String> hostTags = this._hostTagsDao.gethostTags(host.getId());
         host.setHostTags(hostTags);
     }
 
     @Override
     public List<HostVO> listByHostTag(final HostType type, final Long clusterId, final Long podId, final long dcId, final String hostTag) {
 
-        final SearchBuilder<HostTagVO> hostTagSearch = _hostTagsDao.createSearchBuilder();
+        final SearchBuilder<HostTagVO> hostTagSearch = this._hostTagsDao.createSearchBuilder();
         final HostTagVO tagEntity = hostTagSearch.entity();
         hostTagSearch.and("tag", tagEntity.getTag(), SearchCriteria.Op.EQ);
 
@@ -638,10 +638,9 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         return listBy(sc);
     }
 
-    /*TODO: this is used by mycloud, check if it needs resource state Enabled */
     @Override
     public long countRoutingHostsByDataCenter(final long dcId) {
-        final SearchCriteria<Long> sc = CountRoutingByDc.create();
+        final SearchCriteria<Long> sc = this.CountRoutingByDc.create();
         sc.setParameters("dc", dcId);
         sc.setParameters("type", HostType.Routing);
         sc.setParameters("status", HostStatus.Up.toString());
@@ -654,7 +653,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
 
         txn.start();
-        final SearchCriteria<HostVO> sc = UnmanagedApplianceSearch.create();
+        final SearchCriteria<HostVO> sc = this.UnmanagedApplianceSearch.create();
         sc.setParameters("lastPinged", lastPingSecondsAfter);
         sc.setParameters("types", HostType.ExternalDhcp, HostType.ExternalLoadBalancer, HostType.TrafficMonitor,
                 HostType.L2Networking);
@@ -695,16 +694,16 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         if (hostTags == null || (hostTags != null && hostTags.isEmpty())) {
             return;
         }
-        _hostTagsDao.persist(host.getId(), hostTags);
+        this._hostTagsDao.persist(host.getId(), hostTags);
     }
 
     protected void saveGpuRecords(final HostVO host) {
         final HashMap<String, HashMap<String, VgpuTypesInfo>> groupDetails = host.getGpuGroupDetails();
         if (groupDetails != null) {
             // Create/Update GPU group entries
-            _hostGpuGroupsDao.persist(host.getId(), new ArrayList<>(groupDetails.keySet()));
+            this._hostGpuGroupsDao.persist(host.getId(), new ArrayList<>(groupDetails.keySet()));
             // Create/Update VGPU types entries
-            _vgpuTypesDao.persist(host.getId(), groupDetails);
+            this._vgpuTypesDao.persist(host.getId(), groupDetails);
         }
     }
 
@@ -751,7 +750,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
         sc.setParameters("id", host.getId());
 
         final UpdateBuilder ub = getUpdateBuilder(host);
-        ub.set(host, _resourceStateAttr, newState);
+        ub.set(host, this._resourceStateAttr, newState);
         final int result = update(ub, sc, null);
         assert result <= 1 : "How can this update " + result + " rows? ";
 
@@ -781,13 +780,13 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     public HostVO findByGuid(final String guid) {
-        final SearchCriteria<HostVO> sc = GuidSearch.create("guid", guid);
+        final SearchCriteria<HostVO> sc = this.GuidSearch.create("guid", guid);
         return findOneBy(sc);
     }
 
     @Override
     public HostVO findByTypeNameAndZoneId(final long zoneId, final String name, final HostType type) {
-        final SearchCriteria<HostVO> sc = TypeNameZoneSearch.create();
+        final SearchCriteria<HostVO> sc = this.TypeNameZoneSearch.create();
         sc.setParameters("type", type);
         sc.setParameters("name", name);
         sc.setParameters("zoneId", zoneId);
@@ -796,7 +795,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     public List<HostVO> findHypervisorHostInCluster(final long clusterId) {
-        final SearchCriteria<HostVO> sc = TypeClusterStatusSearch.create();
+        final SearchCriteria<HostVO> sc = this.TypeClusterStatusSearch.create();
         sc.setParameters("type", HostType.Routing);
         sc.setParameters("cluster", clusterId);
         sc.setParameters("status", HostStatus.Up);
@@ -809,7 +808,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
     public List<HostVO> listAllUpAndEnabledNonHAHosts(final HostType type, final Long clusterId, final Long podId, final long dcId, final String haTag) {
         SearchBuilder<HostTagVO> hostTagSearch = null;
         if (haTag != null && !haTag.isEmpty()) {
-            hostTagSearch = _hostTagsDao.createSearchBuilder();
+            hostTagSearch = this._hostTagsDao.createSearchBuilder();
             hostTagSearch.and().op("tag", hostTagSearch.entity().getTag(), SearchCriteria.Op.NEQ);
             hostTagSearch.or("tagNull", hostTagSearch.entity().getTag(), SearchCriteria.Op.NULL);
             hostTagSearch.cp();
@@ -855,21 +854,21 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     public List<HostVO> findByPodId(final Long podId) {
-        final SearchCriteria<HostVO> sc = PodSearch.create();
+        final SearchCriteria<HostVO> sc = this.PodSearch.create();
         sc.setParameters("podId", podId);
         return listBy(sc);
     }
 
     @Override
     public List<HostVO> findByClusterId(final Long clusterId) {
-        final SearchCriteria<HostVO> sc = ClusterSearch.create();
+        final SearchCriteria<HostVO> sc = this.ClusterSearch.create();
         sc.setParameters("clusterId", clusterId);
         return listBy(sc);
     }
 
     @Override
     public List<HostVO> listByDataCenterId(final long id) {
-        final SearchCriteria<HostVO> sc = DcSearch.create();
+        final SearchCriteria<HostVO> sc = this.DcSearch.create();
         sc.setParameters("dc", id);
         sc.setParameters("status", HostStatus.Up);
         sc.setParameters("type", HostType.Routing);
@@ -880,21 +879,21 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
     @Override
     public List<Long> listAllHosts(final long zoneId) {
-        final SearchCriteria<Long> sc = HostIdSearch.create();
+        final SearchCriteria<Long> sc = this.HostIdSearch.create();
         sc.addAnd("dataCenterId", SearchCriteria.Op.EQ, zoneId);
         return customSearch(sc, null);
     }
 
     @Override
     public HostVO findByPublicIp(final String publicIp) {
-        final SearchCriteria<HostVO> sc = PublicIpAddressSearch.create();
+        final SearchCriteria<HostVO> sc = this.PublicIpAddressSearch.create();
         sc.setParameters("publicIpAddress", publicIp);
         return findOneBy(sc);
     }
 
     @Override
     public List<HostVO> listByType(final HostType type) {
-        final SearchCriteria<HostVO> sc = TypeSearch.create();
+        final SearchCriteria<HostVO> sc = this.TypeSearch.create();
         sc.setParameters("type", type);
         return listBy(sc);
     }
@@ -903,7 +902,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
      * Find hosts which is in Disconnected, Down, Alert and ping timeout and server is not null, set server to null
      */
     private void resetHosts(final long managementServerId, final long lastPingSecondsAfter) {
-        final SearchCriteria<HostVO> sc = HostsForReconnectSearch.create();
+        final SearchCriteria<HostVO> sc = this.HostsForReconnectSearch.create();
         sc.setParameters("server", managementServerId);
         sc.setParameters("lastPinged", lastPingSecondsAfter);
         sc.setParameters("status", HostStatus.Disconnected, HostStatus.Down, HostStatus.Alert);
@@ -926,7 +925,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
      * Returns a list of cluster owned by @managementServerId
      */
     private List<Long> findClustersOwnedByManagementServer(final long managementServerId) {
-        final SearchCriteria<Long> sc = ClustersOwnedByMSSearch.create();
+        final SearchCriteria<Long> sc = this.ClustersOwnedByMSSearch.create();
         sc.setParameters("server", managementServerId);
 
         final List<Long> clusters = customSearch(sc, null);
@@ -937,7 +936,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
      * Returns clusters based on the list of hosts not owned by any MS
      */
     private List<Long> findClustersForHostsNotOwnedByAnyManagementServer() {
-        final SearchCriteria<Long> sc = ClustersForHostsNotOwnedByAnyMSSearch.create();
+        final SearchCriteria<Long> sc = this.ClustersForHostsNotOwnedByAnyMSSearch.create();
 
         final List<Long> clusters = customSearch(sc, null);
         return clusters;
@@ -947,10 +946,10 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
      * Returns a list of all cluster Ids
      */
     private List<Long> listAllClusters() {
-        final SearchCriteria<Long> sc = AllClustersSearch.create();
+        final SearchCriteria<Long> sc = this.AllClustersSearch.create();
         sc.setParameters("managed", ManagedState.Managed);
 
-        final List<Long> clusters = _clusterDao.customSearch(sc, null);
+        final List<Long> clusters = this._clusterDao.customSearch(sc, null);
         return clusters;
     }
 
@@ -962,7 +961,7 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
      * 2. During MS restart all hosts in a cluster are without any MS
      */
     private boolean canOwnCluster(final long clusterId) {
-        final SearchCriteria<HostVO> sc = HostsInClusterSearch.create();
+        final SearchCriteria<HostVO> sc = this.HostsInClusterSearch.create();
         sc.setParameters("cluster", clusterId);
 
         final List<HostVO> hosts = search(sc, null);
@@ -1011,19 +1010,19 @@ public class HostDaoImpl extends GenericDaoBase<HostVO, Long> implements HostDao
 
         final long newUpdateCount = host.incrUpdated();
         final UpdateBuilder ub = getUpdateBuilder(host);
-        ub.set(host, _statusAttr, newStatus);
+        ub.set(host, this._statusAttr, newStatus);
         if (newStatus.updateManagementServer()) {
             if (newStatus.lostConnection()) {
-                ub.set(host, _msIdAttr, null);
+                ub.set(host, this._msIdAttr, null);
             } else {
-                ub.set(host, _msIdAttr, host.getManagementServerId());
+                ub.set(host, this._msIdAttr, host.getManagementServerId());
             }
             if (event.equals(Event.Ping) || event.equals(Event.AgentConnected)) {
-                ub.set(host, _pingTimeAttr, System.currentTimeMillis() >> 10);
+                ub.set(host, this._pingTimeAttr, System.currentTimeMillis() >> 10);
             }
         }
         if (event.equals(Event.ManagementServerDown)) {
-            ub.set(host, _pingTimeAttr, ((System.currentTimeMillis() >> 10) - (10 * 60)));
+            ub.set(host, this._pingTimeAttr, ((System.currentTimeMillis() >> 10) - (10 * 60)));
         }
         final int result = update(ub, sc, null);
         assert result <= 1 : "How can this update " + result + " rows? ";
