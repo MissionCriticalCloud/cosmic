@@ -1,6 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.storage.StorageLayer;
 
@@ -61,7 +62,7 @@ public class VhdProcessorTest {
         Mockito.when(mockStorageLayer.getSize(Mockito.anyString())).thenReturn(actualSize);
         Mockito.doReturn(virtualSize).when(processor).getTemplateVirtualSize((File) Mockito.any());
 
-        final Processor.FormatInfo info = processor.process(templatePath, null, templateName);
+        final TemplateFormatInfo info = processor.process(templatePath, null, templateName);
         Assert.assertEquals(ImageFormat.VHD, info.format);
         Assert.assertEquals(actualSize, info.size);
         Assert.assertEquals(virtualSize, info.virtualSize);

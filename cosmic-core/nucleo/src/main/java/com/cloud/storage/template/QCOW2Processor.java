@@ -1,6 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
@@ -22,7 +23,7 @@ public class QCOW2Processor extends AdapterBase implements Processor {
     private StorageLayer _storage;
 
     @Override
-    public FormatInfo process(final String templatePath, final ImageFormat format, final String templateName) throws InternalErrorException {
+    public TemplateFormatInfo process(final String templatePath, final ImageFormat format, final String templateName) throws InternalErrorException {
         if (format != null) {
             s_logger.debug("We currently don't handle conversion from " + format + " to QCOW2.");
             return null;
@@ -35,7 +36,7 @@ public class QCOW2Processor extends AdapterBase implements Processor {
             return null;
         }
 
-        final FormatInfo info = new FormatInfo();
+        final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.QCOW2;
         info.filename = templateName + "." + ImageFormat.QCOW2.getFileExtension();
 

@@ -15,7 +15,7 @@ import com.cloud.engine.subsystem.api.storage.TemplateService.TemplateApiResult;
 import com.cloud.framework.async.AsyncCallFuture;
 import com.cloud.framework.events.Event;
 import com.cloud.framework.messagebus.MessageBus;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateVO;
@@ -77,7 +77,7 @@ public class HypervisorTemplateAdapterTest {
         when(store.getName()).thenReturn("Test Store");
 
         final TemplateDataStoreVO dataStoreVO = mock(TemplateDataStoreVO.class);
-        when(dataStoreVO.getDownloadState()).thenReturn(Status.DOWNLOADED);
+        when(dataStoreVO.getDownloadState()).thenReturn(VMTemplateStatus.DOWNLOADED);
 
         final TemplateInfo info = mock(TemplateInfo.class);
         when(info.getDataStore()).thenReturn(store);

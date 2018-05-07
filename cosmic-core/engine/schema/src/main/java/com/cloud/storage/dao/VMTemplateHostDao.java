@@ -2,7 +2,7 @@ package com.cloud.storage.dao;
 
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.utils.fsm.StateDao;
@@ -27,13 +27,13 @@ public interface VMTemplateHostDao extends GenericDao<VMTemplateHostVO, Long>,
 
     void update(VMTemplateHostVO instance);
 
-    List<VMTemplateHostVO> listByTemplateStatus(long templateId, VMTemplateHostVO.Status downloadState);
+    List<VMTemplateHostVO> listByTemplateStatus(long templateId, VMTemplateStatus downloadState);
 
-    List<VMTemplateHostVO> listByTemplateStatus(long templateId, long datacenterId, VMTemplateHostVO.Status downloadState);
+    List<VMTemplateHostVO> listByTemplateStatus(long templateId, long datacenterId, VMTemplateStatus downloadState);
 
-    List<VMTemplateHostVO> listByTemplateStatus(long templateId, long datacenterId, long podId, VMTemplateHostVO.Status downloadState);
+    List<VMTemplateHostVO> listByTemplateStatus(long templateId, long datacenterId, long podId, VMTemplateStatus downloadState);
 
-    List<VMTemplateHostVO> listByTemplateStates(long templateId, VMTemplateHostVO.Status... states);
+    List<VMTemplateHostVO> listByTemplateStates(long templateId, VMTemplateStatus... states);
 
     List<VMTemplateHostVO> listDestroyed(long hostId);
 
@@ -45,7 +45,7 @@ public interface VMTemplateHostDao extends GenericDao<VMTemplateHostVO, Long>,
 
     VMTemplateHostVO findLocalSecondaryStorageByHostTemplate(long hostId, long templateId);
 
-    List<VMTemplateHostVO> listByTemplateHostStatus(long templateId, long hostId, Status... states);
+    List<VMTemplateHostVO> listByTemplateHostStatus(long templateId, long hostId, VMTemplateStatus... states);
 
-    List<VMTemplateHostVO> listByState(Status state);
+    List<VMTemplateHostVO> listByState(VMTemplateStatus state);
 }

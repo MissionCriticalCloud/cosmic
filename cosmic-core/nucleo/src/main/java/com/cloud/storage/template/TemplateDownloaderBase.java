@@ -1,6 +1,8 @@
 package com.cloud.storage.template;
 
 import com.cloud.common.managed.context.ManagedContextRunnable;
+import com.cloud.legacymodel.storage.DownloadCompleteCallback;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
 import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
@@ -13,7 +15,7 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
 
     protected String _downloadUrl;
     protected String _toFile;
-    protected TemplateDownloader.Status _status = TemplateDownloader.Status.NOT_STARTED;
+    protected TemplateDownloadStatus _status = TemplateDownloadStatus.NOT_STARTED;
     protected String _errorString = " ";
     protected long _remoteSize = 0;
     protected long _downloadTime = 0;
@@ -46,7 +48,7 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
             case RECOVERABLE_ERROR:
             case UNRECOVERABLE_ERROR:
             case ABORTED:
-                this._status = TemplateDownloader.Status.ABORTED;
+                this._status = TemplateDownloadStatus.ABORTED;
                 break;
             case DOWNLOAD_FINISHED:
                 break;
@@ -70,12 +72,12 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
     }
 
     @Override
-    public Status getStatus() {
+    public TemplateDownloadStatus getStatus() {
         return this._status;
     }
 
     @Override
-    public void setStatus(final Status status) {
+    public void setStatus(final TemplateDownloadStatus status) {
         this._status = status;
     }
 
@@ -127,7 +129,7 @@ public abstract class TemplateDownloaderBase extends ManagedContextRunnable impl
         } catch (final Exception e) {
             s_logger.warn("Unable to complete download due to ", e);
             this._errorString = "Failed to install: " + e.getMessage();
-            this._status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
         }
     }
 }

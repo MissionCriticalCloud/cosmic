@@ -1,5 +1,8 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.storage.TemplateUploadStatus;
+import com.cloud.legacymodel.storage.UploadCompleteCallback;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,7 +20,7 @@ public class FtpTemplateUploader implements TemplateUploader {
 
     public static final Logger s_logger = LoggerFactory.getLogger(FtpTemplateUploader.class.getName());
     private static final int CHUNK_SIZE = 1024 * 1024; //1M
-    public TemplateUploader.Status status = TemplateUploader.Status.NOT_STARTED;
+    public TemplateUploadStatus status = TemplateUploadStatus.NOT_STARTED;
     public String errorString = "";
     public long totalBytes = 0;
     public long entitySizeinBytes;
@@ -30,20 +33,20 @@ public class FtpTemplateUploader implements TemplateUploader {
     public FtpTemplateUploader(final String sourcePath, final String url, final UploadCompleteCallback callback, final long entitySizeinBytes) {
 
         this.sourcePath = sourcePath;
-        ftpUrl = url;
-        completionCallback = callback;
+        this.ftpUrl = url;
+        this.completionCallback = callback;
         this.entitySizeinBytes = entitySizeinBytes;
     }
 
     @Override
     public void run() {
-        upload(completionCallback);
+        upload(this.completionCallback);
     }
 
     @Override
     public long upload(final UploadCompleteCallback callback) {
 
-        switch (status) {
+        switch (this.status) {
             case ABORTED:
             case UNRECOVERABLE_ERROR:
             case UPLOAD_FINISHED:
@@ -53,7 +56,7 @@ public class FtpTemplateUploader implements TemplateUploader {
 
         new Date();
 
-        final StringBuffer sb = new StringBuffer(ftpUrl);
+        final StringBuffer sb = new StringBuffer(this.ftpUrl);
         // check for authentication else assume its anonymous access.
         /* if (user != null && password != null)
                  {
@@ -71,48 +74,48 @@ public class FtpTemplateUploader implements TemplateUploader {
         try {
             final URL url = new URL(sb.toString());
             final URLConnection urlc = url.openConnection();
-            final File sourceFile = new File(sourcePath);
-            entitySizeinBytes = sourceFile.length();
+            final File sourceFile = new File(this.sourcePath);
+            this.entitySizeinBytes = sourceFile.length();
 
-            outputStream = new BufferedOutputStream(urlc.getOutputStream());
-            inputStream = new BufferedInputStream(new FileInputStream(sourceFile));
+            this.outputStream = new BufferedOutputStream(urlc.getOutputStream());
+            this.inputStream = new BufferedInputStream(new FileInputStream(sourceFile));
 
-            status = TemplateUploader.Status.IN_PROGRESS;
+            this.status = TemplateUploadStatus.IN_PROGRESS;
 
             int bytes = 0;
             final byte[] block = new byte[CHUNK_SIZE];
             boolean done = false;
-            while (!done && status != Status.ABORTED) {
-                if ((bytes = inputStream.read(block, 0, CHUNK_SIZE)) > -1) {
-                    outputStream.write(block, 0, bytes);
-                    totalBytes += bytes;
+            while (!done && this.status != TemplateUploadStatus.ABORTED) {
+                if ((bytes = this.inputStream.read(block, 0, CHUNK_SIZE)) > -1) {
+                    this.outputStream.write(block, 0, bytes);
+                    this.totalBytes += bytes;
                 } else {
                     done = true;
                 }
             }
-            status = TemplateUploader.Status.UPLOAD_FINISHED;
-            return totalBytes;
+            this.status = TemplateUploadStatus.UPLOAD_FINISHED;
+            return this.totalBytes;
         } catch (final MalformedURLException e) {
-            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
-            errorString = e.getMessage();
-            s_logger.error(errorString);
+            this.status = TemplateUploadStatus.UNRECOVERABLE_ERROR;
+            this.errorString = e.getMessage();
+            s_logger.error(this.errorString);
         } catch (final IOException e) {
-            status = TemplateUploader.Status.UNRECOVERABLE_ERROR;
-            errorString = e.getMessage();
-            s_logger.error(errorString);
+            this.status = TemplateUploadStatus.UNRECOVERABLE_ERROR;
+            this.errorString = e.getMessage();
+            s_logger.error(this.errorString);
         } finally {
             try {
-                if (inputStream != null) {
-                    inputStream.close();
+                if (this.inputStream != null) {
+                    this.inputStream.close();
                 }
-                if (outputStream != null) {
-                    outputStream.close();
+                if (this.outputStream != null) {
+                    this.outputStream.close();
                 }
             } catch (final IOException ioe) {
                 s_logger.error(" Caught exception while closing the resources");
             }
             if (callback != null) {
-                callback.uploadComplete(status);
+                callback.uploadComplete(this.status);
             }
         }
 
@@ -124,23 +127,23 @@ public class FtpTemplateUploader implements TemplateUploader {
         switch (getStatus()) {
             case IN_PROGRESS:
                 try {
-                    if (outputStream != null) {
-                        outputStream.close();
+                    if (this.outputStream != null) {
+                        this.outputStream.close();
                     }
-                    if (inputStream != null) {
-                        inputStream.close();
+                    if (this.inputStream != null) {
+                        this.inputStream.close();
                     }
                 } catch (final IOException e) {
                     s_logger.error(" Caught exception while closing the resources");
                 }
-                status = TemplateUploader.Status.ABORTED;
+                this.status = TemplateUploadStatus.ABORTED;
                 return true;
             case UNKNOWN:
             case NOT_STARTED:
             case RECOVERABLE_ERROR:
             case UNRECOVERABLE_ERROR:
             case ABORTED:
-                status = TemplateUploader.Status.ABORTED;
+                this.status = TemplateUploadStatus.ABORTED;
             case UPLOAD_FINISHED:
                 return true;
 
@@ -151,19 +154,19 @@ public class FtpTemplateUploader implements TemplateUploader {
 
     @Override
     public int getUploadPercent() {
-        if (entitySizeinBytes == 0) {
+        if (this.entitySizeinBytes == 0) {
             return 0;
         }
-        return (int) (100.0 * totalBytes / entitySizeinBytes);
+        return (int) (100.0 * this.totalBytes / this.entitySizeinBytes);
     }
 
     @Override
-    public Status getStatus() {
-        return status;
+    public TemplateUploadStatus getStatus() {
+        return this.status;
     }
 
     @Override
-    public void setStatus(final Status status) {
+    public void setStatus(final TemplateUploadStatus status) {
         this.status = status;
     }
 
@@ -175,22 +178,22 @@ public class FtpTemplateUploader implements TemplateUploader {
 
     @Override
     public long getUploadedBytes() {
-        return totalBytes;
+        return this.totalBytes;
     }
 
     @Override
     public String getUploadError() {
-        return errorString;
+        return this.errorString;
     }
 
     @Override
     public void setUploadError(final String string) {
-        errorString = string;
+        this.errorString = string;
     }
 
     @Override
     public String getUploadLocalPath() {
-        return sourcePath;
+        return this.sourcePath;
     }
 
     @Override

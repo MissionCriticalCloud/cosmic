@@ -14,7 +14,7 @@ import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.Processor.FormatInfo;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.storage.template.QCOW2Processor;
 import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.qemu.QemuImg;
@@ -135,7 +135,7 @@ public final class LibvirtCreatePrivateTemplateFromVolumeCommandWrapper
 
             qcow2Processor.configure("QCOW2 Processor", params);
 
-            final FormatInfo info = qcow2Processor.process(tmpltPath, null, command.getUniqueName());
+            final TemplateFormatInfo info = qcow2Processor.process(tmpltPath, null, command.getUniqueName());
 
             final TemplateLocation loc = new TemplateLocation(storage, tmpltPath);
             loc.create(1, true, command.getUniqueName());

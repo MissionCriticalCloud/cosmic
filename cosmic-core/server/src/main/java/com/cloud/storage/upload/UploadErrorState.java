@@ -2,7 +2,7 @@ package com.cloud.storage.upload;
 
 import com.cloud.legacymodel.communication.answer.UploadAnswer;
 import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.UploadStatus;
 
 public class UploadErrorState extends UploadInactiveState {
 
@@ -15,22 +15,22 @@ public class UploadErrorState extends UploadInactiveState {
         switch (answer.getUploadStatus()) {
             case UPLOAD_IN_PROGRESS:
                 getUploadListener().scheduleStatusCheck(RequestType.GET_STATUS);
-                return Status.UPLOAD_IN_PROGRESS.toString();
+                return UploadStatus.UPLOAD_IN_PROGRESS.toString();
             case UPLOADED:
                 getUploadListener().scheduleImmediateStatusCheck(RequestType.PURGE);
                 getUploadListener().cancelTimeoutTask();
-                return Status.UPLOADED.toString();
+                return UploadStatus.UPLOADED.toString();
             case NOT_UPLOADED:
                 getUploadListener().scheduleStatusCheck(RequestType.GET_STATUS);
-                return Status.NOT_UPLOADED.toString();
+                return UploadStatus.NOT_UPLOADED.toString();
             case UPLOAD_ERROR:
                 getUploadListener().cancelStatusTask();
                 getUploadListener().cancelTimeoutTask();
-                return Status.UPLOAD_ERROR.toString();
+                return UploadStatus.UPLOAD_ERROR.toString();
             case UNKNOWN:
                 getUploadListener().cancelStatusTask();
                 getUploadListener().cancelTimeoutTask();
-                return Status.UPLOAD_ERROR.toString();
+                return UploadStatus.UPLOAD_ERROR.toString();
             default:
                 return null;
         }
@@ -38,12 +38,12 @@ public class UploadErrorState extends UploadInactiveState {
 
     @Override
     public String handleAbort() {
-        return Status.ABANDONED.toString();
+        return UploadStatus.ABANDONED.toString();
     }
 
     @Override
     public String getName() {
-        return Status.UPLOAD_ERROR.toString();
+        return UploadStatus.UPLOAD_ERROR.toString();
     }
 
     @Override
@@ -53,12 +53,12 @@ public class UploadErrorState extends UploadInactiveState {
             getUploadListener().logDisconnect();
             getUploadListener().cancelStatusTask();
             getUploadListener().cancelTimeoutTask();
-            getUploadListener().updateDatabase(Status.UPLOAD_ERROR, "Storage agent or storage VM disconnected");
+            getUploadListener().updateDatabase(UploadStatus.UPLOAD_ERROR, "Storage agent or storage VM disconnected");
             getUploadListener().logWarn("Entering upload error state because the storage host disconnected");
         } else if (event == UploadEvent.TIMEOUT_CHECK) {
-            getUploadListener().updateDatabase(Status.UPLOAD_ERROR, "Timeout waiting for response from storage host");
+            getUploadListener().updateDatabase(UploadStatus.UPLOAD_ERROR, "Timeout waiting for response from storage host");
             getUploadListener().logWarn("Entering upload error state: timeout waiting for response from storage host");
         }
-        getUploadListener().setUploadInactive(Status.UPLOAD_ERROR);
+        getUploadListener().setUploadInactive(UploadStatus.UPLOAD_ERROR);
     }
 }

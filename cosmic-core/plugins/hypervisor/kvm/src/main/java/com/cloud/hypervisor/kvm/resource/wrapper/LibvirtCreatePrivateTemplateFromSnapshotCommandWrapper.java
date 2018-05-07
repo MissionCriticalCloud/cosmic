@@ -12,7 +12,7 @@ import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
 import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.Processor.FormatInfo;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.StorageLayer;
@@ -71,7 +71,7 @@ public final class LibvirtCreatePrivateTemplateFromSnapshotCommandWrapper
             scriptCommand.execute();
 
             final Processor qcow2Processor = libvirtUtilitiesHelper.buildQcow2Processor(storage);
-            final FormatInfo info = qcow2Processor.process(templatePath, null, tmplName);
+            final TemplateFormatInfo info = qcow2Processor.process(templatePath, null, tmplName);
             final TemplateLocation loc = libvirtUtilitiesHelper.buildTemplateLocation(storage, templatePath);
 
             loc.create(1, true, tmplName);

@@ -33,7 +33,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.TemplateType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
 import com.cloud.legacymodel.user.Account;
@@ -107,7 +107,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         UriUtils.validateUrl(cmd.getFormat(), url);
         profile.setUrl(url);
         // Check that the resource limit for secondary storage won't be exceeded
-        _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage, UriUtils.getRemoteSize(url));
+        this._resourceLimitMgr.checkResourceLimit(this._accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage, UriUtils.getRemoteSize(url));
         return profile;
     }
 
@@ -116,7 +116,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         final TemplateProfile profile = super.prepare(cmd);
 
         // Check that the resource limit for secondary storage won't be exceeded
-        _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage);
+        this._resourceLimitMgr.checkResourceLimit(this._accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage);
         return profile;
     }
 
@@ -127,7 +127,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         UriUtils.validateUrl(ImageFormat.ISO.getFileExtension(), url);
         profile.setUrl(url);
         // Check that the resource limit for secondary storage won't be exceeded
-        _resourceLimitMgr.checkResourceLimit(_accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage, UriUtils.getRemoteSize(url));
+        this._resourceLimitMgr.checkResourceLimit(this._accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage, UriUtils.getRemoteSize(url));
         return profile;
     }
 
@@ -142,7 +142,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         }
 
         // find all eligible image stores for this zone scope
-        final List<DataStore> imageStores = storeMgr.getImageStoresByScope(new ZoneScope(profile.getZoneId()));
+        final List<DataStore> imageStores = this.storeMgr.getImageStoresByScope(new ZoneScope(profile.getZoneId()));
         if (imageStores == null || imageStores.size() == 0) {
             throw new CloudRuntimeException("Unable to find image store to download template " + profile.getTemplate());
         }
@@ -153,7 +153,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
             // skip data stores for a disabled zone
             final Long zoneId = imageStore.getScope().getScopeId();
             if (zoneId != null) {
-                final DataCenterVO zone = _dcDao.findById(zoneId);
+                final DataCenterVO zone = this._dcDao.findById(zoneId);
                 if (zone == null) {
                     s_logger.warn("Unable to find zone by id " + zoneId + ", so skip downloading template to its image store " + imageStore.getId());
                     continue;
@@ -173,14 +173,14 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 }
             }
 
-            final TemplateInfo tmpl = imageFactory.getTemplate(template.getId(), imageStore);
+            final TemplateInfo tmpl = this.imageFactory.getTemplate(template.getId(), imageStore);
             final CreateTemplateContext<TemplateApiResult> context = new CreateTemplateContext<>(null, tmpl);
             final AsyncCallbackDispatcher<HypervisorTemplateAdapter, TemplateApiResult> caller = AsyncCallbackDispatcher.create(this);
             caller.setCallback(caller.getTarget().createTemplateAsyncCallBack(null, null));
             caller.setContext(context);
-            imageService.createTemplateAsync(tmpl, imageStore, caller);
+            this.imageService.createTemplateAsync(tmpl, imageStore, caller);
         }
-        _resourceLimitMgr.incrementResourceCount(profile.getAccountId(), ResourceType.template);
+        this._resourceLimitMgr.incrementResourceCount(profile.getAccountId(), ResourceType.template);
 
         return template;
     }
@@ -200,14 +200,14 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         final TemplateApiResult result = callback.getResult();
         final TemplateInfo template = context.template;
         if (result.isSuccess()) {
-            final VMTemplateVO tmplt = _tmpltDao.findById(template.getId());
+            final VMTemplateVO tmplt = this._tmpltDao.findById(template.getId());
             // need to grant permission for public templates
             if (tmplt.isPublicTemplate()) {
-                _messageBus.publish(_name, TemplateManager.MESSAGE_REGISTER_PUBLIC_TEMPLATE_EVENT, PublishScope.LOCAL, tmplt.getId());
+                this._messageBus.publish(this._name, TemplateManager.MESSAGE_REGISTER_PUBLIC_TEMPLATE_EVENT, PublishScope.LOCAL, tmplt.getId());
             }
             final long accountId = tmplt.getAccountId();
             if (template.getSize() != null) {
-                _resourceLimitMgr.incrementResourceCount(accountId, ResourceType.secondary_storage, template.getSize());
+                this._resourceLimitMgr.incrementResourceCount(accountId, ResourceType.secondary_storage, template.getSize());
             }
         }
 
@@ -224,7 +224,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
             throw new InvalidParameterValueException("The DomR template cannot be deleted.");
         }
 
-        if (zoneId != null && (storeMgr.getImageStore(zoneId) == null)) {
+        if (zoneId != null && (this.storeMgr.getImageStore(zoneId) == null)) {
             throw new InvalidParameterValueException("Failed to find a secondary storage in the specified zone.");
         }
 
@@ -236,7 +236,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         final TemplateProfile profile = super.prepareDelete(cmd);
         final Long zoneId = profile.getZoneId();
 
-        if (zoneId != null && (storeMgr.getImageStore(zoneId) == null)) {
+        if (zoneId != null && (this.storeMgr.getImageStore(zoneId) == null)) {
             throw new InvalidParameterValueException("Failed to find a secondary storage in the specified zone.");
         }
 
@@ -251,7 +251,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
         final VMTemplateVO template = profile.getTemplate();
 
         // find all eligible image stores for this template
-        final List<DataStore> imageStores = templateMgr.getImageStoreByTemplate(template.getId(), profile.getZoneId());
+        final List<DataStore> imageStores = this.templateMgr.getImageStoreByTemplate(template.getId(), profile.getZoneId());
         if (imageStores == null || imageStores.size() == 0) {
             // already destroyed on image stores
             s_logger.info("Unable to find image store still having template: " + template.getName() + ", so just mark the template removed");
@@ -259,9 +259,9 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
             // Make sure the template is downloaded to all found image stores
             for (final DataStore store : imageStores) {
                 final long storeId = store.getId();
-                final List<TemplateDataStoreVO> templateStores = _tmpltStoreDao.listByTemplateStore(template.getId(), storeId);
+                final List<TemplateDataStoreVO> templateStores = this._tmpltStoreDao.listByTemplateStore(template.getId(), storeId);
                 for (final TemplateDataStoreVO templateStore : templateStores) {
-                    if (templateStore.getDownloadState() == Status.DOWNLOAD_IN_PROGRESS) {
+                    if (templateStore.getDownloadState() == VMTemplateStatus.DOWNLOAD_IN_PROGRESS) {
                         final String errorMsg = "Please specify a template that is not currently being downloaded.";
                         s_logger.debug("Template: " + template.getName() + " is currently being downloaded to secondary storage host: " + store.getName() +
                                 "; cant' delete it.");
@@ -275,7 +275,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 final Long sZoneId = ((ImageStoreEntity) imageStore).getDataCenterId();
 
                 s_logger.info("Delete template from image store: " + imageStore.getName());
-                final AsyncCallFuture<TemplateApiResult> future = imageService.deleteTemplateAsync(imageFactory.getTemplate(template.getId(), imageStore));
+                final AsyncCallFuture<TemplateApiResult> future = this.imageService.deleteTemplateAsync(this.imageFactory.getTemplate(template.getId(), imageStore));
                 try {
                     final TemplateApiResult result = future.get();
                     success = result.isSuccess();
@@ -285,14 +285,14 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                     }
 
                     // remove from template_zone_ref
-                    final List<VMTemplateZoneVO> templateZones = templateZoneDao.listByZoneTemplate(sZoneId, template.getId());
+                    final List<VMTemplateZoneVO> templateZones = this.templateZoneDao.listByZoneTemplate(sZoneId, template.getId());
                     if (templateZones != null) {
                         for (final VMTemplateZoneVO templateZone : templateZones) {
-                            templateZoneDao.remove(templateZone.getId());
+                            this.templateZoneDao.remove(templateZone.getId());
                         }
                     }
                     //mark all the occurrences of this template in the given store as destroyed.
-                    templateDataStoreDao.removeByTemplateStore(template.getId(), imageStore.getId());
+                    this.templateDataStoreDao.removeByTemplateStore(template.getId(), imageStore.getId());
                 } catch (final InterruptedException | ExecutionException e) {
                     s_logger.debug("delete template Failed", e);
                     throw new CloudRuntimeException("delete template Failed", e);
@@ -306,29 +306,29 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
             }
 
             // delete all cache entries for this template
-            final List<TemplateInfo> cacheTmpls = imageFactory.listTemplateOnCache(template.getId());
+            final List<TemplateInfo> cacheTmpls = this.imageFactory.listTemplateOnCache(template.getId());
             for (final TemplateInfo tmplOnCache : cacheTmpls) {
                 s_logger.info("Delete template from image cache store: " + tmplOnCache.getDataStore().getName());
                 tmplOnCache.delete();
             }
 
             // find all eligible image stores for this template
-            final List<DataStore> iStores = templateMgr.getImageStoreByTemplate(template.getId(), null);
+            final List<DataStore> iStores = this.templateMgr.getImageStoreByTemplate(template.getId(), null);
             if (iStores == null || iStores.size() == 0) {
                 // Mark template as Inactive.
                 template.setState(VirtualMachineTemplate.State.Inactive);
-                _tmpltDao.update(template.getId(), template);
+                this._tmpltDao.update(template.getId(), template);
 
                 // Decrement the number of templates and total secondary storage
                 // space used by the account
-                final Account account = _accountDao.findByIdIncludingRemoved(template.getAccountId());
-                _resourceLimitMgr.decrementResourceCount(template.getAccountId(), ResourceType.template);
-                _resourceLimitMgr.recalculateResourceCount(template.getAccountId(), account.getDomainId(), ResourceType.secondary_storage.getOrdinal());
+                final Account account = this._accountDao.findByIdIncludingRemoved(template.getAccountId());
+                this._resourceLimitMgr.decrementResourceCount(template.getAccountId(), ResourceType.template);
+                this._resourceLimitMgr.recalculateResourceCount(template.getAccountId(), account.getDomainId(), ResourceType.secondary_storage.getOrdinal());
             }
 
             // remove its related ACL permission
             final Pair<Class<?>, Long> tmplt = new Pair<>(VirtualMachineTemplate.class, template.getId());
-            _messageBus.publish(_name, EntityManager.MESSAGE_REMOVE_ENTITY_EVENT, PublishScope.LOCAL, tmplt);
+            this._messageBus.publish(this._name, EntityManager.MESSAGE_REMOVE_ENTITY_EVENT, PublishScope.LOCAL, tmplt);
         }
         return success;
     }
@@ -349,7 +349,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 }
 
                 // find all eligible image stores for this zone scope
-                final List<DataStore> imageStores = storeMgr.getImageStoresByScope(new ZoneScope(profile.getZoneId()));
+                final List<DataStore> imageStores = HypervisorTemplateAdapter.this.storeMgr.getImageStoresByScope(new ZoneScope(profile.getZoneId()));
                 if (imageStores == null || imageStores.size() == 0) {
                     throw new CloudRuntimeException("Unable to find image store to download template " + profile.getTemplate());
                 }
@@ -361,7 +361,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                     // skip data stores for a disabled zone
                     final Long zoneId = imageStore.getScope().getScopeId();
                     if (zoneId != null) {
-                        final DataCenterVO zone = _dcDao.findById(zoneId);
+                        final DataCenterVO zone = HypervisorTemplateAdapter.this._dcDao.findById(zoneId);
                         if (zone == null) {
                             s_logger.warn("Unable to find zone by id " + zoneId + ", so skip downloading template to its image store " + imageStore.getId());
                             continue;
@@ -381,14 +381,14 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                         }
                     }
 
-                    final TemplateInfo tmpl = imageFactory.getTemplate(template.getId(), imageStore);
+                    final TemplateInfo tmpl = HypervisorTemplateAdapter.this.imageFactory.getTemplate(template.getId(), imageStore);
                     //imageService.createTemplateAsync(tmpl, imageStore, caller);
 
                     // persist template_store_ref entry
                     final DataObject templateOnStore = imageStore.create(tmpl);
                     // update template_store_ref and template state
 
-                    final EndPoint ep = _epSelector.select(templateOnStore);
+                    final EndPoint ep = HypervisorTemplateAdapter.this._epSelector.select(templateOnStore);
                     if (ep == null) {
                         final String errMsg = "There is no secondary storage VM for downloading template to image store " + imageStore.getName();
                         s_logger.warn(errMsg);
@@ -399,8 +399,8 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                             .getChecksum(), tmpl.getType().toString(), template.getUniqueName(), template.getFormat().toString(), templateOnStore.getDataStore().getUri(),
                             templateOnStore.getDataStore().getRole().toString());
                     //using the existing max template size configuration
-                    payload.setMaxUploadSize(_configDao.getValue(Config.MaxTemplateAndIsoSize.key()));
-                    payload.setDefaultMaxAccountSecondaryStorage(_configDao.getValue(Config.DefaultMaxAccountSecondaryStorage.key()));
+                    payload.setMaxUploadSize(HypervisorTemplateAdapter.this._configDao.getValue(Config.MaxTemplateAndIsoSize.key()));
+                    payload.setDefaultMaxAccountSecondaryStorage(HypervisorTemplateAdapter.this._configDao.getValue(Config.DefaultMaxAccountSecondaryStorage.key()));
                     payload.setAccountId(template.getAccountId());
                     payload.setRemoteEndPoint(ep.getPublicAddr());
                     payload.setDescription(template.getDisplayText());
@@ -409,7 +409,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
                 if (payloads.isEmpty()) {
                     throw new CloudRuntimeException("unable to find zone or an image store with enough capacity");
                 }
-                _resourceLimitMgr.incrementResourceCount(profile.getAccountId(), ResourceType.template);
+                HypervisorTemplateAdapter.this._resourceLimitMgr.incrementResourceCount(profile.getAccountId(), ResourceType.template);
                 return payloads;
             }
         });

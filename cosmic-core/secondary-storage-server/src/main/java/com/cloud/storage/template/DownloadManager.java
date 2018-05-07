@@ -3,9 +3,10 @@ package com.cloud.storage.template;
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.command.DownloadCommand;
 import com.cloud.legacymodel.network.Proxy;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
 import com.cloud.legacymodel.storage.TemplateProp;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.utils.component.Manager;
 
@@ -37,7 +38,7 @@ public interface DownloadManager extends Manager {
      * @param jobId job Id
      * @return status of the download job
      */
-    public TemplateDownloader.Status getDownloadStatus(String jobId);
+    public TemplateDownloadStatus getDownloadStatus(String jobId);
 
     /**
      * Get the status of a download job
@@ -45,7 +46,7 @@ public interface DownloadManager extends Manager {
      * @param jobId job Id
      * @return status of the download job
      */
-    public VMTemplateHostVO.Status getDownloadStatus2(String jobId);
+    public VMTemplateStatus getDownloadStatus2(String jobId);
 
     /**
      * Get the download percent of a download job

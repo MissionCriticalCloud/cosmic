@@ -1,7 +1,7 @@
 package com.cloud.legacymodel.communication.answer;
 
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.UploadStatus;
 
 import java.io.File;
 
@@ -11,7 +11,7 @@ public class UploadAnswer extends Answer {
     private String jobId;
     private int uploadPct;
     private String errorString;
-    private Upload.Status uploadStatus;
+    private UploadStatus uploadStatus;
     private String uploadPath;
     private String installPath;
 
@@ -19,7 +19,7 @@ public class UploadAnswer extends Answer {
 
     }
 
-    public UploadAnswer(final String jobId, final int uploadPct, final String errorString, final Upload.Status uploadStatus, final String fileSystemPath, final String
+    public UploadAnswer(final String jobId, final int uploadPct, final String errorString, final UploadStatus uploadStatus, final String fileSystemPath, final String
             installPath, final long templateSize) {
         super();
         this.jobId = jobId;
@@ -45,7 +45,7 @@ public class UploadAnswer extends Answer {
         return path;
     }
 
-    public UploadAnswer(final String jobId, final int uploadPct, final Command command, final Upload.Status uploadStatus, final String fileSystemPath, final String installPath) {
+    public UploadAnswer(final String jobId, final int uploadPct, final Command command, final UploadStatus uploadStatus, final String fileSystemPath, final String installPath) {
         super(command);
         this.jobId = jobId;
         this.uploadPct = uploadPct;
@@ -55,11 +55,11 @@ public class UploadAnswer extends Answer {
     }
 
     public int getUploadPct() {
-        return uploadPct;
+        return this.uploadPct;
     }
 
     public String getErrorString() {
-        return errorString;
+        return this.errorString;
     }
 
     public void setErrorString(final String errorString) {
@@ -67,23 +67,23 @@ public class UploadAnswer extends Answer {
     }
 
     public String getUploadStatusString() {
-        return uploadStatus.toString();
+        return this.uploadStatus.toString();
     }
 
-    public Upload.Status getUploadStatus() {
-        return uploadStatus;
+    public UploadStatus getUploadStatus() {
+        return this.uploadStatus;
     }
 
-    public void setUploadStatus(final Upload.Status uploadStatus) {
+    public void setUploadStatus(final UploadStatus uploadStatus) {
         this.uploadStatus = uploadStatus;
     }
 
     public String getUploadPath() {
-        return uploadPath;
+        return this.uploadPath;
     }
 
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     public void setJobId(final String jobId) {
@@ -91,7 +91,7 @@ public class UploadAnswer extends Answer {
     }
 
     public String getInstallPath() {
-        return installPath;
+        return this.installPath;
     }
 
     public void setInstallPath(final String installPath) {
@@ -99,7 +99,7 @@ public class UploadAnswer extends Answer {
     }
 
     public Long getTemplateSize() {
-        return templateSize;
+        return this.templateSize;
     }
 
     public void setTemplateSize(final long templateSize) {

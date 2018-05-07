@@ -10,7 +10,7 @@ import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.legacymodel.storage.TemplateType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -263,7 +263,7 @@ public class TemplateDataStoreDaoImpl extends GenericDaoBase<TemplateDataStoreVO
     }
 
     @Override
-    public List<TemplateDataStoreVO> listByTemplateStoreDownloadStatus(final long templateId, final long storeId, final Status... status) {
+    public List<TemplateDataStoreVO> listByTemplateStoreDownloadStatus(final long templateId, final long storeId, final VMTemplateStatus... status) {
         final SearchCriteria<TemplateDataStoreVO> sc = storeTemplateDownloadStatusSearch.create();
         sc.setParameters("template_id", templateId);
         sc.setParameters("store_id", storeId);
@@ -273,7 +273,7 @@ public class TemplateDataStoreDaoImpl extends GenericDaoBase<TemplateDataStoreVO
     }
 
     @Override
-    public List<TemplateDataStoreVO> listByTemplateZoneDownloadStatus(final long templateId, final Long zoneId, final Status... status) {
+    public List<TemplateDataStoreVO> listByTemplateZoneDownloadStatus(final long templateId, final Long zoneId, final VMTemplateStatus... status) {
         // get all elgible image stores
         final List<DataStore> imgStores = _storeMgr.getImageStoresByScope(new ZoneScope(zoneId));
         if (imgStores != null) {
@@ -290,7 +290,7 @@ public class TemplateDataStoreDaoImpl extends GenericDaoBase<TemplateDataStoreVO
     }
 
     @Override
-    public TemplateDataStoreVO findByTemplateZoneDownloadStatus(final long templateId, final Long zoneId, final Status... status) {
+    public TemplateDataStoreVO findByTemplateZoneDownloadStatus(final long templateId, final Long zoneId, final VMTemplateStatus... status) {
         // get all elgible image stores
         final List<DataStore> imgStores = _storeMgr.getImageStoresByScope(new ZoneScope(zoneId));
         if (imgStores != null) {
@@ -306,7 +306,7 @@ public class TemplateDataStoreDaoImpl extends GenericDaoBase<TemplateDataStoreVO
     }
 
     @Override
-    public TemplateDataStoreVO findByTemplateZoneStagingDownloadStatus(final long templateId, final Long zoneId, final Status... status) {
+    public TemplateDataStoreVO findByTemplateZoneStagingDownloadStatus(final long templateId, final Long zoneId, final VMTemplateStatus... status) {
         // get all elgible image stores
         final List<DataStore> cacheStores = _storeMgr.getImageCacheStores(new ZoneScope(zoneId));
         if (cacheStores != null) {

@@ -1,5 +1,6 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.storage.StorageLayer;
@@ -17,7 +18,7 @@ public class TARProcessor extends AdapterBase implements Processor {
     private StorageLayer _storage;
 
     @Override
-    public FormatInfo process(final String templatePath, final ImageFormat format, final String templateName) {
+    public TemplateFormatInfo process(final String templatePath, final ImageFormat format, final String templateName) {
         if (format != null) {
             s_logger.debug("We currently don't handle conversion from " + format + " to TAR.");
             return null;
@@ -30,7 +31,7 @@ public class TARProcessor extends AdapterBase implements Processor {
             return null;
         }
 
-        final FormatInfo info = new FormatInfo();
+        final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.TAR;
         info.filename = templateName + "." + ImageFormat.TAR.getFileExtension();
 

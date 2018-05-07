@@ -8,12 +8,12 @@ import com.cloud.legacymodel.communication.command.DeleteEntityDownloadURLComman
 import com.cloud.legacymodel.communication.command.UploadCommand;
 import com.cloud.legacymodel.communication.command.UploadProgressCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.TemplateUploadStatus;
 import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.UploadCompleteCallback;
+import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.UploadVO;
 import com.cloud.storage.resource.SecondaryStorageResource;
-import com.cloud.storage.template.TemplateUploader.Status;
-import com.cloud.storage.template.TemplateUploader.UploadCompleteCallback;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.script.Script;
@@ -43,31 +43,31 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
     private String parentDir;
     private StorageLayer _storage;
 
-    public static UploadVO.Status convertStatus(final Status tds) {
+    public static UploadStatus convertStatus(final TemplateUploadStatus tds) {
         switch (tds) {
             case ABORTED:
-                return UploadVO.Status.NOT_UPLOADED;
+                return UploadStatus.NOT_UPLOADED;
             case UPLOAD_FINISHED:
-                return UploadVO.Status.UPLOAD_IN_PROGRESS;
+                return UploadStatus.UPLOAD_IN_PROGRESS;
             case IN_PROGRESS:
-                return UploadVO.Status.UPLOAD_IN_PROGRESS;
+                return UploadStatus.UPLOAD_IN_PROGRESS;
             case NOT_STARTED:
-                return UploadVO.Status.NOT_UPLOADED;
+                return UploadStatus.NOT_UPLOADED;
             case RECOVERABLE_ERROR:
-                return UploadVO.Status.NOT_UPLOADED;
+                return UploadStatus.NOT_UPLOADED;
             case UNKNOWN:
-                return UploadVO.Status.UNKNOWN;
+                return UploadStatus.UNKNOWN;
             case UNRECOVERABLE_ERROR:
-                return UploadVO.Status.UPLOAD_ERROR;
+                return UploadStatus.UPLOAD_ERROR;
             case POST_UPLOAD_FINISHED:
-                return UploadVO.Status.UPLOADED;
+                return UploadStatus.UPLOADED;
             default:
-                return UploadVO.Status.UNKNOWN;
+                return UploadStatus.UNKNOWN;
         }
     }
 
     @Override
-    public Status getUploadStatus(final String jobId) {
+    public TemplateUploadStatus getUploadStatus(final String jobId) {
         final UploadJob job = this.jobs.get(jobId);
         if (job != null) {
             final TemplateUploader tu = job.getTemplateUploader();
@@ -75,11 +75,11 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
                 return tu.getStatus();
             }
         }
-        return Status.UNKNOWN;
+        return TemplateUploadStatus.UNKNOWN;
     }
 
     @Override
-    public com.cloud.storage.UploadVO.Status getUploadStatus2(final String jobId) {
+    public UploadStatus getUploadStatus2(final String jobId) {
         return convertStatus(getUploadStatus(jobId));
     }
 
@@ -245,7 +245,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
             uj = this.jobs.get(jobId);
         }
         if (uj == null) {
-            return new UploadAnswer(null, 0, "Cannot find job", com.cloud.storage.UploadVO.Status.UNKNOWN, "", "", 0);
+            return new UploadAnswer(null, 0, "Cannot find job", UploadStatus.UNKNOWN, "", "", 0);
         }
         final TemplateUploader td = uj.getTemplateUploader();
         switch (cmd.getRequest()) {
@@ -369,7 +369,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
      * @param jobId  the id of the job
      * @param status the status of the job
      */
-    public void setUploadStatus(final String jobId, final Status status) {
+    public void setUploadStatus(final String jobId, final TemplateUploadStatus status) {
         final UploadJob uj = this.jobs.get(jobId);
         if (uj == null) {
             s_logger.warn("setUploadStatus for jobId: " + jobId + ", status=" + status + " no job found");
@@ -403,11 +403,11 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
                 final String result = postUpload(jobId);
                 if (result != null) {
                     s_logger.error("Failed post upload script: " + result);
-                    tu.setStatus(Status.UNRECOVERABLE_ERROR);
+                    tu.setStatus(TemplateUploadStatus.UNRECOVERABLE_ERROR);
                     tu.setUploadError("Failed post upload script: " + result);
                 } else {
                     s_logger.warn("Upload completed successfully at " + new SimpleDateFormat().format(new Date()));
-                    tu.setStatus(Status.POST_UPLOAD_FINISHED);
+                    tu.setStatus(TemplateUploadStatus.POST_UPLOAD_FINISHED);
                     tu.setUploadError("Upload completed successfully at " + new SimpleDateFormat().format(new Date()));
                 }
                 // Delete the entity only if its a volume. TO DO - find a better way of finding it a volume.
@@ -465,7 +465,7 @@ public class UploadManagerImpl extends ManagerBase implements UploadManager {
         }
 
         @Override
-        public void uploadComplete(final Status status) {
+        public void uploadComplete(final TemplateUploadStatus status) {
             setUploadStatus(this.jobId, status);
         }
     }

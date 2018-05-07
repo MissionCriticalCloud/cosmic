@@ -1,6 +1,6 @@
 package com.cloud.storage.upload;
 
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public class UploadInProgressState extends UploadActiveState {
 
@@ -18,6 +18,6 @@ public class UploadInProgressState extends UploadActiveState {
 
     @Override
     public String getName() {
-        return Status.UPLOAD_IN_PROGRESS.toString();
+        return VMTemplateStatus.UPLOAD_IN_PROGRESS.toString();
     }
 }

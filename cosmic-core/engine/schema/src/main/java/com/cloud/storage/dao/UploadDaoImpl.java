@@ -1,7 +1,7 @@
 package com.cloud.storage.dao;
 
 import com.cloud.legacymodel.storage.Upload.Mode;
-import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.storage.UploadVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -25,26 +25,26 @@ public class UploadDaoImpl extends GenericDaoBase<UploadVO, Long> implements Upl
     protected final SearchBuilder<UploadVO> typeModeAndStatusSearch;
 
     public UploadDaoImpl() {
-        typeUploadStatusSearch = createSearchBuilder();
-        typeUploadStatusSearch.and("type_id", typeUploadStatusSearch.entity().getTypeId(), SearchCriteria.Op.EQ);
-        typeUploadStatusSearch.and("upload_state", typeUploadStatusSearch.entity().getUploadState(), SearchCriteria.Op.EQ);
-        typeUploadStatusSearch.and("type", typeUploadStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
-        typeUploadStatusSearch.done();
+        this.typeUploadStatusSearch = createSearchBuilder();
+        this.typeUploadStatusSearch.and("type_id", this.typeUploadStatusSearch.entity().getTypeId(), SearchCriteria.Op.EQ);
+        this.typeUploadStatusSearch.and("upload_state", this.typeUploadStatusSearch.entity().getUploadState(), SearchCriteria.Op.EQ);
+        this.typeUploadStatusSearch.and("type", this.typeUploadStatusSearch.entity().getType(), SearchCriteria.Op.EQ);
+        this.typeUploadStatusSearch.done();
 
-        typeHostAndUploadStatusSearch = createSearchBuilder();
-        typeHostAndUploadStatusSearch.and("host_id", typeHostAndUploadStatusSearch.entity().getDataStoreId(), SearchCriteria.Op.EQ);
-        typeHostAndUploadStatusSearch.and("upload_state", typeHostAndUploadStatusSearch.entity().getUploadState(), SearchCriteria.Op.EQ);
-        typeHostAndUploadStatusSearch.done();
+        this.typeHostAndUploadStatusSearch = createSearchBuilder();
+        this.typeHostAndUploadStatusSearch.and("host_id", this.typeHostAndUploadStatusSearch.entity().getDataStoreId(), SearchCriteria.Op.EQ);
+        this.typeHostAndUploadStatusSearch.and("upload_state", this.typeHostAndUploadStatusSearch.entity().getUploadState(), SearchCriteria.Op.EQ);
+        this.typeHostAndUploadStatusSearch.done();
 
-        typeModeAndStatusSearch = createSearchBuilder();
-        typeModeAndStatusSearch.and("mode", typeModeAndStatusSearch.entity().getMode(), SearchCriteria.Op.EQ);
-        typeModeAndStatusSearch.and("upload_state", typeModeAndStatusSearch.entity().getUploadState(), SearchCriteria.Op.EQ);
-        typeModeAndStatusSearch.done();
+        this.typeModeAndStatusSearch = createSearchBuilder();
+        this.typeModeAndStatusSearch.and("mode", this.typeModeAndStatusSearch.entity().getMode(), SearchCriteria.Op.EQ);
+        this.typeModeAndStatusSearch.and("upload_state", this.typeModeAndStatusSearch.entity().getUploadState(), SearchCriteria.Op.EQ);
+        this.typeModeAndStatusSearch.done();
     }
 
     @Override
-    public List<UploadVO> listByTypeUploadStatus(final long typeId, final UploadVO.Type type, final UploadVO.Status uploadState) {
-        final SearchCriteria<UploadVO> sc = typeUploadStatusSearch.create();
+    public List<UploadVO> listByTypeUploadStatus(final long typeId, final UploadVO.Type type, final UploadStatus uploadState) {
+        final SearchCriteria<UploadVO> sc = this.typeUploadStatusSearch.create();
         sc.setParameters("type_id", typeId);
         sc.setParameters("type", type);
         sc.setParameters("upload_state", uploadState.toString());
@@ -52,16 +52,16 @@ public class UploadDaoImpl extends GenericDaoBase<UploadVO, Long> implements Upl
     }
 
     @Override
-    public List<UploadVO> listByHostAndUploadStatus(final long sserverId, final Status uploadState) {
-        final SearchCriteria<UploadVO> sc = typeHostAndUploadStatusSearch.create();
+    public List<UploadVO> listByHostAndUploadStatus(final long sserverId, final UploadStatus uploadState) {
+        final SearchCriteria<UploadVO> sc = this.typeHostAndUploadStatusSearch.create();
         sc.setParameters("host_id", sserverId);
         sc.setParameters("upload_state", uploadState.toString());
         return listBy(sc);
     }
 
     @Override
-    public List<UploadVO> listByModeAndStatus(final Mode mode, final Status uploadState) {
-        final SearchCriteria<UploadVO> sc = typeModeAndStatusSearch.create();
+    public List<UploadVO> listByModeAndStatus(final Mode mode, final UploadStatus uploadState) {
+        final SearchCriteria<UploadVO> sc = this.typeModeAndStatusSearch.create();
         sc.setParameters("mode", mode.toString());
         sc.setParameters("upload_state", uploadState.toString());
         return listBy(sc);

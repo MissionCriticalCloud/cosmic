@@ -16,7 +16,7 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.dc.DataCenter;
-import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 
@@ -61,15 +61,15 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
     }
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
     public Long getZoneId() {
-        return zoneId;
+        return this.zoneId;
     }
 
     public String getMode() {
-        return mode;
+        return this.mode;
     }
 
     /////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     @Override
@@ -103,20 +103,20 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Volume Id: " + getId());
-        final String uploadUrl = _volumeService.extractVolume(this);
+        final String uploadUrl = this._volumeService.extractVolume(this);
         if (uploadUrl != null) {
             final ExtractResponse response = new ExtractResponse();
             response.setResponseName(getCommandName());
             response.setObjectName("volume");
-            final Volume vol = _entityMgr.findById(Volume.class, id);
+            final Volume vol = this._entityMgr.findById(Volume.class, this.id);
             response.setId(vol.getUuid());
             response.setName(vol.getName());
-            final DataCenter zone = _entityMgr.findById(DataCenter.class, zoneId);
+            final DataCenter zone = this._entityMgr.findById(DataCenter.class, this.zoneId);
             response.setZoneId(zone.getUuid());
             response.setZoneName(zone.getName());
-            response.setMode(mode);
-            response.setState(Upload.Status.DOWNLOAD_URL_CREATED.toString());
-            final Account account = _entityMgr.findById(Account.class, getEntityOwnerId());
+            response.setMode(this.mode);
+            response.setState(UploadStatus.DOWNLOAD_URL_CREATED.toString());
+            final Account account = this._entityMgr.findById(Account.class, getEntityOwnerId());
             response.setAccountId(account.getUuid());
             response.setUrl(uploadUrl);
             setResponseObject(response);
@@ -132,7 +132,7 @@ public class ExtractVolumeCmd extends BaseAsyncCmd {
 
     @Override
     public long getEntityOwnerId() {
-        final Volume volume = _entityMgr.findById(Volume.class, getId());
+        final Volume volume = this._entityMgr.findById(Volume.class, getId());
         if (volume != null) {
             return volume.getAccountId();
         }

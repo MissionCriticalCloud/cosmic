@@ -1,9 +1,9 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.storage.StorageLayer;
 
@@ -29,7 +29,7 @@ public class TemplateLocation {
     File _file;
     Properties _props;
 
-    ArrayList<FormatInfo> _formats;
+    ArrayList<TemplateFormatInfo> _formats;
 
     public TemplateLocation(final StorageLayer storage, final String templatePath) {
         this._storage = storage;
@@ -68,7 +68,7 @@ public class TemplateLocation {
         for (final ImageFormat format : ImageFormat.values()) {
             final String ext = this._props.getProperty(format.getFileExtension());
             if (ext != null) {
-                final FormatInfo info = new FormatInfo();
+                final TemplateFormatInfo info = new TemplateFormatInfo();
                 info.format = format;
                 info.filename = this._props.getProperty(format.getFileExtension() + ".filename");
                 if (info.filename == null) {
@@ -93,7 +93,7 @@ public class TemplateLocation {
         return (this._formats.size() > 0);
     }
 
-    protected boolean checkFormatValidity(final FormatInfo info) {
+    protected boolean checkFormatValidity(final TemplateFormatInfo info) {
         return (info.format != null && info.size > 0 && info.virtualSize > 0 && info.filename != null);
     }
 
@@ -114,7 +114,7 @@ public class TemplateLocation {
     }
 
     public boolean save() {
-        for (final FormatInfo info : this._formats) {
+        for (final TemplateFormatInfo info : this._formats) {
             this._props.setProperty(info.format.getFileExtension(), "true");
             this._props.setProperty(info.format.getFileExtension() + ".filename", info.filename);
             this._props.setProperty(info.format.getFileExtension() + ".size", Long.toString(info.size));
@@ -151,8 +151,8 @@ public class TemplateLocation {
         return tmplInfo;
     }
 
-    public FormatInfo getFormat(final ImageFormat format) {
-        for (final FormatInfo info : this._formats) {
+    public TemplateFormatInfo getFormat(final ImageFormat format) {
+        for (final TemplateFormatInfo info : this._formats) {
             if (info.format == format) {
                 return info;
             }
@@ -161,7 +161,7 @@ public class TemplateLocation {
         return null;
     }
 
-    public boolean addFormat(final FormatInfo newInfo) {
+    public boolean addFormat(final TemplateFormatInfo newInfo) {
         deleteFormat(newInfo.format);
 
         if (!checkFormatValidity(newInfo)) {
@@ -176,10 +176,10 @@ public class TemplateLocation {
         return true;
     }
 
-    protected FormatInfo deleteFormat(final ImageFormat format) {
-        final Iterator<FormatInfo> it = this._formats.iterator();
+    protected TemplateFormatInfo deleteFormat(final ImageFormat format) {
+        final Iterator<TemplateFormatInfo> it = this._formats.iterator();
         while (it.hasNext()) {
-            final FormatInfo info = it.next();
+            final TemplateFormatInfo info = it.next();
             if (info.format == format) {
                 it.remove();
                 this._props.remove(format.getFileExtension());

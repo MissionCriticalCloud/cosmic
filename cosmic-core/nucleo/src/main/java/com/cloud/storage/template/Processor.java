@@ -1,6 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.component.Adapter;
 
@@ -22,15 +23,7 @@ public interface Processor extends Adapter {
      *                     there is already a file with thte template name and image format extension
      *                     that exists in case a conversion can be done.
      */
-    FormatInfo process(String templatePath, ImageFormat format, String templateName) throws InternalErrorException;
+    TemplateFormatInfo process(String templatePath, ImageFormat format, String templateName) throws InternalErrorException;
 
     long getVirtualSize(File file) throws IOException;
-
-    public static class FormatInfo {
-        public ImageFormat format;
-        public long size;
-        public long virtualSize;
-        public String filename;
-        public boolean isCorrupted;
-    }
 }

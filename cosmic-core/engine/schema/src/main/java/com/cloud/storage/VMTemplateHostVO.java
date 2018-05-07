@@ -3,6 +3,7 @@ package com.cloud.storage;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.utils.db.GenericDaoBase;
 
@@ -54,7 +55,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     private long physicalSize;
     @Column(name = "download_state")
     @Enumerated(EnumType.STRING)
-    private Status downloadState;
+    private VMTemplateStatus downloadState;
     @Column(name = "local_path")
     private String localDownloadPath;
     @Column(name = "error_str")
@@ -75,7 +76,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
         this.state = ObjectInDataStoreStateMachine.State.Allocated;
     }
 
-    public VMTemplateHostVO(final long hostId, final long templateId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String
+    public VMTemplateHostVO(final long hostId, final long templateId, final Date lastUpdated, final int downloadPercent, final VMTemplateStatus downloadState, final String
             localDownloadPath, final String errorString,
                             final String jobId, final String installPath, final String downloadUrl) {
         super();
@@ -117,7 +118,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public String getInstallPath() {
-        return installPath;
+        return this.installPath;
     }
 
     @Override
@@ -127,7 +128,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public long getTemplateId() {
-        return templateId;
+        return this.templateId;
     }
 
     @Override
@@ -137,7 +138,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public int getDownloadPercent() {
-        return downloadPercent;
+        return this.downloadPercent;
     }
 
     @Override
@@ -147,32 +148,32 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public Date getCreated() {
-        return created;
+        return this.created;
     }
 
     @Override
     public Date getLastUpdated() {
-        return lastUpdated;
+        return this.lastUpdated;
     }
 
     @Override
     public void setLastUpdated(final Date date) {
-        lastUpdated = date;
+        this.lastUpdated = date;
     }
 
     @Override
-    public Status getDownloadState() {
-        return downloadState;
+    public VMTemplateStatus getDownloadState() {
+        return this.downloadState;
     }
 
     @Override
-    public void setDownloadState(final Status downloadState) {
+    public void setDownloadState(final VMTemplateStatus downloadState) {
         this.downloadState = downloadState;
     }
 
     @Override
     public String getLocalDownloadPath() {
-        return localDownloadPath;
+        return this.localDownloadPath;
     }
 
     @Override
@@ -182,7 +183,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public String getErrorString() {
-        return errorString;
+        return this.errorString;
     }
 
     @Override
@@ -192,7 +193,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     @Override
@@ -207,13 +208,13 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public long getId() {
-        return id;
+        return this.id;
     }
 
     @Override
     public int hashCode() {
-        final Long tid = new Long(templateId);
-        final Long hid = new Long(hostId);
+        final Long tid = new Long(this.templateId);
+        final Long hid = new Long(this.hostId);
         return tid.hashCode() + hid.hashCode();
     }
 
@@ -227,7 +228,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     public long getHostId() {
-        return hostId;
+        return this.hostId;
     }
 
     public void setHostId(final long hostId) {
@@ -236,11 +237,11 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
 
     @Override
     public String toString() {
-        return new StringBuilder("TmplHost[").append(id).append("-").append(templateId).append("-").append(hostId).append(installPath).append("]").toString();
+        return new StringBuilder("TmplHost[").append(this.id).append("-").append(this.templateId).append("-").append(this.hostId).append(this.installPath).append("]").toString();
     }
 
     public long getSize() {
-        return size;
+        return this.size;
     }
 
     public void setSize(final long size) {
@@ -248,7 +249,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     public long getPhysicalSize() {
-        return physicalSize;
+        return this.physicalSize;
     }
 
     public void setPhysicalSize(final long physicalSize) {
@@ -256,7 +257,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     public boolean getDestroyed() {
-        return destroyed;
+        return this.destroyed;
     }
 
     public void setDestroyed(final boolean destroyed) {
@@ -264,7 +265,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     public String getDownloadUrl() {
-        return downloadUrl;
+        return this.downloadUrl;
     }
 
     public void setDownloadUrl(final String downloadUrl) {
@@ -272,7 +273,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     public boolean isCopy() {
-        return isCopy;
+        return this.isCopy;
     }
 
     public void setCopy(final boolean isCopy) {
@@ -298,7 +299,7 @@ public class VMTemplateHostVO implements VMTemplateStorageResourceAssoc, DataObj
     }
 
     public Date getUpdated() {
-        return updated;
+        return this.updated;
     }
 
     @Override

@@ -1,5 +1,8 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.storage.DownloadCompleteCallback;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
+
 public interface TemplateDownloader extends Runnable {
 
     long DEFAULT_MAX_TEMPLATE_SIZE_IN_BYTES = 50L * 1024L * 1024L * 1024L;
@@ -28,9 +31,9 @@ public interface TemplateDownloader extends Runnable {
      *
      * @return status of download
      */
-    TemplateDownloader.Status getStatus();
+    TemplateDownloadStatus getStatus();
 
-    void setStatus(TemplateDownloader.Status status);
+    void setStatus(TemplateDownloadStatus status);
 
     /**
      * Get time taken to download so far
@@ -67,15 +70,4 @@ public interface TemplateDownloader extends Runnable {
     boolean isInited();
 
     long getMaxTemplateSizeInBytes();
-
-    enum Status {
-        UNKNOWN, NOT_STARTED, IN_PROGRESS, ABORTED, UNRECOVERABLE_ERROR, RECOVERABLE_ERROR, DOWNLOAD_FINISHED, POST_DOWNLOAD_FINISHED
-    }
-
-    /**
-     * Callback used to notify completion of download
-     */
-    interface DownloadCompleteCallback {
-        void downloadComplete(Status status);
-    }
 }

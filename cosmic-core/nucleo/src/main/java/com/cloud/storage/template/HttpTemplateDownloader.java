@@ -3,6 +3,8 @@ package com.cloud.storage.template;
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
 import com.cloud.legacymodel.network.Proxy;
+import com.cloud.legacymodel.storage.DownloadCompleteCallback;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.utils.UriUtils;
 import com.cloud.utils.imagestore.ImageStoreUtil;
@@ -41,7 +43,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
     private static final int CHUNK_SIZE = 1024 * 1024; //1M
     private final HttpClient client;
     private final HttpMethodRetryHandler myretryhandler;
-    public TemplateDownloader.Status status = TemplateDownloader.Status.NOT_STARTED;
+    public TemplateDownloadStatus status = TemplateDownloadStatus.NOT_STARTED;
     public String errorString = " ";
     public long downloadTime = 0;
     public long totalBytes;
@@ -62,7 +64,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
         this._storage = storageLayer;
         this.downloadUrl = downloadUrl;
         setToDir(toDir);
-        this.status = TemplateDownloader.Status.NOT_STARTED;
+        this.status = TemplateDownloadStatus.NOT_STARTED;
         this.resourceType = resourceType;
         this.maxTemplateSizeInBytes = maxTemplateSizeInBytes;
 
@@ -119,11 +121,11 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             }
         } catch (final IllegalArgumentException iae) {
             this.errorString = iae.getMessage();
-            this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             this.inited = false;
         } catch (final Exception ex) {
             this.errorString = "Unable to start download -- check url? ";
-            this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             s_logger.warn("Exception in constructor -- " + ex.toString());
         }
     }
@@ -135,7 +137,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
         } catch (final Exception e) {
             s_logger.warn("Caught exception during download " + e.getMessage(), e);
             this.errorString = "Failed to install: " + e.getMessage();
-            this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
         }
     }
 
@@ -167,11 +169,11 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
                 this.request.addRequestHeader("Range", "bytes=" + localFileSize + "-");
                 if (this.client.executeMethod(this.request) != HttpStatus.SC_PARTIAL_CONTENT) {
                     this.errorString = "HTTP Server does not support partial get";
-                    this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+                    this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
                     return 0;
                 }
             } else if ((responseCode = this.client.executeMethod(this.request)) != HttpStatus.SC_OK) {
-                this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+                this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
                 this.errorString = " HTTP Server returned " + responseCode + " (expected 200 OK) ";
                 return 0; //FIXME: retry?
             }
@@ -182,7 +184,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             if (contentLengthHeader == null) {
                 final Header chunkedHeader = this.request.getResponseHeader("Transfer-Encoding");
                 if (chunkedHeader == null || !"chunked".equalsIgnoreCase(chunkedHeader.getValue())) {
-                    this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+                    this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
                     this.errorString = " Failed to receive length of download ";
                     return 0; //FIXME: what status do we put here? Do we retry?
                 } else if ("chunked".equalsIgnoreCase(chunkedHeader.getValue())) {
@@ -191,7 +193,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             } else {
                 remoteSize2 = Long.parseLong(contentLengthHeader.getValue());
                 if (remoteSize2 == 0) {
-                    this.status = TemplateDownloader.Status.DOWNLOAD_FINISHED;
+                    this.status = TemplateDownloadStatus.DOWNLOAD_FINISHED;
                     final String downloaded = "(download complete remote=" + this.remoteSize + "bytes)";
                     this.errorString = "Downloaded " + this.totalBytes + " bytes " + downloaded;
                     this.downloadTime = 0;
@@ -205,7 +207,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
 
             if (this.remoteSize > this.maxTemplateSizeInBytes) {
                 s_logger.info("Remote size is too large: " + this.remoteSize + " , max=" + this.maxTemplateSizeInBytes);
-                this.status = Status.UNRECOVERABLE_ERROR;
+                this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
                 this.errorString = "Download file size is too large";
                 return 0;
             }
@@ -225,8 +227,8 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             long offset = 0;
             boolean done = false;
             boolean verifiedFormat = false;
-            this.status = TemplateDownloader.Status.IN_PROGRESS;
-            while (!done && this.status != Status.ABORTED && offset <= this.remoteSize) {
+            this.status = TemplateDownloadStatus.IN_PROGRESS;
+            while (!done && this.status != TemplateDownloadStatus.ABORTED && offset <= this.remoteSize) {
                 if ((bytes = in.read(block, 0, CHUNK_SIZE)) > -1) {
                     out.write(block, 0, bytes);
                     offset += bytes;
@@ -249,7 +251,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
                             } catch (final Exception ex) {
                                 s_logger.debug("Error on http connection : " + ex.getMessage());
                             }
-                            this.status = Status.UNRECOVERABLE_ERROR;
+                            this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
                             this.errorString = "Template content is unsupported, or mismatch between selected format and template content. Found  : " + unsupportedFormat;
                             return 0;
                         }
@@ -265,7 +267,7 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
             final Date finish = new Date();
             String downloaded = "(incomplete download)";
             if (this.totalBytes >= this.remoteSize) {
-                this.status = TemplateDownloader.Status.DOWNLOAD_FINISHED;
+                this.status = TemplateDownloadStatus.DOWNLOAD_FINISHED;
                 downloaded = "(download complete remote=" + this.remoteSize + "bytes)";
             }
             this.errorString = "Downloaded " + this.totalBytes + " bytes " + downloaded;
@@ -275,13 +277,13 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
 
             return this.totalBytes;
         } catch (final HttpException hte) {
-            this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             this.errorString = hte.getMessage();
         } catch (final IOException ioe) {
-            this.status = TemplateDownloader.Status.UNRECOVERABLE_ERROR; //probably a file write error?
+            this.status = TemplateDownloadStatus.UNRECOVERABLE_ERROR; //probably a file write error?
             this.errorString = ioe.getMessage();
         } finally {
-            if (this.status == Status.UNRECOVERABLE_ERROR && file.exists() && !file.isDirectory()) {
+            if (this.status == TemplateDownloadStatus.UNRECOVERABLE_ERROR && file.exists() && !file.isDirectory()) {
                 file.delete();
             }
             this.request.releaseConnection();
@@ -303,14 +305,14 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
                 if (this.request != null) {
                     this.request.abort();
                 }
-                this.status = TemplateDownloader.Status.ABORTED;
+                this.status = TemplateDownloadStatus.ABORTED;
                 return true;
             case UNKNOWN:
             case NOT_STARTED:
             case RECOVERABLE_ERROR:
             case UNRECOVERABLE_ERROR:
             case ABORTED:
-                this.status = TemplateDownloader.Status.ABORTED;
+                this.status = TemplateDownloadStatus.ABORTED;
             case DOWNLOAD_FINISHED:
                 final File f = new File(this.toFile);
                 if (f.exists()) {
@@ -333,12 +335,12 @@ public class HttpTemplateDownloader extends ManagedContextRunnable implements Te
     }
 
     @Override
-    public TemplateDownloader.Status getStatus() {
+    public TemplateDownloadStatus getStatus() {
         return this.status;
     }
 
     @Override
-    public void setStatus(final TemplateDownloader.Status status) {
+    public void setStatus(final TemplateDownloadStatus status) {
         this.status = status;
     }
 

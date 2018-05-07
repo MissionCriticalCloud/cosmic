@@ -42,8 +42,7 @@ import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.TemplateProp;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.storage.Volume.State;
 import com.cloud.legacymodel.to.StorageFilerTO;
@@ -271,7 +270,7 @@ public class VolumeServiceImpl implements VolumeService {
                             if (templatePoolRef == null) {
                                 s_logger.warn("Reset Template State On Pool failed - unable to lock TemplatePoolRef " + templatePoolRefId);
                             } else {
-                                templatePoolRef.setDownloadState(VMTemplateStorageResourceAssoc.Status.NOT_DOWNLOADED);
+                                templatePoolRef.setDownloadState(VMTemplateStatus.NOT_DOWNLOADED);
                                 templatePoolRef.setState(ObjectInDataStoreStateMachine.State.Allocated);
                                 _tmpltPoolDao.update(templatePoolRefId, templatePoolRef);
                             }
@@ -560,7 +559,7 @@ public class VolumeServiceImpl implements VolumeService {
         // Find out if the volume is at state of download_in_progress on secondary storage
         final VolumeDataStoreVO volumeStore = _volumeStoreDao.findByVolume(volume.getId());
         if (volumeStore != null) {
-            if (volumeStore.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOAD_IN_PROGRESS) {
+            if (volumeStore.getDownloadState() == VMTemplateStatus.DOWNLOAD_IN_PROGRESS) {
                 s_logger.debug("Volume: " + volume.getName() + " is currently being uploaded; cant' delete it.");
                 future.complete(result);
                 return future;
@@ -1357,11 +1356,11 @@ public class VolumeServiceImpl implements VolumeService {
                             final TemplateProp volInfo = volumeInfos.remove(volume.getId());
                             toBeDownloaded.remove(volumeStore);
                             s_logger.info("Volume Sync found " + volume.getUuid() + " already in the volume image store table");
-                            if (volumeStore.getDownloadState() != Status.DOWNLOADED) {
+                            if (volumeStore.getDownloadState() != VMTemplateStatus.DOWNLOADED) {
                                 volumeStore.setErrorString("");
                             }
                             if (volInfo.isCorrupted()) {
-                                volumeStore.setDownloadState(Status.DOWNLOAD_ERROR);
+                                volumeStore.setDownloadState(VMTemplateStatus.DOWNLOAD_ERROR);
                                 String msg = "Volume " + volume.getUuid() + " is corrupted on image store";
                                 volumeStore.setErrorString(msg);
                                 s_logger.info(msg);
@@ -1383,7 +1382,7 @@ public class VolumeServiceImpl implements VolumeService {
                                 }
                             } else { // Put them in right status
                                 volumeStore.setDownloadPercent(100);
-                                volumeStore.setDownloadState(Status.DOWNLOADED);
+                                volumeStore.setDownloadState(VMTemplateStatus.DOWNLOADED);
                                 volumeStore.setState(ObjectInDataStoreStateMachine.State.Ready);
                                 volumeStore.setInstallPath(volInfo.getInstallPath());
                                 volumeStore.setSize(volInfo.getSize());
@@ -1420,7 +1419,7 @@ public class VolumeServiceImpl implements VolumeService {
                         } else if (volume.getState() == State.NotUploaded || volume.getState() == State.UploadInProgress) { // failed uploads through SSVM
                             s_logger.info("Volume Sync did not find " + volume.getUuid() + " uploaded using SSVM on image store " + storeId + ", marking it as failed");
                             toBeDownloaded.remove(volumeStore);
-                            volumeStore.setDownloadState(Status.DOWNLOAD_ERROR);
+                            volumeStore.setDownloadState(VMTemplateStatus.DOWNLOAD_ERROR);
                             final String msg = "Volume " + volume.getUuid() + " is corrupted on image store";
                             volumeStore.setErrorString(msg);
                             _volumeStoreDao.update(volumeStore.getId(), volumeStore);
@@ -1430,7 +1429,7 @@ public class VolumeServiceImpl implements VolumeService {
                             continue;
                         }
                         // Volume is not on secondary but we should download.
-                        if (volumeStore.getDownloadState() != Status.DOWNLOADED) {
+                        if (volumeStore.getDownloadState() != VMTemplateStatus.DOWNLOADED) {
                             s_logger.info("Volume Sync did not find " + volume.getName() + " ready on image store " + storeId + ", will request download to start/resume shortly");
                         }
                     }
@@ -1446,7 +1445,7 @@ public class VolumeServiceImpl implements VolumeService {
                             // if this is a region store, and there is already an DOWNLOADED entry there without install_path information, which
                             // means that this is a duplicate entry from migration of previous NFS to staging.
                             if (store.getScope().getScopeType() == ScopeType.REGION) {
-                                if (volumeHost.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED && volumeHost.getInstallPath() == null) {
+                                if (volumeHost.getDownloadState() == VMTemplateStatus.DOWNLOADED && volumeHost.getInstallPath() == null) {
                                     s_logger.info("Skip sync volume for migration of previous NFS to object store");
                                     continue;
                                 }

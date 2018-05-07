@@ -2,7 +2,7 @@ package com.cloud.storage.download;
 
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public abstract class DownloadActiveState extends DownloadState {
 
@@ -18,21 +18,21 @@ public abstract class DownloadActiveState extends DownloadState {
         switch (answer.getDownloadStatus()) {
             case DOWNLOAD_IN_PROGRESS:
                 getDownloadListener().scheduleStatusCheck(RequestType.GET_STATUS);
-                return Status.DOWNLOAD_IN_PROGRESS.toString();
+                return VMTemplateStatus.DOWNLOAD_IN_PROGRESS.toString();
             case DOWNLOADED:
                 getDownloadListener().cancelTimeoutTask();
-                return Status.DOWNLOADED.toString();
+                return VMTemplateStatus.DOWNLOADED.toString();
             case NOT_DOWNLOADED:
                 getDownloadListener().scheduleStatusCheck(RequestType.GET_STATUS);
-                return Status.NOT_DOWNLOADED.toString();
+                return VMTemplateStatus.NOT_DOWNLOADED.toString();
             case DOWNLOAD_ERROR:
                 getDownloadListener().cancelStatusTask();
                 getDownloadListener().cancelTimeoutTask();
-                return Status.DOWNLOAD_ERROR.toString();
+                return VMTemplateStatus.DOWNLOAD_ERROR.toString();
             case UNKNOWN:
                 getDownloadListener().cancelStatusTask();
                 getDownloadListener().cancelTimeoutTask();
-                return Status.DOWNLOAD_ERROR.toString();
+                return VMTemplateStatus.DOWNLOAD_ERROR.toString();
             default:
                 return null;
         }
@@ -40,7 +40,7 @@ public abstract class DownloadActiveState extends DownloadState {
 
     @Override
     public String handleAbort() {
-        return Status.ABANDONED.toString();
+        return VMTemplateStatus.ABANDONED.toString();
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class DownloadActiveState extends DownloadState {
         }
         String newState = getName();
         if (updateMs > 5 * DownloadListener.STATUS_POLL_INTERVAL) {
-            newState = Status.DOWNLOAD_ERROR.toString();
+            newState = VMTemplateStatus.DOWNLOAD_ERROR.toString();
             getDownloadListener().logDebug("timeout: transitioning to download error state, currstate=" + getName());
         } else if (updateMs > 3 * DownloadListener.STATUS_POLL_INTERVAL) {
             getDownloadListener().cancelStatusTask();
@@ -66,7 +66,7 @@ public abstract class DownloadActiveState extends DownloadState {
     @Override
     public String handleDisconnect() {
 
-        return Status.DOWNLOAD_ERROR.toString();
+        return VMTemplateStatus.DOWNLOAD_ERROR.toString();
     }
 
     @Override

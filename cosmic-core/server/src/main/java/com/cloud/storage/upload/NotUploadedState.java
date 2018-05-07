@@ -1,7 +1,7 @@
 package com.cloud.storage.upload;
 
 import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public class NotUploadedState extends UploadActiveState {
 
@@ -11,7 +11,7 @@ public class NotUploadedState extends UploadActiveState {
 
     @Override
     public String getName() {
-        return Status.NOT_UPLOADED.toString();
+        return VMTemplateStatus.NOT_UPLOADED.toString();
     }
 
     @Override

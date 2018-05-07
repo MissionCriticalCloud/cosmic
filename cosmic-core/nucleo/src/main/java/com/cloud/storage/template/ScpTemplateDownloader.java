@@ -1,6 +1,8 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.DownloadCompleteCallback;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
 import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
@@ -23,7 +25,7 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
             uri = new URI(this._downloadUrl);
         } catch (final URISyntaxException e) {
             s_logger.warn("URI syntax error: " + this._downloadUrl);
-            this._status = Status.UNRECOVERABLE_ERROR;
+            this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             return;
         }
 
@@ -34,7 +36,7 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
 
     @Override
     public long download(final boolean resume, final DownloadCompleteCallback callback) {
-        if (this._status == Status.ABORTED || this._status == Status.UNRECOVERABLE_ERROR || this._status == Status.DOWNLOAD_FINISHED) {
+        if (this._status == TemplateDownloadStatus.ABORTED || this._status == TemplateDownloadStatus.UNRECOVERABLE_ERROR || this._status == TemplateDownloadStatus.DOWNLOAD_FINISHED) {
             return 0;
         }
 
@@ -46,7 +48,7 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
         try {
             uri = new URI(this._downloadUrl);
         } catch (final URISyntaxException e1) {
-            this._status = Status.UNRECOVERABLE_ERROR;
+            this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             return 0;
         }
 
@@ -85,16 +87,16 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
 
             final String src = uri.getPath();
 
-            this._status = Status.IN_PROGRESS;
+            this._status = TemplateDownloadStatus.IN_PROGRESS;
             scp.get(src, this._toDir);
 
             if (!file.exists()) {
-                this._status = Status.UNRECOVERABLE_ERROR;
+                this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
                 s_logger.debug("unable to scp the file " + this._downloadUrl);
                 return 0;
             }
 
-            this._status = Status.DOWNLOAD_FINISHED;
+            this._status = TemplateDownloadStatus.DOWNLOAD_FINISHED;
 
             this._totalBytes = file.length();
 
@@ -105,12 +107,12 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
             return this._totalBytes;
         } catch (final Exception e) {
             s_logger.warn("Unable to download " + this._downloadUrl, e);
-            this._status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             this._errorString = e.getMessage();
             return 0;
         } finally {
             sshConnection.close();
-            if (this._status == Status.UNRECOVERABLE_ERROR && file.exists()) {
+            if (this._status == TemplateDownloadStatus.UNRECOVERABLE_ERROR && file.exists()) {
                 file.delete();
             }
             if (callback != null) {
@@ -121,9 +123,9 @@ public class ScpTemplateDownloader extends TemplateDownloaderBase implements Tem
 
     @Override
     public int getDownloadPercent() {
-        if (this._status == Status.DOWNLOAD_FINISHED) {
+        if (this._status == TemplateDownloadStatus.DOWNLOAD_FINISHED) {
             return 100;
-        } else if (this._status == Status.IN_PROGRESS) {
+        } else if (this._status == TemplateDownloadStatus.IN_PROGRESS) {
             return 50;
         } else {
             return 0;

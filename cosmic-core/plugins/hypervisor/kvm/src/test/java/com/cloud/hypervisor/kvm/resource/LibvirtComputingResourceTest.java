@@ -92,7 +92,7 @@ import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.Processor.FormatInfo;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
@@ -3007,7 +3007,7 @@ public class LibvirtComputingResourceTest {
         final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
         final TemplateLocation location = Mockito.mock(TemplateLocation.class);
         final Processor qcow2Processor = Mockito.mock(Processor.class);
-        final FormatInfo info = Mockito.mock(FormatInfo.class);
+        final TemplateFormatInfo info = Mockito.mock(TemplateFormatInfo.class);
 
         when(this.libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
 
@@ -3082,7 +3082,7 @@ public class LibvirtComputingResourceTest {
         final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
         final TemplateLocation location = Mockito.mock(TemplateLocation.class);
         final Processor qcow2Processor = Mockito.mock(Processor.class);
-        final FormatInfo info = Mockito.mock(FormatInfo.class);
+        final TemplateFormatInfo info = Mockito.mock(TemplateFormatInfo.class);
 
         when(this.libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
 
@@ -3231,7 +3231,7 @@ public class LibvirtComputingResourceTest {
         final LibvirtUtilitiesHelper libvirtUtilitiesHelper = Mockito.mock(LibvirtUtilitiesHelper.class);
         final TemplateLocation location = Mockito.mock(TemplateLocation.class);
         final Processor qcow2Processor = Mockito.mock(Processor.class);
-        final FormatInfo info = Mockito.mock(FormatInfo.class);
+        final TemplateFormatInfo info = Mockito.mock(TemplateFormatInfo.class);
 
         when(this.libvirtComputingResource.getStoragePoolMgr()).thenReturn(storagePoolMgr);
 

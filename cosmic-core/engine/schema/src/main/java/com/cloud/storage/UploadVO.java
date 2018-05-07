@@ -1,6 +1,7 @@
 package com.cloud.storage;
 
 import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDaoBase;
 
@@ -53,7 +54,7 @@ public class UploadVO implements Upload {
 
     @Column(name = "upload_state")
     @Enumerated(EnumType.STRING)
-    private Status uploadState;
+    private UploadStatus uploadState;
 
     @Column(name = "error_str")
     private String errorString;
@@ -74,7 +75,7 @@ public class UploadVO implements Upload {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public UploadVO(final long hostId, final long typeId, final Date lastUpdated, final Status uploadState, final Type type, final String uploadUrl, final Mode mode) {
+    public UploadVO(final long hostId, final long typeId, final Date lastUpdated, final UploadStatus uploadState, final Type type, final String uploadUrl, final Mode mode) {
         super();
         this.dataStoreId = hostId;
         this.typeId = typeId;
@@ -86,7 +87,7 @@ public class UploadVO implements Upload {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public UploadVO(final long hostId, final long typeId, final Date lastUpdated, final Status uploadState, final int uploadPercent, final Type type, final Mode mode) {
+    public UploadVO(final long hostId, final long typeId, final Date lastUpdated, final UploadStatus uploadState, final int uploadPercent, final Type type, final Mode mode) {
         super();
         this.dataStoreId = hostId;
         this.typeId = typeId;
@@ -107,7 +108,7 @@ public class UploadVO implements Upload {
 
     @Override
     public long getId() {
-        return id;
+        return this.id;
     }
 
     @Override
@@ -117,7 +118,7 @@ public class UploadVO implements Upload {
 
     @Override
     public String getInstallPath() {
-        return installPath;
+        return this.installPath;
     }
 
     @Override
@@ -127,12 +128,12 @@ public class UploadVO implements Upload {
 
     @Override
     public String getUuid() {
-        return uuid;
+        return this.uuid;
     }
 
     @Override
     public int hashCode() {
-        return NumbersUtil.hash(id);
+        return NumbersUtil.hash(this.id);
     }
 
     @Override
@@ -146,7 +147,7 @@ public class UploadVO implements Upload {
 
     @Override
     public long getDataStoreId() {
-        return dataStoreId;
+        return this.dataStoreId;
     }
 
     public void setDataStoreId(final long hostId) {
@@ -155,7 +156,7 @@ public class UploadVO implements Upload {
 
     @Override
     public Date getCreated() {
-        return created;
+        return this.created;
     }
 
     @Override
@@ -165,16 +166,16 @@ public class UploadVO implements Upload {
 
     @Override
     public Date getLastUpdated() {
-        return lastUpdated;
+        return this.lastUpdated;
     }
 
     public void setLastUpdated(final Date date) {
-        lastUpdated = date;
+        this.lastUpdated = date;
     }
 
     @Override
     public String getErrorString() {
-        return errorString;
+        return this.errorString;
     }
 
     public void setErrorString(final String errorString) {
@@ -183,7 +184,7 @@ public class UploadVO implements Upload {
 
     @Override
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     public void setJobId(final String jobId) {
@@ -192,7 +193,7 @@ public class UploadVO implements Upload {
 
     @Override
     public int getUploadPercent() {
-        return uploadPercent;
+        return this.uploadPercent;
     }
 
     public void setUploadPercent(final int uploadPercent) {
@@ -200,17 +201,17 @@ public class UploadVO implements Upload {
     }
 
     @Override
-    public Status getUploadState() {
-        return uploadState;
+    public UploadStatus getUploadState() {
+        return this.uploadState;
     }
 
-    public void setUploadState(final Status uploadState) {
+    public void setUploadState(final UploadStatus uploadState) {
         this.uploadState = uploadState;
     }
 
     @Override
     public long getTypeId() {
-        return typeId;
+        return this.typeId;
     }
 
     public void setTypeId(final long typeId) {
@@ -219,7 +220,7 @@ public class UploadVO implements Upload {
 
     @Override
     public Type getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(final Type type) {
@@ -228,7 +229,7 @@ public class UploadVO implements Upload {
 
     @Override
     public Mode getMode() {
-        return mode;
+        return this.mode;
     }
 
     public void setMode(final Mode mode) {
@@ -237,7 +238,7 @@ public class UploadVO implements Upload {
 
     @Override
     public String getUploadUrl() {
-        return uploadUrl;
+        return this.uploadUrl;
     }
 
     public void setUploadUrl(final String uploadUrl) {

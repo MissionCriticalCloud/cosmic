@@ -1,6 +1,8 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.legacymodel.storage.DownloadCompleteCallback;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
 import com.cloud.utils.storage.StorageLayer;
 
 import java.io.File;
@@ -41,7 +43,7 @@ public class LocalTemplateDownloader extends TemplateDownloaderBase implements T
 
     @Override
     public long download(final boolean resume, final DownloadCompleteCallback callback) {
-        if (this._status == Status.ABORTED || this._status == Status.UNRECOVERABLE_ERROR || this._status == Status.DOWNLOAD_FINISHED) {
+        if (this._status == TemplateDownloadStatus.ABORTED || this._status == TemplateDownloadStatus.UNRECOVERABLE_ERROR || this._status == TemplateDownloadStatus.DOWNLOAD_FINISHED) {
             throw new CloudRuntimeException("Invalid status for downloading: " + this._status);
         }
 
@@ -54,7 +56,7 @@ public class LocalTemplateDownloader extends TemplateDownloaderBase implements T
         } catch (final URISyntaxException e) {
             final String message = "Invalid URI " + this._downloadUrl;
             s_logger.warn(message);
-            this._status = Status.UNRECOVERABLE_ERROR;
+            this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             throw new CloudRuntimeException(message, e);
         }
 
@@ -95,10 +97,10 @@ public class LocalTemplateDownloader extends TemplateDownloaderBase implements T
 
             this._remoteSize = src.length();
             this._totalBytes = 0;
-            this._status = TemplateDownloader.Status.IN_PROGRESS;
+            this._status = TemplateDownloadStatus.IN_PROGRESS;
 
             try {
-                while (this._status != Status.ABORTED && fic.read(buffer) != -1) {
+                while (this._status != TemplateDownloadStatus.ABORTED && fic.read(buffer) != -1) {
                     buffer.flip();
                     final int count = foc.write(buffer);
                     this._totalBytes += count;
@@ -110,7 +112,7 @@ public class LocalTemplateDownloader extends TemplateDownloaderBase implements T
 
             String downloaded = "(incomplete download)";
             if (this._totalBytes == this._remoteSize) {
-                this._status = TemplateDownloader.Status.DOWNLOAD_FINISHED;
+                this._status = TemplateDownloadStatus.DOWNLOAD_FINISHED;
                 downloaded = "(download complete)";
             }
 
@@ -118,7 +120,7 @@ public class LocalTemplateDownloader extends TemplateDownloaderBase implements T
             this._downloadTime += System.currentTimeMillis() - this._start;
             return this._totalBytes;
         } catch (final Exception e) {
-            this._status = TemplateDownloader.Status.UNRECOVERABLE_ERROR;
+            this._status = TemplateDownloadStatus.UNRECOVERABLE_ERROR;
             this._errorString = e.getMessage();
             throw new CloudRuntimeException(this._errorString, e);
         } finally {
@@ -154,7 +156,7 @@ public class LocalTemplateDownloader extends TemplateDownloaderBase implements T
                 }
             }
 
-            if (this._status == Status.UNRECOVERABLE_ERROR && dst.exists()) {
+            if (this._status == TemplateDownloadStatus.UNRECOVERABLE_ERROR && dst.exists()) {
                 dst.delete();
             }
             if (callback != null) {

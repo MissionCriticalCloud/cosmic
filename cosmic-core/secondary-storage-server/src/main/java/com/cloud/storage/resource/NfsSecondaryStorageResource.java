@@ -44,6 +44,8 @@ import com.cloud.legacymodel.communication.command.UploadStatusCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
+import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.legacymodel.storage.TemplateProp;
 import com.cloud.legacymodel.storage.UploadEntity;
 import com.cloud.legacymodel.to.DataStoreTO;
@@ -60,7 +62,6 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.template.DownloadManager;
 import com.cloud.storage.template.DownloadManagerImpl;
 import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.Processor.FormatInfo;
 import com.cloud.storage.template.QCOW2Processor;
 import com.cloud.storage.template.RawImageProcessor;
 import com.cloud.storage.template.TARProcessor;
@@ -75,7 +76,6 @@ import com.cloud.utils.imagestore.ImageStoreUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.StorageLayer;
-import com.cloud.vm.SecondaryStorageVm;
 
 import javax.naming.ConfigurationException;
 import java.io.BufferedWriter;
@@ -300,7 +300,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
             final Processor processor = new VhdProcessor();
 
             processor.configure("Vhd Processor", params);
-            final FormatInfo info = processor.process(destPath, null, templateUuid);
+            final TemplateFormatInfo info = processor.process(destPath, null, templateUuid);
 
             final TemplateLocation loc = new TemplateLocation(this._storage, destPath);
             loc.create(1, true, templateUuid);
@@ -390,7 +390,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
                     processor.configure("template processor", params);
                     final String destPath = destFile.getAbsolutePath();
 
-                    final FormatInfo info = processor.process(destPath, null, templateName);
+                    final TemplateFormatInfo info = processor.process(destPath, null, templateName);
                     final TemplateLocation loc = new TemplateLocation(this._storage, destPath);
                     loc.create(1, true, destData.getName());
                     loc.addFormat(info);
@@ -1257,7 +1257,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
     @Override
     public HostType getType() {
-        if (SecondaryStorageVm.Role.templateProcessor.toString().equals(this._role)) {
+        if (SecondaryStorageVmRole.templateProcessor.toString().equals(this._role)) {
             return HostType.SecondaryStorage;
         }
 
@@ -1391,7 +1391,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
         this._role = (String) params.get("role");
         if (this._role == null) {
-            this._role = SecondaryStorageVm.Role.templateProcessor.toString();
+            this._role = SecondaryStorageVmRole.templateProcessor.toString();
         }
         s_logger.info("Secondary storage runs in role " + this._role);
 
@@ -2120,7 +2120,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
         final Map<String, Processor> processors = this._dlMgr.getProcessors();
         for (final Processor processor : processors.values()) {
-            FormatInfo info = null;
+            TemplateFormatInfo info = null;
             try {
                 info = processor.process(resourcePath, null, templateName);
             } catch (final InternalErrorException e) {

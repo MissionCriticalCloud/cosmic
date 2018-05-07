@@ -1,5 +1,8 @@
 package com.cloud.storage.template;
 
+import com.cloud.legacymodel.storage.TemplateUploadStatus;
+import com.cloud.legacymodel.storage.UploadCompleteCallback;
+
 public interface TemplateUploader extends Runnable {
 
     /**
@@ -8,67 +11,56 @@ public interface TemplateUploader extends Runnable {
      * @param callback completion callback to be called after upload is complete
      * @return bytes uploaded
      */
-    public long upload(UploadCompleteCallback callback);
+    long upload(UploadCompleteCallback callback);
 
     /**
      * @return
      */
-    public boolean stopUpload();
+    boolean stopUpload();
 
     /**
      * @return percent of file uploaded
      */
-    public int getUploadPercent();
+    int getUploadPercent();
 
     /**
      * Get the status of the upload
      *
      * @return status of upload
      */
-    public TemplateUploader.Status getStatus();
+    TemplateUploadStatus getStatus();
 
-    public void setStatus(TemplateUploader.Status status);
+    void setStatus(TemplateUploadStatus status);
 
     /**
      * Get time taken to upload so far
      *
      * @return time in seconds taken to upload
      */
-    public long getUploadTime();
+    long getUploadTime();
 
     /**
      * Get bytes uploaded
      *
      * @return bytes uploaded so far
      */
-    public long getUploadedBytes();
+    long getUploadedBytes();
 
     /**
      * Get the error if any
      *
      * @return error string if any
      */
-    public String getUploadError();
+    String getUploadError();
 
-    public void setUploadError(String string);
+    void setUploadError(String string);
 
     /**
      * Get local path of the uploaded file
      *
      * @return local path of the file uploaded
      */
-    public String getUploadLocalPath();
+    String getUploadLocalPath();
 
-    public void setResume(boolean resume);
-
-    public static enum Status {
-        UNKNOWN, NOT_STARTED, IN_PROGRESS, ABORTED, UNRECOVERABLE_ERROR, RECOVERABLE_ERROR, UPLOAD_FINISHED, POST_UPLOAD_FINISHED
-    }
-
-    /**
-     * Callback used to notify completion of upload
-     */
-    public interface UploadCompleteCallback {
-        void uploadComplete(Status status);
-    }
+    void setResume(boolean resume);
 }

@@ -50,6 +50,7 @@ import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.user.Account;
@@ -99,7 +100,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.SystemVmLoadScanner;
 import com.cloud.vm.VirtualMachineGuru;
@@ -617,14 +617,14 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final long dataCenterId = pool.longValue();
 
         final List<SecondaryStorageVmVO> ssVms =
-                this._secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVm.Role.templateProcessor, dataCenterId, Running, Migrating, Starting, Stopped, Stopping);
+                this._secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVmRole.templateProcessor, dataCenterId, Running, Migrating, Starting, Stopped, Stopping);
         final int vmSize = (ssVms == null) ? 0 : ssVms.size();
         final List<DataStore> ssStores = this._dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
         final int storeSize = (ssStores == null) ? 0 : ssStores.size();
         if (storeSize > vmSize) {
             final int requiredVMs = storeSize - vmSize;
             logger.info("Found less ({}) secondary storage VMs than image stores ({}) in dcId={}, starting {} new VMs", vmSize, storeSize, dataCenterId, requiredVMs);
-            return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
+            return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVmRole.templateProcessor);
         } else {
             final String standByCapacity = this._configDao.getValue(Config.SecStorageCapacityStandby.toString());
             final String maxPerVm = this._configDao.getValue(Config.SecStorageSessionMax.toString());
@@ -632,11 +632,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             if (requiredCapacity > vmSize) {
                 final int requiredVMs = requiredCapacity - vmSize;
                 logger.info("Found less ({}) secondary storage VMs than required ({}) in dcId={}, starting {} new VMs", vmSize, requiredCapacity, dataCenterId, requiredVMs);
-                return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
+                return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVmRole.templateProcessor);
             }
         }
 
-        return new Pair<>(AfterScanAction.nop(), SecondaryStorageVm.Role.templateProcessor);
+        return new Pair<>(AfterScanAction.nop(), SecondaryStorageVmRole.templateProcessor);
     }
 
     @Override
@@ -648,10 +648,10 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public void expandPool(final Long pool, final Object actionArgs) {
         final long dataCenterId = pool.longValue();
-        allocCapacity(dataCenterId, (SecondaryStorageVm.Role) actionArgs);
+        allocCapacity(dataCenterId, (SecondaryStorageVmRole) actionArgs);
     }
 
-    private void allocCapacity(final long dataCenterId, final SecondaryStorageVm.Role role) {
+    private void allocCapacity(final long dataCenterId, final SecondaryStorageVmRole role) {
         logger.trace("Allocate secondary storage vm standby capacity for data center : " + dataCenterId);
 
         if (!isSecondaryStorageVmRequired(dataCenterId)) {
@@ -737,7 +737,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return true;
     }
 
-    public SecondaryStorageVmVO assignSecStorageVmFromStoppedPool(final long dataCenterId, final SecondaryStorageVm.Role role) {
+    public SecondaryStorageVmVO assignSecStorageVmFromStoppedPool(final long dataCenterId, final SecondaryStorageVmRole role) {
         final List<SecondaryStorageVmVO> l = this._secStorageVmDao.getSecStorageVmListInStates(role, dataCenterId, Starting, Stopped, Migrating);
         if (l != null && l.size() > 0) {
             return l.get(0);
@@ -746,7 +746,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return null;
     }
 
-    public SecondaryStorageVmVO startNew(final long dataCenterId, final SecondaryStorageVm.Role role) {
+    public SecondaryStorageVmVO startNew(final long dataCenterId, final SecondaryStorageVmRole role) {
 
         if (!isSecondaryStorageVmRequired(dataCenterId)) {
             logger.debug("Secondary storage vm not required in zone " + dataCenterId + " acc. to zone config");
@@ -1068,7 +1068,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return null;
     }
 
-    protected Map<String, Object> createSecStorageVmInstance(final long dataCenterId, final SecondaryStorageVm.Role role) {
+    protected Map<String, Object> createSecStorageVmInstance(final long dataCenterId, final SecondaryStorageVmRole role) {
         final DataStore secStore = this._dataStoreMgr.getImageStore(dataCenterId);
         if (secStore == null) {
             final String msg = "No secondary storage available in zone " + dataCenterId + ", cannot create secondary storage vm";

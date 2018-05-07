@@ -1,6 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.AdapterBase;
@@ -31,7 +32,7 @@ public class VhdProcessor extends AdapterBase implements Processor {
     StorageLayer _storage;
 
     @Override
-    public FormatInfo process(final String templatePath, final ImageFormat format, final String templateName) throws InternalErrorException {
+    public TemplateFormatInfo process(final String templatePath, final ImageFormat format, final String templateName) throws InternalErrorException {
         if (format != null) {
             s_logger.debug("We currently don't handle conversion from " + format + " to VHD.");
             return null;
@@ -45,7 +46,7 @@ public class VhdProcessor extends AdapterBase implements Processor {
 
         final File vhdFile = this._storage.getFile(vhdPath);
 
-        final FormatInfo info = new FormatInfo();
+        final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.VHD;
         info.filename = templateName + "." + ImageFormat.VHD.getFileExtension();
         info.size = this._storage.getSize(vhdPath);

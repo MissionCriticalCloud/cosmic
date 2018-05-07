@@ -39,8 +39,7 @@ import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.TemplateProp;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.to.TemplateObjectTO;
 import com.cloud.legacymodel.user.Account;
@@ -309,11 +308,11 @@ public class TemplateServiceImpl implements TemplateService {
                             toBeDownloaded.remove(tmplt);
                             if (tmpltStore != null) {
                                 s_logger.info("Template Sync found " + uniqueName + " already in the image store");
-                                if (tmpltStore.getDownloadState() != Status.DOWNLOADED) {
+                                if (tmpltStore.getDownloadState() != VMTemplateStatus.DOWNLOADED) {
                                     tmpltStore.setErrorString("");
                                 }
                                 if (tmpltInfo.isCorrupted()) {
-                                    tmpltStore.setDownloadState(Status.DOWNLOAD_ERROR);
+                                    tmpltStore.setDownloadState(VMTemplateStatus.DOWNLOAD_ERROR);
                                     String msg = "Template " + tmplt.getName() + ":" + tmplt.getId() + " is corrupted on secondary storage " + tmpltStore.getId();
                                     tmpltStore.setErrorString(msg);
                                     s_logger.info(msg);
@@ -338,7 +337,7 @@ public class TemplateServiceImpl implements TemplateService {
                                     }
                                 } else {
                                     tmpltStore.setDownloadPercent(100);
-                                    tmpltStore.setDownloadState(Status.DOWNLOADED);
+                                    tmpltStore.setDownloadState(VMTemplateStatus.DOWNLOADED);
                                     tmpltStore.setState(ObjectInDataStoreStateMachine.State.Ready);
                                     tmpltStore.setInstallPath(tmpltInfo.getInstallPath());
                                     tmpltStore.setSize(tmpltInfo.getSize());
@@ -376,7 +375,7 @@ public class TemplateServiceImpl implements TemplateService {
                                 }
                                 _vmTemplateStoreDao.update(tmpltStore.getId(), tmpltStore);
                             } else {
-                                tmpltStore = new TemplateDataStoreVO(storeId, tmplt.getId(), new Date(), 100, Status.DOWNLOADED, null, null, null, tmpltInfo.getInstallPath(),
+                                tmpltStore = new TemplateDataStoreVO(storeId, tmplt.getId(), new Date(), 100, VMTemplateStatus.DOWNLOADED, null, null, null, tmpltInfo.getInstallPath(),
                                         tmplt.getUrl());
                                 tmpltStore.setSize(tmpltInfo.getSize());
                                 tmpltStore.setPhysicalSize(tmpltInfo.getPhysicalSize());
@@ -392,7 +391,7 @@ public class TemplateServiceImpl implements TemplateService {
                         } else if (tmplt.getState() == VirtualMachineTemplate.State.NotUploaded || tmplt.getState() == VirtualMachineTemplate.State.UploadInProgress) {
                             s_logger.info("Template Sync did not find " + uniqueName + " on image store " + storeId + " uploaded using SSVM, marking it as failed");
                             toBeDownloaded.remove(tmplt);
-                            tmpltStore.setDownloadState(Status.DOWNLOAD_ERROR);
+                            tmpltStore.setDownloadState(VMTemplateStatus.DOWNLOAD_ERROR);
                             final String msg = "Template " + tmplt.getName() + ":" + tmplt.getId() + " is corrupted on secondary storage " + tmpltStore.getId();
                             tmpltStore.setErrorString(msg);
                             tmpltStore.setState(State.Failed);
@@ -405,11 +404,11 @@ public class TemplateServiceImpl implements TemplateService {
                         } else {
                             s_logger.info("Template Sync did not find " + uniqueName + " on image store " + storeId + ", may request download based on available hypervisor types");
                             if (tmpltStore != null) {
-                                if (_storeMgr.isRegionStore(store) && tmpltStore.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED
+                                if (_storeMgr.isRegionStore(store) && tmpltStore.getDownloadState() == VMTemplateStatus.DOWNLOADED
                                         && tmpltStore.getState() == State.Ready
                                         && tmpltStore.getInstallPath() == null) {
                                     s_logger.info("Keep fake entry in template store table for migration of previous NFS to object store");
-                                } else if (tmpltStore.getState() == State.Ready && tmpltStore.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED) {
+                                } else if (tmpltStore.getState() == State.Ready && tmpltStore.getDownloadState() == VMTemplateStatus.DOWNLOADED) {
                                     s_logger.info("Keep template " + uniqueName + " entry as state is Ready and downloaded. No need to download again.");
                                 } else {
                                     s_logger.info("Removing leftover template " + uniqueName + " entry from template store table");
@@ -442,7 +441,7 @@ public class TemplateServiceImpl implements TemplateService {
                             // means that this is a duplicate entry from migration of previous NFS to staging.
                             if (_storeMgr.isRegionStore(store)) {
                                 final TemplateDataStoreVO tmpltStore = _vmTemplateStoreDao.findByStoreTemplate(storeId, tmplt.getId());
-                                if (tmpltStore != null && tmpltStore.getDownloadState() == VMTemplateStorageResourceAssoc.Status.DOWNLOADED && tmpltStore.getState() == State.Ready
+                                if (tmpltStore != null && tmpltStore.getDownloadState() == VMTemplateStatus.DOWNLOADED && tmpltStore.getState() == State.Ready
                                         && tmpltStore.getInstallPath() == null) {
                                     s_logger.info("Skip sync template for migration of previous NFS to object store");
                                     continue;
@@ -869,7 +868,7 @@ public class TemplateServiceImpl implements TemplateService {
             TemplateDataStoreVO tmpltStore = _vmTemplateStoreDao.findByStoreTemplate(storeId, tmplt.getId());
             if (tmpltStore == null) {
                 tmpltStore =
-                        new TemplateDataStoreVO(storeId, tmplt.getId(), new Date(), 100, Status.DOWNLOADED, null, null, null,
+                        new TemplateDataStoreVO(storeId, tmplt.getId(), new Date(), 100, VMTemplateStatus.DOWNLOADED, null, null, null,
                                 TemplateConstants.DEFAULT_SYSTEM_VM_TEMPLATE_PATH + tmplt.getId() + '/', tmplt.getUrl());
                 tmpltStore.setSize(0L);
                 tmpltStore.setPhysicalSize(0); // no size information for

@@ -18,7 +18,7 @@ import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.storage.TemplateProp;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.StorageResourceType;
@@ -99,9 +99,9 @@ public class DummySecondaryStorageResource extends ServerResourceBase implements
     @Override
     public Answer executeRequest(final Command cmd) {
         if (cmd instanceof DownloadProgressCommand) {
-            return new DownloadAnswer(null, 100, cmd, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
+            return new DownloadAnswer(null, 100, cmd, VMTemplateStatus.DOWNLOADED, "dummyFS", "/dummy");
         } else if (cmd instanceof DownloadCommand) {
-            return new DownloadAnswer(null, 100, cmd, VMTemplateStorageResourceAssoc.Status.DOWNLOADED, "dummyFS", "/dummy");
+            return new DownloadAnswer(null, 100, cmd, VMTemplateStatus.DOWNLOADED, "dummyFS", "/dummy");
         } else if (cmd instanceof GetStorageStatsCommand) {
             return execute((GetStorageStatsCommand) cmd);
         } else if (cmd instanceof CheckHealthCommand) {

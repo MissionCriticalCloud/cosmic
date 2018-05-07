@@ -35,7 +35,7 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.resource.StorageProcessor;
 import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.Processor.FormatInfo;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.storage.template.QCOW2Processor;
 import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.qemu.QemuImg;
@@ -533,7 +533,7 @@ public class KvmStorageProcessor implements StorageProcessor {
 
             qcow2Processor.configure("QCOW2 Processor", params);
 
-            final FormatInfo info = qcow2Processor.process(tmpltPath, null, templateName);
+            final TemplateFormatInfo info = qcow2Processor.process(tmpltPath, null, templateName);
 
             final TemplateLocation loc = new TemplateLocation(this.storageLayer, tmpltPath);
             loc.create(1, true, templateName);

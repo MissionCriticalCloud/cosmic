@@ -1,6 +1,7 @@
 package com.cloud.storage.template;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.storage.StorageLayer;
@@ -27,7 +28,7 @@ public class RawImageProcessor extends AdapterBase implements Processor {
     }
 
     @Override
-    public FormatInfo process(final String templatePath, final ImageFormat format, final String templateName) throws InternalErrorException {
+    public TemplateFormatInfo process(final String templatePath, final ImageFormat format, final String templateName) throws InternalErrorException {
         if (format != null) {
             s_logger.debug("We currently don't handle conversion from " + format + " to raw image.");
             return null;
@@ -38,7 +39,7 @@ public class RawImageProcessor extends AdapterBase implements Processor {
             s_logger.debug("Unable to find raw image:" + imgPath);
             return null;
         }
-        final FormatInfo info = new FormatInfo();
+        final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.RAW;
         info.filename = templateName + "." + ImageFormat.RAW.getFileExtension();
         info.size = this._storage.getSize(imgPath);

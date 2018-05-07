@@ -41,7 +41,7 @@ import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.network.Network;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
@@ -810,7 +810,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
                 logger.debug("System vm template is not ready at data center " + dataCenterId + ", wait until it is ready to launch console proxy vm");
                 return false;
             }
-            final TemplateDataStoreVO templateHostRef = this._vmTemplateStoreDao.findByTemplateZoneDownloadStatus(template.getId(), dataCenterId, Status.DOWNLOADED);
+            final TemplateDataStoreVO templateHostRef = this._vmTemplateStoreDao.findByTemplateZoneDownloadStatus(template.getId(), dataCenterId, VMTemplateStatus.DOWNLOADED);
 
             if (templateHostRef != null) {
                 boolean useLocalStorage = false;

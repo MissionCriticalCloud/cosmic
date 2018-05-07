@@ -8,16 +8,15 @@ import com.cloud.legacymodel.communication.command.DownloadProgressCommand.Reque
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.network.Proxy;
+import com.cloud.legacymodel.storage.DownloadCompleteCallback;
+import com.cloud.legacymodel.storage.TemplateDownloadStatus;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.legacymodel.storage.TemplateProp;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.resource.SecondaryStorageResource;
-import com.cloud.storage.template.Processor.FormatInfo;
-import com.cloud.storage.template.TemplateDownloader.DownloadCompleteCallback;
-import com.cloud.storage.template.TemplateDownloader.Status;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;
@@ -69,26 +68,26 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     public DownloadManagerImpl() {
     }
 
-    public static VMTemplateHostVO.Status convertStatus(final Status tds) {
+    public static VMTemplateStatus convertStatus(final TemplateDownloadStatus tds) {
         switch (tds) {
             case ABORTED:
-                return VMTemplateHostVO.Status.NOT_DOWNLOADED;
+                return VMTemplateStatus.NOT_DOWNLOADED;
             case DOWNLOAD_FINISHED:
-                return VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS;
+                return VMTemplateStatus.DOWNLOAD_IN_PROGRESS;
             case IN_PROGRESS:
-                return VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS;
+                return VMTemplateStatus.DOWNLOAD_IN_PROGRESS;
             case NOT_STARTED:
-                return VMTemplateHostVO.Status.NOT_DOWNLOADED;
+                return VMTemplateStatus.NOT_DOWNLOADED;
             case RECOVERABLE_ERROR:
-                return VMTemplateHostVO.Status.NOT_DOWNLOADED;
+                return VMTemplateStatus.NOT_DOWNLOADED;
             case UNKNOWN:
-                return VMTemplateHostVO.Status.UNKNOWN;
+                return VMTemplateStatus.UNKNOWN;
             case UNRECOVERABLE_ERROR:
-                return VMTemplateHostVO.Status.DOWNLOAD_ERROR;
+                return VMTemplateStatus.DOWNLOAD_ERROR;
             case POST_DOWNLOAD_FINISHED:
-                return VMTemplateHostVO.Status.DOWNLOADED;
+                return VMTemplateStatus.DOWNLOADED;
             default:
-                return VMTemplateHostVO.Status.UNKNOWN;
+                return VMTemplateStatus.UNKNOWN;
         }
     }
 
@@ -107,7 +106,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
      * @param jobId  the id of the job
      * @param status the status of the job
      */
-    public void setDownloadStatus(final String jobId, final Status status) {
+    public void setDownloadStatus(final String jobId, final TemplateDownloadStatus status) {
         final DownloadJob dj = this.jobs.get(jobId);
         if (dj == null) {
             s_logger.warn("setDownloadStatus for jobId: " + jobId + ", status=" + status + " no job found");
@@ -142,10 +141,10 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                 final String result = postLocalDownload(jobId);
                 if (result != null) {
                     s_logger.error("Failed post download script: " + result);
-                    td.setStatus(Status.UNRECOVERABLE_ERROR);
+                    td.setStatus(TemplateDownloadStatus.UNRECOVERABLE_ERROR);
                     td.setDownloadError("Failed post download script: " + result);
                 } else {
-                    td.setStatus(Status.POST_DOWNLOAD_FINISHED);
+                    td.setStatus(TemplateDownloadStatus.POST_DOWNLOAD_FINISHED);
                     td.setDownloadError("Install completed successfully at " + new SimpleDateFormat().format(new Date()));
                 }
 
@@ -246,7 +245,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         while (en.hasNext()) {
             final Processor processor = en.next();
 
-            FormatInfo info = null;
+            TemplateFormatInfo info = null;
             try {
                 info = processor.process(resourcePath, null, templateName);
             } catch (final InternalErrorException e) {
@@ -379,7 +378,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
     }
 
     @Override
-    public Status getDownloadStatus(final String jobId) {
+    public TemplateDownloadStatus getDownloadStatus(final String jobId) {
         final DownloadJob job = this.jobs.get(jobId);
         if (job != null) {
             final TemplateDownloader td = job.getTemplateDownloader();
@@ -387,11 +386,11 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                 return td.getStatus();
             }
         }
-        return Status.UNKNOWN;
+        return TemplateDownloadStatus.UNKNOWN;
     }
 
     @Override
-    public com.cloud.storage.VMTemplateHostVO.Status getDownloadStatus2(final String jobId) {
+    public VMTemplateStatus getDownloadStatus2(final String jobId) {
         return convertStatus(getDownloadStatus(jobId));
     }
 
@@ -422,11 +421,11 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
 
         if (cmd.getUrl() == null) {
             return new DownloadAnswer(resourceType.toString() + " is corrupted on storage due to an invalid url , cannot download",
-                    VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR);
+                    VMTemplateStatus.DOWNLOAD_ERROR);
         }
 
         if (cmd.getName() == null) {
-            return new DownloadAnswer("Invalid Name", VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR);
+            return new DownloadAnswer("Invalid Name", VMTemplateStatus.DOWNLOAD_ERROR);
         }
 
         final DataStoreTO dstore = cmd.getDataStore();
@@ -450,7 +449,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                         cmd.getChecksum(), installPathPrefix, cmd.getInstallPath(), user, password, maxDownloadSizeInBytes, cmd.getProxy(), resourceType);
         sleep();
         if (jobId == null) {
-            return new DownloadAnswer("Internal Error", VMTemplateStorageResourceAssoc.Status.DOWNLOAD_ERROR);
+            return new DownloadAnswer("Internal Error", VMTemplateStatus.DOWNLOAD_ERROR);
         }
         return new DownloadAnswer(jobId, getDownloadPct(jobId), getDownloadError(jobId), getDownloadStatus2(jobId), getDownloadLocalPath(jobId), getInstallPath(jobId),
                 getDownloadTemplateSize(jobId), getDownloadTemplateSize(jobId), getDownloadCheckSum(jobId));
@@ -610,7 +609,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
                 final DownloadCommand dcmd = new DownloadCommand(cmd);
                 return handleDownloadCommand(resource, dcmd);
             } else {
-                return new DownloadAnswer("Cannot find job", VMTemplateStorageResourceAssoc.Status.UNKNOWN);
+                return new DownloadAnswer("Cannot find job", VMTemplateStatus.UNKNOWN);
             }
         }
         final TemplateDownloader td = dj.getTemplateDownloader();
@@ -894,7 +893,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
         }
 
         @Override
-        public void downloadComplete(final Status status) {
+        public void downloadComplete(final TemplateDownloadStatus status) {
             setDownloadStatus(this.jobId, status);
         }
     }
