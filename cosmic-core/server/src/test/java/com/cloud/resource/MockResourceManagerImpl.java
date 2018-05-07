@@ -3,7 +3,6 @@ package com.cloud.resource;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
-import com.cloud.api.command.admin.host.AddSecondaryStorageCmd;
 import com.cloud.api.command.admin.host.CancelMaintenanceCmd;
 import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
 import com.cloud.api.command.admin.host.ReconnectHostCmd;
@@ -100,15 +99,6 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
      */
     @Override
     public List<? extends Host> discoverHosts(final AddHostCmd cmd) throws IllegalArgumentException, DiscoveryException, InvalidParameterValueException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceService#discoverHosts(com.cloud.api.commands.AddSecondaryStorageCmd)
-     */
-    @Override
-    public List<? extends Host> discoverHosts(final AddSecondaryStorageCmd cmd) throws IllegalArgumentException, DiscoveryException, InvalidParameterValueException {
         // TODO Auto-generated method stub
         return null;
     }

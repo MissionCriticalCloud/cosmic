@@ -5,7 +5,6 @@ import com.cloud.api.ApiConstants;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
-import com.cloud.api.command.admin.host.AddSecondaryStorageCmd;
 import com.cloud.api.command.admin.host.CancelMaintenanceCmd;
 import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
 import com.cloud.api.command.admin.host.ReconnectHostCmd;
@@ -1575,9 +1574,8 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         }
     }
 
-    private List<HostVO> discoverHostsFull(final Long dcId, final Long podId, Long clusterId, final String clusterName, final String url, final String username, final String
-            password,
-                                           final String hypervisorType, final List<String> hostTags, final Map<String, String> params, final boolean deferAgentCreation) throws
+    private List<HostVO> discoverHostsFull(final Long dcId, final Long podId, Long clusterId, final String clusterName, final String url, final String username, final String password, final String
+            hypervisorType, final List<String> hostTags, final Map<String, String> params, final boolean deferAgentCreation) throws
             IllegalArgumentException, DiscoveryException,
             InvalidParameterValueException {
         final ResourceChecker resourceChecker = ResourceChecker.builder()
@@ -2246,13 +2244,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         }
 
         return discoverHostsFull(dcId, podId, clusterId, clusterName, url, username, password, cmd.getHypervisor(), hostTags, cmd.getFullUrlParams(), false);
-    }
-
-    @Override
-    public List<? extends Host> discoverHosts(final AddSecondaryStorageCmd cmd) throws IllegalArgumentException, DiscoveryException, InvalidParameterValueException {
-        final Long dcId = cmd.getZoneId();
-        final String url = cmd.getUrl();
-        return discoverHostsFull(dcId, null, null, null, url, null, null, "SecondaryStorage", null, null, false);
     }
 
     @Override
