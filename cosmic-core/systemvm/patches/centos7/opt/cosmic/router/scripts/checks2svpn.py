@@ -20,10 +20,13 @@ def main():
 
             for peer in peers:
                 vpnname = "vpn-%s-%s" % (vpn['right'], peer.replace("/", "_"))
-                output = subprocess.check_output(["strongswan", "status", vpnname])
-                if "INSTALLED" in output:
-                    exittext = "IPsec SA found;Site-to-site VPN have connected"
-                    exitcode = 0
+                try:
+                    output = subprocess.check_output(["strongswan", "status", vpnname])
+                    if "INSTALLED" in output:
+                        exittext = "IPsec SA found;Site-to-site VPN have connected"
+                        exitcode = 0
+                except subprocess.CalledProcessError:
+                    pass
 
                 batchinfo += "%s:%s:%s&" % (vpn['right'], exitcode, exittext)
     print batchinfo
