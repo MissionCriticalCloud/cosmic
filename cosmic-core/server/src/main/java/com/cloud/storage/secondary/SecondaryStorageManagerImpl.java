@@ -10,6 +10,7 @@ import com.cloud.agent.AgentManager;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.common.resource.ServerResource;
+import com.cloud.common.storageprocessor.TemplateConstants;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
@@ -87,7 +88,6 @@ import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
-import com.cloud.storage.template.TemplateConstants;
 import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.template.TemplateManager;
 import com.cloud.user.AccountService;
@@ -381,7 +381,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         buf.append(" workers=").append(this._configDao.getValue("workers"));
 
-        buf.append(" resource=com.cloud.storage.resource.NfsSecondaryStorageResource");
+        buf.append(" resource=com.cloud.secondarystorage.NfsSecondaryStorageResource");
         buf.append(" instance=SecStorage");
         buf.append(" sslcopy=").append(Boolean.toString(this._useSSlCopy));
         buf.append(" role=").append(vm.getRole().toString());

@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.common.storageprocessor;
 
 public final class TemplateConstants {
     public static final String DEFAULT_TMPLT_ROOT_DIR = "template";

@@ -1,4 +1,4 @@
-package com.cloud.storage.resource;
+package com.cloud.secondarystorage;
 
 import com.cloud.common.resource.ServerResource;
 

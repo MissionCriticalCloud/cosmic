@@ -29,7 +29,7 @@ import com.cloud.storage.command.CommandResult;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
-import com.cloud.storage.template.TemplateConstants;
+import com.cloud.common.storageprocessor.TemplateConstants;
 
 import javax.inject.Inject;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.common.storageprocessor;
 
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.storage.TemplateFormatInfo;

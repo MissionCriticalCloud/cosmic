@@ -1,10 +1,17 @@
-package com.cloud.storage.resource;
+package com.cloud.secondarystorage;
 
 import static com.cloud.utils.StringUtils.join;
 
 import static java.util.Arrays.asList;
 
 import com.cloud.common.resource.ServerResourceBase;
+import com.cloud.common.storageprocessor.Processor;
+import com.cloud.common.storageprocessor.QCOW2Processor;
+import com.cloud.common.storageprocessor.RawImageProcessor;
+import com.cloud.common.storageprocessor.TARProcessor;
+import com.cloud.common.storageprocessor.TemplateConstants;
+import com.cloud.common.storageprocessor.TemplateLocation;
+import com.cloud.common.storageprocessor.VhdProcessor;
 import com.cloud.legacymodel.auth.Certificates;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
@@ -59,17 +66,6 @@ import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.template.DownloadManager;
-import com.cloud.storage.template.DownloadManagerImpl;
-import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.QCOW2Processor;
-import com.cloud.storage.template.RawImageProcessor;
-import com.cloud.storage.template.TARProcessor;
-import com.cloud.storage.template.TemplateConstants;
-import com.cloud.storage.template.TemplateLocation;
-import com.cloud.storage.template.UploadManager;
-import com.cloud.storage.template.UploadManagerImpl;
-import com.cloud.storage.template.VhdProcessor;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.imagestore.ImageStoreUtil;

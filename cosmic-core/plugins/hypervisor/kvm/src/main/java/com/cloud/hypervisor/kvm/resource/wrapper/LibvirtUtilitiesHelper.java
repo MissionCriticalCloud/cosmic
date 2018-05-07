@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.storageprocessor.Processor;
+import com.cloud.common.storageprocessor.QCOW2Processor;
+import com.cloud.common.storageprocessor.TemplateLocation;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.legacymodel.to.VMSnapshotTO;
-import com.cloud.storage.template.Processor;
-import com.cloud.storage.template.QCOW2Processor;
-import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.StorageLayer;
 

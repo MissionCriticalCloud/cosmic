@@ -1,5 +1,13 @@
-package com.cloud.storage.template;
+package com.cloud.secondarystorage;
 
+import com.cloud.common.storageprocessor.IsoProcessor;
+import com.cloud.common.storageprocessor.Processor;
+import com.cloud.common.storageprocessor.QCOW2Processor;
+import com.cloud.common.storageprocessor.RawImageProcessor;
+import com.cloud.common.storageprocessor.TARProcessor;
+import com.cloud.common.storageprocessor.TemplateConstants;
+import com.cloud.common.storageprocessor.TemplateLocation;
+import com.cloud.common.storageprocessor.VhdProcessor;
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.command.DownloadCommand;
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
@@ -16,7 +24,10 @@ import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.resource.SecondaryStorageResource;
+import com.cloud.storage.template.HttpTemplateDownloader;
+import com.cloud.storage.template.LocalTemplateDownloader;
+import com.cloud.storage.template.ScpTemplateDownloader;
+import com.cloud.storage.template.TemplateDownloader;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.component.ManagerBase;

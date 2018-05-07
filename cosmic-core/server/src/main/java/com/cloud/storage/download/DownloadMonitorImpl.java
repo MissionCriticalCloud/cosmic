@@ -1,6 +1,7 @@
 package com.cloud.storage.download;
 
 import com.cloud.agent.AgentManager;
+import com.cloud.common.storageprocessor.TemplateConstants;
 import com.cloud.configuration.Config;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
@@ -29,7 +30,6 @@ import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
-import com.cloud.storage.template.TemplateConstants;
 import com.cloud.storage.upload.UploadListener;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ManagerBase;

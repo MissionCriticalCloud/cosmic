@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.common.storageprocessor;
 
 import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.model.enumeration.ImageFormat;
@@ -12,30 +12,34 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IsoProcessor extends AdapterBase implements Processor {
-    private static final Logger s_logger = LoggerFactory.getLogger(IsoProcessor.class);
+public class TARProcessor extends AdapterBase implements Processor {
+    private static final Logger s_logger = LoggerFactory.getLogger(TARProcessor.class);
 
-    StorageLayer _storage;
+    private StorageLayer _storage;
 
     @Override
     public TemplateFormatInfo process(final String templatePath, final ImageFormat format, final String templateName) {
         if (format != null) {
-            s_logger.debug("We don't handle conversion from " + format + " to ISO.");
+            s_logger.debug("We currently don't handle conversion from " + format + " to TAR.");
             return null;
         }
 
-        final String isoPath = templatePath + File.separator + templateName + "." + ImageFormat.ISO.getFileExtension();
+        final String tarPath = templatePath + File.separator + templateName + "." + ImageFormat.TAR.getFileExtension();
 
-        if (!this._storage.exists(isoPath)) {
-            s_logger.debug("Unable to find the iso file: " + isoPath);
+        if (!this._storage.exists(tarPath)) {
+            s_logger.debug("Unable to find the tar file: " + tarPath);
             return null;
         }
 
         final TemplateFormatInfo info = new TemplateFormatInfo();
-        info.format = ImageFormat.ISO;
-        info.filename = templateName + "." + ImageFormat.ISO.getFileExtension();
-        info.size = this._storage.getSize(isoPath);
-        info.virtualSize = info.size;
+        info.format = ImageFormat.TAR;
+        info.filename = templateName + "." + ImageFormat.TAR.getFileExtension();
+
+        final File tarFile = this._storage.getFile(tarPath);
+
+        info.size = this._storage.getSize(tarPath);
+
+        info.virtualSize = getVirtualSize(tarFile);
 
         return info;
     }
@@ -51,6 +55,7 @@ public class IsoProcessor extends AdapterBase implements Processor {
         if (this._storage == null) {
             throw new ConfigurationException("Unable to get storage implementation");
         }
+
         return true;
     }
 }

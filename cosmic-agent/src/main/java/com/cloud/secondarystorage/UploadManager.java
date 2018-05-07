@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.secondarystorage;
 
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CreateEntityDownloadURLAnswer;
@@ -9,7 +9,6 @@ import com.cloud.legacymodel.communication.command.UploadCommand;
 import com.cloud.legacymodel.storage.TemplateUploadStatus;
 import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.resource.SecondaryStorageResource;
 import com.cloud.utils.component.Manager;
 
 public interface UploadManager extends Manager {

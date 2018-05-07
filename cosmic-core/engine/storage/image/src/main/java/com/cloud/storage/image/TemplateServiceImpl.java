@@ -57,7 +57,7 @@ import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.image.datastore.ImageStoreEntity;
 import com.cloud.storage.image.store.TemplateObject;
-import com.cloud.storage.template.TemplateConstants;
+import com.cloud.common.storageprocessor.TemplateConstants;
 import com.cloud.template.TemplateManager;
 import com.cloud.user.AccountManager;
 import com.cloud.user.ResourceLimitService;

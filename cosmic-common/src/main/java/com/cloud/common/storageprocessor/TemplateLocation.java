@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.common.storageprocessor;
 
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;
 import com.cloud.legacymodel.storage.TemplateFormatInfo;

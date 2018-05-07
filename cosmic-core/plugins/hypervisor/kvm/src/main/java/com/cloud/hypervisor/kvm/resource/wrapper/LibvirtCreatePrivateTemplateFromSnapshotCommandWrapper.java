@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.storageprocessor.Processor;
+import com.cloud.common.storageprocessor.TemplateLocation;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
@@ -9,11 +11,9 @@ import com.cloud.legacymodel.communication.answer.CreatePrivateTemplateAnswer;
 import com.cloud.legacymodel.communication.command.CreatePrivateTemplateFromSnapshotCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.resource.CommandWrapper;
 import com.cloud.resource.ResourceWrapper;
-import com.cloud.storage.template.Processor;
-import com.cloud.legacymodel.storage.TemplateFormatInfo;
-import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.StorageLayer;
 

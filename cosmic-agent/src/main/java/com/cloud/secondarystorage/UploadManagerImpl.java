@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.secondarystorage;
 
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CreateEntityDownloadURLAnswer;
@@ -13,7 +13,8 @@ import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.UploadCompleteCallback;
 import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.resource.SecondaryStorageResource;
+import com.cloud.storage.template.FtpTemplateUploader;
+import com.cloud.storage.template.TemplateUploader;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.script.Script;

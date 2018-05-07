@@ -1,5 +1,8 @@
 package com.cloud.hypervisor.kvm.storage;
 
+import com.cloud.common.storageprocessor.Processor;
+import com.cloud.common.storageprocessor.QCOW2Processor;
+import com.cloud.common.storageprocessor.TemplateLocation;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtConnection;
 import com.cloud.hypervisor.kvm.resource.LibvirtDomainXmlParser;
@@ -21,6 +24,7 @@ import com.cloud.legacymodel.communication.command.IntroduceObjectCommand;
 import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
+import com.cloud.legacymodel.storage.TemplateFormatInfo;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
@@ -34,10 +38,6 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.storage.resource.StorageProcessor;
-import com.cloud.storage.template.Processor;
-import com.cloud.legacymodel.storage.TemplateFormatInfo;
-import com.cloud.storage.template.QCOW2Processor;
-import com.cloud.storage.template.TemplateLocation;
 import com.cloud.utils.qemu.QemuImg;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.qemu.QemuImgException;

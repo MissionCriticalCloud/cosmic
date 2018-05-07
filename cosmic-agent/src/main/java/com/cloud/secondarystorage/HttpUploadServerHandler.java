@@ -1,4 +1,4 @@
-package com.cloud.storage.resource;
+package com.cloud.secondarystorage;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
