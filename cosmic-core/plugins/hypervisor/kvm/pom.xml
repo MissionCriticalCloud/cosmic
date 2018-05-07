@@ -12,17 +12,18 @@
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
+            <artifactId>cosmic-common</artifactId>
+            <version>6.0.16-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cosmic-common</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -37,11 +38,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-engine-storage-datamotion</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
