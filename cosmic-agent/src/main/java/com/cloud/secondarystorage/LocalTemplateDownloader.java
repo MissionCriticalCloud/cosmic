@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.secondarystorage;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.DownloadCompleteCallback;

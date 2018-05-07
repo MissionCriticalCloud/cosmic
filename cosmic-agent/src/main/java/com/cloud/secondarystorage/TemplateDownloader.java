@@ -1,4 +1,4 @@
-package com.cloud.storage.template;
+package com.cloud.secondarystorage;
 
 import com.cloud.legacymodel.storage.DownloadCompleteCallback;
 import com.cloud.legacymodel.storage.TemplateDownloadStatus;
