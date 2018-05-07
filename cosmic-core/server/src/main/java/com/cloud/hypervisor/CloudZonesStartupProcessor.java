@@ -1,7 +1,7 @@
 package com.cloud.hypervisor;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.StartupCommandProcessor;
+import com.cloud.common.agent.StartupCommandProcessor;
 import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.exceptions.ConnectionException;
@@ -30,11 +30,11 @@ public class CloudZonesStartupProcessor extends AdapterBase implements StartupCo
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _agentManager.registerForInitialConnects(this, false);
-        if (_nodeId == -1) {
+        this._agentManager.registerForInitialConnects(this, false);
+        if (this._nodeId == -1) {
             // FIXME: We really should not do this like this. It should be done
             // at config time and is stored as a config variable.
-            _nodeId = MacAddress.getMacAddress().toLong();
+            this._nodeId = MacAddress.getMacAddress().toLong();
         }
         return true;
     }

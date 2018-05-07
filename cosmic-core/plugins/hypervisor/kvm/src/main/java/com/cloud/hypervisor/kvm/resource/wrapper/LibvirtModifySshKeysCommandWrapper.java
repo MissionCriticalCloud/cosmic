@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.ModifySshKeysCommand;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.StringUtils;
 import com.cloud.utils.script.Script;
 
@@ -56,7 +56,7 @@ public final class LibvirtModifySshKeysCommandWrapper
         }
 
         if (pubKeyFile.exists()) {
-            try (FileOutputStream pubkStream = new FileOutputStream(pubKeyFile)) {
+            try (final FileOutputStream pubkStream = new FileOutputStream(pubKeyFile)) {
                 pubkStream.write(command.getPubKey().getBytes(StringUtils.getPreferredCharset()));
             } catch (final FileNotFoundException e) {
                 result = "File" + sshpubkeypath + "is not found:"
@@ -80,7 +80,7 @@ public final class LibvirtModifySshKeysCommandWrapper
 
         if (prvKeyFile.exists()) {
             final String prvKey = command.getPrvKey();
-            try (FileOutputStream prvKStream = new FileOutputStream(prvKeyFile)) {
+            try (final FileOutputStream prvKStream = new FileOutputStream(prvKeyFile)) {
                 if (prvKStream != null) {
                     prvKStream.write(prvKey.getBytes(StringUtils.getPreferredCharset()));
                 }

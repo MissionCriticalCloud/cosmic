@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
@@ -12,8 +14,6 @@ import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

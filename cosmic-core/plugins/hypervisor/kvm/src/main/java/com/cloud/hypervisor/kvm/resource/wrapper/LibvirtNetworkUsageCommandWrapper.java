@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
 import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 @ResourceWrapper(handles = NetworkUsageCommand.class)
 public final class LibvirtNetworkUsageCommandWrapper

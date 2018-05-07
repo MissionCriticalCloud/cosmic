@@ -1,4 +1,4 @@
-package com.cloud.resource.hypervisor;
+package com.cloud.hypervisor;
 
 import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.RebootAnswer;

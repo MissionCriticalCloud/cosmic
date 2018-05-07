@@ -1,6 +1,7 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
+import com.cloud.common.request.ResourceListener;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterVO;
@@ -15,7 +16,6 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.resource.ResourceListener;
 import com.cloud.resource.ResourceManager;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;

@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
@@ -8,8 +10,6 @@ import com.cloud.legacymodel.communication.answer.PlugNicAnswer;
 import com.cloud.legacymodel.communication.command.PlugNicCommand;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.NicTO;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.List;
 

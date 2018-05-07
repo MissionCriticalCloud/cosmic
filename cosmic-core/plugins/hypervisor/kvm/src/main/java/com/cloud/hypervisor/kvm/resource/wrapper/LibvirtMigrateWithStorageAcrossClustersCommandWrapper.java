@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateWithStorageAcrossClustersAnswer;
@@ -9,8 +11,6 @@ import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;

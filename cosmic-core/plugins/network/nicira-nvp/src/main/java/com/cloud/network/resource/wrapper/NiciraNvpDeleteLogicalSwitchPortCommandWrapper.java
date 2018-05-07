@@ -4,13 +4,13 @@ import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 import com.cloud.agent.api.DeleteLogicalSwitchPortAnswer;
 import com.cloud.agent.api.DeleteLogicalSwitchPortCommand;
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.utils.CommandRetryUtility;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 @ResourceWrapper(handles = DeleteLogicalSwitchPortCommand.class)
 public final class NiciraNvpDeleteLogicalSwitchPortCommandWrapper extends CommandWrapper<DeleteLogicalSwitchPortCommand, Answer, NiciraNvpResource> {

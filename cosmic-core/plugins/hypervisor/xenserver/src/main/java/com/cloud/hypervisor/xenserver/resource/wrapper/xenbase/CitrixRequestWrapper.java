@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.RequestWrapper;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.hypervisor.xenserver.resource.XcpServerResource;
@@ -9,8 +11,6 @@ import com.cloud.hypervisor.xenserver.resource.XenServer610Resource;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.RequestWrapper;
 
 import java.util.Hashtable;
 import java.util.Set;

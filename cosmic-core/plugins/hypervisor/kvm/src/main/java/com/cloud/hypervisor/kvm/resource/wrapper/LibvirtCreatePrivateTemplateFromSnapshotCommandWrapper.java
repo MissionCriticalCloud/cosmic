@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.storageprocessor.Processor;
 import com.cloud.common.storageprocessor.TemplateLocation;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
@@ -12,8 +14,6 @@ import com.cloud.legacymodel.communication.command.CreatePrivateTemplateFromSnap
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.storage.TemplateFormatInfo;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.StorageLayer;
 

@@ -1,6 +1,7 @@
 package com.cloud.agent;
 
 import com.cloud.agent.manager.Commands;
+import com.cloud.common.agent.StartupCommandProcessor;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.HostVO;

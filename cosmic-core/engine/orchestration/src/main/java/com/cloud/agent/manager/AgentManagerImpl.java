@@ -2,8 +2,8 @@ package com.cloud.agent.manager;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
-import com.cloud.agent.StartupCommandProcessor;
 import com.cloud.alert.AlertManager;
+import com.cloud.common.agent.StartupCommandProcessor;
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.common.transport.Request;

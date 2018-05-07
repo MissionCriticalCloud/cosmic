@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef.InterfaceDef;
 import com.cloud.hypervisor.kvm.resource.VifDriver;
@@ -9,8 +11,6 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateAnswer;
 import com.cloud.legacymodel.communication.command.MigrateCommand;
 import com.cloud.legacymodel.utils.Ternary;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -40,13 +40,13 @@ public final class LibvirtMigrateCommandWrapper extends CommandWrapper<MigrateCo
         String result = null;
 
         List<InterfaceDef> ifaces = null;
-        List<LibvirtDiskDef> disks;
+        final List<LibvirtDiskDef> disks;
 
         Domain dm = null;
         Connect dconn = null;
         Domain destDomain = null;
         Connect conn = null;
-        String xmlDesc;
+        final String xmlDesc;
         List<Ternary<String, Boolean, String>> vmsnapshots = null;
         try {
             final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();

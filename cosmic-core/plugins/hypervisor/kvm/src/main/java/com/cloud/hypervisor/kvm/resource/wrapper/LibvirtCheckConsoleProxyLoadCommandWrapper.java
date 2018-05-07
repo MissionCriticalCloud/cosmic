@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.resource.ResourceWrapper;
 
 @ResourceWrapper(handles = CheckConsoleProxyLoadCommand.class)
 public class LibvirtCheckConsoleProxyLoadCommandWrapper

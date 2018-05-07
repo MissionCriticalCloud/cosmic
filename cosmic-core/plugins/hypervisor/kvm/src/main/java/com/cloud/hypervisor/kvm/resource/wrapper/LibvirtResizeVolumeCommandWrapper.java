@@ -1,17 +1,17 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.legacymodel.communication.answer.ResizeVolumeAnswer;
-import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.ResizeVolumeAnswer;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
 

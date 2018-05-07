@@ -8,6 +8,7 @@ import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
 import com.cloud.api.command.admin.host.ReconnectHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
+import com.cloud.common.request.ResourceListener;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
@@ -161,7 +162,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#registerResourceEvent(java.lang.Integer, com.cloud.resource.ResourceListener)
+     * @see com.cloud.resource.ResourceManager#registerResourceEvent(java.lang.Integer, com.cloud.common.request.ResourceListener)
      */
     @Override
     public void registerResourceEvent(final Integer event, final ResourceListener listener) {
@@ -170,7 +171,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#unregisterResourceEvent(com.cloud.resource.ResourceListener)
+     * @see com.cloud.resource.ResourceManager#unregisterResourceEvent(com.cloud.common.request.ResourceListener)
      */
     @Override
     public void unregisterResourceEvent(final ResourceListener listener) {

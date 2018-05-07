@@ -1,11 +1,11 @@
 package com.cloud.network.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ReadyAnswer;
 import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.network.resource.NiciraNvpResource;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 @ResourceWrapper(handles = ReadyCommand.class)
 public final class NiciraNvpReadyCommandWrapper extends CommandWrapper<ReadyCommand, Answer, NiciraNvpResource> {

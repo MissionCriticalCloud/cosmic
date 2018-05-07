@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ClusterVMMetaDataSyncAnswer;
 import com.cloud.legacymodel.communication.command.ClusterVMMetaDataSyncCommand;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.HashMap;
 
@@ -33,7 +33,7 @@ public final class CitrixClusterVMMetaDataSyncCommandWrapper extends CommandWrap
             if (!citrixResourceBase.getHost().getUuid().equals(hostr.uuid)) {
                 return new ClusterVMMetaDataSyncAnswer(command.getClusterId(), null);
             }
-        } catch (XmlRpcException | XenAPIException e) {
+        } catch (final XmlRpcException | XenAPIException e) {
             s_logger.warn("Check for master failed, failing the Cluster sync VMMetaData command");
             return new ClusterVMMetaDataSyncAnswer(command.getClusterId(), null);
         }

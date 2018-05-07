@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen56;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
 import com.cloud.legacymodel.ExecutionResult;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
 import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import com.xensource.xenapi.Connection;
 import org.slf4j.Logger;

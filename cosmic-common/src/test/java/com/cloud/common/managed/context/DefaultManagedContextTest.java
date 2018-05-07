@@ -22,12 +22,12 @@ public class DefaultManagedContextTest {
     public void init() {
         ManagedThreadLocal.setValidateInContext(false);
 
-        context = new DefaultManagedContext();
+        this.context = new DefaultManagedContext();
     }
 
     @Test
     public void testCallable() throws Exception {
-        assertEquals(5, context.callWithContext(new Callable<Integer>() {
+        assertEquals(5, this.context.callWithContext(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 return 5;
@@ -39,7 +39,7 @@ public class DefaultManagedContextTest {
     public void testRunnable() throws Exception {
         final List<Object> touch = new ArrayList<>();
 
-        context.runWithContext(new Runnable() {
+        this.context.runWithContext(new Runnable() {
             @Override
             public void run() {
                 touch.add(new Object());
@@ -53,7 +53,7 @@ public class DefaultManagedContextTest {
     public void testGoodListeners() throws Exception {
         final List<Object> touch = new ArrayList<>();
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
@@ -67,7 +67,7 @@ public class DefaultManagedContextTest {
             }
         });
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
@@ -81,7 +81,7 @@ public class DefaultManagedContextTest {
             }
         });
 
-        assertEquals(5, context.callWithContext(new Callable<Integer>() {
+        assertEquals(5, this.context.callWithContext(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 return 5;
@@ -98,7 +98,7 @@ public class DefaultManagedContextTest {
     public void testBadListeners() throws Exception {
         final List<Object> touch = new ArrayList<>();
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
@@ -112,7 +112,7 @@ public class DefaultManagedContextTest {
             }
         });
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
@@ -127,7 +127,7 @@ public class DefaultManagedContextTest {
         });
 
         try {
-            context.callWithContext(() -> 5).intValue();
+            this.context.callWithContext(() -> 5).intValue();
 
             fail();
         } catch (final Throwable t) {
@@ -144,7 +144,7 @@ public class DefaultManagedContextTest {
     public void testBadInvocation() throws Exception {
         final List<Object> touch = new ArrayList<>();
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
@@ -158,7 +158,7 @@ public class DefaultManagedContextTest {
             }
         });
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
@@ -173,7 +173,7 @@ public class DefaultManagedContextTest {
         });
 
         try {
-            context.callWithContext(new Callable<Integer>() {
+            this.context.callWithContext(new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
                     throw new RuntimeException("I'm a failure");
@@ -196,7 +196,7 @@ public class DefaultManagedContextTest {
     public void testBadListernInExit() throws Exception {
         final List<Object> touch = new ArrayList<>();
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter");
@@ -212,7 +212,7 @@ public class DefaultManagedContextTest {
             }
         });
 
-        context.registerListener(new ManagedContextListener<Object>() {
+        this.context.registerListener(new ManagedContextListener<Object>() {
             @Override
             public Object onEnterContext(final boolean reentry) {
                 touch.add("enter1");
@@ -227,7 +227,7 @@ public class DefaultManagedContextTest {
         });
 
         try {
-            context.callWithContext(new Callable<Integer>() {
+            this.context.callWithContext(new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
                     return 5;

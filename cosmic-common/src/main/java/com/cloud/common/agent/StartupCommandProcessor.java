@@ -1,4 +1,4 @@
-package com.cloud.agent;
+package com.cloud.common.agent;
 
 import com.cloud.utils.component.Adapter;
 

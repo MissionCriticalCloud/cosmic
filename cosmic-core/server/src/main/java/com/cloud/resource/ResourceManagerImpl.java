@@ -15,6 +15,7 @@ import com.cloud.capacity.CapacityManager;
 import com.cloud.capacity.CapacityVO;
 import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.cluster.ClusterManager;
+import com.cloud.common.request.ResourceListener;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.common.transport.GsonHelper;
 import com.cloud.common.transport.Request;

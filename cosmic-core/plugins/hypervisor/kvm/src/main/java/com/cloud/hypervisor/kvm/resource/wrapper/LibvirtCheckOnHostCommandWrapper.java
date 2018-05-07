@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.KvmHaBase.NfsStoragePool;
 import com.cloud.hypervisor.kvm.resource.KvmHaChecker;
 import com.cloud.hypervisor.kvm.resource.KvmHaMonitor;
@@ -8,8 +10,6 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
 import com.cloud.legacymodel.to.HostTO;
 import com.cloud.legacymodel.to.NetworkTO;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

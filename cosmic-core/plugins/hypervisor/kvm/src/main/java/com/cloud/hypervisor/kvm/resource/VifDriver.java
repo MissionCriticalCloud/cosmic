@@ -10,10 +10,10 @@ import org.libvirt.LibvirtException;
 
 public interface VifDriver {
 
-    public void configure(Map<String, Object> params) throws ConfigurationException;
+    void configure(Map<String, Object> params) throws ConfigurationException;
 
-    public LibvirtVmDef.InterfaceDef plug(NicTO nic, String guestOsType, String nicAdapter)
+    LibvirtVmDef.InterfaceDef plug(NicTO nic, String guestOsType, String nicAdapter)
             throws InternalErrorException, LibvirtException;
 
-    public void unplug(LibvirtVmDef.InterfaceDef iface);
+    void unplug(LibvirtVmDef.InterfaceDef iface);
 }

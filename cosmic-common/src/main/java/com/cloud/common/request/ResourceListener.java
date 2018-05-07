@@ -1,4 +1,4 @@
-package com.cloud.resource;
+package com.cloud.common.request;
 
 import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.dc.Host;
@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface ResourceListener {
-    static final Integer EVENT_DISCOVER_BEFORE = 0x1;
-    static final Integer EVENT_DISCOVER_AFTER = 0x1 << 1;
-    static final Integer EVENT_DELETE_HOST_BEFORE = 0x1 << 2;
-    static final Integer EVENT_DELETE_HOST_AFTER = 0x1 << 3;
-    static final Integer EVENT_CANCEL_MAINTENANCE_BEFORE = 0x1 << 4;
-    static final Integer EVENT_CANCEL_MAINTENANCE_AFTER = 0x1 << 5;
-    static final Integer EVENT_PREPARE_MAINTENANCE_BEFORE = 0x1 << 6;
-    static final Integer EVENT_PREPARE_MAINTENANCE_AFTER = 0x1 << 7;
-    static final Integer EVENT_ALL = (EVENT_DISCOVER_BEFORE | EVENT_DISCOVER_AFTER | EVENT_DELETE_HOST_BEFORE | EVENT_DELETE_HOST_AFTER |
+    Integer EVENT_DISCOVER_BEFORE = 0x1;
+    Integer EVENT_DISCOVER_AFTER = 0x1 << 1;
+    Integer EVENT_DELETE_HOST_BEFORE = 0x1 << 2;
+    Integer EVENT_DELETE_HOST_AFTER = 0x1 << 3;
+    Integer EVENT_CANCEL_MAINTENANCE_BEFORE = 0x1 << 4;
+    Integer EVENT_CANCEL_MAINTENANCE_AFTER = 0x1 << 5;
+    Integer EVENT_PREPARE_MAINTENANCE_BEFORE = 0x1 << 6;
+    Integer EVENT_PREPARE_MAINTENANCE_AFTER = 0x1 << 7;
+    Integer EVENT_ALL = (EVENT_DISCOVER_BEFORE | EVENT_DISCOVER_AFTER | EVENT_DELETE_HOST_BEFORE | EVENT_DELETE_HOST_AFTER |
             EVENT_CANCEL_MAINTENANCE_BEFORE | EVENT_CANCEL_MAINTENANCE_AFTER | EVENT_PREPARE_MAINTENANCE_BEFORE | EVENT_PREPARE_MAINTENANCE_AFTER);
 
     /**

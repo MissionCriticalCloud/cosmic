@@ -1,10 +1,10 @@
 package com.cloud.network.resource;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.RequestWrapper;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.RequestWrapper;
 
 import java.util.Hashtable;
 import java.util.Set;

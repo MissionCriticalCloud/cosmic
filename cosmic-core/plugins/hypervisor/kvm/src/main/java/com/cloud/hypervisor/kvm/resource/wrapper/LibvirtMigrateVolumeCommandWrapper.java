@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.legacymodel.communication.answer.MigrateVolumeAnswer;
-import com.cloud.legacymodel.communication.command.MigrateVolumeCommand;
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.xml.LibvirtDiskDef;
 import com.cloud.legacymodel.communication.answer.Answer;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
+import com.cloud.legacymodel.communication.answer.MigrateVolumeAnswer;
+import com.cloud.legacymodel.communication.command.MigrateVolumeCommand;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -34,17 +34,17 @@ public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<Mig
         final String vmName = command.getAttachedVmName();
 
         LibvirtDiskDef disk = null;
-        List<LibvirtDiskDef> disks;
+        final List<LibvirtDiskDef> disks;
 
         Domain dm = null;
         Connect conn = null;
 
-        String currentVolumePath;
-        String newVolumePath;
+        final String currentVolumePath;
+        final String newVolumePath;
 
-        CountDownLatch completeSignal = new CountDownLatch(1);
+        final CountDownLatch completeSignal = new CountDownLatch(1);
 
-        BlockJobListener blockJobListener = new BlockJobListener() {
+        final BlockJobListener blockJobListener = new BlockJobListener() {
             @Override
             public void onBlockJobCompleted(final Domain domain, final String disk, final int type) throws LibvirtException {
                 onBlockJobReady(domain, disk, type);
@@ -75,7 +75,7 @@ public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<Mig
             dm = conn.domainLookupByName(vmName);
             newVolumePath = "/mnt/" + command.getPool().getUuid() + "/" + command.getVolumePath();
 
-            for (LibvirtDiskDef diskDef : disks) {
+            for (final LibvirtDiskDef diskDef : disks) {
                 if (diskDef.getDiskPath().contains(command.getVolumePath())) {
                     disk = diskDef;
                     break;
@@ -100,11 +100,11 @@ public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<Mig
             completeSignal.await();
 
             logger.debug("Refreshing storage pool " + command.getPool().getUuid());
-            StoragePool storagePool = conn.storagePoolLookupByUUIDString(command.getPool().getUuid());
+            final StoragePool storagePool = conn.storagePoolLookupByUUIDString(command.getPool().getUuid());
             storagePool.refresh(0);
 
             logger.debug("Cleaning up old disk " + currentVolumePath);
-            StorageVol storageVol = conn.storageVolLookupByPath(currentVolumePath);
+            final StorageVol storageVol = conn.storageVolLookupByPath(currentVolumePath);
             storageVol.delete(0);
         } catch (final LibvirtException | InterruptedException e) {
             logger.debug("Can't migrate disk: " + e.getMessage());

@@ -4,9 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.cloud.common.virtualnetwork.ConfigItem;
-import com.cloud.common.virtualnetwork.FileConfigItem;
-import com.cloud.common.virtualnetwork.ScriptConfigItem;
 import com.cloud.common.virtualnetwork.facade.AbstractConfigItemFacade;
 import com.cloud.legacymodel.communication.command.LoadBalancerConfigCommand;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;

@@ -1,12 +1,12 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen620sp1;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.xenserver.resource.XenServer620SP1Resource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.GetGPUStatsAnswer;
 import com.cloud.legacymodel.communication.command.GetGPUStatsCommand;
 import com.cloud.legacymodel.vm.VgpuTypesInfo;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.HashMap;
 

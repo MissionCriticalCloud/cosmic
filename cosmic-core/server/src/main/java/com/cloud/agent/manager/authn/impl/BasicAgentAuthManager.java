@@ -1,8 +1,8 @@
 package com.cloud.agent.manager.authn.impl;
 
 import com.cloud.agent.AgentManager;
-import com.cloud.agent.StartupCommandProcessor;
 import com.cloud.agent.manager.authn.AgentAuthorizer;
+import com.cloud.common.agent.StartupCommandProcessor;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.command.StartupCommand;
@@ -33,7 +33,7 @@ public class BasicAgentAuthManager extends AdapterBase implements AgentAuthorize
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _agentManager.registerForInitialConnects(this, true);
+        this._agentManager.registerForInitialConnects(this, true);
         return true;
     }
 }

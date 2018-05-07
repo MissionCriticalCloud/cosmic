@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
@@ -7,8 +9,6 @@ import com.cloud.legacymodel.communication.command.RestoreVMSnapshotCommand;
 import com.cloud.legacymodel.to.VMSnapshotTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.List;
 import java.util.Map;

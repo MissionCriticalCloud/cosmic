@@ -1,4 +1,4 @@
-package com.cloud.resource;
+package com.cloud.common.request;
 
 import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;

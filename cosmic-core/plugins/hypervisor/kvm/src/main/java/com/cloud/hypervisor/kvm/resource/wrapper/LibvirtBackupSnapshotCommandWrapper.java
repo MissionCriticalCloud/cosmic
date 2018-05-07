@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.storage.KvmPhysicalDisk;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePool;
@@ -9,8 +11,6 @@ import com.cloud.legacymodel.communication.answer.BackupSnapshotAnswer;
 import com.cloud.legacymodel.communication.command.BackupSnapshotCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 import com.cloud.utils.script.Script;
 
 import java.io.BufferedOutputStream;
@@ -84,7 +84,7 @@ public final class LibvirtBackupSnapshotCommandWrapper
                     final Rbd rbd = new Rbd(io);
                     final RbdImage image = rbd.open(snapshotDisk.getName(), snapshotName);
                     final File fh = new File(snapshotDestPath);
-                    try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fh))) {
+                    try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fh))) {
                         final int chunkSize = 4194304;
                         long offset = 0;
                         s_logger.debug("Backuping up RBD snapshot " + snapshotName + " to  " + snapshotDestPath);
