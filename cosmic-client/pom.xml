@@ -35,12 +35,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-nucleo</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-spring-module</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
