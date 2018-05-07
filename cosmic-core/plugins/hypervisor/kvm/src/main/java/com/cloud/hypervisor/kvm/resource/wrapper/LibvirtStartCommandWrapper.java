@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.kvm.resource.wrapper;
 
-import com.cloud.agent.resource.virtualnetwork.VirtualRoutingResource;
+import com.cloud.common.virtualnetwork.VirtualRoutingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtComputingResource;
 import com.cloud.hypervisor.kvm.resource.LibvirtVmDef;
 import com.cloud.hypervisor.kvm.storage.KvmStoragePoolManager;

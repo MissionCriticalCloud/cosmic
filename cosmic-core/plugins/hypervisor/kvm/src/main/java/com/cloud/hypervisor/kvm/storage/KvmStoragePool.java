@@ -9,50 +9,50 @@ import java.util.List;
 import java.util.Map;
 
 public interface KvmStoragePool {
-    public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, PhysicalDiskFormat format,
-                                              StorageProvisioningType provisioningType, long size);
+    KvmPhysicalDisk createPhysicalDisk(String volumeUuid, PhysicalDiskFormat format,
+                                       StorageProvisioningType provisioningType, long size);
 
-    public KvmPhysicalDisk createPhysicalDisk(String volumeUuid, StorageProvisioningType provisioningType, long size);
+    KvmPhysicalDisk createPhysicalDisk(String volumeUuid, StorageProvisioningType provisioningType, long size);
 
-    public boolean connectPhysicalDisk(String volumeUuid, Map<String, String> details);
+    boolean connectPhysicalDisk(String volumeUuid, Map<String, String> details);
 
-    public KvmPhysicalDisk getPhysicalDisk(String volumeUuid);
+    KvmPhysicalDisk getPhysicalDisk(String volumeUuid);
 
-    public boolean disconnectPhysicalDisk(String volumeUuid);
+    boolean disconnectPhysicalDisk(String volumeUuid);
 
-    public boolean deletePhysicalDisk(String volumeUuid, ImageFormat format);
+    boolean deletePhysicalDisk(String volumeUuid, ImageFormat format);
 
-    public List<KvmPhysicalDisk> listPhysicalDisks();
+    List<KvmPhysicalDisk> listPhysicalDisks();
 
-    public String getUuid();
+    String getUuid();
 
-    public long getCapacity();
+    long getCapacity();
 
-    public long getUsed();
+    long getUsed();
 
-    public long getAvailable();
+    long getAvailable();
 
-    public boolean refresh();
+    boolean refresh();
 
-    public boolean isExternalSnapshot();
+    boolean isExternalSnapshot();
 
-    public String getLocalPath();
+    String getLocalPath();
 
-    public String getSourceHost();
+    String getSourceHost();
 
-    public String getSourceDir();
+    String getSourceDir();
 
-    public int getSourcePort();
+    int getSourcePort();
 
-    public String getAuthUserName();
+    String getAuthUserName();
 
-    public String getAuthSecret();
+    String getAuthSecret();
 
-    public StoragePoolType getType();
+    StoragePoolType getType();
 
-    public boolean delete();
+    boolean delete();
 
     PhysicalDiskFormat getDefaultFormat();
 
-    public boolean createFolder(String path);
+    boolean createFolder(String path);
 }

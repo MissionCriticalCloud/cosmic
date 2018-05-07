@@ -3,8 +3,8 @@ package com.cloud.hypervisor.xenserver.resource;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.hypervisor.xenserver.XenServerResourceNewBase;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.storage.resource.StorageSubsystemCommandHandler;
-import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
+import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandler;
+import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.utils.ssh.SSHCmdHelper;
 
 import javax.ejb.Local;
