@@ -38,7 +38,6 @@
         <module>framework/security</module>
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>
-        <module>plugins/acl-static-role-based</module>
         <module>plugins/affinity-group-processors/explicit-dedication</module>
         <module>plugins/affinity-group-processors/host-anti-affinity</module>
         <module>plugins/api/discovery</module>

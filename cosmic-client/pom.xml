@@ -55,11 +55,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-acl-static-role-based</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-dedicated-resources</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
