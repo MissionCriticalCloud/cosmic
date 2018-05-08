@@ -9,13 +9,13 @@ import com.cloud.utils.component.PluggableService;
  */
 public interface ApiRateLimitService extends PluggableService {
 
-    public ApiLimitResponse searchApiLimit(Account caller);
+    ApiLimitResponse searchApiLimit(Account caller);
 
-    public boolean resetApiLimit(Long accountId);
+    boolean resetApiLimit(Long accountId);
 
-    public void setTimeToLive(int timeToLive);
+    void setTimeToLive(int timeToLive);
 
-    public void setMaxAllowed(int max);
+    void setMaxAllowed(int max);
 
-    public void setEnabled(boolean enabled);
+    void setEnabled(boolean enabled);
 }
