@@ -70,26 +70,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-planner-user-dispersing</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-planner-skip-heuristics</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-planner-user-concentrated-pod</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-planner-implicit-dedication</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-host-allocator-random</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
