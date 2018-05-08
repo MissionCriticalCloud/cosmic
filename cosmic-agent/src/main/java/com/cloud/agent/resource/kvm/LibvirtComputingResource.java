@@ -1559,7 +1559,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     boolean isGuestVirtIoCapable(final String guestOsName) {
-        final DiskControllerType db = getGuestDiskModel(guestOsName);
+        final DiskControllerType db = DiskControllerType.getGuestDiskModel(guestOsName);
         return db != DiskControllerType.IDE;
     }
 
@@ -1740,16 +1740,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     @Override
     public HostType getType() {
         return HostType.Routing;
-    }
-
-    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
-        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
-            return DiskControllerType.IDE;
-        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
-            return DiskControllerType.SCSI;
-        } else {
-            return DiskControllerType.VIRTIO;
-        }
     }
 
     private Map<String, String> getVersionStrings() {

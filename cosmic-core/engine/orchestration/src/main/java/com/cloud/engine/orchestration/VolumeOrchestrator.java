@@ -1298,7 +1298,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         if (diskControllerType == null) {
             final GuestOS guestOs = this._guestOsDao.findById(vm.getGuestOSId());
-            diskControllerType = getGuestDiskModel(guestOs.getDisplayName());
+            diskControllerType = DiskControllerType.getGuestDiskModel(guestOs.getDisplayName());
         }
 
         VolumeVO vol = new VolumeVO(type,
@@ -1348,16 +1348,6 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             this._resourceLimitMgr.incrementResourceCount(vm.getAccountId(), ResourceType.primary_storage, vol.isDisplayVolume(), new Long(vol.getSize()));
         }
         return toDiskProfile(vol, offering);
-    }
-
-    private DiskControllerType getGuestDiskModel(final String platformEmulator) {
-        if (platformEmulator == null || platformEmulator.toLowerCase().contains("Non-VirtIO".toLowerCase())) {
-            return DiskControllerType.IDE;
-        } else if (platformEmulator.toLowerCase().contains("VirtIO-SCSI".toLowerCase())) {
-            return DiskControllerType.SCSI;
-        } else {
-            return DiskControllerType.VIRTIO;
-        }
     }
 
     @Override
