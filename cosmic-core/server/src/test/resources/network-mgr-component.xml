@@ -58,13 +58,13 @@
             <adapter name="DirectNetworkGuru" class="com.cloud.network.guru.DirectNetworkGuru" />
             <adapter name="DirectPodBasedNetworkGuru" class="com.cloud.network.guru.DirectPodBasedNetworkGuru" />
             <adapter name="PrivateNetworkGuru" class="com.cloud.network.guru.PrivateNetworkGuru" />
-            <!--<adapter name="NiciraNvpGuestNetworkGuru" class="com.cloud.network.guru.NiciraNvpGuestNetworkGuru"/> -->
+            <!--<adapter name="NiciraNvpGuestNetworkGuru" class="NiciraNvpGuestNetworkGuru"/> -->
         </adapters>
 
         <adapters key="com.cloud.network.element.NetworkElement">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
-            <!--<adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->
+            <!--<adapter name="NiciraNvp" class="NiciraNvpElement"/> -->
         </adapters>
         <adapters key="com.cloud.network.element.FirewallServiceProvider">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
@@ -82,17 +82,17 @@
         <adapters key="com.cloud.network.element.SourceNatServiceProvider">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
-            <!--<adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/>   -->
+            <!--<adapter name="NiciraNvp" class="NiciraNvpElement"/>   -->
         </adapters>
         <adapters key="com.cloud.network.element.StaticNatServiceProvider">
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
-            <!-- <adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->
+            <!-- <adapter name="NiciraNvp" class="NiciraNvpElement"/> -->
         </adapters>
         <adapters key="com.cloud.network.element.PortForwardingServiceProvider">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
-            <!-- <adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->
+            <!-- <adapter name="NiciraNvp" class="NiciraNvpElement"/> -->
         </adapters>
         <adapters key="com.cloud.network.element.LoadBalancingServiceProvider">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
@@ -107,10 +107,10 @@
         <adapters key="com.cloud.network.element.IpDeployer">
             <adapter name="VirtualRouter" class="com.cloud.network.element.VirtualRouterElement" />
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
-            <!-- <adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->
+            <!-- <adapter name="NiciraNvp" class="NiciraNvpElement"/> -->
         </adapters>
         <adapters key="com.cloud.network.element.ConnectivityProvider">
-            <!-- <adapter name="NiciraNvp" class="com.cloud.network.element.NiciraNvpElement"/> -->
+            <!-- <adapter name="NiciraNvp" class="NiciraNvpElement"/> -->
         </adapters>
         <adapters key="com.cloud.network.element.NetworkACLServiceProvider">
             <adapter name="VpcVirtualRouter" class="com.cloud.network.element.VpcVirtualRouterElement" />
@@ -121,10 +121,10 @@
 
         <pluggableservice name="VirtualRouterElementService" key="com.cloud.network.element.VirtualRouterElementService"
                           class="com.cloud.network.element.VirtualRouterElement" />
-        <!-- <pluggableservice name="NiciraNvpElementService" key="com.cloud.network.element.NiciraNvpElementService" class="com.cloud.network.element.NiciraNvpElement"/> -->
-        <!--<dao name="NiciraNvpDao" class="com.cloud.network.dao.NiciraNvpDaoImpl" singleton="false"/> -->
-        <!--<dao name="NiciraNvpNicMappingDao" class="com.cloud.network.dao.NiciraNvpNicMappingDaoImpl" singleton="false"/> -->
-        <!--<dao name="NiciraNvpRouterMappingDao" class="com.cloud.network.dao.NiciraNvpRouterMappingDaoImpl" singleton="false"/> -->
+        <!-- <pluggableservice name="NiciraNvpElementService" key="NiciraNvpElementService" class="NiciraNvpElement"/> -->
+        <!--<dao name="NiciraNvpDao" class="NiciraNvpDaoImpl" singleton="false"/> -->
+        <!--<dao name="NiciraNvpNicMappingDao" class="NiciraNvpNicMappingDaoImpl" singleton="false"/> -->
+        <!--<dao name="NiciraNvpRouterMappingDao" class="NiciraNvpRouterMappingDaoImpl" singleton="false"/> -->
     </management-server>
 
     <configuration-server class="com.cloud.server.ConfigurationServerImpl">
