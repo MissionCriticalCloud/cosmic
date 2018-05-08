@@ -38,8 +38,6 @@
         <module>framework/security</module>
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>
-        <module>plugins/authentication/sha256salted</module>
-        <module>plugins/dedicated-resources</module>
         <module>plugins/deployment-planners/implicit-dedication</module>
         <module>plugins/deployment-planners/skip-heuristics</module>
         <module>plugins/deployment-planners/user-concentrated-pod</module>
