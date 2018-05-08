@@ -60,11 +60,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-storage-allocator-random</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
