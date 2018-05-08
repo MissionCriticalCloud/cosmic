@@ -190,11 +190,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-host-anti-affinity</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-scripts</artifactId>
             <version>6.0.16-SNAPSHOT</version>
             <type>pom</type>
