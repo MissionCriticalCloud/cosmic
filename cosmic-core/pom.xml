@@ -38,7 +38,6 @@
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>
         <module>plugins/network/nicira-nvp</module>
-        <module>plugins/storage/volume-default</module>
         <module>scripts</module>
         <module>server</module>
     </modules>
