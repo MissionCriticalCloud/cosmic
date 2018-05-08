@@ -32,7 +32,6 @@
         <module>framework/jobs</module>
         <module>framework/security</module>
         <module>framework/spring/lifecycle</module>
-        <module>framework/spring/module</module>
         <module>scripts</module>
         <module>server</module>
     </modules>

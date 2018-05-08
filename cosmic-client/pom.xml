@@ -35,11 +35,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-spring-module</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-spring-lifecycle</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
