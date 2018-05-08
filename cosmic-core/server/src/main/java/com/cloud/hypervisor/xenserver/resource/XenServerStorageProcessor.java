@@ -1,5 +1,6 @@
 package com.cloud.hypervisor.xenserver.resource;
 
+import com.cloud.common.storageprocessor.resource.StorageProcessor;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase.SRType;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.AttachAnswer;
@@ -30,11 +31,10 @@ import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.to.TemplateObjectTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.DataObjectType;
+import com.cloud.model.enumeration.DataStoreProtocol;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.storage.datastore.protocol.DataStoreProtocol;
-import com.cloud.common.storageprocessor.resource.StorageProcessor;
 import com.cloud.utils.storage.encoding.DecodedDataObject;
 import com.cloud.utils.storage.encoding.DecodedDataStore;
 import com.cloud.utils.storage.encoding.Decoder;

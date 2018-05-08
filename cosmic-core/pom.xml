@@ -38,7 +38,6 @@
         <module>framework/security</module>
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>
-        <module>plugins/hypervisor/xenserver</module>
         <module>plugins/network/nicira-nvp</module>
         <module>plugins/storage/allocator-random</module>
         <module>plugins/storage/image-default</module>

@@ -1,7 +1,9 @@
-package com.cloud.storage.datastore.protocol;
+package com.cloud.model.enumeration;
 
 public enum DataStoreProtocol {
-    NFS("nfs"), CIFS("cifs"), ISCSI("iscsi");
+    NFS("nfs"),
+    CIFS("cifs"),
+    ISCSI("iscsi");
 
     private final String name;
 
