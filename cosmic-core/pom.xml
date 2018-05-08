@@ -26,7 +26,6 @@
         <module>engine/storage/cache</module>
         <module>engine/storage/datamotion</module>
         <module>engine/storage/default</module>
-        <module>engine/storage/image</module>
         <module>engine/storage/snapshot</module>
         <module>engine/storage/volume</module>
         <module>framework/cluster</module>
@@ -39,7 +38,6 @@
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>
         <module>plugins/network/nicira-nvp</module>
-        <module>plugins/storage/image-default</module>
         <module>plugins/storage/volume-default</module>
         <module>scripts</module>
         <module>server</module>

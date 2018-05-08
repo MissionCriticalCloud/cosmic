@@ -95,11 +95,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-engine-storage-image</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-datamotion</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
@@ -116,11 +111,6 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-plugin-storage-volume-default</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-storage-image-default</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
