@@ -16,6 +16,13 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
+            <artifactId>cloud-api</artifactId>
+            <version>6.0.16-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
