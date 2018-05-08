@@ -1,5 +1,6 @@
 package com.cloud.vm;
 
+import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;
 
@@ -22,7 +23,7 @@ import java.util.Date;
 @Table(name = "secondary_storage_vm")
 @PrimaryKeyJoinColumn(name = "id")
 @DiscriminatorValue(value = "SecondaryStorageVm")
-public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStorageVm {
+public class SecondaryStorageVmVO extends VMInstanceVO implements SystemVm {
     @Column(name = "public_ip_address", nullable = false)
     private String publicIpAddress;
 
@@ -40,14 +41,14 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING)
-    private Role role;
+    private SecondaryStorageVmRole role;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_update", updatable = true, nullable = true)
     private Date lastUpdateTime;
 
     public SecondaryStorageVmVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
-                                final long dataCenterId, final long domainId, final long accountId, final long userId, final Role role, final boolean haEnabled) {
+                                final long dataCenterId, final long domainId, final long accountId, final long userId, final SecondaryStorageVmRole role, final boolean haEnabled) {
         super(id, serviceOfferingId, name, name, VirtualMachineType.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.role = role;
         this.dataCenterId = dataCenterId;
@@ -59,7 +60,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Override
     public String getPublicIpAddress() {
-        return publicIpAddress;
+        return this.publicIpAddress;
     }
 
     public void setPublicIpAddress(final String publicIpAddress) {
@@ -68,7 +69,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
 
     @Override
     public String getPublicNetmask() {
-        return publicNetmask;
+        return this.publicNetmask;
     }
 
     public void setPublicNetmask(final String publicNetmask) {
@@ -78,7 +79,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
     @Override
 
     public String getPublicMacAddress() {
-        return publicMacAddress;
+        return this.publicMacAddress;
     }
 
     public void setPublicMacAddress(final String publicMacAddress) {
@@ -91,18 +92,18 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SecondaryStora
     }
 
     public String getGuid() {
-        return guid;
+        return this.guid;
     }
 
     public void setGuid(final String guid) {
         this.guid = guid;
     }
 
-    public Role getRole() {
+    public SecondaryStorageVmRole getRole() {
         return this.role;
     }
 
-    public void setRole(final Role role) {
+    public void setRole(final SecondaryStorageVmRole role) {
         this.role = role;
     }
 }

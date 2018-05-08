@@ -27,7 +27,7 @@
     <!--
       Managed Context
     -->
-    <bean id="ManagedContext" class="com.cloud.managed.context.impl.DefaultManagedContext">
+    <bean id="ManagedContext" class="com.cloud.common.managed.context.DefaultManagedContext">
         <property name="listeners">
             <list>
                 <!-- Put CallContext listener first because it will open and then close a DB connection.
@@ -40,7 +40,7 @@
         </property>
     </bean>
 
-    <bean class="com.cloud.managed.context.ManagedContextRunnable" factory-method="initializeGlobalContext"
+    <bean class="com.cloud.common.managed.context.ManagedContextRunnable" factory-method="initializeGlobalContext"
           autowire-candidate="false">
         <constructor-arg>
             <ref bean="ManagedContext" />

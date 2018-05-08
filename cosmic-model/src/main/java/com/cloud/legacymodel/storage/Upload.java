@@ -21,7 +21,7 @@ public interface Upload extends InternalIdentity, Identity {
 
     int getUploadPercent();
 
-    Status getUploadState();
+    UploadStatus getUploadState();
 
     long getTypeId();
 
@@ -36,22 +36,6 @@ public interface Upload extends InternalIdentity, Identity {
     String getInstallPath();
 
     void setInstallPath(String installPath);
-
-    enum Status {
-        UNKNOWN,
-        ABANDONED,
-        UPLOADED,
-        NOT_UPLOADED,
-        UPLOAD_ERROR,
-        UPLOAD_IN_PROGRESS,
-        NOT_COPIED,
-        COPY_IN_PROGRESS,
-        COPY_ERROR,
-        COPY_COMPLETE,
-        DOWNLOAD_URL_CREATED,
-        DOWNLOAD_URL_NOT_CREATED,
-        ERROR
-    }
 
     enum Type {
         VOLUME, TEMPLATE, ISO

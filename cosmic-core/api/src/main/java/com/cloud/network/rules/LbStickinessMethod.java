@@ -1,5 +1,7 @@
 package com.cloud.network.rules;
 
+import com.cloud.legacymodel.network.StickinessMethodType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,16 +25,16 @@ public class LbStickinessMethod {
         /* FIXME : UI is breaking if the capability string length is larger , temporarily description is commented out */
         // LbStickinessMethodParam param = new LbStickinessMethodParam(name, required, description);
         final LbStickinessMethodParam param = new LbStickinessMethodParam(name, required, " ", isFlag);
-        _paramList.add(param);
+        this._paramList.add(param);
         return;
     }
 
     public String getMethodName() {
-        return _methodName;
+        return this._methodName;
     }
 
     public List<LbStickinessMethodParam> getParamList() {
-        return _paramList;
+        return this._paramList;
     }
 
     public void setParamList(final List<LbStickinessMethodParam> paramList) {
@@ -40,28 +42,13 @@ public class LbStickinessMethod {
     }
 
     public String getDescription() {
-        return _description;
+        return this._description;
     }
 
     public void setDescription(final String description) {
         /* FIXME : UI is breaking if the capability string length is larger , temporarily description is commented out */
         //this.description = description;
         this._description = " ";
-    }
-
-    public static class StickinessMethodType {
-        public static final StickinessMethodType LBCookieBased = new StickinessMethodType("LbCookie");
-        public static final StickinessMethodType AppCookieBased = new StickinessMethodType("AppCookie");
-        public static final StickinessMethodType SourceBased = new StickinessMethodType("SourceBased");
-        private final String _name;
-
-        public StickinessMethodType(final String name) {
-            _name = name;
-        }
-
-        public String getName() {
-            return _name;
-        }
     }
 
     public class LbStickinessMethodParam {
@@ -85,7 +72,7 @@ public class LbStickinessMethod {
         }
 
         public String getParamName() {
-            return _paramName;
+            return this._paramName;
         }
 
         public void setParamName(final String paramName) {
@@ -93,7 +80,7 @@ public class LbStickinessMethod {
         }
 
         public Boolean getIsflag() {
-            return _isFlag;
+            return this._isFlag;
         }
 
         public void setIsflag(final Boolean isFlag) {
@@ -101,7 +88,7 @@ public class LbStickinessMethod {
         }
 
         public Boolean getRequired() {
-            return _required;
+            return this._required;
         }
 
         public void setRequired(final Boolean required) {
@@ -109,7 +96,7 @@ public class LbStickinessMethod {
         }
 
         public String getDescription() {
-            return _description;
+            return this._description;
         }
 
         public void setDescription(final String description) {

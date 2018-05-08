@@ -2,7 +2,7 @@ package com.cloud.storage.download;
 
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public class DownloadErrorState extends DownloadInactiveState {
 
@@ -15,22 +15,22 @@ public class DownloadErrorState extends DownloadInactiveState {
         switch (answer.getDownloadStatus()) {
             case DOWNLOAD_IN_PROGRESS:
                 getDownloadListener().scheduleStatusCheck(RequestType.GET_STATUS);
-                return Status.DOWNLOAD_IN_PROGRESS.toString();
+                return VMTemplateStatus.DOWNLOAD_IN_PROGRESS.toString();
             case DOWNLOADED:
                 getDownloadListener().scheduleImmediateStatusCheck(RequestType.PURGE);
                 getDownloadListener().cancelTimeoutTask();
-                return Status.DOWNLOADED.toString();
+                return VMTemplateStatus.DOWNLOADED.toString();
             case NOT_DOWNLOADED:
                 getDownloadListener().scheduleStatusCheck(RequestType.GET_STATUS);
-                return Status.NOT_DOWNLOADED.toString();
+                return VMTemplateStatus.NOT_DOWNLOADED.toString();
             case DOWNLOAD_ERROR:
                 getDownloadListener().cancelStatusTask();
                 getDownloadListener().cancelTimeoutTask();
-                return Status.DOWNLOAD_ERROR.toString();
+                return VMTemplateStatus.DOWNLOAD_ERROR.toString();
             case UNKNOWN:
                 getDownloadListener().cancelStatusTask();
                 getDownloadListener().cancelTimeoutTask();
-                return Status.DOWNLOAD_ERROR.toString();
+                return VMTemplateStatus.DOWNLOAD_ERROR.toString();
             default:
                 return null;
         }
@@ -38,12 +38,12 @@ public class DownloadErrorState extends DownloadInactiveState {
 
     @Override
     public String handleAbort() {
-        return Status.ABANDONED.toString();
+        return VMTemplateStatus.ABANDONED.toString();
     }
 
     @Override
     public String getName() {
-        return Status.DOWNLOAD_ERROR.toString();
+        return VMTemplateStatus.DOWNLOAD_ERROR.toString();
     }
 
     @Override
@@ -53,14 +53,14 @@ public class DownloadErrorState extends DownloadInactiveState {
             getDownloadListener().logDisconnect();
             getDownloadListener().cancelStatusTask();
             getDownloadListener().cancelTimeoutTask();
-            final DownloadAnswer answer = new DownloadAnswer("Storage agent or storage VM disconnected", Status.DOWNLOAD_ERROR);
+            final DownloadAnswer answer = new DownloadAnswer("Storage agent or storage VM disconnected", VMTemplateStatus.DOWNLOAD_ERROR);
             getDownloadListener().callback(answer);
             getDownloadListener().logWarn("Entering download error state because the storage host disconnected");
         } else if (event == DownloadEvent.TIMEOUT_CHECK) {
-            final DownloadAnswer answer = new DownloadAnswer("Timeout waiting for response from storage host", Status.DOWNLOAD_ERROR);
+            final DownloadAnswer answer = new DownloadAnswer("Timeout waiting for response from storage host", VMTemplateStatus.DOWNLOAD_ERROR);
             getDownloadListener().callback(answer);
             getDownloadListener().logWarn("Entering download error state: timeout waiting for response from storage host");
         }
-        getDownloadListener().setDownloadInactive(Status.DOWNLOAD_ERROR);
+        getDownloadListener().setDownloadInactive(VMTemplateStatus.DOWNLOAD_ERROR);
     }
 }

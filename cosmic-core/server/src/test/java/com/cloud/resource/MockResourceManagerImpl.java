@@ -1,20 +1,21 @@
 package com.cloud.resource;
 
-import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
-import com.cloud.api.command.admin.host.AddSecondaryStorageCmd;
 import com.cloud.api.command.admin.host.CancelMaintenanceCmd;
 import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
 import com.cloud.api.command.admin.host.ReconnectHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostCmd;
 import com.cloud.api.command.admin.host.UpdateHostPasswordCmd;
+import com.cloud.common.request.ResourceListener;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.host.HostVO;
 import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStats;
@@ -104,15 +105,6 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceService#discoverHosts(com.cloud.api.commands.AddSecondaryStorageCmd)
-     */
-    @Override
-    public List<? extends Host> discoverHosts(final AddSecondaryStorageCmd cmd) throws IllegalArgumentException, DiscoveryException, InvalidParameterValueException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
      * @see com.cloud.resource.ResourceService#maintain(com.cloud.api.commands.PrepareForMaintenanceCmd)
      */
     @Override
@@ -170,7 +162,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#registerResourceEvent(java.lang.Integer, com.cloud.resource.ResourceListener)
+     * @see com.cloud.resource.ResourceManager#registerResourceEvent(java.lang.Integer, com.cloud.common.request.ResourceListener)
      */
     @Override
     public void registerResourceEvent(final Integer event, final ResourceListener listener) {
@@ -179,7 +171,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#unregisterResourceEvent(com.cloud.resource.ResourceListener)
+     * @see com.cloud.resource.ResourceManager#unregisterResourceEvent(com.cloud.common.request.ResourceListener)
      */
     @Override
     public void unregisterResourceEvent(final ResourceListener listener) {
@@ -206,7 +198,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#createHostAndAgent(java.lang.Long, com.cloud.resource.ServerResource, java.util.Map, boolean, java.util.List, boolean)
+     * @see com.cloud.resource.ResourceManager#createHostAndAgent(java.lang.Long, com.cloud.common.resource.ServerResource, java.util.Map, boolean, java.util.List, boolean)
      */
     @Override
     public Host createHostAndAgent(final Long hostId, final ServerResource resource, final Map<String, String> details, final boolean old, final List<String> hostTags, final
@@ -216,7 +208,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#addHost(long, com.cloud.resource.ServerResource, com.cloud.legacymodel.dc.Host.Type, java.util.Map)
+     * @see com.cloud.resource.ResourceManager#addHost(long, com.cloud.common.resource.ServerResource, com.cloud.legacymodel.dc.Host.Type, java.util.Map)
      */
     @Override
     public Host addHost(final long zoneId, final ServerResource resource, final HostType hostType, final Map<String, String> hostDetails) {

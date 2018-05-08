@@ -7,7 +7,7 @@ import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.legacymodel.exceptions.ActiveFencingException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.Profiler;
 import com.cloud.utils.component.ComponentLifecycle;

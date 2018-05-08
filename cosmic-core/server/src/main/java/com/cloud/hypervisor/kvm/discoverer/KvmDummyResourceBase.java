@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.kvm.discoverer;
 
+import com.cloud.common.resource.ServerResource;
+import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.PingCommand;
@@ -7,8 +9,6 @@ import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.resource.ServerResource;
-import com.cloud.resource.ServerResourceBase;
 
 import javax.naming.ConfigurationException;
 import java.util.HashMap;
@@ -30,13 +30,13 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
     @Override
     public StartupCommand[] initialize() {
         final StartupRoutingCommand cmd = new StartupRoutingCommand(0, 0, 0, null, HypervisorType.KVM, new HashMap<>());
-        cmd.setDataCenter(_zoneId);
-        cmd.setPod(_podId);
-        cmd.setCluster(_clusterId);
-        cmd.setGuid(_guid);
-        cmd.setName(_agentIp);
-        cmd.setPrivateIpAddress(_agentIp);
-        cmd.setStorageIpAddress(_agentIp);
+        cmd.setDataCenter(this._zoneId);
+        cmd.setPod(this._podId);
+        cmd.setCluster(this._clusterId);
+        cmd.setGuid(this._guid);
+        cmd.setName(this._agentIp);
+        cmd.setPrivateIpAddress(this._agentIp);
+        cmd.setStorageIpAddress(this._agentIp);
         cmd.setVersion(KvmDummyResourceBase.class.getPackage().getImplementationVersion());
         return new StartupCommand[]{cmd};
     }
@@ -55,11 +55,11 @@ public class KvmDummyResourceBase extends ServerResourceBase implements ServerRe
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _zoneId = (String) params.get("zone");
-        _podId = (String) params.get("pod");
-        _clusterId = (String) params.get("cluster");
-        _guid = (String) params.get("guid");
-        _agentIp = (String) params.get("agentIp");
+        this._zoneId = (String) params.get("zone");
+        this._podId = (String) params.get("pod");
+        this._clusterId = (String) params.get("cluster");
+        this._guid = (String) params.get("guid");
+        this._agentIp = (String) params.get("agentIp");
         return true;
     }
 

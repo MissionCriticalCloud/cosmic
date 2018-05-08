@@ -1,7 +1,7 @@
 package com.cloud.utils.db;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.mgmt.JmxUtil;
 

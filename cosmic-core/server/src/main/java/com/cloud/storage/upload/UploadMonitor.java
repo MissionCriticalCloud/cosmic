@@ -3,8 +3,8 @@ package com.cloud.storage.upload;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.legacymodel.storage.Upload.Mode;
-import com.cloud.legacymodel.storage.Upload.Status;
 import com.cloud.legacymodel.storage.Upload.Type;
+import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.storage.UploadVO;
 import com.cloud.storage.VMTemplateVO;
@@ -26,7 +26,7 @@ public interface UploadMonitor extends Manager {
 
     void handleUploadSync(long sserverId);
 
-    UploadVO createNewUploadEntry(Long hostId, Long typeId, Status uploadState, Type type, String errorString, Mode extractMode);
+    UploadVO createNewUploadEntry(Long hostId, Long typeId, UploadStatus uploadState, Type type, String errorString, Mode extractMode);
 
     void extractVolume(UploadVO uploadVolumeObj, DataStore secStore, VolumeVO volume, String url, Long dataCenterId, String installPath, long eventId, long asyncJobId,
                        AsyncJobManager asyncMgr);

@@ -1,5 +1,7 @@
 package com.cloud.agent.manager;
 
+import com.cloud.common.managed.context.ManagedContextRunnable;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.common.transport.Request;
 import com.cloud.common.transport.Response;
 import com.cloud.framework.config.ConfigKey;
@@ -10,8 +12,6 @@ import com.cloud.legacymodel.communication.command.CronCommand;
 import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
-import com.cloud.managed.context.ManagedContextRunnable;
-import com.cloud.resource.ServerResource;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -40,9 +40,9 @@ public class DirectAgentAttache extends AgentAttache {
 
     public DirectAgentAttache(final AgentManagerImpl agentMgr, final long id, final String name, final ServerResource resource, final boolean maintenance) {
         super(agentMgr, id, name, maintenance);
-        _resource = resource;
-        _outstandingTaskCount = new AtomicInteger(0);
-        _outstandingCronTaskCount = new AtomicInteger(0);
+        this._resource = resource;
+        this._outstandingTaskCount = new AtomicInteger(0);
+        this._outstandingCronTaskCount = new AtomicInteger(0);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DirectAgentAttache extends AgentAttache {
             if (answers != null && answers[0] instanceof StartupAnswer) {
                 final StartupAnswer startup = (StartupAnswer) answers[0];
                 final int interval = startup.getPingInterval();
-                _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
+                this._futures.add(this._agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
             }
         } else {
             final Command[] cmds = req.getCommands();
@@ -63,7 +63,7 @@ public class DirectAgentAttache extends AgentAttache {
                 scheduleFromQueue();
             } else {
                 final CronCommand cmd = (CronCommand) cmds[0];
-                _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new CronTask(req), cmd.getInterval(), cmd.getInterval(), TimeUnit.SECONDS));
+                this._futures.add(this._agentMgr.getCronJobPool().scheduleAtFixedRate(new CronTask(req), cmd.getInterval(), cmd.getInterval(), TimeUnit.SECONDS));
             }
         }
     }
@@ -82,55 +82,55 @@ public class DirectAgentAttache extends AgentAttache {
             final StartupAnswer startup = (StartupAnswer) answers[0];
             final int interval = startup.getPingInterval();
             s_logger.info("StartupAnswer received " + startup.getHostId() + " Interval = " + interval);
-            _futures.add(_agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
+            this._futures.add(this._agentMgr.getCronJobPool().scheduleAtFixedRate(new PingTask(), interval, interval, TimeUnit.SECONDS));
         }
     }
 
     @Override
     public void disconnect(final HostStatus state) {
         if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Processing disconnect " + _id + "(" + _name + ")");
+            s_logger.debug("Processing disconnect " + this._id + "(" + this._name + ")");
         }
 
-        for (final ScheduledFuture<?> future : _futures) {
+        for (final ScheduledFuture<?> future : this._futures) {
             future.cancel(false);
         }
 
         synchronized (this) {
-            if (_resource != null) {
-                _resource.disconnected();
-                _resource = null;
+            if (this._resource != null) {
+                this._resource.disconnected();
+                this._resource = null;
             }
         }
     }
 
     @Override
     public synchronized boolean isClosed() {
-        return _resource == null;
+        return this._resource == null;
     }
 
     private synchronized void queueTask(final Task task) {
-        tasks.add(task);
+        this.tasks.add(task);
     }
 
     private synchronized void scheduleFromQueue() {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Agent attache=" + _id + ", task queue size=" + tasks.size() + ", outstanding tasks=" + _outstandingTaskCount.get());
+            s_logger.trace("Agent attache=" + this._id + ", task queue size=" + this.tasks.size() + ", outstanding tasks=" + this._outstandingTaskCount.get());
         }
-        while (!tasks.isEmpty() && _outstandingTaskCount.get() < _agentMgr.getDirectAgentThreadCap()) {
-            _outstandingTaskCount.incrementAndGet();
-            _agentMgr.getDirectAgentPool().execute(tasks.remove());
+        while (!this.tasks.isEmpty() && this._outstandingTaskCount.get() < this._agentMgr.getDirectAgentThreadCap()) {
+            this._outstandingTaskCount.incrementAndGet();
+            this._agentMgr.getDirectAgentPool().execute(this.tasks.remove());
         }
     }
 
     @Override
     protected void finalize() throws Throwable {
         try {
-            assert _resource == null : "Come on now....If you're going to dabble in agent code, you better know how to close out our resources. Ever considered why there's a " +
+            assert this._resource == null : "Come on now....If you're going to dabble in agent code, you better know how to close out our resources. Ever considered why there's a " +
                     "method called disconnect()?";
             synchronized (this) {
-                if (_resource != null) {
-                    s_logger.warn("Lost attache for " + _id + "(" + _name + ")");
+                if (this._resource != null) {
+                    s_logger.warn("Lost attache for " + this._id + "(" + this._name + ")");
                     disconnect(HostStatus.Alert);
                 }
             }
@@ -143,24 +143,25 @@ public class DirectAgentAttache extends AgentAttache {
         @Override
         protected synchronized void runInContext() {
             try {
-                if (_outstandingCronTaskCount.incrementAndGet() >= _agentMgr.getDirectAgentThreadCap()) {
-                    s_logger.warn("PingTask execution for direct attache(" + _id + ") has reached maximum outstanding limit(" + _agentMgr.getDirectAgentThreadCap() + "), bailing" +
+                if (DirectAgentAttache.this._outstandingCronTaskCount.incrementAndGet() >= DirectAgentAttache.this._agentMgr.getDirectAgentThreadCap()) {
+                    s_logger.warn("PingTask execution for direct attache(" + DirectAgentAttache.this._id + ") has reached maximum outstanding limit(" + DirectAgentAttache.this._agentMgr
+                            .getDirectAgentThreadCap() + "), bailing" +
                             " out");
                     return;
                 }
 
-                final ServerResource resource = _resource;
+                final ServerResource resource = DirectAgentAttache.this._resource;
 
                 if (resource != null) {
-                    PingCommand cmd = resource.getCurrentStatus(_id);
+                    PingCommand cmd = resource.getCurrentStatus(DirectAgentAttache.this._id);
                     int retried = 0;
-                    while (cmd == null && ++retried <= _HostPingRetryCount.value()) {
-                        Thread.sleep(1000 * _HostPingRetryTimer.value());
-                        cmd = resource.getCurrentStatus(_id);
+                    while (cmd == null && ++retried <= DirectAgentAttache.this._HostPingRetryCount.value()) {
+                        Thread.sleep(1000 * DirectAgentAttache.this._HostPingRetryTimer.value());
+                        cmd = resource.getCurrentStatus(DirectAgentAttache.this._id);
                     }
 
                     if (cmd == null) {
-                        s_logger.warn("Unable to get current status on " + _id + "(" + _name + ")");
+                        s_logger.warn("Unable to get current status on " + DirectAgentAttache.this._id + "(" + DirectAgentAttache.this._name + ")");
                         return;
                     }
 
@@ -168,22 +169,22 @@ public class DirectAgentAttache extends AgentAttache {
                         MDC.put("logcontextid", cmd.getContextParam("logid"));
                     }
                     if (s_logger.isDebugEnabled()) {
-                        s_logger.debug("Ping from " + _id + "(" + _name + ")");
+                        s_logger.debug("Ping from " + DirectAgentAttache.this._id + "(" + DirectAgentAttache.this._name + ")");
                     }
-                    final long seq = _seq++;
+                    final long seq = DirectAgentAttache.this._seq++;
 
                     if (s_logger.isTraceEnabled()) {
-                        s_logger.trace("SeqA " + _id + "-" + seq + ": " + new Request(_id, -1, cmd, false).toString());
+                        s_logger.trace("SeqA " + DirectAgentAttache.this._id + "-" + seq + ": " + new Request(DirectAgentAttache.this._id, -1, cmd, false).toString());
                     }
 
-                    _agentMgr.handleCommands(DirectAgentAttache.this, seq, new Command[]{cmd});
+                    DirectAgentAttache.this._agentMgr.handleCommands(DirectAgentAttache.this, seq, new Command[]{cmd});
                 } else {
-                    s_logger.debug("Unable to send ping because agent is disconnected " + _id + "(" + _name + ")");
+                    s_logger.debug("Unable to send ping because agent is disconnected " + DirectAgentAttache.this._id + "(" + DirectAgentAttache.this._name + ")");
                 }
             } catch (final Exception e) {
                 s_logger.warn("Unable to complete the ping task", e);
             } finally {
-                _outstandingCronTaskCount.decrementAndGet();
+                DirectAgentAttache.this._outstandingCronTaskCount.decrementAndGet();
             }
         }
     }
@@ -192,19 +193,19 @@ public class DirectAgentAttache extends AgentAttache {
         Request _req;
 
         public CronTask(final Request req) {
-            _req = req;
+            this._req = req;
         }
 
         private void bailout() {
-            final long seq = _req.getSequence();
+            final long seq = this._req.getSequence();
             try {
-                final Command[] cmds = _req.getCommands();
+                final Command[] cmds = this._req.getCommands();
                 final ArrayList<Answer> answers = new ArrayList<>(cmds.length);
                 for (final Command cmd : cmds) {
                     final Answer answer = new Answer(cmd, false, "Bailed out as maximum outstanding task limit reached");
                     answers.add(answer);
                 }
-                final Response resp = new Response(_req, answers.toArray(new Answer[answers.size()]));
+                final Response resp = new Response(this._req, answers.toArray(new Answer[answers.size()]));
                 processAnswers(seq, resp);
             } catch (final Exception e) {
                 s_logger.warn(log(seq, "Exception caught in bailout "), e);
@@ -213,18 +214,19 @@ public class DirectAgentAttache extends AgentAttache {
 
         @Override
         protected void runInContext() {
-            final long seq = _req.getSequence();
+            final long seq = this._req.getSequence();
             try {
-                if (_outstandingCronTaskCount.incrementAndGet() >= _agentMgr.getDirectAgentThreadCap()) {
-                    s_logger.warn("CronTask execution for direct attache(" + _id + ") has reached maximum outstanding limit(" + _agentMgr.getDirectAgentThreadCap() + "), bailing" +
+                if (DirectAgentAttache.this._outstandingCronTaskCount.incrementAndGet() >= DirectAgentAttache.this._agentMgr.getDirectAgentThreadCap()) {
+                    s_logger.warn("CronTask execution for direct attache(" + DirectAgentAttache.this._id + ") has reached maximum outstanding limit(" + DirectAgentAttache.this._agentMgr
+                            .getDirectAgentThreadCap() + "), bailing" +
                             " out");
                     bailout();
                     return;
                 }
 
-                final ServerResource resource = _resource;
-                final Command[] cmds = _req.getCommands();
-                final boolean stopOnError = _req.stopOnError();
+                final ServerResource resource = DirectAgentAttache.this._resource;
+                final Command[] cmds = this._req.getCommands();
+                final boolean stopOnError = this._req.stopOnError();
 
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug(log(seq, "Executing request"));
@@ -259,7 +261,7 @@ public class DirectAgentAttache extends AgentAttache {
                     }
                 }
 
-                final Response resp = new Response(_req, answers.toArray(new Answer[answers.size()]));
+                final Response resp = new Response(this._req, answers.toArray(new Answer[answers.size()]));
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug(log(seq, "Response Received: "));
                 }
@@ -268,7 +270,7 @@ public class DirectAgentAttache extends AgentAttache {
             } catch (final Exception e) {
                 s_logger.warn(log(seq, "Exception caught "), e);
             } finally {
-                _outstandingCronTaskCount.decrementAndGet();
+                DirectAgentAttache.this._outstandingCronTaskCount.decrementAndGet();
             }
         }
     }
@@ -277,16 +279,16 @@ public class DirectAgentAttache extends AgentAttache {
         Request _req;
 
         public Task(final Request req) {
-            _req = req;
+            this._req = req;
         }
 
         @Override
         protected void runInContext() {
-            final long seq = _req.getSequence();
+            final long seq = this._req.getSequence();
             try {
-                final ServerResource resource = _resource;
-                final Command[] cmds = _req.getCommands();
-                final boolean stopOnError = _req.stopOnError();
+                final ServerResource resource = DirectAgentAttache.this._resource;
+                final Command[] cmds = this._req.getCommands();
+                final boolean stopOnError = this._req.stopOnError();
 
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug(log(seq, "Executing request"));
@@ -316,14 +318,14 @@ public class DirectAgentAttache extends AgentAttache {
                     }
                 }
 
-                final Response resp = new Response(_req, answers.toArray(new Answer[answers.size()]));
+                final Response resp = new Response(this._req, answers.toArray(new Answer[answers.size()]));
                 if (s_logger.isDebugEnabled()) {
                     s_logger.debug(log(seq, "Response Received: "));
                 }
 
                 processAnswers(seq, resp);
             } finally {
-                _outstandingTaskCount.decrementAndGet();
+                DirectAgentAttache.this._outstandingTaskCount.decrementAndGet();
                 scheduleFromQueue();
             }
         }

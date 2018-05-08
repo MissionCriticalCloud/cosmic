@@ -1,5 +1,8 @@
 package com.cloud.agent.resource.consoleproxy;
 
+import com.cloud.common.managed.context.ManagedContextRunnable;
+import com.cloud.common.resource.ServerResource;
+import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
@@ -13,11 +16,8 @@ import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHan
 import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupProxyCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
-import com.cloud.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.ExitStatus;
 import com.cloud.model.enumeration.HostType;
-import com.cloud.resource.ServerResource;
-import com.cloud.resource.ServerResourceBase;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
@@ -75,11 +75,11 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
     public synchronized StartupCommand[] initialize() {
         final StartupProxyCommand cmd = new StartupProxyCommand();
         fillNetworkInformation(cmd);
-        cmd.setProxyPort(_proxyPort);
-        cmd.setProxyVmId(_proxyVmId);
+        cmd.setProxyPort(this._proxyPort);
+        cmd.setProxyVmId(this._proxyVmId);
         cmd.setVersion(ConsoleProxyResource.class.getPackage().getImplementationVersion());
-        if (_pubIp != null) {
-            cmd.setPublicIpAddress(_pubIp);
+        if (this._pubIp != null) {
+            cmd.setPublicIpAddress(this._pubIp);
         }
         return new StartupCommand[]{cmd};
     }
@@ -161,8 +161,8 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
     private void launchConsoleProxy(final byte[] ksBits, final String ksPassword, final String encryptorPassword) {
         final Object resource = this;
-        if (_consoleProxyMain == null) {
-            _consoleProxyMain = new Thread(new ManagedContextRunnable() {
+        if (this._consoleProxyMain == null) {
+            this._consoleProxyMain = new Thread(new ManagedContextRunnable() {
                 @Override
                 protected void runInContext() {
                     try {
@@ -174,7 +174,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
                             s_logger.info("Invoke startWithContext()");
                             final Method method = consoleProxyClazz.getMethod("startWithContext", Properties.class, Object.class, byte[].class, String.class);
-                            method.invoke(null, _properties, resource, ksBits, ksPassword);
+                            method.invoke(null, ConsoleProxyResource.this._properties, resource, ksBits, ksPassword);
                         } catch (final SecurityException e) {
                             s_logger.error("Unable to launch console proxy due to SecurityException", e);
                             System.exit(ExitStatus.Error.value());
@@ -197,8 +197,8 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
                     }
                 }
             }, "Console-Proxy-Main");
-            _consoleProxyMain.setDaemon(true);
-            _consoleProxyMain.start();
+            this._consoleProxyMain.setDaemon(true);
+            this._consoleProxyMain.start();
         } else {
             s_logger.info("com.cloud.consoleproxy.ConsoleProxy is already running");
 
@@ -230,15 +230,15 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
     @Override
     public String getName() {
-        return _name;
+        return this._name;
     }
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        _localgw = (String) params.get("localgw");
-        _eth1mask = (String) params.get("eth1mask");
-        _eth1ip = (String) params.get("eth1ip");
-        if (_eth1ip != null) {
+        this._localgw = (String) params.get("localgw");
+        this._eth1mask = (String) params.get("eth1mask");
+        this._eth1ip = (String) params.get("eth1ip");
+        if (this._eth1ip != null) {
             params.put("private.network.device", "eth1");
         } else {
             s_logger.info("eth1ip parameter has not been configured, assuming that we are not inside a system vm");
@@ -254,38 +254,38 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
         super.configure(name, params);
 
         for (final Map.Entry<String, Object> entry : params.entrySet()) {
-            _properties.put(entry.getKey(), entry.getValue());
+            this._properties.put(entry.getKey(), entry.getValue());
         }
 
         String value = (String) params.get("premium");
         if (value != null && value.equals("premium")) {
-            _proxyPort = 443;
+            this._proxyPort = 443;
         } else {
             value = (String) params.get("consoleproxy.httpListenPort");
-            _proxyPort = NumbersUtil.parseInt(value, 80);
+            this._proxyPort = NumbersUtil.parseInt(value, 80);
         }
 
         value = (String) params.get("proxy_vm");
-        _proxyVmId = NumbersUtil.parseLong(value, 0);
+        this._proxyVmId = NumbersUtil.parseLong(value, 0);
 
-        if (_localgw != null) {
+        if (this._localgw != null) {
             final String mgmtHost = (String) params.get("host");
-            if (_eth1ip != null) {
-                addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, mgmtHost);
+            if (this._eth1ip != null) {
+                addRouteToInternalIpOrCidr(this._localgw, this._eth1ip, this._eth1mask, mgmtHost);
                 final String internalDns1 = (String) params.get("internaldns1");
                 if (internalDns1 == null) {
                     s_logger.warn("No DNS entry found during configuration of NfsSecondaryStorage");
                 } else {
-                    addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, internalDns1);
+                    addRouteToInternalIpOrCidr(this._localgw, this._eth1ip, this._eth1mask, internalDns1);
                 }
                 final String internalDns2 = (String) params.get("internaldns2");
                 if (internalDns2 != null) {
-                    addRouteToInternalIpOrCidr(_localgw, _eth1ip, _eth1mask, internalDns2);
+                    addRouteToInternalIpOrCidr(this._localgw, this._eth1ip, this._eth1mask, internalDns2);
                 }
             }
         }
 
-        _pubIp = (String) params.get("public.ip");
+        this._pubIp = (String) params.get("public.ip");
 
         value = (String) params.get("disable_rp_filter");
         if (value != null && value.equalsIgnoreCase("true")) {
@@ -293,7 +293,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
         }
 
         if (s_logger.isInfoEnabled()) {
-            s_logger.info("Receive proxyVmId in ConsoleProxyResource configuration as " + _proxyVmId);
+            s_logger.info("Receive proxyVmId in ConsoleProxyResource configuration as " + this._proxyVmId);
         }
 
         return true;
@@ -348,8 +348,8 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
     }
 
     private void disableRpFilter() {
-        try (FileWriter fstream = new FileWriter("/proc/sys/net/ipv4/conf/eth2/rp_filter");
-             BufferedWriter out = new BufferedWriter(fstream)) {
+        try (final FileWriter fstream = new FileWriter("/proc/sys/net/ipv4/conf/eth2/rp_filter");
+             final BufferedWriter out = new BufferedWriter(fstream)) {
             out.write("0");
         } catch (final IOException e) {
             s_logger.warn("Unable to disable rp_filter");

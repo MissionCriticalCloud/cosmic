@@ -1,8 +1,8 @@
 package com.cloud.hypervisor.xenserver.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.hypervisor.xenserver.XenserverConfigs;
 import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
-import com.cloud.resource.ServerResource;
 
 import javax.ejb.Local;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class XenServer620Resource extends XenServer610Resource {
 
     protected boolean hostHasHotFix(final Connection conn, final String hotFixUuid) {
         try {
-            final Host host = Host.getByUuid(conn, _host.getUuid());
+            final Host host = Host.getByUuid(conn, this._host.getUuid());
             final Host.Record re = host.getRecord(conn);
             final Set<HostPatch> patches = re.patches;
             final PoolPatch poolPatch = PoolPatch.getByUuid(conn, hotFixUuid);

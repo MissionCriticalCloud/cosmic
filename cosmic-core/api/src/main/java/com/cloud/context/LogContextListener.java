@@ -1,7 +1,7 @@
 package com.cloud.context;
 
 import com.cloud.dao.EntityManager;
-import com.cloud.managed.context.ManagedContextListener;
+import com.cloud.common.managed.context.ManagedContextListener;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

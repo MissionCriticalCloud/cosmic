@@ -1,5 +1,7 @@
 package com.cloud.network.resource.wrapper;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;
@@ -7,8 +9,6 @@ import com.cloud.network.nicira.ControlClusterStatus;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
 import com.cloud.network.resource.NiciraNvpResource;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

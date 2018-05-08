@@ -11,11 +11,10 @@ import com.cloud.engine.subsystem.api.storage.TemplateState;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.TemplateType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
-import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.user.AccountManager;
 import com.cloud.user.AccountService;
 import com.cloud.utils.db.Filter;
@@ -156,9 +155,9 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
 
     private String getTemplateStatus(final TemplateJoinVO template) {
         String templateStatus = null;
-        if (template.getDownloadState() != Status.DOWNLOADED) {
+        if (template.getDownloadState() != VMTemplateStatus.DOWNLOADED) {
             templateStatus = "Processing";
-            if (template.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
+            if (template.getDownloadState() == VMTemplateStatus.DOWNLOAD_IN_PROGRESS) {
                 if (template.getDownloadPercent() == 100) {
                     templateStatus = "Installing Template";
                 } else {
@@ -167,7 +166,7 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
             } else {
                 templateStatus = template.getErrorString();
             }
-        } else if (template.getDownloadState() == VMTemplateHostVO.Status.DOWNLOADED) {
+        } else if (template.getDownloadState() == VMTemplateStatus.DOWNLOADED) {
             templateStatus = "Download Complete";
         } else {
             templateStatus = "Successfully Installed";
@@ -217,11 +216,11 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         // If the user is an admin, add the template download status
         if (isAdmin || caller.getId() == iso.getAccountId()) {
             // add download status
-            if (iso.getDownloadState() != Status.DOWNLOADED) {
+            if (iso.getDownloadState() != VMTemplateStatus.DOWNLOADED) {
                 String isoStatus = "Processing";
-                if (iso.getDownloadState() == VMTemplateHostVO.Status.DOWNLOADED) {
+                if (iso.getDownloadState() == VMTemplateStatus.DOWNLOADED) {
                     isoStatus = "Download Complete";
-                } else if (iso.getDownloadState() == VMTemplateHostVO.Status.DOWNLOAD_IN_PROGRESS) {
+                } else if (iso.getDownloadState() == VMTemplateStatus.DOWNLOAD_IN_PROGRESS) {
                     if (iso.getDownloadPercent() == 100) {
                         isoStatus = "Installing ISO";
                     } else {

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
+import com.cloud.legacymodel.ExecutionResult;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
 import com.cloud.legacymodel.communication.command.FenceCommand;
@@ -16,7 +17,6 @@ import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
 import com.cloud.legacymodel.communication.command.SetupCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostEnvironment;
-import com.cloud.utils.ExecutionResult;
 import com.cloud.vm.VMInstanceVO;
 
 import com.xensource.xenapi.Connection;
@@ -40,7 +40,7 @@ public class XenServer56WrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(onHostCommand, xenServer56Resource);
+        final Answer answer = wrapper.execute(onHostCommand, this.xenServer56Resource);
 
         assertTrue(answer.getResult());
     }
@@ -57,12 +57,12 @@ public class XenServer56WrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(xenServer56Resource.getConnection()).thenReturn(conn);
+        when(this.xenServer56Resource.getConnection()).thenReturn(conn);
 
-        final Answer answer = wrapper.execute(fenceCommand, xenServer56Resource);
+        final Answer answer = wrapper.execute(fenceCommand, this.xenServer56Resource);
 
-        verify(xenServer56Resource, times(1)).getConnection();
-        verify(xenServer56Resource, times(1)).checkHeartbeat(fenceCommand.getHostGuid());
+        verify(this.xenServer56Resource, times(1)).getConnection();
+        verify(this.xenServer56Resource, times(1)).checkHeartbeat(fenceCommand.getHostGuid());
 
         assertFalse(answer.getResult());
     }
@@ -76,12 +76,12 @@ public class XenServer56WrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(xenServer56Resource.getConnection()).thenReturn(conn);
-        when(xenServer56Resource.getNetworkStats(conn, networkCommand.getPrivateIP())).thenReturn(new long[]{1, 1});
+        when(this.xenServer56Resource.getConnection()).thenReturn(conn);
+        when(this.xenServer56Resource.getNetworkStats(conn, networkCommand.getPrivateIP())).thenReturn(new long[]{1, 1});
 
-        final Answer answer = wrapper.execute(networkCommand, xenServer56Resource);
+        final Answer answer = wrapper.execute(networkCommand, this.xenServer56Resource);
 
-        verify(xenServer56Resource, times(1)).getConnection();
+        verify(this.xenServer56Resource, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -95,12 +95,12 @@ public class XenServer56WrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(xenServer56Resource.getConnection()).thenReturn(conn);
-        when(xenServer56Resource.getNetworkStats(conn, networkCommand.getPrivateIP())).thenReturn(new long[0]);
+        when(this.xenServer56Resource.getConnection()).thenReturn(conn);
+        when(this.xenServer56Resource.getNetworkStats(conn, networkCommand.getPrivateIP())).thenReturn(new long[0]);
 
-        final Answer answer = wrapper.execute(networkCommand, xenServer56Resource);
+        final Answer answer = wrapper.execute(networkCommand, this.xenServer56Resource);
 
-        verify(xenServer56Resource, times(1)).getConnection();
+        verify(this.xenServer56Resource, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -115,10 +115,10 @@ public class XenServer56WrapperTest {
         assertNotNull(wrapper);
 
         final String args = " -l 192.168.10.1 -c -v 10.1.1.1/24";
-        when(xenServer56Resource.executeInVR(networkCommand.getPrivateIP(), "vpc_netusage.sh", args)).thenReturn(executionResult);
+        when(this.xenServer56Resource.executeInVR(networkCommand.getPrivateIP(), "vpc_netusage.sh", args)).thenReturn(executionResult);
         when(executionResult.isSuccess()).thenReturn(true);
 
-        final Answer answer = wrapper.execute(networkCommand, xenServer56Resource);
+        final Answer answer = wrapper.execute(networkCommand, this.xenServer56Resource);
 
         assertTrue(answer.getResult());
     }
@@ -133,10 +133,10 @@ public class XenServer56WrapperTest {
         assertNotNull(wrapper);
 
         final String args = " -l 192.168.10.1 -c -v 10.1.1.1/24";
-        when(xenServer56Resource.executeInVR(networkCommand.getPrivateIP(), "vpc_netusage.sh", args)).thenReturn(executionResult);
+        when(this.xenServer56Resource.executeInVR(networkCommand.getPrivateIP(), "vpc_netusage.sh", args)).thenReturn(executionResult);
         when(executionResult.isSuccess()).thenReturn(false);
 
-        final Answer answer = wrapper.execute(networkCommand, xenServer56Resource);
+        final Answer answer = wrapper.execute(networkCommand, this.xenServer56Resource);
 
         assertFalse(answer.getResult());
     }
@@ -151,10 +151,10 @@ public class XenServer56WrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(xenServer56Resource.getHost()).thenReturn(xsHost);
+        when(this.xenServer56Resource.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(setupCommand, xenServer56Resource);
-        verify(xenServer56Resource, times(1)).getConnection();
+        final Answer answer = wrapper.execute(setupCommand, this.xenServer56Resource);
+        verify(this.xenServer56Resource, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }

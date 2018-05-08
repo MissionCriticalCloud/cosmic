@@ -36,11 +36,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-framework-managed-context</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-model</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>

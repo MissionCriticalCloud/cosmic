@@ -3,7 +3,6 @@ package com.cloud.resource;
 import com.cloud.api.command.admin.cluster.AddClusterCmd;
 import com.cloud.api.command.admin.cluster.DeleteClusterCmd;
 import com.cloud.api.command.admin.host.AddHostCmd;
-import com.cloud.api.command.admin.host.AddSecondaryStorageCmd;
 import com.cloud.api.command.admin.host.CancelMaintenanceCmd;
 import com.cloud.api.command.admin.host.PrepareForMaintenanceCmd;
 import com.cloud.api.command.admin.host.ReconnectHostCmd;
@@ -49,8 +48,6 @@ public interface ResourceService {
     Cluster updateCluster(Cluster cluster, String clusterType, String hypervisor, String allocationState, String managedstate);
 
     List<? extends Host> discoverHosts(AddHostCmd cmd) throws IllegalArgumentException, DiscoveryException, InvalidParameterValueException;
-
-    List<? extends Host> discoverHosts(AddSecondaryStorageCmd cmd) throws IllegalArgumentException, DiscoveryException, InvalidParameterValueException;
 
     Host maintain(PrepareForMaintenanceCmd cmd);
 

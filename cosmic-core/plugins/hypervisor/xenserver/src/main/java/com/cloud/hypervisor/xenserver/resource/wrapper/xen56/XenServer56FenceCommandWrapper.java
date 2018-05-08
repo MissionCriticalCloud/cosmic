@@ -1,11 +1,11 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xen56;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.xenserver.resource.XenServer56Resource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.FenceAnswer;
 import com.cloud.legacymodel.communication.command.FenceCommand;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.Set;
 

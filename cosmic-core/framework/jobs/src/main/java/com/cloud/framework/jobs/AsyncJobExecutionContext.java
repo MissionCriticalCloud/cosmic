@@ -11,7 +11,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
-import com.cloud.managed.threadlocal.ManagedThreadLocal;
+import com.cloud.common.managed.threadlocal.ManagedThreadLocal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

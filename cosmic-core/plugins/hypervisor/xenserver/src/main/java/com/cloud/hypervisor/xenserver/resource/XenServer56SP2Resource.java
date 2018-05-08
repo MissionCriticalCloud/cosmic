@@ -1,6 +1,6 @@
 package com.cloud.hypervisor.xenserver.resource;
 
-import com.cloud.resource.ServerResource;
+import com.cloud.common.resource.ServerResource;
 
 import javax.ejb.Local;
 
@@ -9,7 +9,7 @@ public class XenServer56SP2Resource extends XenServer56FP1Resource {
 
     public XenServer56SP2Resource() {
         super();
-        _xsMemoryUsed = 128 * 1024 * 1024L;
-        _xsVirtualizationFactor = 62.0 / 64.0;
+        this._xsMemoryUsed = 128 * 1024 * 1024L;
+        this._xsVirtualizationFactor = 62.0 / 64.0;
     }
 }

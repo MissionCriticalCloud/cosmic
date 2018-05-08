@@ -31,12 +31,12 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-secondary-storage</artifactId>
+            <artifactId>cloud-engine-api</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-engine-api</artifactId>
+            <artifactId>cloud-server</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
     </dependencies>

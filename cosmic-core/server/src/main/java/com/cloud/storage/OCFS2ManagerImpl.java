@@ -1,6 +1,8 @@
 package com.cloud.storage;
 
 import com.cloud.agent.AgentManager;
+import com.cloud.common.request.ResourceListener;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.dc.ClusterDetailsDao;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.dao.ClusterDao;
@@ -14,9 +16,7 @@ import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.resource.ResourceListener;
 import com.cloud.resource.ResourceManager;
-import com.cloud.resource.ServerResource;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.utils.component.ManagerBase;
@@ -60,13 +60,13 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
 
     @Override
     public boolean start() {
-        _resourceMgr.registerResourceEvent(ResourceListener.EVENT_DELETE_HOST_AFTER, this);
+        this._resourceMgr.registerResourceEvent(ResourceListener.EVENT_DELETE_HOST_AFTER, this);
         return true;
     }
 
     @Override
     public boolean stop() {
-        _resourceMgr.unregisterResourceEvent(this);
+        this._resourceMgr.unregisterResourceEvent(this);
         return true;
     }
 
@@ -82,7 +82,7 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
     private boolean prepareNodes(final String clusterName, final List<HostVO> hosts) {
         final PrepareOCFS2NodesCommand cmd = new PrepareOCFS2NodesCommand(clusterName, marshalNodes(hosts));
         for (final HostVO h : hosts) {
-            final Answer ans = _agentMgr.easySend(h.getId(), cmd);
+            final Answer ans = this._agentMgr.easySend(h.getId(), cmd);
             if (ans == null) {
                 s_logger.debug("Host " + h.getId() + " is not in UP state, skip preparing OCFS2 node on it");
                 continue;
@@ -97,7 +97,7 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
     }
 
     private String getClusterName(final Long clusterId) {
-        final ClusterVO cluster = _clusterDao.findById(clusterId);
+        final ClusterVO cluster = this._clusterDao.findById(clusterId);
         if (cluster == null) {
             throw new CloudRuntimeException("Cannot get cluster for id " + clusterId);
         }
@@ -123,7 +123,7 @@ public class OCFS2ManagerImpl extends ManagerBase implements OCFS2Manager, Resou
 
     @Override
     public boolean prepareNodes(final Long clusterId) {
-        final ClusterVO cluster = _clusterDao.findById(clusterId);
+        final ClusterVO cluster = this._clusterDao.findById(clusterId);
         if (cluster == null) {
             throw new CloudRuntimeException("Cannot find cluster for ID " + clusterId);
         }

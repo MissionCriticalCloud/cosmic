@@ -9,16 +9,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cloud.legacymodel.communication.command.DestroyCommand;
-import com.cloud.legacymodel.communication.command.PrimaryStorageDownloadCommand;
-import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
-import com.cloud.agent.resource.virtualnetwork.VRScripts;
+import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandler;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.hypervisor.xenserver.resource.XsHost;
 import com.cloud.hypervisor.xenserver.resource.XsLocalNetwork;
 import com.cloud.legacymodel.communication.answer.Answer;
+import com.cloud.legacymodel.communication.answer.AttachAnswer;
 import com.cloud.legacymodel.communication.answer.CreateAnswer;
 import com.cloud.legacymodel.communication.answer.RebootAnswer;
+import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.legacymodel.communication.command.AttachIsoCommand;
 import com.cloud.legacymodel.communication.command.CheckConsoleProxyLoadCommand;
 import com.cloud.legacymodel.communication.command.CheckHealthCommand;
@@ -33,6 +32,7 @@ import com.cloud.legacymodel.communication.command.CreateStoragePoolCommand;
 import com.cloud.legacymodel.communication.command.CreateVMSnapshotCommand;
 import com.cloud.legacymodel.communication.command.DeleteStoragePoolCommand;
 import com.cloud.legacymodel.communication.command.DeleteVMSnapshotCommand;
+import com.cloud.legacymodel.communication.command.DestroyCommand;
 import com.cloud.legacymodel.communication.command.GetHostStatsCommand;
 import com.cloud.legacymodel.communication.command.GetStorageStatsCommand;
 import com.cloud.legacymodel.communication.command.GetVmDiskStatsCommand;
@@ -47,10 +47,12 @@ import com.cloud.legacymodel.communication.command.PerformanceMonitorCommand;
 import com.cloud.legacymodel.communication.command.PingTestCommand;
 import com.cloud.legacymodel.communication.command.PlugNicCommand;
 import com.cloud.legacymodel.communication.command.PrepareForMigrationCommand;
+import com.cloud.legacymodel.communication.command.PrimaryStorageDownloadCommand;
 import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
 import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.legacymodel.communication.command.RebootCommand;
 import com.cloud.legacymodel.communication.command.RebootRouterCommand;
+import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
 import com.cloud.legacymodel.communication.command.RevertToVMSnapshotCommand;
 import com.cloud.legacymodel.communication.command.ScaleVmCommand;
 import com.cloud.legacymodel.communication.command.SetupCommand;
@@ -62,6 +64,7 @@ import com.cloud.legacymodel.communication.command.UpgradeSnapshotCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
 import com.cloud.legacymodel.dc.HostEnvironment;
 import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
+import com.cloud.legacymodel.network.VRScripts;
 import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
 import com.cloud.legacymodel.to.DataStoreTO;
@@ -75,10 +78,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
-import com.cloud.legacymodel.communication.answer.AttachAnswer;
-import com.cloud.legacymodel.communication.command.AttachCommand;
 import com.cloud.storage.datastore.db.StoragePoolVO;
-import com.cloud.storage.resource.StorageSubsystemCommandHandler;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -128,7 +128,7 @@ public class CitrixRequestWrapperTest {
         assertNotNull(wrapper);
 
         try {
-            wrapper.execute(new NotAValidCommand(), citrixResourceBase);
+            wrapper.execute(new NotAValidCommand(), this.citrixResourceBase);
         } catch (final Exception e) {
             assertTrue(e instanceof NullPointerException);
         }
@@ -141,9 +141,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(rebootRouterCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(rebootRouterCommand, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(2)).getConnection();
+        verify(this.citrixResourceBase, times(2)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -157,9 +157,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(createCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(createCommand, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -171,7 +171,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(consoleProxyCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(consoleProxyCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -183,7 +183,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(watchConsoleProxyCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(watchConsoleProxyCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -195,7 +195,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(readyCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(readyCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -207,7 +207,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(statsCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(statsCommand, this.citrixResourceBase);
 
         assertTrue(answer.getResult());
     }
@@ -219,7 +219,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(statsCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(statsCommand, this.citrixResourceBase);
 
         assertTrue(answer.getResult());
     }
@@ -231,7 +231,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(diskStatsCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(diskStatsCommand, this.citrixResourceBase);
 
         assertTrue(answer.getResult());
     }
@@ -243,7 +243,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(checkHealthCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(checkHealthCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -255,7 +255,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(stopCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(stopCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -267,9 +267,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(rebootCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(rebootCommand, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -281,8 +281,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(virtualMachineCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(virtualMachineCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -295,8 +295,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(prepareCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(prepareCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -309,8 +309,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(migrateCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(migrateCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -326,8 +326,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(destroyCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(destroyCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -342,10 +342,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(createStorageCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(createStorageCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -360,10 +360,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(modifyStorageCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(modifyStorageCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -378,10 +378,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(deleteStorageCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(deleteStorageCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -395,8 +395,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(resizeCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(resizeCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -408,8 +408,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(attachCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(attachCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -424,8 +424,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(upgradeSnapshotCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(upgradeSnapshotCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -440,8 +440,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(upgradeSnapshotCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(0)).getConnection();
+        final Answer answer = wrapper.execute(upgradeSnapshotCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(0)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -456,10 +456,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(storageStatsCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(storageStatsCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -474,10 +474,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(storageDownloadCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(storageDownloadCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -489,8 +489,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(vncPortCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(vncPortCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -505,10 +505,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
 
-        final Answer answer = wrapper.execute(setupCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(setupCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -536,8 +536,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
         when(xsHost.getUuid()).thenReturn(uuid);
         when(conn.getSessionReference()).thenReturn("befc4dcd");
 
@@ -580,7 +580,7 @@ public class CitrixRequestWrapperTest {
         // fail(e.getMessage());
         // }
 
-        final Answer answer = wrapper.execute(maintainCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(maintainCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -592,8 +592,8 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(pingTestCommand, citrixResourceBase);
-        verify(citrixResourceBase, times(1)).getConnection();
+        final Answer answer = wrapper.execute(pingTestCommand, this.citrixResourceBase);
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -605,9 +605,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(pingTestCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(pingTestCommand, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -620,7 +620,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(onHostCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(onHostCommand, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -632,7 +632,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(sshKeysCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(sshKeysCommand, this.citrixResourceBase);
 
         assertTrue(answer.getResult());
     }
@@ -647,9 +647,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(startCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(startCommand, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -661,9 +661,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(sshCommand, citrixResourceBase);
+        final Answer answer = wrapper.execute(sshCommand, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -675,17 +675,17 @@ public class CitrixRequestWrapperTest {
 
         final UpdateHostPasswordCommand updatePwd = new UpdateHostPasswordCommand("test", "123", "127.0.0.1");
 
-        when(citrixResourceBase.getPwdFromQueue()).thenReturn("password");
+        when(this.citrixResourceBase.getPwdFromQueue()).thenReturn("password");
 
         final String hostIp = updatePwd.getHostIp();
         final String username = updatePwd.getUsername();
-        final String hostPasswd = citrixResourceBase.getPwdFromQueue();
+        final String hostPasswd = this.citrixResourceBase.getPwdFromQueue();
         final String newPassword = updatePwd.getNewPassword();
 
         final StringBuilder cmdLine = new StringBuilder();
         cmdLine.append(XenServerUtilitiesHelper.SCRIPT_CMD_PATH).append(VRScripts.UPDATE_HOST_PASSWD).append(' ').append(username).append(' ').append(newPassword);
 
-        when(citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
+        when(this.citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
         when(xenServerUtilitiesHelper.buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword)).thenReturn(
                 cmdLine.toString());
 
@@ -700,10 +700,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(updatePwd, citrixResourceBase);
+        final Answer answer = wrapper.execute(updatePwd, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(2)).getPwdFromQueue();
-        verify(citrixResourceBase, times(1)).getXenServerUtilitiesHelper();
+        verify(this.citrixResourceBase, times(2)).getPwdFromQueue();
+        verify(this.citrixResourceBase, times(1)).getXenServerUtilitiesHelper();
         verify(xenServerUtilitiesHelper, times(1)).buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword);
         try {
             verify(xenServerUtilitiesHelper, times(1)).executeSshWrapper(hostIp, 22, username, null, hostPasswd, cmdLine.toString());
@@ -723,17 +723,17 @@ public class CitrixRequestWrapperTest {
 
         final UpdateHostPasswordCommand updatePwd = new UpdateHostPasswordCommand("test", "123", "127.0.0.1");
 
-        when(citrixResourceBase.getPwdFromQueue()).thenReturn("password");
+        when(this.citrixResourceBase.getPwdFromQueue()).thenReturn("password");
 
         final String hostIp = updatePwd.getHostIp();
         final String username = updatePwd.getUsername();
-        final String hostPasswd = citrixResourceBase.getPwdFromQueue();
+        final String hostPasswd = this.citrixResourceBase.getPwdFromQueue();
         final String newPassword = updatePwd.getNewPassword();
 
         final StringBuilder cmdLine = new StringBuilder();
         cmdLine.append(XenServerUtilitiesHelper.SCRIPT_CMD_PATH).append(VRScripts.UPDATE_HOST_PASSWD).append(' ').append(username).append(' ').append(newPassword);
 
-        when(citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
+        when(this.citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
         when(xenServerUtilitiesHelper.buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword)).thenReturn(
                 cmdLine.toString());
 
@@ -748,10 +748,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(updatePwd, citrixResourceBase);
+        final Answer answer = wrapper.execute(updatePwd, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(2)).getPwdFromQueue();
-        verify(citrixResourceBase, times(1)).getXenServerUtilitiesHelper();
+        verify(this.citrixResourceBase, times(2)).getPwdFromQueue();
+        verify(this.citrixResourceBase, times(1)).getXenServerUtilitiesHelper();
         verify(xenServerUtilitiesHelper, times(1)).buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword);
         try {
             verify(xenServerUtilitiesHelper, times(1)).executeSshWrapper(hostIp, 22, username, null, hostPasswd, cmdLine.toString());
@@ -770,17 +770,17 @@ public class CitrixRequestWrapperTest {
 
         final UpdateHostPasswordCommand updatePwd = new UpdateHostPasswordCommand("test", "123", "127.0.0.1");
 
-        when(citrixResourceBase.getPwdFromQueue()).thenReturn("password");
+        when(this.citrixResourceBase.getPwdFromQueue()).thenReturn("password");
 
         final String hostIp = updatePwd.getHostIp();
         final String username = updatePwd.getUsername();
-        final String hostPasswd = citrixResourceBase.getPwdFromQueue();
+        final String hostPasswd = this.citrixResourceBase.getPwdFromQueue();
         final String newPassword = updatePwd.getNewPassword();
 
         final StringBuilder cmdLine = new StringBuilder();
         cmdLine.append(XenServerUtilitiesHelper.SCRIPT_CMD_PATH).append(VRScripts.UPDATE_HOST_PASSWD).append(' ').append(username).append(' ').append(newPassword);
 
-        when(citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
+        when(this.citrixResourceBase.getXenServerUtilitiesHelper()).thenReturn(xenServerUtilitiesHelper);
         when(xenServerUtilitiesHelper.buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword)).thenReturn(
                 cmdLine.toString());
 
@@ -793,10 +793,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(updatePwd, citrixResourceBase);
+        final Answer answer = wrapper.execute(updatePwd, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(2)).getPwdFromQueue();
-        verify(citrixResourceBase, times(1)).getXenServerUtilitiesHelper();
+        verify(this.citrixResourceBase, times(2)).getPwdFromQueue();
+        verify(this.citrixResourceBase, times(1)).getXenServerUtilitiesHelper();
         verify(xenServerUtilitiesHelper, times(1)).buildCommandLine(XenServerUtilitiesHelper.SCRIPT_CMD_PATH, VRScripts.UPDATE_HOST_PASSWD, username, newPassword);
         try {
             verify(xenServerUtilitiesHelper, times(1)).executeSshWrapper(hostIp, 22, username, null, hostPasswd, cmdLine.toString());
@@ -824,10 +824,10 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
         try {
-            when(citrixResourceBase.getHost()).thenReturn(xsHost);
-            when(citrixResourceBase.getHost().getUuid()).thenReturn(uuid);
+            when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
+            when(this.citrixResourceBase.getHost().getUuid()).thenReturn(uuid);
             when(xsHost.getPool()).thenReturn("pool");
 
             PowerMockito.mockStatic(Pool.class);
@@ -842,9 +842,9 @@ public class CitrixRequestWrapperTest {
             fail(e.getMessage());
         }
 
-        final Answer answer = wrapper.execute(vmDataSync, citrixResourceBase);
+        final Answer answer = wrapper.execute(vmDataSync, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -858,7 +858,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(checkNet, citrixResourceBase);
+        final Answer answer = wrapper.execute(checkNet, this.citrixResourceBase);
 
         assertTrue(answer.getResult());
     }
@@ -875,7 +875,7 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(checkNet, citrixResourceBase);
+        final Answer answer = wrapper.execute(checkNet, this.citrixResourceBase);
 
         assertFalse(answer.getResult());
     }
@@ -890,11 +890,11 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
 
-        final Answer answer = wrapper.execute(plugNic, citrixResourceBase);
+        final Answer answer = wrapper.execute(plugNic, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -909,11 +909,11 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
 
-        final Answer answer = wrapper.execute(unplugNic, citrixResourceBase);
+        final Answer answer = wrapper.execute(unplugNic, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -930,11 +930,11 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
 
-        final Answer answer = wrapper.execute(vmSnapshot, citrixResourceBase);
+        final Answer answer = wrapper.execute(vmSnapshot, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -951,11 +951,11 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
 
-        final Answer answer = wrapper.execute(vmSnapshot, citrixResourceBase);
+        final Answer answer = wrapper.execute(vmSnapshot, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -972,11 +972,11 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
 
-        final Answer answer = wrapper.execute(vmSnapshot, citrixResourceBase);
+        final Answer answer = wrapper.execute(vmSnapshot, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -995,21 +995,21 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getHost()).thenReturn(xsHost);
-        when(citrixResourceBase.getHost().getUuid()).thenReturn(uuid);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getHost()).thenReturn(xsHost);
+        when(this.citrixResourceBase.getHost().getUuid()).thenReturn(uuid);
 
         try {
-            when(citrixResourceBase.isDmcEnabled(conn, host)).thenReturn(true);
+            when(this.citrixResourceBase.isDmcEnabled(conn, host)).thenReturn(true);
         } catch (final XenAPIException e) {
             fail(e.getMessage());
         } catch (final XmlRpcException e) {
             fail(e.getMessage());
         }
 
-        final Answer answer = wrapper.execute(scaleVm, citrixResourceBase);
+        final Answer answer = wrapper.execute(scaleVm, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -1034,9 +1034,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
         try {
-            when(citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
+            when(this.citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
             when(network.getNetwork()).thenReturn(network2);
             when(network2.getNameLabel(conn)).thenReturn(label);
         } catch (final XenAPIException e) {
@@ -1045,12 +1045,12 @@ public class CitrixRequestWrapperTest {
             fail(e.getMessage());
         }
 
-        when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-dhcp", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
+        when(this.citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-dhcp", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
                 isolatedPvlan, "dhcp-name", dhcpName, "dhcp-ip", dhcpIp, "dhcp-mac", dhcpMac)).thenReturn("true");
 
-        final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
+        final Answer answer = wrapper.execute(lanSetup, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -1075,9 +1075,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
         try {
-            when(citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
+            when(this.citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
             when(network.getNetwork()).thenReturn(network2);
             when(network2.getNameLabel(conn)).thenReturn(label);
         } catch (final XenAPIException e) {
@@ -1086,12 +1086,12 @@ public class CitrixRequestWrapperTest {
             fail(e.getMessage());
         }
 
-        when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-dhcp", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
+        when(this.citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-dhcp", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
                 isolatedPvlan, "dhcp-name", dhcpName, "dhcp-ip", dhcpIp, "dhcp-mac", dhcpMac)).thenReturn("false");
 
-        final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
+        final Answer answer = wrapper.execute(lanSetup, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -1114,9 +1114,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
         try {
-            when(citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
+            when(this.citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
             when(network.getNetwork()).thenReturn(network2);
             when(network2.getNameLabel(conn)).thenReturn(label);
         } catch (final XenAPIException e) {
@@ -1125,12 +1125,12 @@ public class CitrixRequestWrapperTest {
             fail(e.getMessage());
         }
 
-        when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-vm", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
+        when(this.citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-vm", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
                 isolatedPvlan, "vm-mac", vmMac)).thenReturn("true");
 
-        final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
+        final Answer answer = wrapper.execute(lanSetup, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -1153,9 +1153,9 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
         try {
-            when(citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
+            when(this.citrixResourceBase.getNativeNetworkForTraffic(conn, TrafficType.Guest, "tag")).thenReturn(network);
             when(network.getNetwork()).thenReturn(network2);
             when(network2.getNameLabel(conn)).thenReturn(label);
         } catch (final XenAPIException e) {
@@ -1164,12 +1164,12 @@ public class CitrixRequestWrapperTest {
             fail(e.getMessage());
         }
 
-        when(citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-vm", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
+        when(this.citrixResourceBase.callHostPlugin(conn, "ovs-pvlan", "setup-pvlan-vm", "op", op, "nw-label", label, "primary-pvlan", primaryPvlan, "isolated-pvlan",
                 isolatedPvlan, "vm-mac", vmMac)).thenReturn("false");
 
-        final Answer answer = wrapper.execute(lanSetup, citrixResourceBase);
+        final Answer answer = wrapper.execute(lanSetup, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -1183,12 +1183,12 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getPerfMon(conn, performanceMonitor.getParams(), performanceMonitor.getWait())).thenReturn("performance");
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getPerfMon(conn, performanceMonitor.getParams(), performanceMonitor.getWait())).thenReturn("performance");
 
-        final Answer answer = wrapper.execute(performanceMonitor, citrixResourceBase);
+        final Answer answer = wrapper.execute(performanceMonitor, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }
@@ -1202,12 +1202,12 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getPerfMon(conn, performanceMonitor.getParams(), performanceMonitor.getWait())).thenReturn(null);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getPerfMon(conn, performanceMonitor.getParams(), performanceMonitor.getWait())).thenReturn(null);
 
-        final Answer answer = wrapper.execute(performanceMonitor, citrixResourceBase);
+        final Answer answer = wrapper.execute(performanceMonitor, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertFalse(answer.getResult());
     }
@@ -1219,14 +1219,14 @@ public class CitrixRequestWrapperTest {
         final AttachCommand command = new AttachCommand(disk, vmName);
 
         final StorageSubsystemCommandHandler handler = Mockito.mock(StorageSubsystemCommandHandler.class);
-        when(citrixResourceBase.getStorageHandler()).thenReturn(handler);
+        when(this.citrixResourceBase.getStorageHandler()).thenReturn(handler);
 
         when(handler.handleStorageCommands(command)).thenReturn(new AttachAnswer(disk));
 
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        final Answer answer = wrapper.execute(command, citrixResourceBase);
+        final Answer answer = wrapper.execute(command, this.citrixResourceBase);
         assertTrue(answer.getResult());
     }
 
@@ -1247,14 +1247,14 @@ public class CitrixRequestWrapperTest {
         final CitrixRequestWrapper wrapper = CitrixRequestWrapper.getInstance();
         assertNotNull(wrapper);
 
-        when(citrixResourceBase.getConnection()).thenReturn(conn);
-        when(citrixResourceBase.getVM(conn, getVmIpAddrCmd.getVmName())).thenReturn(vm);
+        when(this.citrixResourceBase.getConnection()).thenReturn(conn);
+        when(this.citrixResourceBase.getVM(conn, getVmIpAddrCmd.getVmName())).thenReturn(vm);
         when(vm.getGuestMetrics(conn)).thenReturn(mtr);
         when(mtr.getRecord(conn)).thenReturn(rec);
 
-        final Answer answer = wrapper.execute(getVmIpAddrCmd, citrixResourceBase);
+        final Answer answer = wrapper.execute(getVmIpAddrCmd, this.citrixResourceBase);
 
-        verify(citrixResourceBase, times(1)).getConnection();
+        verify(this.citrixResourceBase, times(1)).getConnection();
 
         assertTrue(answer.getResult());
     }

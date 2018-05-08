@@ -2,7 +2,7 @@ package com.cloud.storage.download;
 
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
 import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public class DownloadAbandonedState extends DownloadInactiveState {
 
@@ -12,14 +12,14 @@ public class DownloadAbandonedState extends DownloadInactiveState {
 
     @Override
     public String getName() {
-        return Status.ABANDONED.toString();
+        return VMTemplateStatus.ABANDONED.toString();
     }
 
     @Override
     public void onEntry(final String prevState, final DownloadEvent event, final Object evtObj) {
         super.onEntry(prevState, event, evtObj);
         if (!prevState.equalsIgnoreCase(getName())) {
-            final DownloadAnswer answer = new DownloadAnswer("Download canceled", Status.ABANDONED);
+            final DownloadAnswer answer = new DownloadAnswer("Download canceled", VMTemplateStatus.ABANDONED);
             getDownloadListener().callback(answer);
             getDownloadListener().cancelStatusTask();
             getDownloadListener().cancelTimeoutTask();

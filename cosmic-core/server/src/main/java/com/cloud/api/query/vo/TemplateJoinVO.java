@@ -2,7 +2,7 @@ package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.TemplateType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
 import com.cloud.model.enumeration.HypervisorType;
@@ -130,7 +130,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     private Long dataStoreId;
     @Column(name = "download_state")
     @Enumerated(EnumType.STRING)
-    private Status downloadState;
+    private VMTemplateStatus downloadState;
     @Column(name = "download_pct")
     private int downloadPercent;
     @Column(name = "error_str")
@@ -175,7 +175,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Override
     public long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(final long id) {
@@ -184,7 +184,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Override
     public String getUuid() {
-        return uuid;
+        return this.uuid;
     }
 
     public void setUuid(final String uuid) {
@@ -192,7 +192,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(final String name) {
@@ -200,7 +200,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public Date getCreated() {
-        return created;
+        return this.created;
     }
 
     public void setCreated(final Date created) {
@@ -208,7 +208,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public Date getRemoved() {
-        return removed;
+        return this.removed;
     }
 
     public void setRemoved(final Date removed) {
@@ -217,7 +217,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Override
     public long getAccountId() {
-        return accountId;
+        return this.accountId;
     }
 
     public void setAccountId(final long accountId) {
@@ -226,7 +226,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Override
     public long getDomainId() {
-        return domainId;
+        return this.domainId;
     }
 
     public void setDomainId(final long domainId) {
@@ -235,42 +235,42 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Override
     public String getDomainPath() {
-        return domainPath;
+        return this.domainPath;
     }
 
     @Override
     public short getAccountType() {
-        return accountType;
+        return this.accountType;
     }
 
     @Override
     public String getAccountUuid() {
-        return accountUuid;
+        return this.accountUuid;
     }
 
     @Override
     public String getAccountName() {
-        return accountName;
+        return this.accountName;
     }
 
     @Override
     public String getDomainUuid() {
-        return domainUuid;
+        return this.domainUuid;
     }
 
     @Override
     public String getDomainName() {
-        return domainName;
+        return this.domainName;
     }
 
     @Override
     public String getProjectUuid() {
-        return projectUuid;
+        return this.projectUuid;
     }
 
     @Override
     public String getProjectName() {
-        return projectName;
+        return this.projectName;
     }
 
     public void setProjectName(final String projectName) {
@@ -306,7 +306,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getProjectId() {
-        return projectId;
+        return this.projectId;
     }
 
     public void setProjectId(final long projectId) {
@@ -314,7 +314,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isExtractable() {
-        return extractable;
+        return this.extractable;
     }
 
     public void setExtractable(final boolean extractable) {
@@ -322,7 +322,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public TemplateType getTemplateType() {
-        return templateType;
+        return this.templateType;
     }
 
     public void setTemplateType(final TemplateType templateType) {
@@ -330,7 +330,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getTagId() {
-        return tagId;
+        return this.tagId;
     }
 
     public void setTagId(final long tagId) {
@@ -338,7 +338,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTagUuid() {
-        return tagUuid;
+        return this.tagUuid;
     }
 
     public void setTagUuid(final String tagUuid) {
@@ -346,7 +346,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTagKey() {
-        return tagKey;
+        return this.tagKey;
     }
 
     public void setTagKey(final String tagKey) {
@@ -354,7 +354,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTagValue() {
-        return tagValue;
+        return this.tagValue;
     }
 
     public void setTagValue(final String tagValue) {
@@ -362,7 +362,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getTagDomainId() {
-        return tagDomainId;
+        return this.tagDomainId;
     }
 
     public void setTagDomainId(final long tagDomainId) {
@@ -370,7 +370,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getTagAccountId() {
-        return tagAccountId;
+        return this.tagAccountId;
     }
 
     public void setTagAccountId(final long tagAccountId) {
@@ -378,7 +378,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getTagResourceId() {
-        return tagResourceId;
+        return this.tagResourceId;
     }
 
     public void setTagResourceId(final long tagResourceId) {
@@ -386,7 +386,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTagResourceUuid() {
-        return tagResourceUuid;
+        return this.tagResourceUuid;
     }
 
     public void setTagResourceUuid(final String tagResourceUuid) {
@@ -394,7 +394,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public ResourceObjectType getTagResourceType() {
-        return tagResourceType;
+        return this.tagResourceType;
     }
 
     public void setTagResourceType(final ResourceObjectType tagResourceType) {
@@ -402,7 +402,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTagCustomer() {
-        return tagCustomer;
+        return this.tagCustomer;
     }
 
     public void setTagCustomer(final String tagCustomer) {
@@ -410,7 +410,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getDataCenterId() {
-        return dataCenterId;
+        return this.dataCenterId;
     }
 
     public void setDataCenterId(final long dataCenterId) {
@@ -418,7 +418,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getDataCenterUuid() {
-        return dataCenterUuid;
+        return this.dataCenterUuid;
     }
 
     public void setDataCenterUuid(final String dataCenterUuid) {
@@ -426,7 +426,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getDataCenterName() {
-        return dataCenterName;
+        return this.dataCenterName;
     }
 
     public void setDataCenterName(final String dataCenterName) {
@@ -434,7 +434,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getUniqueName() {
-        return uniqueName;
+        return this.uniqueName;
     }
 
     public void setUniqueName(final String uniqueName) {
@@ -442,7 +442,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isPublicTemplate() {
-        return publicTemplate;
+        return this.publicTemplate;
     }
 
     public void setPublicTemplate(final boolean publicTemplate) {
@@ -450,7 +450,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isFeatured() {
-        return featured;
+        return this.featured;
     }
 
     public void setFeatured(final boolean featured) {
@@ -458,7 +458,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
     public void setUrl(final String url) {
@@ -466,7 +466,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public int getBits() {
-        return bits;
+        return this.bits;
     }
 
     public void setBits(final int bits) {
@@ -474,7 +474,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getChecksum() {
-        return checksum;
+        return this.checksum;
     }
 
     public void setChecksum(final String checksum) {
@@ -482,7 +482,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getDisplayText() {
-        return displayText;
+        return this.displayText;
     }
 
     public void setDisplayText(final String displayText) {
@@ -490,7 +490,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isEnablePassword() {
-        return enablePassword;
+        return this.enablePassword;
     }
 
     public void setEnablePassword(final boolean enablePassword) {
@@ -498,7 +498,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isDynamicallyScalable() {
-        return dynamicallyScalable;
+        return this.dynamicallyScalable;
     }
 
     public void setDynamicallyScalable(final boolean dynamicallyScalable) {
@@ -506,7 +506,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public long getGuestOSId() {
-        return guestOSId;
+        return this.guestOSId;
     }
 
     public void setGuestOSId(final long guestOSId) {
@@ -514,7 +514,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getGuestOSUuid() {
-        return guestOSUuid;
+        return this.guestOSUuid;
     }
 
     public void setGuestOSUuid(final String guestOSUuid) {
@@ -522,7 +522,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getGuestOSName() {
-        return guestOSName;
+        return this.guestOSName;
     }
 
     public void setGuestOSName(final String guestOSName) {
@@ -530,7 +530,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isBootable() {
-        return bootable;
+        return this.bootable;
     }
 
     public void setBootable(final boolean bootable) {
@@ -538,7 +538,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isPrepopulate() {
-        return prepopulate;
+        return this.prepopulate;
     }
 
     public void setPrepopulate(final boolean prepopulate) {
@@ -546,7 +546,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isCrossZones() {
-        return crossZones;
+        return this.crossZones;
     }
 
     public void setCrossZones(final boolean crossZones) {
@@ -554,7 +554,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public HypervisorType getHypervisorType() {
-        return hypervisorType;
+        return this.hypervisorType;
     }
 
     public void setHypervisorType(final HypervisorType hypervisorType) {
@@ -562,7 +562,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public Long getSourceTemplateId() {
-        return sourceTemplateId;
+        return this.sourceTemplateId;
     }
 
     public void setSourceTemplateId(final Long sourceTemplateId) {
@@ -570,7 +570,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getSourceTemplateUuid() {
-        return sourceTemplateUuid;
+        return this.sourceTemplateUuid;
     }
 
     public void setSourceTemplateUuid(final String sourceTemplateUuid) {
@@ -578,7 +578,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTemplateTag() {
-        return templateTag;
+        return this.templateTag;
     }
 
     public void setTemplateTag(final String templateTag) {
@@ -586,7 +586,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public int getSortKey() {
-        return sortKey;
+        return this.sortKey;
     }
 
     public void setSortKey(final int sortKey) {
@@ -594,23 +594,23 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isEnableSshKey() {
-        return enableSshKey;
+        return this.enableSshKey;
     }
 
     public void setEnableSshKey(final boolean enableSshKey) {
         this.enableSshKey = enableSshKey;
     }
 
-    public Status getDownloadState() {
-        return downloadState;
+    public VMTemplateStatus getDownloadState() {
+        return this.downloadState;
     }
 
-    public void setDownloadState(final Status downloadState) {
+    public void setDownloadState(final VMTemplateStatus downloadState) {
         this.downloadState = downloadState;
     }
 
     public long getSize() {
-        return size;
+        return this.size;
     }
 
     public void setSize(final long size) {
@@ -618,7 +618,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public boolean isDestroyed() {
-        return destroyed;
+        return this.destroyed;
     }
 
     public void setDestroyed(final boolean destroyed) {
@@ -626,7 +626,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public Long getSharedAccountId() {
-        return sharedAccountId;
+        return this.sharedAccountId;
     }
 
     public void setSharedAccountId(final Long sharedAccountId) {
@@ -634,7 +634,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getDetailName() {
-        return detailName;
+        return this.detailName;
     }
 
     public void setDetailName(final String detailName) {
@@ -642,7 +642,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getDetailValue() {
-        return detailValue;
+        return this.detailValue;
     }
 
     public void setDetailValue(final String detailValue) {
@@ -650,7 +650,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public Date getCreatedOnStore() {
-        return createdOnStore;
+        return this.createdOnStore;
     }
 
     public void setCreatedOnStore(final Date createdOnStore) {
@@ -658,7 +658,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public ImageFormat getFormat() {
-        return format;
+        return this.format;
     }
 
     public void setFormat(final ImageFormat format) {
@@ -666,7 +666,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public int getDownloadPercent() {
-        return downloadPercent;
+        return this.downloadPercent;
     }
 
     public void setDownloadPercent(final int downloadPercent) {
@@ -674,7 +674,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getErrorString() {
-        return errorString;
+        return this.errorString;
     }
 
     public void setErrorString(final String errorString) {
@@ -682,7 +682,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public Long getDataStoreId() {
-        return dataStoreId;
+        return this.dataStoreId;
     }
 
     public void setDataStoreId(final Long dataStoreId) {
@@ -690,7 +690,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public ObjectInDataStoreStateMachine.State getState() {
-        return state;
+        return this.state;
     }
 
     public void setState(final ObjectInDataStoreStateMachine.State state) {
@@ -698,7 +698,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public ScopeType getDataStoreScope() {
-        return dataStoreScope;
+        return this.dataStoreScope;
     }
 
     public void setDataStoreScope(final ScopeType dataStoreScope) {
@@ -706,7 +706,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public String getTempZonePair() {
-        return tempZonePair;
+        return this.tempZonePair;
     }
 
     public void setTempZonePair(final String tempZonePair) {
@@ -714,7 +714,7 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public State getTemplateState() {
-        return templateState;
+        return this.templateState;
     }
 
     public void setTemplateState(final State templateState) {

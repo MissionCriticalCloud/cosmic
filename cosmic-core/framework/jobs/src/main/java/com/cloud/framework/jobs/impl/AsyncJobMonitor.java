@@ -5,7 +5,7 @@ import com.cloud.framework.jobs.AsyncJobManager;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDispatcher;
 import com.cloud.framework.messagebus.MessageHandler;
-import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
 import com.cloud.utils.component.ManagerBase;
 
 import javax.inject.Inject;

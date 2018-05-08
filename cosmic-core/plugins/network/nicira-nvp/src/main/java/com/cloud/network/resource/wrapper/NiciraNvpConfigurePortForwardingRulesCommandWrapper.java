@@ -4,6 +4,8 @@ import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 import com.cloud.agent.api.ConfigurePortForwardingRulesOnLogicalRouterAnswer;
 import com.cloud.agent.api.ConfigurePortForwardingRulesOnLogicalRouterCommand;
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.to.PortForwardingRuleTO;
 import com.cloud.network.nicira.NatRule;
@@ -11,8 +13,6 @@ import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.utils.CommandRetryUtility;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.List;
 

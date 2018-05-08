@@ -1,11 +1,11 @@
 package com.cloud.agent.manager;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.common.transport.Request;
 import com.cloud.common.transport.Response;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.UnsupportedVersionException;
-import com.cloud.resource.ServerResource;
 
 public class ClusteredDirectAgentAttache extends DirectAgentAttache implements Routable {
     private final long _nodeId;
@@ -13,7 +13,7 @@ public class ClusteredDirectAgentAttache extends DirectAgentAttache implements R
     public ClusteredDirectAgentAttache(final ClusteredAgentManagerImpl agentMgr, final long id, final String name, final long mgmtId, final ServerResource resource, final
     boolean maintenance) {
         super(agentMgr, id, name, resource, maintenance);
-        _nodeId = mgmtId;
+        this._nodeId = mgmtId;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class ClusteredDirectAgentAttache extends DirectAgentAttache implements R
     @Override
     public boolean processAnswers(final long seq, final Response response) {
         final long mgmtId = response.getManagementServerId();
-        if (mgmtId != -1 && mgmtId != _nodeId) {
-            ((ClusteredAgentManagerImpl) _agentMgr).routeToPeer(Long.toString(mgmtId), response.getBytes());
+        if (mgmtId != -1 && mgmtId != this._nodeId) {
+            ((ClusteredAgentManagerImpl) this._agentMgr).routeToPeer(Long.toString(mgmtId), response.getBytes());
             if (response.executeInSequence()) {
                 sendNext(response.getSequence());
             }

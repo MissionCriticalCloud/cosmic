@@ -3,8 +3,8 @@ package com.cloud.storage.dao;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.Event;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.VMTemplateStoragePoolVO;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
@@ -45,75 +45,75 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
     protected final SearchBuilder<VMTemplateStoragePoolVO> updateStateSearch;
 
     public VMTemplatePoolDaoImpl() {
-        PoolSearch = createSearchBuilder();
-        PoolSearch.and("pool_id", PoolSearch.entity().getPoolId(), SearchCriteria.Op.EQ);
-        PoolSearch.done();
+        this.PoolSearch = createSearchBuilder();
+        this.PoolSearch.and("pool_id", this.PoolSearch.entity().getPoolId(), SearchCriteria.Op.EQ);
+        this.PoolSearch.done();
 
-        TemplateSearch = createSearchBuilder();
-        TemplateSearch.and("template_id", TemplateSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
-        TemplateSearch.done();
+        this.TemplateSearch = createSearchBuilder();
+        this.TemplateSearch.and("template_id", this.TemplateSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
+        this.TemplateSearch.done();
 
-        PoolTemplateSearch = createSearchBuilder();
-        PoolTemplateSearch.and("pool_id", PoolTemplateSearch.entity().getPoolId(), SearchCriteria.Op.EQ);
-        PoolTemplateSearch.and("template_id", PoolTemplateSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
-        PoolTemplateSearch.done();
+        this.PoolTemplateSearch = createSearchBuilder();
+        this.PoolTemplateSearch.and("pool_id", this.PoolTemplateSearch.entity().getPoolId(), SearchCriteria.Op.EQ);
+        this.PoolTemplateSearch.and("template_id", this.PoolTemplateSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
+        this.PoolTemplateSearch.done();
 
-        TemplateStatusSearch = createSearchBuilder();
-        TemplateStatusSearch.and("template_id", TemplateStatusSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
-        TemplateStatusSearch.and("download_state", TemplateStatusSearch.entity().getDownloadState(), SearchCriteria.Op.EQ);
-        TemplateStatusSearch.done();
+        this.TemplateStatusSearch = createSearchBuilder();
+        this.TemplateStatusSearch.and("template_id", this.TemplateStatusSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
+        this.TemplateStatusSearch.and("download_state", this.TemplateStatusSearch.entity().getDownloadState(), SearchCriteria.Op.EQ);
+        this.TemplateStatusSearch.done();
 
-        TemplatePoolStatusSearch = createSearchBuilder();
-        TemplatePoolStatusSearch.and("pool_id", TemplatePoolStatusSearch.entity().getPoolId(), SearchCriteria.Op.EQ);
-        TemplatePoolStatusSearch.and("template_id", TemplatePoolStatusSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
-        TemplatePoolStatusSearch.and("download_state", TemplatePoolStatusSearch.entity().getDownloadState(), SearchCriteria.Op.EQ);
-        TemplatePoolStatusSearch.done();
+        this.TemplatePoolStatusSearch = createSearchBuilder();
+        this.TemplatePoolStatusSearch.and("pool_id", this.TemplatePoolStatusSearch.entity().getPoolId(), SearchCriteria.Op.EQ);
+        this.TemplatePoolStatusSearch.and("template_id", this.TemplatePoolStatusSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
+        this.TemplatePoolStatusSearch.and("download_state", this.TemplatePoolStatusSearch.entity().getDownloadState(), SearchCriteria.Op.EQ);
+        this.TemplatePoolStatusSearch.done();
 
-        TemplateStatesSearch = createSearchBuilder();
-        TemplateStatesSearch.and("template_id", TemplateStatesSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
-        TemplateStatesSearch.and("states", TemplateStatesSearch.entity().getDownloadState(), SearchCriteria.Op.IN);
-        TemplateStatesSearch.done();
+        this.TemplateStatesSearch = createSearchBuilder();
+        this.TemplateStatesSearch.and("template_id", this.TemplateStatesSearch.entity().getTemplateId(), SearchCriteria.Op.EQ);
+        this.TemplateStatesSearch.and("states", this.TemplateStatesSearch.entity().getDownloadState(), SearchCriteria.Op.IN);
+        this.TemplateStatesSearch.done();
 
-        updateStateSearch = this.createSearchBuilder();
-        updateStateSearch.and("id", updateStateSearch.entity().getId(), Op.EQ);
-        updateStateSearch.and("state", updateStateSearch.entity().getState(), Op.EQ);
-        updateStateSearch.and("updatedCount", updateStateSearch.entity().getUpdatedCount(), Op.EQ);
-        updateStateSearch.done();
+        this.updateStateSearch = this.createSearchBuilder();
+        this.updateStateSearch.and("id", this.updateStateSearch.entity().getId(), Op.EQ);
+        this.updateStateSearch.and("state", this.updateStateSearch.entity().getState(), Op.EQ);
+        this.updateStateSearch.and("updatedCount", this.updateStateSearch.entity().getUpdatedCount(), Op.EQ);
+        this.updateStateSearch.done();
     }
 
     @Override
     public List<VMTemplateStoragePoolVO> listByPoolId(final long id) {
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = PoolSearch.create();
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.PoolSearch.create();
         sc.setParameters("pool_id", id);
         return listIncludingRemovedBy(sc);
     }
 
     @Override
     public List<VMTemplateStoragePoolVO> listByTemplateId(final long templateId) {
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = TemplateSearch.create();
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.TemplateSearch.create();
         sc.setParameters("template_id", templateId);
         return listIncludingRemovedBy(sc);
     }
 
     @Override
     public VMTemplateStoragePoolVO findByPoolTemplate(final long hostId, final long templateId) {
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = PoolTemplateSearch.create();
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.PoolTemplateSearch.create();
         sc.setParameters("pool_id", hostId);
         sc.setParameters("template_id", templateId);
         return findOneIncludingRemovedBy(sc);
     }
 
     @Override
-    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final VMTemplateStoragePoolVO.Status downloadState) {
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = TemplateStatusSearch.create();
+    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final VMTemplateStatus downloadState) {
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.TemplateStatusSearch.create();
         sc.setParameters("template_id", templateId);
         sc.setParameters("download_state", downloadState.toString());
         return listIncludingRemovedBy(sc);
     }
 
     @Override
-    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final VMTemplateStoragePoolVO.Status downloadState, final long poolId) {
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = TemplatePoolStatusSearch.create();
+    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final VMTemplateStatus downloadState, final long poolId) {
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.TemplatePoolStatusSearch.create();
         sc.setParameters("pool_id", poolId);
         sc.setParameters("template_id", templateId);
         sc.setParameters("download_state", downloadState.toString());
@@ -121,7 +121,7 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
     }
 
     @Override
-    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final long datacenterId, final VMTemplateStoragePoolVO.Status downloadState) {
+    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final long datacenterId, final VMTemplateStatus downloadState) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement pstmt = null;
         final List<VMTemplateStoragePoolVO> result = new ArrayList<>();
@@ -142,17 +142,17 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
     }
 
     @Override
-    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final long datacenterId, final long podId, final VMTemplateStoragePoolVO.Status
+    public List<VMTemplateStoragePoolVO> listByTemplateStatus(final long templateId, final long datacenterId, final long podId, final VMTemplateStatus
             downloadState) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VMTemplateStoragePoolVO> result = new ArrayList<>();
         final String sql = DOWNLOADS_STATE_DC_POD;
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, datacenterId);
             pstmt.setLong(2, podId);
             pstmt.setLong(3, templateId);
             pstmt.setString(4, downloadState.toString());
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (final ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     // result.add(toEntityBean(rs, false)); TODO: this is buggy in
                     // GenericDaoBase for hand constructed queries
@@ -169,8 +169,8 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
     }
 
     @Override
-    public List<VMTemplateStoragePoolVO> listByTemplateStates(final long templateId, final VMTemplateStoragePoolVO.Status... states) {
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = TemplateStatesSearch.create();
+    public List<VMTemplateStoragePoolVO> listByTemplateStates(final long templateId, final VMTemplateStatus... states) {
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.TemplateStatesSearch.create();
         sc.setParameters("states", (Object[]) states);
         sc.setParameters("template_id", templateId);
 
@@ -184,7 +184,7 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
             return false;
         }
 
-        return tmpltPool.getDownloadState() == Status.DOWNLOADED;
+        return tmpltPool.getDownloadState() == VMTemplateStatus.DOWNLOADED;
     }
 
     @Override
@@ -197,10 +197,10 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<VMTemplateStoragePoolVO> result = new ArrayList<>();
         final String sql = HOST_TEMPLATE_SEARCH;
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, hostId);
             pstmt.setLong(2, templateId);
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (final ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     // result.add(toEntityBean(rs, false)); TODO: this is buggy in
                     // GenericDaoBase for hand constructed queries
@@ -222,7 +222,7 @@ public class VMTemplatePoolDaoImpl extends GenericDaoBase<VMTemplateStoragePoolV
         final Long oldUpdated = templatePool.getUpdatedCount();
         final Date oldUpdatedTime = templatePool.getUpdated();
 
-        final SearchCriteria<VMTemplateStoragePoolVO> sc = updateStateSearch.create();
+        final SearchCriteria<VMTemplateStoragePoolVO> sc = this.updateStateSearch.create();
         sc.setParameters("id", templatePool.getId());
         sc.setParameters("state", currentState);
         sc.setParameters("updatedCount", templatePool.getUpdatedCount());

@@ -1,7 +1,7 @@
 package com.cloud.storage.download;
 
 import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public class NotDownloadedState extends DownloadActiveState {
 
@@ -11,7 +11,7 @@ public class NotDownloadedState extends DownloadActiveState {
 
     @Override
     public String getName() {
-        return Status.NOT_DOWNLOADED.toString();
+        return VMTemplateStatus.NOT_DOWNLOADED.toString();
     }
 
     @Override

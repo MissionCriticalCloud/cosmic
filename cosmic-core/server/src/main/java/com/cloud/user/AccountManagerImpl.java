@@ -58,7 +58,7 @@ import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.utils.Ternary;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
 import com.cloud.network.VpnUserVO;

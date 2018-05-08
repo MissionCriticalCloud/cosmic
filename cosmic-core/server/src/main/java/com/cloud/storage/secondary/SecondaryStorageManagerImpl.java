@@ -9,6 +9,8 @@ import static com.cloud.legacymodel.vm.VirtualMachine.State.Stopping;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.dao.CapacityDao;
+import com.cloud.common.resource.ServerResource;
+import com.cloud.common.storageprocessor.TemplateConstants;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.configuration.ZoneConfig;
@@ -49,6 +51,7 @@ import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.NfsTO;
 import com.cloud.legacymodel.user.Account;
@@ -73,7 +76,6 @@ import com.cloud.offering.ServiceOffering;
 import com.cloud.offerings.dao.NetworkOfferingDao;
 import com.cloud.resource.ResourceManager;
 import com.cloud.resource.ResourceStateAdapter;
-import com.cloud.resource.ServerResource;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.UploadVO;
@@ -86,7 +88,6 @@ import com.cloud.storage.datastore.db.ImageStoreDao;
 import com.cloud.storage.datastore.db.ImageStoreVO;
 import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
-import com.cloud.storage.template.TemplateConstants;
 import com.cloud.systemvm.SystemVmManagerBase;
 import com.cloud.template.TemplateManager;
 import com.cloud.user.AccountService;
@@ -99,7 +100,6 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.ReservationContext;
-import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.SystemVmLoadScanner;
 import com.cloud.vm.VirtualMachineGuru;
@@ -231,67 +231,67 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
         logger.info("Start configuring secondary storage vm manager : " + name);
 
-        final Map<String, String> configs = _configDao.getConfiguration("management-server", params);
+        final Map<String, String> configs = this._configDao.getConfiguration("management-server", params);
 
-        _secStorageVmMtuSize = NumbersUtil.parseInt(configs.get("secstorage.vm.mtu.size"), DEFAULT_SS_VM_MTUSIZE);
-        final String useServiceVM = _configDao.getValue("secondary.storage.vm");
+        this._secStorageVmMtuSize = NumbersUtil.parseInt(configs.get("secstorage.vm.mtu.size"), DEFAULT_SS_VM_MTUSIZE);
+        final String useServiceVM = this._configDao.getValue("secondary.storage.vm");
         boolean _useServiceVM = false;
         if ("true".equalsIgnoreCase(useServiceVM)) {
             _useServiceVM = true;
         }
 
-        final String sslcopy = _configDao.getValue("secstorage.encrypt.copy");
+        final String sslcopy = this._configDao.getValue("secstorage.encrypt.copy");
         if ("true".equalsIgnoreCase(sslcopy)) {
-            _useSSlCopy = true;
+            this._useSSlCopy = true;
         }
 
         //default to HTTP in case of missing domain
-        final String ssvmUrlDomain = _configDao.getValue("secstorage.ssl.cert.domain");
-        if (_useSSlCopy && (ssvmUrlDomain == null || ssvmUrlDomain.isEmpty())) {
+        final String ssvmUrlDomain = this._configDao.getValue("secstorage.ssl.cert.domain");
+        if (this._useSSlCopy && (ssvmUrlDomain == null || ssvmUrlDomain.isEmpty())) {
             logger.warn("Empty secondary storage url domain, explicitly disabling SSL");
-            _useSSlCopy = false;
+            this._useSSlCopy = false;
         }
 
-        _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
-        _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
+        this._allowedInternalSites = this._configDao.getValue("secstorage.allowed.internal.sites");
+        this._allowedExternalCidrs = this._configDao.getValue("secstorage.allowed.external.cidrs");
 
         String value = configs.get("secstorage.capacityscan.interval");
         final long _capacityScanInterval = NumbersUtil.parseLong(value, DEFAULT_CAPACITY_SCAN_INTERVAL);
 
-        _instance = configs.get("instance.name");
-        if (_instance == null) {
-            _instance = "DEFAULT";
+        this._instance = configs.get("instance.name");
+        if (this._instance == null) {
+            this._instance = "DEFAULT";
         }
 
-        final Map<String, String> agentMgrConfigs = _configDao.getConfiguration("AgentManager", params);
+        final Map<String, String> agentMgrConfigs = this._configDao.getConfiguration("AgentManager", params);
 
         value = agentMgrConfigs.get("port");
-        _mgmtPort = NumbersUtil.parseInt(value, 8250);
+        this._mgmtPort = NumbersUtil.parseInt(value, 8250);
 
         final SecondaryStorageListener _listener = new SecondaryStorageListener(this);
-        _agentMgr.registerForHostEvents(_listener, true, false, true);
+        this._agentMgr.registerForHostEvents(_listener, true, false, true);
 
-        _itMgr.registerGuru(VirtualMachineType.SecondaryStorageVm, this);
+        this._itMgr.registerGuru(VirtualMachineType.SecondaryStorageVm, this);
 
         //check if there is a default service offering configured
         final String ssvmSrvcOffIdStr = configs.get(Config.SecondaryStorageServiceOffering.key());
         if (ssvmSrvcOffIdStr != null) {
-            _serviceOffering = _offeringDao.findByUuid(ssvmSrvcOffIdStr);
-            if (_serviceOffering == null) {
+            this._serviceOffering = this._offeringDao.findByUuid(ssvmSrvcOffIdStr);
+            if (this._serviceOffering == null) {
                 try {
-                    _serviceOffering = _offeringDao.findById(Long.parseLong(ssvmSrvcOffIdStr));
+                    this._serviceOffering = this._offeringDao.findById(Long.parseLong(ssvmSrvcOffIdStr));
                 } catch (final NumberFormatException e) {
                     logger.debug("The system service offering specified by global config is not id, but uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm", e);
                 }
             }
-            if (_serviceOffering == null) {
+            if (this._serviceOffering == null) {
                 logger.warn("Can't find system service offering specified by global config, uuid=" + ssvmSrvcOffIdStr + " for secondary storage vm");
             }
         }
 
-        if (_serviceOffering == null || !_serviceOffering.getSystemUse()) {
-            final int ramSize = NumbersUtil.parseInt(_configDao.getValue("ssvm.ram.size"), DEFAULT_SS_VM_RAMSIZE);
-            final List<ServiceOfferingVO> offerings = _offeringDao.createSystemServiceOfferings("System Offering For Secondary Storage VM",
+        if (this._serviceOffering == null || !this._serviceOffering.getSystemUse()) {
+            final int ramSize = NumbersUtil.parseInt(this._configDao.getValue("ssvm.ram.size"), DEFAULT_SS_VM_RAMSIZE);
+            final List<ServiceOfferingVO> offerings = this._offeringDao.createSystemServiceOfferings("System Offering For Secondary Storage VM",
                     ServiceOffering.ssvmDefaultOffUniqueName, 1, ramSize, null, null, false, null,
                     StorageProvisioningType.THIN, true, null, true, VirtualMachineType.SecondaryStorageVm, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
@@ -303,8 +303,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         if (_useServiceVM) {
-            _loadScanner = new SystemVmLoadScanner<>(this);
-            _loadScanner.initScan(STARTUP_DELAY, _capacityScanInterval);
+            this._loadScanner = new SystemVmLoadScanner<>(this);
+            this._loadScanner.initScan(STARTUP_DELAY, _capacityScanInterval);
         }
 
         String _httpProxy = configs.get(Config.SecStorageProxy.key());
@@ -333,7 +333,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             }
         }
         logger.info("Secondary storage vm Manager is configured.");
-        _resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
+        this._resourceMgr.registerResourceStateAdapter(this.getClass().getSimpleName(), this);
         return true;
     }
 
@@ -346,9 +346,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean stop() {
-        _loadScanner.stop();
-        _allocLock.releaseRef();
-        _resourceMgr.unregisterResourceStateAdapter(this.getClass().getSimpleName());
+        this._loadScanner.stop();
+        this._allocLock.releaseRef();
+        this._resourceMgr.unregisterResourceStateAdapter(this.getClass().getSimpleName());
         return true;
     }
 
@@ -361,17 +361,17 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public boolean finalizeVirtualMachineProfile(final VirtualMachineProfile profile, final DeployDestination dest, final ReservationContext context) {
 
-        final SecondaryStorageVmVO vm = _secStorageVmDao.findById(profile.getId());
-        final Map<String, String> details = _vmDetailsDao.listDetailsKeyPairs(vm.getId());
+        final SecondaryStorageVmVO vm = this._secStorageVmDao.findById(profile.getId());
+        final Map<String, String> details = this._vmDetailsDao.listDetailsKeyPairs(vm.getId());
         vm.setDetails(details);
 
-        final DataStore secStore = _dataStoreMgr.getImageStore(dest.getZone().getId());
+        final DataStore secStore = this._dataStoreMgr.getImageStore(dest.getZone().getId());
         assert (secStore != null);
 
         final StringBuilder buf = profile.getBootArgsBuilder();
         buf.append(" template=domP type=secstorage");
-        buf.append(" host=").append(computeManagementServerIpList(managementServerService));
-        buf.append(" port=").append(_mgmtPort);
+        buf.append(" host=").append(computeManagementServerIpList(this.managementServerService));
+        buf.append(" port=").append(this._mgmtPort);
         buf.append(" name=").append(profile.getVirtualMachine().getHostName());
 
         buf.append(" zone=").append(dest.getZone().getId());
@@ -379,22 +379,22 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         buf.append(" guid=").append(profile.getVirtualMachine().getHostName());
 
-        buf.append(" workers=").append(_configDao.getValue("workers"));
+        buf.append(" workers=").append(this._configDao.getValue("workers"));
 
-        buf.append(" resource=com.cloud.storage.resource.NfsSecondaryStorageResource");
+        buf.append(" resource=com.cloud.agent.resource.secondarystorage.NfsSecondaryStorageResource");
         buf.append(" instance=SecStorage");
-        buf.append(" sslcopy=").append(Boolean.toString(_useSSlCopy));
+        buf.append(" sslcopy=").append(Boolean.toString(this._useSSlCopy));
         buf.append(" role=").append(vm.getRole().toString());
-        buf.append(" mtu=").append(_secStorageVmMtuSize);
+        buf.append(" mtu=").append(this._secStorageVmMtuSize);
 
         boolean externalDhcp = false;
-        final String externalDhcpStr = _configDao.getValue("direct.attach.network.externalIpAllocator.enabled");
+        final String externalDhcpStr = this._configDao.getValue("direct.attach.network.externalIpAllocator.enabled");
         if (externalDhcpStr != null && externalDhcpStr.equalsIgnoreCase("true")) {
             externalDhcp = true;
         }
 
-        if (Boolean.valueOf(_configDao.getValue("system.vm.random.password"))) {
-            buf.append(" vmpassword=").append(_configDao.getValue("system.vm.password"));
+        if (Boolean.valueOf(this._configDao.getValue("system.vm.random.password"))) {
+            buf.append(" vmpassword=").append(this._configDao.getValue("system.vm.password"));
         }
 
         for (final NicProfile nic : profile.getNics()) {
@@ -416,7 +416,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 buf.append(" mgtmask=").append(nic.getIPv4Netmask());
                 buf.append(" mgtmac=").append(nic.getMacAddress());
 
-                final String mgmt_cidr = _configDao.getValue(Config.ManagementNetwork.key());
+                final String mgmt_cidr = this._configDao.getValue(Config.ManagementNetwork.key());
                 if (NetUtils.isValidIp4Cidr(mgmt_cidr)) {
                     buf.append(" mgmtcidr=").append(mgmt_cidr);
                 }
@@ -433,7 +433,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             buf.append(" bootproto=dhcp");
         }
 
-        final DataCenterVO dc = _dcDao.findById(profile.getVirtualMachine().getDataCenterId());
+        final DataCenterVO dc = this._dcDao.findById(profile.getVirtualMachine().getDataCenterId());
         buf.append(" internaldns1=").append(dc.getInternalDns1());
         if (dc.getInternalDns2() != null) {
             buf.append(" internaldns2=").append(dc.getInternalDns2());
@@ -454,11 +454,11 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         finalizeCommandsOnStart(cmds, profile);
 
-        final SecondaryStorageVmVO secVm = _secStorageVmDao.findById(profile.getId());
+        final SecondaryStorageVmVO secVm = this._secStorageVmDao.findById(profile.getId());
         final Zone zone = dest.getZone();
         final List<NicProfile> nics = profile.getNics();
         computeVmIps(secVm, zone, nics);
-        _secStorageVmDao.update(secVm.getId(), secVm);
+        this._secStorageVmDao.update(secVm.getId(), secVm);
         return true;
     }
 
@@ -472,13 +472,13 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         try {
             //get system ip and create static nat rule for the vm in case of basic networking with EIP/ELB
-            _rulesMgr.getSystemIpAndEnableStaticNatForVm(profile.getVirtualMachine(), false);
-            final IPAddressVO ipaddr = _ipAddressDao.findByAssociatedVmId(profile.getVirtualMachine().getId());
+            this._rulesMgr.getSystemIpAndEnableStaticNatForVm(profile.getVirtualMachine(), false);
+            final IPAddressVO ipaddr = this._ipAddressDao.findByAssociatedVmId(profile.getVirtualMachine().getId());
             if (ipaddr != null && ipaddr.getSystem()) {
-                final SecondaryStorageVmVO secVm = _secStorageVmDao.findById(profile.getId());
+                final SecondaryStorageVmVO secVm = this._secStorageVmDao.findById(profile.getId());
                 // override SSVM guest IP with EIP, so that download url's with be prepared with EIP
                 secVm.setPublicIpAddress(ipaddr.getAddress().addr());
-                _secStorageVmDao.update(secVm.getId(), secVm);
+                this._secStorageVmDao.update(secVm.getId(), secVm);
             }
         } catch (final Exception e) {
             logger.warn("Failed to get system ip and enable static nat for the vm " + profile.getVirtualMachine() + " due to exception ", e);
@@ -518,17 +518,17 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public void finalizeStop(final VirtualMachineProfile profile, final Answer answer) {
         //release elastic IP here
-        finalizeStop(profile, _ipAddressDao.findByAssociatedVmId(profile.getId()), _rulesMgr);
+        finalizeStop(profile, this._ipAddressDao.findByAssociatedVmId(profile.getId()), this._rulesMgr);
     }
 
     @Override
     public void finalizeExpunge(final VirtualMachine vm) {
-        final SecondaryStorageVmVO ssvm = _secStorageVmDao.findByUuid(vm.getUuid());
+        final SecondaryStorageVmVO ssvm = this._secStorageVmDao.findByUuid(vm.getUuid());
 
         ssvm.setPublicIpAddress(null);
         ssvm.setPublicMacAddress(null);
         ssvm.setPublicNetmask(null);
-        _secStorageVmDao.update(ssvm.getId(), ssvm);
+        this._secStorageVmDao.update(ssvm.getId(), ssvm);
     }
 
     @Override
@@ -547,16 +547,16 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public void onScanStart() {
-        _zoneHostInfoMap = getZoneHostInfo();
+        this._zoneHostInfoMap = getZoneHostInfo();
     }
 
     private synchronized Map<Long, ZoneHostInfo> getZoneHostInfo() {
-        return getLongZoneHostInfoMap(_hostDao);
+        return getLongZoneHostInfoMap(this._hostDao);
     }
 
     @Override
     public Long[] getScannablePools() {
-        return getLongs(_dcDao);
+        return getLongs(this._dcDao);
     }
 
     @Override
@@ -564,7 +564,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         // pool is at zone basis
         final long dataCenterId = pool.longValue();
 
-        if (!isZoneReady(_zoneHostInfoMap, dataCenterId)) {
+        if (!isZoneReady(this._zoneHostInfoMap, dataCenterId)) {
             logger.debug("Zone " + dataCenterId + " is not ready to launch secondary storage VM yet");
             return false;
         }
@@ -576,19 +576,19 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     public boolean isZoneReady(final Map<Long, ZoneHostInfo> zoneHostInfoMap, final long dataCenterId) {
         final ZoneHostInfo zoneHostInfo = zoneHostInfoMap.get(dataCenterId);
         if (zoneHostInfo != null && (zoneHostInfo.getFlags() & RunningHostInfoAgregator.ZoneHostInfo.ROUTING_HOST_MASK) != 0) {
-            final VMTemplateVO template = _templateDao.findSystemVMReadyTemplate(dataCenterId, HypervisorType.Any);
+            final VMTemplateVO template = this._templateDao.findSystemVMReadyTemplate(dataCenterId, HypervisorType.Any);
             if (template == null) {
                 logger.debug("System vm template is not ready at data center " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
                 return false;
             }
 
-            final List<DataStore> stores = _dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
+            final List<DataStore> stores = this._dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
             if (stores.size() < 1) {
                 logger.debug("No image store added  in zone " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
                 return false;
             }
 
-            final DataStore store = templateMgr.getImageStore(dataCenterId, template.getId());
+            final DataStore store = this.templateMgr.getImageStore(dataCenterId, template.getId());
             if (store == null) {
                 logger.debug("No secondary storage available in zone " + dataCenterId + ", wait until it is ready to launch secondary storage vm");
                 return false;
@@ -599,7 +599,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             if (useLocal != null) {
                 useLocalStorage = useLocal.booleanValue();
             }
-            final List<Pair<Long, Integer>> l = _storagePoolHostDao.getDatacenterStoragePoolHostInfo(dataCenterId, !useLocalStorage);
+            final List<Pair<Long, Integer>> l = this._storagePoolHostDao.getDatacenterStoragePoolHostInfo(dataCenterId, !useLocalStorage);
             if (l != null && l.size() > 0 && l.get(0).second().intValue() > 0) {
                 return true;
             } else {
@@ -617,26 +617,26 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         final long dataCenterId = pool.longValue();
 
         final List<SecondaryStorageVmVO> ssVms =
-                _secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVm.Role.templateProcessor, dataCenterId, Running, Migrating, Starting, Stopped, Stopping);
+                this._secStorageVmDao.getSecStorageVmListInStates(SecondaryStorageVmRole.templateProcessor, dataCenterId, Running, Migrating, Starting, Stopped, Stopping);
         final int vmSize = (ssVms == null) ? 0 : ssVms.size();
-        final List<DataStore> ssStores = _dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
+        final List<DataStore> ssStores = this._dataStoreMgr.getImageStoresByScope(new ZoneScope(dataCenterId));
         final int storeSize = (ssStores == null) ? 0 : ssStores.size();
         if (storeSize > vmSize) {
             final int requiredVMs = storeSize - vmSize;
             logger.info("Found less ({}) secondary storage VMs than image stores ({}) in dcId={}, starting {} new VMs", vmSize, storeSize, dataCenterId, requiredVMs);
-            return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
+            return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVmRole.templateProcessor);
         } else {
-            final String standByCapacity = _configDao.getValue(Config.SecStorageCapacityStandby.toString());
-            final String maxPerVm = _configDao.getValue(Config.SecStorageSessionMax.toString());
+            final String standByCapacity = this._configDao.getValue(Config.SecStorageCapacityStandby.toString());
+            final String maxPerVm = this._configDao.getValue(Config.SecStorageSessionMax.toString());
             final int requiredCapacity = new SecondaryStorageCapacityCalculator().calculateRequiredCapacity(Integer.parseInt(standByCapacity), Integer.parseInt(maxPerVm));
             if (requiredCapacity > vmSize) {
                 final int requiredVMs = requiredCapacity - vmSize;
                 logger.info("Found less ({}) secondary storage VMs than required ({}) in dcId={}, starting {} new VMs", vmSize, requiredCapacity, dataCenterId, requiredVMs);
-                return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVm.Role.templateProcessor);
+                return new Pair<>(AfterScanAction.expand(requiredVMs), SecondaryStorageVmRole.templateProcessor);
             }
         }
 
-        return new Pair<>(AfterScanAction.nop(), SecondaryStorageVm.Role.templateProcessor);
+        return new Pair<>(AfterScanAction.nop(), SecondaryStorageVmRole.templateProcessor);
     }
 
     @Override
@@ -648,10 +648,10 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public void expandPool(final Long pool, final Object actionArgs) {
         final long dataCenterId = pool.longValue();
-        allocCapacity(dataCenterId, (SecondaryStorageVm.Role) actionArgs);
+        allocCapacity(dataCenterId, (SecondaryStorageVmRole) actionArgs);
     }
 
-    private void allocCapacity(final long dataCenterId, final SecondaryStorageVm.Role role) {
+    private void allocCapacity(final long dataCenterId, final SecondaryStorageVmRole role) {
         logger.trace("Allocate secondary storage vm standby capacity for data center : " + dataCenterId);
 
         if (!isSecondaryStorageVmRequired(dataCenterId)) {
@@ -666,14 +666,14 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             if (secStorageVm == null) {
                 logger.info("No stopped secondary storage vm is available, need to allocate a new secondary storage vm");
 
-                if (_allocLock.lock(ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_SYNC)) {
+                if (this._allocLock.lock(ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_SYNC)) {
                     try {
                         secStorageVm = startNew(dataCenterId, role);
-                        for (final UploadVO upload : _uploadDao.listAll()) {
-                            _uploadDao.expunge(upload.getId());
+                        for (final UploadVO upload : this._uploadDao.listAll()) {
+                            this._uploadDao.expunge(upload.getId());
                         }
                     } finally {
-                        _allocLock.unlock();
+                        this._allocLock.unlock();
                     }
                 } else {
                     logger.info("Unable to acquire synchronization lock for secondary storage vm allocation, wait for next scan");
@@ -728,8 +728,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     }
 
     protected boolean isSecondaryStorageVmRequired(final long dcId) {
-        final DataCenterVO dc = _dcDao.findById(dcId);
-        _dcDao.loadDetails(dc);
+        final DataCenterVO dc = this._dcDao.findById(dcId);
+        this._dcDao.loadDetails(dc);
         final String ssvmReq = dc.getDetail(ZoneConfig.EnableSecStorageVm.key());
         if (ssvmReq != null) {
             return Boolean.parseBoolean(ssvmReq);
@@ -737,8 +737,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return true;
     }
 
-    public SecondaryStorageVmVO assignSecStorageVmFromStoppedPool(final long dataCenterId, final SecondaryStorageVm.Role role) {
-        final List<SecondaryStorageVmVO> l = _secStorageVmDao.getSecStorageVmListInStates(role, dataCenterId, Starting, Stopped, Migrating);
+    public SecondaryStorageVmVO assignSecStorageVmFromStoppedPool(final long dataCenterId, final SecondaryStorageVmRole role) {
+        final List<SecondaryStorageVmVO> l = this._secStorageVmDao.getSecStorageVmListInStates(role, dataCenterId, Starting, Stopped, Migrating);
         if (l != null && l.size() > 0) {
             return l.get(0);
         }
@@ -746,7 +746,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return null;
     }
 
-    public SecondaryStorageVmVO startNew(final long dataCenterId, final SecondaryStorageVm.Role role) {
+    public SecondaryStorageVmVO startNew(final long dataCenterId, final SecondaryStorageVmRole role) {
 
         if (!isSecondaryStorageVmRequired(dataCenterId)) {
             logger.debug("Secondary storage vm not required in zone " + dataCenterId + " acc. to zone config");
@@ -763,7 +763,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             return null;
         }
 
-        final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
+        final SecondaryStorageVmVO secStorageVm = this._secStorageVmDao.findById(secStorageVmId);
         if (secStorageVm != null) {
             SubscriptionMgr.getInstance().notifySubscribers(ALERT_SUBJECT, this,
                     new SecStorageVmAlertEventArgs(SecStorageVmAlertEventArgs.SSVM_CREATED, dataCenterId, secStorageVmId, secStorageVm, null));
@@ -783,9 +783,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
     @Override
     public SecondaryStorageVmVO startSecStorageVm(final long secStorageVmId) {
         try {
-            final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
-            _itMgr.advanceStart(secStorageVm.getUuid(), null, null);
-            return _secStorageVmDao.findById(secStorageVm.getId());
+            final SecondaryStorageVmVO secStorageVm = this._secStorageVmDao.findById(secStorageVmId);
+            this._itMgr.advanceStart(secStorageVm.getUuid(), null, null);
+            return this._secStorageVmDao.findById(secStorageVm.getId());
         } catch (final InsufficientCapacityException | ResourceUnavailableException | OperationTimedoutException e) {
             logger.warn("Exception while trying to start secondary storage vm", e);
             return null;
@@ -794,7 +794,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean stopSecStorageVm(final long secStorageVmId) {
-        final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
+        final SecondaryStorageVmVO secStorageVm = this._secStorageVmDao.findById(secStorageVmId);
         if (secStorageVm == null) {
             final String msg = "Stopping secondary storage vm failed: secondary storage vm " + secStorageVmId + " no longer exists";
             logger.debug(msg);
@@ -806,7 +806,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
                 try {
                     if (secStorageVmLock.lock(ACQUIRE_GLOBAL_LOCK_TIMEOUT_FOR_SYNC)) {
                         try {
-                            _itMgr.stop(secStorageVm.getUuid());
+                            this._itMgr.stop(secStorageVm.getUuid());
                             return true;
                         } finally {
                             secStorageVmLock.unlock();
@@ -831,15 +831,15 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean rebootSecStorageVm(final long secStorageVmId) {
-        final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findById(secStorageVmId);
+        final SecondaryStorageVmVO secStorageVm = this._secStorageVmDao.findById(secStorageVmId);
 
         if (secStorageVm == null || secStorageVm.getState() == State.Destroyed) {
             return false;
         }
 
         if (secStorageVm.getState() == Running && secStorageVm.getHostId() != null) {
-            final RebootCommand cmd = new RebootCommand(secStorageVm.getInstanceName(), _itMgr.getExecuteInSequence(secStorageVm.getHypervisorType()));
-            final Answer answer = _agentMgr.easySend(secStorageVm.getHostId(), cmd);
+            final RebootCommand cmd = new RebootCommand(secStorageVm.getInstanceName(), this._itMgr.getExecuteInSequence(secStorageVm.getHypervisorType()));
+            final Answer answer = this._agentMgr.easySend(secStorageVm.getHostId(), cmd);
 
             if (answer != null && answer.getResult()) {
                 logger.debug("Successfully reboot secondary storage vm " + secStorageVm.getHostName());
@@ -860,18 +860,18 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean destroySecStorageVm(final long vmId) {
-        final SecondaryStorageVmVO ssvm = _secStorageVmDao.findById(vmId);
+        final SecondaryStorageVmVO ssvm = this._secStorageVmDao.findById(vmId);
 
         try {
-            _itMgr.expunge(ssvm.getUuid());
-            _secStorageVmDao.remove(ssvm.getId());
-            final HostVO host = _hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), HostType.SecondaryStorageVM);
+            this._itMgr.expunge(ssvm.getUuid());
+            this._secStorageVmDao.remove(ssvm.getId());
+            final HostVO host = this._hostDao.findByTypeNameAndZoneId(ssvm.getDataCenterId(), ssvm.getHostName(), HostType.SecondaryStorageVM);
             if (host != null) {
                 logger.debug("Removing host entry for ssvm id=" + vmId);
-                _hostDao.remove(host.getId());
+                this._hostDao.remove(host.getId());
                 //Expire the download urls in the entire zone for templates and volumes.
-                _tmplStoreDao.expireDnldUrlsForZone(host.getDataCenterId());
-                _volumeStoreDao.expireDnldUrlsForZone(host.getDataCenterId());
+                this._tmplStoreDao.expireDnldUrlsForZone(host.getDataCenterId());
+                this._volumeStoreDao.expireDnldUrlsForZone(host.getDataCenterId());
                 return true;
             }
             return false;
@@ -890,15 +890,15 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         if (ssAHostId == null) {
             return true;
         }
-        final HostVO ssAHost = _hostDao.findById(ssAHostId);
-        final SecondaryStorageVmVO thisSecStorageVm = _secStorageVmDao.findByInstanceName(ssAHost.getName());
+        final HostVO ssAHost = this._hostDao.findById(ssAHostId);
+        final SecondaryStorageVmVO thisSecStorageVm = this._secStorageVmDao.findByInstanceName(ssAHost.getName());
 
         if (thisSecStorageVm == null) {
             logger.warn("secondary storage VM " + ssAHost.getName() + " doesn't exist");
             return false;
         }
 
-        final String copyPort = _useSSlCopy ? "443" : Integer.toString(TemplateConstants.DEFAULT_TMPLT_COPY_PORT);
+        final String copyPort = this._useSSlCopy ? "443" : Integer.toString(TemplateConstants.DEFAULT_TMPLT_COPY_PORT);
         final SecStorageFirewallCfgCommand thiscpc = new SecStorageFirewallCfgCommand(true);
         thiscpc.addPortConfig(thisSecStorageVm.getPublicIpAddress(), copyPort, true, TemplateConstants.DEFAULT_TMPLT_COPY_INTF);
 
@@ -910,7 +910,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             if (ssvm.getId() == ssAHostId) {
                 continue;
             }
-            final Answer answer = _agentMgr.easySend(ssvm.getId(), thiscpc);
+            final Answer answer = this._agentMgr.easySend(ssvm.getId(), thiscpc);
             if (answer != null && answer.getResult()) {
                 logger.debug("Successfully programmed firewall rules into SSVM " + ssvm.getName());
             } else {
@@ -927,7 +927,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             allSSVMIpList.addPortConfig(ssvm.getPublicIpAddress(), copyPort, true, TemplateConstants.DEFAULT_TMPLT_COPY_INTF);
         }
 
-        final Answer answer = _agentMgr.easySend(ssAHostId, allSSVMIpList);
+        final Answer answer = this._agentMgr.easySend(ssAHostId, allSSVMIpList);
         if (answer != null && answer.getResult()) {
             logger.debug("Successfully programmed firewall rules into " + thisSecStorageVm.getHostName());
         } else {
@@ -940,33 +940,33 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean generateVMSetupCommand(final Long ssAHostId) {
-        final HostVO ssAHost = _hostDao.findById(ssAHostId);
+        final HostVO ssAHost = this._hostDao.findById(ssAHostId);
         if (ssAHost.getType() != HostType.SecondaryStorageVM) {
             return false;
         }
-        final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(ssAHost.getName());
+        final SecondaryStorageVmVO secStorageVm = this._secStorageVmDao.findByInstanceName(ssAHost.getName());
         if (secStorageVm == null) {
             logger.warn("secondary storage VM " + ssAHost.getName() + " doesn't exist");
             return false;
         }
 
         final SecStorageVMSetupCommand setupCmd = new SecStorageVMSetupCommand();
-        _allowedInternalSites = _configDao.getValue("secstorage.allowed.internal.sites");
-        if (_allowedInternalSites != null) {
-            final List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedInternalSites);
+        this._allowedInternalSites = this._configDao.getValue("secstorage.allowed.internal.sites");
+        if (this._allowedInternalSites != null) {
+            final List<String> allowedCidrs = this.GenerateAllowedCidrs(this._allowedInternalSites);
             setupCmd.setAllowedInternalSites(allowedCidrs.toArray(new String[allowedCidrs.size()]));
         }
 
-        _allowedExternalCidrs = _configDao.getValue("secstorage.allowed.external.cidrs");
-        if (_allowedExternalCidrs != null) {
-            final List<String> allowedCidrs = this.GenerateAllowedCidrs(_allowedExternalCidrs);
+        this._allowedExternalCidrs = this._configDao.getValue("secstorage.allowed.external.cidrs");
+        if (this._allowedExternalCidrs != null) {
+            final List<String> allowedCidrs = this.GenerateAllowedCidrs(this._allowedExternalCidrs);
             setupCmd.setAllowedExternalCidrs(allowedCidrs.toArray(new String[allowedCidrs.size()]));
         }
 
-        final String copyPasswd = _configDao.getValue("secstorage.copy.password");
+        final String copyPasswd = this._configDao.getValue("secstorage.copy.password");
         setupCmd.setCopyPassword(copyPasswd);
         setupCmd.setCopyUserName(TemplateConstants.DEFAULT_HTTP_AUTH_USER);
-        final Answer answer = _agentMgr.easySend(ssAHostId, setupCmd);
+        final Answer answer = this._agentMgr.easySend(ssAHostId, setupCmd);
         if (answer != null && answer.getResult()) {
             logger.debug("Successfully programmed http auth into " + secStorageVm.getHostName());
             return true;
@@ -994,42 +994,42 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
     @Override
     public boolean generateSetupCommand(final Long ssHostId) {
-        final HostVO cssHost = _hostDao.findById(ssHostId);
+        final HostVO cssHost = this._hostDao.findById(ssHostId);
         final Long zoneId = cssHost.getDataCenterId();
         if (cssHost.getType() == HostType.SecondaryStorageVM) {
 
-            final SecondaryStorageVmVO secStorageVm = _secStorageVmDao.findByInstanceName(cssHost.getName());
+            final SecondaryStorageVmVO secStorageVm = this._secStorageVmDao.findByInstanceName(cssHost.getName());
             if (secStorageVm == null) {
                 logger.warn("secondary storage VM " + cssHost.getName() + " doesn't exist");
                 return false;
             }
 
-            final List<DataStore> ssStores = _dataStoreMgr.getImageStoresByScope(new ZoneScope(zoneId));
+            final List<DataStore> ssStores = this._dataStoreMgr.getImageStoresByScope(new ZoneScope(zoneId));
             for (final DataStore ssStore : ssStores) {
                 if (!(ssStore.getTO() instanceof NfsTO)) {
                     continue; // only do this for Nfs
                 }
                 final String secUrl = ssStore.getUri();
                 final SecStorageSetupCommand setupCmd;
-                if (!_useSSlCopy) {
+                if (!this._useSSlCopy) {
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, null);
                 } else {
-                    final Certificates certs = _keystoreMgr.getCertificates(ConsoleProxyManager.CERTIFICATE_NAME);
+                    final Certificates certs = this._keystoreMgr.getCertificates(ConsoleProxyManager.CERTIFICATE_NAME);
                     setupCmd = new SecStorageSetupCommand(ssStore.getTO(), secUrl, certs);
                 }
 
                 //template/volume file upload key
-                final String postUploadKey = _configDao.getValue(Config.SSVMPSK.key());
+                final String postUploadKey = this._configDao.getValue(Config.SSVMPSK.key());
                 setupCmd.setPostUploadKey(postUploadKey);
 
-                final Answer answer = _agentMgr.easySend(ssHostId, setupCmd);
+                final Answer answer = this._agentMgr.easySend(ssHostId, setupCmd);
                 if (answer != null && answer.getResult()) {
                     final SecStorageSetupAnswer an = (SecStorageSetupAnswer) answer;
                     if (an.get_dir() != null) {
                         // update the parent path in image_store table for this image store
-                        final ImageStoreVO svo = _imageStoreDao.findById(ssStore.getId());
+                        final ImageStoreVO svo = this._imageStoreDao.findById(ssStore.getId());
                         svo.setParent(an.get_dir());
-                        _imageStoreDao.update(ssStore.getId(), svo);
+                        this._imageStoreDao.update(ssStore.getId(), svo);
                     }
                     logger.debug("Successfully programmed secondary storage " + ssStore.getName() + " in secondary storage VM " + secStorageVm.getInstanceName());
                 } else {
@@ -1068,65 +1068,65 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         return null;
     }
 
-    protected Map<String, Object> createSecStorageVmInstance(final long dataCenterId, final SecondaryStorageVm.Role role) {
-        final DataStore secStore = _dataStoreMgr.getImageStore(dataCenterId);
+    protected Map<String, Object> createSecStorageVmInstance(final long dataCenterId, final SecondaryStorageVmRole role) {
+        final DataStore secStore = this._dataStoreMgr.getImageStore(dataCenterId);
         if (secStore == null) {
             final String msg = "No secondary storage available in zone " + dataCenterId + ", cannot create secondary storage vm";
             logger.warn(msg);
             throw new CloudRuntimeException(msg);
         }
 
-        final long id = _secStorageVmDao.getNextInSequence(Long.class, "id");
-        final String name = VirtualMachineName.getSystemVmName(id, _instance, "s").intern();
-        final Account systemAcct = _accountMgr.getSystemAccount();
+        final long id = this._secStorageVmDao.getNextInSequence(Long.class, "id");
+        final String name = VirtualMachineName.getSystemVmName(id, this._instance, "s").intern();
+        final Account systemAcct = this._accountMgr.getSystemAccount();
 
         final DataCenterDeployment plan = new DataCenterDeployment(dataCenterId);
-        final Zone zone = zoneRepository.findById(plan.getDataCenterId()).orElse(null);
+        final Zone zone = this.zoneRepository.findById(plan.getDataCenterId()).orElse(null);
 
         final NetworkVO defaultNetwork = getDefaultNetworkForCreation(zone);
 
         final List<? extends NetworkOffering> offerings;
-        if (_sNwMgr.isStorageIpRangeAvailable(dataCenterId)) {
-            offerings = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork, NetworkOffering
+        if (this._sNwMgr.isStorageIpRangeAvailable(dataCenterId)) {
+            offerings = this._networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork, NetworkOffering
                     .SystemStorageNetwork);
         } else {
-            offerings = _networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork);
+            offerings = this._networkModel.getSystemAccountNetworkOfferings(NetworkOffering.SystemControlNetwork, NetworkOffering.SystemManagementNetwork);
         }
         final LinkedHashMap<Network, List<? extends NicProfile>> networks = new LinkedHashMap<>(offerings.size() + 1);
         final NicProfile defaultNic = new NicProfile();
         defaultNic.setDefaultNic(true);
         try {
-            networks.put(_networkMgr.setupNetwork(systemAcct, _networkOfferingDao.findById(defaultNetwork.getNetworkOfferingId()), plan, null, null, false).get(0),
+            networks.put(this._networkMgr.setupNetwork(systemAcct, this._networkOfferingDao.findById(defaultNetwork.getNetworkOfferingId()), plan, null, null, false).get(0),
                     new ArrayList<>(Arrays.asList(defaultNic)));
             for (final NetworkOffering offering : offerings) {
-                networks.put(_networkMgr.setupNetwork(systemAcct, offering, plan, null, null, false).get(0), new ArrayList<>());
+                networks.put(this._networkMgr.setupNetwork(systemAcct, offering, plan, null, null, false).get(0), new ArrayList<>());
             }
         } catch (final ConcurrentOperationException e) {
             logger.info("Unable to setup due to concurrent operation.", e);
             return new HashMap<>();
         }
 
-        final HypervisorType availableHypervisor = _resourceMgr.getAvailableHypervisor(dataCenterId);
+        final HypervisorType availableHypervisor = this._resourceMgr.getAvailableHypervisor(dataCenterId);
         final String templateName = retrieveTemplateName(dataCenterId);
-        final VMTemplateVO template = _templateDao.findRoutingTemplate(availableHypervisor, templateName);
+        final VMTemplateVO template = this._templateDao.findRoutingTemplate(availableHypervisor, templateName);
 
         if (template == null) {
             throw new CloudRuntimeException("Not able to find the System templates or not downloaded in zone " + dataCenterId);
         }
 
-        ServiceOfferingVO serviceOffering = _serviceOffering;
+        ServiceOfferingVO serviceOffering = this._serviceOffering;
         if (serviceOffering == null) {
-            serviceOffering = _offeringDao.findDefaultSystemOffering(ServiceOffering.ssvmDefaultOffUniqueName, ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn
+            serviceOffering = this._offeringDao.findDefaultSystemOffering(ServiceOffering.ssvmDefaultOffUniqueName, ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn
                     (dataCenterId));
         }
         SecondaryStorageVmVO secStorageVm =
                 new SecondaryStorageVmVO(id, serviceOffering.getId(), name, template.getId(), template.getHypervisorType(), template.getGuestOSId(), dataCenterId,
-                        systemAcct.getDomainId(), systemAcct.getId(), _accountMgr.getSystemUser().getId(), role, serviceOffering.getOfferHA());
+                        systemAcct.getDomainId(), systemAcct.getId(), this._accountMgr.getSystemUser().getId(), role, serviceOffering.getOfferHA());
         secStorageVm.setDynamicallyScalable(template.isDynamicallyScalable());
-        secStorageVm = _secStorageVmDao.persist(secStorageVm);
+        secStorageVm = this._secStorageVmDao.persist(secStorageVm);
         try {
-            _itMgr.allocate(name, template, serviceOffering, networks, plan, null);
-            secStorageVm = _secStorageVmDao.findById(secStorageVm.getId());
+            this._itMgr.allocate(name, template, serviceOffering, networks, plan, null);
+            secStorageVm = this._secStorageVmDao.findById(secStorageVm.getId());
         } catch (final InsufficientCapacityException e) {
             logger.warn("InsufficientCapacity", e);
             throw new CloudRuntimeException("Insufficient capacity exception", e);
@@ -1155,7 +1155,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
     protected NetworkVO getDefaultNetworkForAdvancedZone(final Zone zone) {
-        return getNetworkForAdvancedZone(zone, _networkDao);
+        return getNetworkForAdvancedZone(zone, this._networkDao);
     }
 
     /**
@@ -1167,7 +1167,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
      * @throws CloudRuntimeException - If the zone is not a valid choice or a network couldn't be found.
      */
     protected NetworkVO getDefaultNetworkForBasicZone(final Zone zone) {
-        return getNetworkForBasicZone(zone, _networkDao);
+        return getNetworkForBasicZone(zone, this._networkDao);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.cloud.storage.upload;
 
 import com.cloud.legacymodel.communication.command.UploadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.Upload.Status;
+import com.cloud.legacymodel.storage.UploadStatus;
 
 public class UploadCompleteState extends UploadInactiveState {
 
@@ -11,7 +11,7 @@ public class UploadCompleteState extends UploadInactiveState {
 
     @Override
     public String getName() {
-        return Status.UPLOADED.toString();
+        return UploadStatus.UPLOADED.toString();
     }
 
     @Override
@@ -21,7 +21,7 @@ public class UploadCompleteState extends UploadInactiveState {
             if (event == UploadEvent.UPLOAD_ANSWER) {
                 getUploadListener().scheduleImmediateStatusCheck(RequestType.PURGE);
             }
-            getUploadListener().setUploadInactive(Status.UPLOADED);
+            getUploadListener().setUploadInactive(UploadStatus.UPLOADED);
         }
     }
 }

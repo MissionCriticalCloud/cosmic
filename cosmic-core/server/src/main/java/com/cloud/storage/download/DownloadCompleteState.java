@@ -1,7 +1,7 @@
 package com.cloud.storage.download;
 
 import com.cloud.legacymodel.communication.command.DownloadProgressCommand.RequestType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 public class DownloadCompleteState extends DownloadInactiveState {
 
@@ -11,7 +11,7 @@ public class DownloadCompleteState extends DownloadInactiveState {
 
     @Override
     public String getName() {
-        return Status.DOWNLOADED.toString();
+        return VMTemplateStatus.DOWNLOADED.toString();
     }
 
     @Override
@@ -22,7 +22,7 @@ public class DownloadCompleteState extends DownloadInactiveState {
                 getDownloadListener().scheduleImmediateStatusCheck(RequestType.PURGE);
             }
         } else {
-            getDownloadListener().setDownloadInactive(Status.DOWNLOADED);
+            getDownloadListener().setDownloadInactive(VMTemplateStatus.DOWNLOADED);
         }
     }
 }

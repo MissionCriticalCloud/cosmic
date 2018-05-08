@@ -22,7 +22,7 @@ import com.cloud.legacymodel.communication.command.StopCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
-import com.cloud.managed.context.ManagedContextRunnable;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 
 import java.util.ArrayList;

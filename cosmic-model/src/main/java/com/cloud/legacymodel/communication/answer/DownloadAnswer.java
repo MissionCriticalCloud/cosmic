@@ -1,8 +1,7 @@
 package com.cloud.legacymodel.communication.answer;
 
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 
 import java.io.File;
 
@@ -10,7 +9,7 @@ public class DownloadAnswer extends Answer {
     private String jobId;
     private int downloadPct;
     private String errorString;
-    private VMTemplateStorageResourceAssoc.Status downloadStatus;
+    private VMTemplateStatus downloadStatus;
     private String downloadPath;
     private String installPath;
     private long templateSize = 0L;
@@ -21,7 +20,7 @@ public class DownloadAnswer extends Answer {
 
     }
 
-    public DownloadAnswer(final String errorString, final Status status) {
+    public DownloadAnswer(final String errorString, final VMTemplateStatus status) {
         super();
         this.downloadPct = 0;
         this.errorString = errorString;
@@ -29,7 +28,7 @@ public class DownloadAnswer extends Answer {
         this.details = errorString;
     }
 
-    public DownloadAnswer(final String jobId, final int downloadPct, final String errorString, final Status downloadStatus, final String fileSystemPath, final String
+    public DownloadAnswer(final String jobId, final int downloadPct, final String errorString, final VMTemplateStatus downloadStatus, final String fileSystemPath, final String
             installPath, final long templateSize,
                           final long templatePhySicalSize, final String checkSum) {
         super();
@@ -58,7 +57,7 @@ public class DownloadAnswer extends Answer {
         return path;
     }
 
-    public DownloadAnswer(final String jobId, final int downloadPct, final Command command, final Status downloadStatus, final String fileSystemPath, final String installPath) {
+    public DownloadAnswer(final String jobId, final int downloadPct, final Command command, final VMTemplateStatus downloadStatus, final String fileSystemPath, final String installPath) {
         super(command);
         this.jobId = jobId;
         this.downloadPct = downloadPct;
@@ -68,35 +67,35 @@ public class DownloadAnswer extends Answer {
     }
 
     public String getCheckSum() {
-        return checkSum;
+        return this.checkSum;
     }
 
     public int getDownloadPct() {
-        return downloadPct;
+        return this.downloadPct;
     }
 
     public String getErrorString() {
-        return errorString;
+        return this.errorString;
     }
 
     public String getDownloadStatusString() {
-        return downloadStatus.toString();
+        return this.downloadStatus.toString();
     }
 
-    public VMTemplateStorageResourceAssoc.Status getDownloadStatus() {
-        return downloadStatus;
+    public VMTemplateStatus getDownloadStatus() {
+        return this.downloadStatus;
     }
 
-    public void setDownloadStatus(final VMTemplateStorageResourceAssoc.Status downloadStatus) {
+    public void setDownloadStatus(final VMTemplateStatus downloadStatus) {
         this.downloadStatus = downloadStatus;
     }
 
     public String getDownloadPath() {
-        return downloadPath;
+        return this.downloadPath;
     }
 
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     public void setJobId(final String jobId) {
@@ -104,7 +103,7 @@ public class DownloadAnswer extends Answer {
     }
 
     public String getInstallPath() {
-        return installPath;
+        return this.installPath;
     }
 
     public void setInstallPath(final String installPath) {
@@ -112,7 +111,7 @@ public class DownloadAnswer extends Answer {
     }
 
     public Long getTemplateSize() {
-        return templateSize;
+        return this.templateSize;
     }
 
     public void setTemplateSize(final long templateSize) {
@@ -120,7 +119,7 @@ public class DownloadAnswer extends Answer {
     }
 
     public long getTemplatePhySicalSize() {
-        return templatePhySicalSize;
+        return this.templatePhySicalSize;
     }
 
     public void setTemplatePhySicalSize(final long templatePhySicalSize) {

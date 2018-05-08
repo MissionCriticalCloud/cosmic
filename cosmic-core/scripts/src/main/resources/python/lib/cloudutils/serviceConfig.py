@@ -670,7 +670,7 @@ class cloudAgentConfig(serviceCfgBase):
             if cfo.getEntry("local.storage.uuid") == "":
                 cfo.addEntry("local.storage.uuid", str(bash("uuidgen").getStdout()))
             if cfo.getEntry("resource") == "":
-                cfo.addEntry("resource", "com.cloud.hypervisor.kvm.resource.LibvirtComputingResource")
+                cfo.addEntry("resource", "com.cloud.agent.resource.kvm.LibvirtComputingResource")
             cfo.save()
 
             self.syscfg.svo.stopService("cosmic-agent")

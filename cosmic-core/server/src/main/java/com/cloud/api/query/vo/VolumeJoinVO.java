@@ -2,7 +2,7 @@ package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.storage.TemplateType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
@@ -131,7 +131,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     private int downloadPercent;
     @Column(name = "download_state")
     @Enumerated(EnumType.STRING)
-    private Status downloadState;
+    private VMTemplateStatus downloadState;
     @Column(name = "error_str")
     private String errorString;
     @Column(name = "hypervisor_type")
@@ -390,7 +390,7 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
         this.downloadPercent = downloadPercent;
     }
 
-    public void setDownloadState(final Status downloadState) {
+    public void setDownloadState(final VMTemplateStatus downloadState) {
         this.downloadState = downloadState;
     }
 
@@ -532,338 +532,338 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     @Override
     public long getId() {
-        return id;
+        return this.id;
     }
 
     @Override
     public String getUuid() {
-        return uuid;
+        return this.uuid;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public Long getDeviceId() {
-        return deviceId;
+        return this.deviceId;
     }
 
     public VolumeType getVolumeType() {
-        return volumeType;
+        return this.volumeType;
     }
 
     public StorageProvisioningType getProvisioningType() {
-        return provisioningType;
+        return this.provisioningType;
     }
 
     public long getSize() {
-        return size;
+        return this.size;
     }
 
     public Long getMinIops() {
-        return minIops;
+        return this.minIops;
     }
 
     public Long getMaxIops() {
-        return maxIops;
+        return this.maxIops;
     }
 
     public Volume.State getState() {
-        return state;
+        return this.state;
     }
 
     public Date getCreated() {
-        return created;
+        return this.created;
     }
 
     public Date getAttached() {
-        return attached;
+        return this.attached;
     }
 
     public Date getRemoved() {
-        return removed;
+        return this.removed;
     }
 
     @Override
     public long getAccountId() {
-        return accountId;
+        return this.accountId;
     }
 
     public boolean isDisplayVolume() {
-        return displayVolume;
+        return this.displayVolume;
     }
 
     @Override
     public long getDomainId() {
-        return domainId;
+        return this.domainId;
     }
 
     @Override
     public String getDomainPath() {
-        return domainPath;
+        return this.domainPath;
     }
 
     @Override
     public short getAccountType() {
-        return accountType;
+        return this.accountType;
     }
 
     @Override
     public String getAccountUuid() {
-        return accountUuid;
+        return this.accountUuid;
     }
 
     @Override
     public String getAccountName() {
-        return accountName;
+        return this.accountName;
     }
 
     @Override
     public String getDomainUuid() {
-        return domainUuid;
+        return this.domainUuid;
     }
 
     @Override
     public String getDomainName() {
-        return domainName;
+        return this.domainName;
     }
 
     @Override
     public String getProjectUuid() {
-        return projectUuid;
+        return this.projectUuid;
     }
 
     @Override
     public String getProjectName() {
-        return projectName;
+        return this.projectName;
     }
 
     public long getProjectId() {
-        return projectId;
+        return this.projectId;
     }
 
     public long getVmId() {
-        return vmId;
+        return this.vmId;
     }
 
     public String getVmUuid() {
-        return vmUuid;
+        return this.vmUuid;
     }
 
     public String getVmName() {
-        return vmName;
+        return this.vmName;
     }
 
     public String getVmDisplayName() {
-        return vmDisplayName;
+        return this.vmDisplayName;
     }
 
     public VirtualMachine.State getVmState() {
-        return vmState;
+        return this.vmState;
     }
 
     public VirtualMachineType getVmType() {
-        return vmType;
+        return this.vmType;
     }
 
     public long getVolumeStoreSize() {
-        return volumeStoreSize;
+        return this.volumeStoreSize;
     }
 
     public Date getCreatedOnStore() {
-        return createdOnStore;
+        return this.createdOnStore;
     }
 
     public ImageFormat getFormat() {
-        return format;
+        return this.format;
     }
 
     public int getDownloadPercent() {
-        return downloadPercent;
+        return this.downloadPercent;
     }
 
-    public Status getDownloadState() {
-        return downloadState;
+    public VMTemplateStatus getDownloadState() {
+        return this.downloadState;
     }
 
     public String getErrorString() {
-        return errorString;
+        return this.errorString;
     }
 
     public HypervisorType getHypervisorType() {
-        return hypervisorType;
+        return this.hypervisorType;
     }
 
     public long getDiskOfferingId() {
-        return diskOfferingId;
+        return this.diskOfferingId;
     }
 
     public String getDiskOfferingUuid() {
-        return diskOfferingUuid;
+        return this.diskOfferingUuid;
     }
 
     public String getDiskOfferingName() {
-        return diskOfferingName;
+        return this.diskOfferingName;
     }
 
     public String getDiskOfferingDisplayText() {
-        return diskOfferingDisplayText;
+        return this.diskOfferingDisplayText;
     }
 
     public boolean isUseLocalStorage() {
-        return useLocalStorage;
+        return this.useLocalStorage;
     }
 
     public Long getBytesReadRate() {
-        return bytesReadRate;
+        return this.bytesReadRate;
     }
 
     public Long getBytesWriteRate() {
-        return bytesWriteRate;
+        return this.bytesWriteRate;
     }
 
     public Long getIopsReadRate() {
-        return iopsReadRate;
+        return this.iopsReadRate;
     }
 
     public Long getIopsWriteRate() {
-        return iopsWriteRate;
+        return this.iopsWriteRate;
     }
 
     public String getCacheMode() {
-        return cacheMode;
+        return this.cacheMode;
     }
 
     public long getPoolId() {
-        return poolId;
+        return this.poolId;
     }
 
     public String getPoolUuid() {
-        return poolUuid;
+        return this.poolUuid;
     }
 
     public String getPoolName() {
-        return poolName;
+        return this.poolName;
     }
 
     public long getTemplateId() {
-        return templateId;
+        return this.templateId;
     }
 
     public String getTemplateUuid() {
-        return templateUuid;
+        return this.templateUuid;
     }
 
     public boolean isExtractable() {
-        return extractable;
+        return this.extractable;
     }
 
     public TemplateType getTemplateType() {
-        return templateType;
+        return this.templateType;
     }
 
     public String getTemplateName() {
-        return templateName;
+        return this.templateName;
     }
 
     public String getTemplateDisplayText() {
-        return templateDisplayText;
+        return this.templateDisplayText;
     }
 
     public long getIsoId() {
-        return isoId;
+        return this.isoId;
     }
 
     public String getIsoUuid() {
-        return isoUuid;
+        return this.isoUuid;
     }
 
     public String getIsoName() {
-        return isoName;
+        return this.isoName;
     }
 
     public String getIsoDisplayText() {
-        return isoDisplayText;
+        return this.isoDisplayText;
     }
 
     public Long getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     public String getJobUuid() {
-        return jobUuid;
+        return this.jobUuid;
     }
 
     public int getJobStatus() {
-        return jobStatus;
+        return this.jobStatus;
     }
 
     public long getTagId() {
-        return tagId;
+        return this.tagId;
     }
 
     public String getTagUuid() {
-        return tagUuid;
+        return this.tagUuid;
     }
 
     public String getTagKey() {
-        return tagKey;
+        return this.tagKey;
     }
 
     public String getTagValue() {
-        return tagValue;
+        return this.tagValue;
     }
 
     public long getTagDomainId() {
-        return tagDomainId;
+        return this.tagDomainId;
     }
 
     public long getTagAccountId() {
-        return tagAccountId;
+        return this.tagAccountId;
     }
 
     public long getTagResourceId() {
-        return tagResourceId;
+        return this.tagResourceId;
     }
 
     public String getTagResourceUuid() {
-        return tagResourceUuid;
+        return this.tagResourceUuid;
     }
 
     public ResourceObjectType getTagResourceType() {
-        return tagResourceType;
+        return this.tagResourceType;
     }
 
     public String getTagCustomer() {
-        return tagCustomer;
+        return this.tagCustomer;
     }
 
     public long getDataCenterId() {
-        return dataCenterId;
+        return this.dataCenterId;
     }
 
     public String getDataCenterUuid() {
-        return dataCenterUuid;
+        return this.dataCenterUuid;
     }
 
     public String getDataCenterName() {
-        return dataCenterName;
+        return this.dataCenterName;
     }
 
     public long getPodId() {
-        return podId;
+        return this.podId;
     }
 
     public boolean isSystemUse() {
-        return systemUse;
+        return this.systemUse;
     }
 
     public String getPath() {
-        return path;
+        return this.path;
     }
 
     public String getChainInfo() {
-        return chainInfo;
+        return this.chainInfo;
     }
 
     @Override
@@ -872,6 +872,6 @@ public class VolumeJoinVO extends BaseViewVO implements ControlledViewEntity {
     }
 
     public DiskControllerType getDiskController() {
-        return diskController;
+        return this.diskController;
     }
 }

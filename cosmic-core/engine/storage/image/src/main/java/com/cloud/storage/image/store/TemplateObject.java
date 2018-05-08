@@ -11,7 +11,7 @@ import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.TemplateType;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
@@ -265,7 +265,7 @@ public class TemplateObject implements TemplateInfo {
                     if (newTemplate.getSize() != null) {
                         templatePoolRef.setTemplateSize(newTemplate.getSize());
                     }
-                    templatePoolRef.setDownloadState(Status.DOWNLOADED);
+                    templatePoolRef.setDownloadState(VMTemplateStatus.DOWNLOADED);
                     templatePoolRef.setLocalDownloadPath(newTemplate.getPath());
                     templatePoolRef.setInstallPath(newTemplate.getPath());
                     templatePoolDao.update(templatePoolRef.getId(), templatePoolRef);
@@ -277,7 +277,7 @@ public class TemplateObject implements TemplateInfo {
                     final TemplateDataStoreVO templateStoreRef = templateStoreDao.findByStoreTemplate(getDataStore().getId(), getId());
                     templateStoreRef.setInstallPath(newTemplate.getPath());
                     templateStoreRef.setDownloadPercent(100);
-                    templateStoreRef.setDownloadState(Status.DOWNLOADED);
+                    templateStoreRef.setDownloadState(VMTemplateStatus.DOWNLOADED);
                     templateStoreRef.setSize(newTemplate.getSize());
                     if (newTemplate.getPhysicalSize() != null) {
                         templateStoreRef.setPhysicalSize(newTemplate.getPhysicalSize());

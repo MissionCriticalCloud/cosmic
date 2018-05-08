@@ -12,11 +12,6 @@
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-nucleo</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-common</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
@@ -25,16 +20,7 @@
             <artifactId>cosmic-model</artifactId>
             <version>6.0.16-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-hypervisor-kvm</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-secondary-storage</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -46,6 +32,29 @@
         <dependency>
             <groupId>commons-daemon</groupId>
             <artifactId>commons-daemon</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.libvirt</groupId>
+            <artifactId>libvirt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ceph</groupId>
+            <artifactId>rados</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+
+        <!-- dependencies for starting a post upload server on ssvm -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

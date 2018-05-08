@@ -1,5 +1,7 @@
 package com.cloud.hypervisor.xenserver.resource.wrapper.xenbase;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.hypervisor.xenserver.resource.CitrixResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CreateAnswer;
@@ -7,8 +9,6 @@ import com.cloud.legacymodel.communication.command.CreateCommand;
 import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.to.VolumeTO;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.HashMap;
 

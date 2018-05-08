@@ -2,7 +2,7 @@ package com.cloud.storage.volume.db;
 
 import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.utils.db.GenericDaoBase;
 
 import javax.persistence.Column;
@@ -40,7 +40,7 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
 
     @Column(name = "download_state")
     @Enumerated(EnumType.STRING)
-    Status downloadState;
+    VMTemplateStatus downloadState;
 
     @Column(name = "local_path")
     String localDownloadPath;
@@ -70,12 +70,12 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
         super();
         this.poolId = poolId;
         this.templateId = templateId;
-        this.downloadState = Status.NOT_DOWNLOADED;
+        this.downloadState = VMTemplateStatus.NOT_DOWNLOADED;
         this.state = ObjectInDataStoreStateMachine.State.Allocated;
         this.markedForGC = false;
     }
 
-    public TemplatePrimaryDataStoreVO(final long poolId, final long templateId, final Date lastUpdated, final int downloadPercent, final Status downloadState, final String
+    public TemplatePrimaryDataStoreVO(final long poolId, final long templateId, final Date lastUpdated, final int downloadPercent, final VMTemplateStatus downloadState, final String
             localDownloadPath,
                                       final String errorString, final String jobId, final String installPath, final long templateSize) {
         super();
@@ -151,11 +151,11 @@ public class TemplatePrimaryDataStoreVO implements StateObject<ObjectInDataStore
         lastUpdated = date;
     }
 
-    public Status getDownloadState() {
+    public VMTemplateStatus getDownloadState() {
         return downloadState;
     }
 
-    public void setDownloadState(final Status downloadState) {
+    public void setDownloadState(final VMTemplateStatus downloadState) {
         this.downloadState = downloadState;
     }
 

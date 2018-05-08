@@ -36,7 +36,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.StoragePool;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.HypervisorType;
@@ -182,7 +182,7 @@ public class TemplateManagerImplTest {
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
 
         final VMTemplateStoragePoolVO mockTemplateStore = mock(VMTemplateStoragePoolVO.class);
-        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
+        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStatus.DOWNLOADED);
 
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
@@ -209,7 +209,7 @@ public class TemplateManagerImplTest {
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
         when(vmTemplatePoolDao.findByPoolTemplate(anyLong(), anyLong())).thenReturn(null);
-        when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStorageResourceAssoc.Status.DOWNLOADED)).thenReturn(null);
+        when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStatus.DOWNLOADED)).thenReturn(null);
 
         final VMTemplateStoragePoolVO returnObject = templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
         assertTrue("Test template is not ready", returnObject == null);
@@ -232,7 +232,7 @@ public class TemplateManagerImplTest {
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
         when(vmTemplatePoolDao.findByPoolTemplate(anyLong(), anyLong())).thenReturn(null);
-        when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStorageResourceAssoc.Status.DOWNLOADED)).thenReturn(mockTemplateDataStore);
+        when(templateDataStoreDao.findByTemplateZoneDownloadStatus(202l, 1l, VMTemplateStatus.DOWNLOADED)).thenReturn(mockTemplateDataStore);
         when(storagePoolHostDao.listByHostStatus(2l, HostStatus.Up)).thenReturn(null);
 
         templateManager.prepareTemplateForCreate(mockTemplate, (StoragePool) mockPrimaryDataStore);
@@ -256,7 +256,7 @@ public class TemplateManagerImplTest {
         when(mockPool.getStatus()).thenReturn(StoragePoolStatus.Up);
         when(mockPool.getDataCenterId()).thenReturn(1l);
         when(mockTemplate.getId()).thenReturn(202l);
-        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
+        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStatus.DOWNLOADED);
         when(vmTemplateDao.findById(anyLong())).thenReturn(mockTemplate);
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
@@ -285,7 +285,7 @@ public class TemplateManagerImplTest {
         when(mockPool.getStatus()).thenReturn(StoragePoolStatus.Disabled);
         when(mockPool.getDataCenterId()).thenReturn(1l);
         when(mockTemplate.getId()).thenReturn(202l);
-        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
+        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStatus.DOWNLOADED);
         when(vmTemplateDao.findById(anyLong())).thenReturn(mockTemplate);
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);
@@ -327,7 +327,7 @@ public class TemplateManagerImplTest {
 
         when(mockPrimaryDataStore.getId()).thenReturn(2l);
         when(mockTemplate.getId()).thenReturn(202l);
-        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStorageResourceAssoc.Status.DOWNLOADED);
+        when(mockTemplateStore.getDownloadState()).thenReturn(VMTemplateStatus.DOWNLOADED);
         when(vmTemplateDao.findById(anyLong())).thenReturn(mockTemplate);
         when(dataStoreManager.getPrimaryDataStore(anyLong())).thenReturn(mockPrimaryDataStore);
         when(vmTemplateDao.findById(anyLong(), anyBoolean())).thenReturn(mockTemplate);

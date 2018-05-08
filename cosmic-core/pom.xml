@@ -35,7 +35,6 @@
         <module>framework/events</module>
         <module>framework/ipc</module>
         <module>framework/jobs</module>
-        <module>framework/managed-context</module>
         <module>framework/security</module>
         <module>framework/spring/lifecycle</module>
         <module>framework/spring/module</module>
@@ -54,14 +53,12 @@
         <module>plugins/deployment-planners/user-dispersing</module>
         <module>plugins/event-bus-rabbitmq</module>
         <module>plugins/host-allocator-random</module>
-        <module>plugins/hypervisor/kvm</module>
         <module>plugins/hypervisor/xenserver</module>
         <module>plugins/network/nicira-nvp</module>
         <module>plugins/storage/allocator-random</module>
         <module>plugins/storage/image-default</module>
         <module>plugins/storage/volume-default</module>
         <module>scripts</module>
-        <module>secondary-storage-server</module>
         <module>server</module>
     </modules>
 

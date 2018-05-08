@@ -23,9 +23,9 @@ public interface VMTemplateStorageResourceAssoc extends InternalIdentity {
 
     void setLastUpdated(Date date);
 
-    Status getDownloadState();
+    VMTemplateStatus getDownloadState();
 
-    void setDownloadState(Status downloadState);
+    void setDownloadState(VMTemplateStatus downloadState);
 
     String getLocalDownloadPath();
 
@@ -40,8 +40,4 @@ public interface VMTemplateStorageResourceAssoc extends InternalIdentity {
     void setJobId(String jobId);
 
     long getTemplateSize();
-
-    enum Status {
-        UNKNOWN, DOWNLOAD_ERROR, NOT_DOWNLOADED, DOWNLOAD_IN_PROGRESS, DOWNLOADED, ABANDONED, UPLOADED, NOT_UPLOADED, UPLOAD_ERROR, UPLOAD_IN_PROGRESS, CREATING, CREATED
-    }
 }

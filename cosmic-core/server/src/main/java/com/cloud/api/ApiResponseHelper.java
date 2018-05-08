@@ -154,7 +154,7 @@ import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.network.vpc.VpcOffering;
 import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.StoragePool;
-import com.cloud.legacymodel.storage.Upload;
+import com.cloud.legacymodel.storage.UploadStatus;
 import com.cloud.legacymodel.storage.VMSnapshot;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.Volume;
@@ -456,9 +456,9 @@ public class ApiResponseHelper implements ResponseGenerator {
         if (snapshot instanceof SnapshotInfo) {
             snapshotInfo = (SnapshotInfo) snapshot;
         } else {
-            final DataStoreRole dataStoreRole = getDataStoreRole(snapshot, _snapshotStoreDao, _dataStoreMgr);
+            final DataStoreRole dataStoreRole = getDataStoreRole(snapshot, this._snapshotStoreDao, this._dataStoreMgr);
 
-            snapshotInfo = snapshotfactory.getSnapshot(snapshot.getId(), dataStoreRole);
+            snapshotInfo = this.snapshotfactory.getSnapshot(snapshot.getId(), dataStoreRole);
         }
 
         if (snapshotInfo == null) {
@@ -690,7 +690,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             } else {
                 final Long networkId = vlan.getNetworkId();
                 if (networkId != null) {
-                    final Network network = _ntwkModel.getNetwork(networkId);
+                    final Network network = this._ntwkModel.getNetwork(networkId);
                     if (network != null) {
                         final Long accountId = network.getAccountId();
                         populateAccount(vlanResponse, accountId);
@@ -1324,12 +1324,12 @@ public class ApiResponseHelper implements ResponseGenerator {
             // it seems that the volume can actually be removed from the DB at some point if it's deleted
             // if volume comes back null, use another technique to try to discover the zone
             if (volume == null) {
-                final SnapshotDataStoreVO snapshotStore = _snapshotStoreDao.findBySnapshot(snapshot.getId(), DataStoreRole.Primary);
+                final SnapshotDataStoreVO snapshotStore = this._snapshotStoreDao.findBySnapshot(snapshot.getId(), DataStoreRole.Primary);
 
                 if (snapshotStore != null) {
                     final long storagePoolId = snapshotStore.getDataStoreId();
 
-                    final StoragePoolVO storagePool = _storagePoolDao.findById(storagePoolId);
+                    final StoragePoolVO storagePool = this._storagePoolDao.findById(storagePoolId);
 
                     if (storagePool != null) {
                         zoneId = storagePool.getDataCenterId();
@@ -1367,7 +1367,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         }
         response.setMode(mode);
         response.setUrl(url);
-        response.setState(Upload.Status.DOWNLOAD_URL_CREATED.toString());
+        response.setState(UploadStatus.DOWNLOAD_URL_CREATED.toString());
         final Account account = ApiDBUtils.findAccountById(accountId);
         response.setAccountId(account.getUuid());
 
@@ -1547,25 +1547,25 @@ public class ApiResponseHelper implements ResponseGenerator {
     public AsyncJobResponse queryJobResult(final QueryAsyncJobResultCmd cmd) {
         final Account caller = CallContext.current().getCallingAccount();
 
-        final AsyncJob job = _entityMgr.findById(AsyncJob.class, cmd.getId());
+        final AsyncJob job = this._entityMgr.findById(AsyncJob.class, cmd.getId());
         if (job == null) {
             throw new InvalidParameterValueException("Unable to find a job by id " + cmd.getId());
         }
 
-        final User userJobOwner = _accountMgr.getUserIncludingRemoved(job.getUserId());
-        final Account jobOwner = _accountMgr.getAccount(userJobOwner.getAccountId());
+        final User userJobOwner = this._accountMgr.getUserIncludingRemoved(job.getUserId());
+        final Account jobOwner = this._accountMgr.getAccount(userJobOwner.getAccountId());
 
         //check permissions
-        if (_accountMgr.isNormalUser(caller.getId())) {
+        if (this._accountMgr.isNormalUser(caller.getId())) {
             //regular user can see only jobs he owns
             if (caller.getId() != jobOwner.getId()) {
                 throw new PermissionDeniedException("Account " + caller + " is not authorized to see job id=" + job.getId());
             }
-        } else if (_accountMgr.isDomainAdmin(caller.getId())) {
-            _accountMgr.checkAccess(caller, null, true, jobOwner);
+        } else if (this._accountMgr.isDomainAdmin(caller.getId())) {
+            this._accountMgr.checkAccess(caller, null, true, jobOwner);
         }
 
-        return createAsyncJobResponse(_jobMgr.queryJob(cmd.getId(), true));
+        return createAsyncJobResponse(this._jobMgr.queryJob(cmd.getId(), true));
     }
 
     public AsyncJobResponse createAsyncJobResponse(final AsyncJob job) {
@@ -1605,7 +1605,7 @@ public class ApiResponseHelper implements ResponseGenerator {
             }
         }
 
-        final ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
+        final ServiceOffering secondaryServiceOffering = this._serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
         if (secondaryServiceOffering != null) {
             response.setSecondaryServiceOfferingId(secondaryServiceOffering.getUuid());
             response.setSecondaryServiceOfferingName(secondaryServiceOffering.getName());
@@ -1681,12 +1681,12 @@ public class ApiResponseHelper implements ResponseGenerator {
 
             serviceResponses.add(svcRsp);
         }
-        response.setForVpc(_configMgr.isOfferingForVpc(offering));
+        response.setForVpc(this._configMgr.isOfferingForVpc(offering));
 
         response.setServices(serviceResponses);
 
         //set network offering details
-        final Map<Detail, String> details = _ntwkModel.getNtwkOffDetails(offering.getId());
+        final Map<Detail, String> details = this._ntwkModel.getNtwkOffDetails(offering.getId());
         if (details != null && !details.isEmpty()) {
             response.setDetails(details);
         }
@@ -2244,12 +2244,12 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setDisplayText(offering.getDisplayText());
         response.setIsDefault(offering.isDefault());
         response.setState(offering.getState().name());
-        final ServiceOffering serviceOffering = _serviceOfferingDao.findById(offering.getServiceOfferingId());
+        final ServiceOffering serviceOffering = this._serviceOfferingDao.findById(offering.getServiceOfferingId());
         if (serviceOffering != null) {
             response.setServiceOfferingId(serviceOffering.getUuid());
             response.setServiceOfferingName(serviceOffering.getName());
         }
-        final ServiceOffering secondaryServiceOffering = _serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
+        final ServiceOffering secondaryServiceOffering = this._serviceOfferingDao.findById(offering.getSecondaryServiceOfferingId());
         if (secondaryServiceOffering != null) {
             response.setSecondaryServiceOfferingId(secondaryServiceOffering.getUuid());
             response.setSecondaryServiceOfferingName(secondaryServiceOffering.getName());
@@ -2611,8 +2611,8 @@ public class ApiResponseHelper implements ResponseGenerator {
     @Override
     public NicSecondaryIpResponse createSecondaryIPToNicResponse(final NicSecondaryIp result) {
         final NicSecondaryIpResponse response = new NicSecondaryIpResponse();
-        final NicVO nic = _entityMgr.findById(NicVO.class, result.getNicId());
-        final NetworkVO network = _entityMgr.findById(NetworkVO.class, result.getNetworkId());
+        final NicVO nic = this._entityMgr.findById(NicVO.class, result.getNicId());
+        final NetworkVO network = this._entityMgr.findById(NetworkVO.class, result.getNetworkId());
         response.setId(result.getUuid());
         response.setIpAddr(result.getIp4Address());
         response.setNicId(nic.getUuid());
@@ -2624,8 +2624,8 @@ public class ApiResponseHelper implements ResponseGenerator {
     @Override
     public NicResponse createNicResponse(final Nic result) {
         final NicResponse response = new NicResponse();
-        final NetworkVO network = _entityMgr.findById(NetworkVO.class, result.getNetworkId());
-        final VMInstanceVO vm = _entityMgr.findById(VMInstanceVO.class, result.getInstanceId());
+        final NetworkVO network = this._entityMgr.findById(NetworkVO.class, result.getNetworkId());
+        final VMInstanceVO vm = this._entityMgr.findById(VMInstanceVO.class, result.getInstanceId());
 
         response.setId(result.getUuid());
         response.setNetworkid(network.getUuid());
@@ -2707,7 +2707,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         final List<UpgradeRouterTemplateResponse> responses = new ArrayList<>();
         for (final Long jobId : jobIds) {
             final UpgradeRouterTemplateResponse routerResponse = new UpgradeRouterTemplateResponse();
-            final AsyncJob job = _entityMgr.findById(AsyncJob.class, jobId);
+            final AsyncJob job = this._entityMgr.findById(AsyncJob.class, jobId);
             routerResponse.setAsyncJobId(job.getUuid());
             routerResponse.setObjectName("asyncjobs");
             responses.add(routerResponse);

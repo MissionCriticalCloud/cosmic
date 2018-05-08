@@ -1,5 +1,6 @@
 package com.cloud.vm.dao;
 
+import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
@@ -7,7 +8,6 @@ import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
 import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.UpdateBuilder;
-import com.cloud.vm.SecondaryStorageVm;
 import com.cloud.vm.SecondaryStorageVmVO;
 
 import java.util.List;
@@ -27,53 +27,53 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     protected SearchBuilder<SecondaryStorageVmVO> InstanceSearch;
 
     public SecondaryStorageVmDaoImpl() {
-        DataCenterStatusSearch = createSearchBuilder();
-        DataCenterStatusSearch.and("dc", DataCenterStatusSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        DataCenterStatusSearch.and("states", DataCenterStatusSearch.entity().getState(), SearchCriteria.Op.IN);
-        DataCenterStatusSearch.and("role", DataCenterStatusSearch.entity().getRole(), SearchCriteria.Op.EQ);
-        DataCenterStatusSearch.done();
+        this.DataCenterStatusSearch = createSearchBuilder();
+        this.DataCenterStatusSearch.and("dc", this.DataCenterStatusSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.DataCenterStatusSearch.and("states", this.DataCenterStatusSearch.entity().getState(), SearchCriteria.Op.IN);
+        this.DataCenterStatusSearch.and("role", this.DataCenterStatusSearch.entity().getRole(), SearchCriteria.Op.EQ);
+        this.DataCenterStatusSearch.done();
 
-        StateSearch = createSearchBuilder();
-        StateSearch.and("states", StateSearch.entity().getState(), SearchCriteria.Op.IN);
-        StateSearch.and("role", StateSearch.entity().getRole(), SearchCriteria.Op.EQ);
-        StateSearch.done();
+        this.StateSearch = createSearchBuilder();
+        this.StateSearch.and("states", this.StateSearch.entity().getState(), SearchCriteria.Op.IN);
+        this.StateSearch.and("role", this.StateSearch.entity().getRole(), SearchCriteria.Op.EQ);
+        this.StateSearch.done();
 
-        HostSearch = createSearchBuilder();
-        HostSearch.and("host", HostSearch.entity().getHostId(), SearchCriteria.Op.EQ);
-        HostSearch.and("role", HostSearch.entity().getRole(), SearchCriteria.Op.EQ);
-        HostSearch.done();
+        this.HostSearch = createSearchBuilder();
+        this.HostSearch.and("host", this.HostSearch.entity().getHostId(), SearchCriteria.Op.EQ);
+        this.HostSearch.and("role", this.HostSearch.entity().getRole(), SearchCriteria.Op.EQ);
+        this.HostSearch.done();
 
-        InstanceSearch = createSearchBuilder();
-        InstanceSearch.and("instanceName", InstanceSearch.entity().getInstanceName(), SearchCriteria.Op.EQ);
-        InstanceSearch.done();
+        this.InstanceSearch = createSearchBuilder();
+        this.InstanceSearch.and("instanceName", this.InstanceSearch.entity().getInstanceName(), SearchCriteria.Op.EQ);
+        this.InstanceSearch.done();
 
-        LastHostSearch = createSearchBuilder();
-        LastHostSearch.and("lastHost", LastHostSearch.entity().getLastHostId(), SearchCriteria.Op.EQ);
-        LastHostSearch.and("state", LastHostSearch.entity().getState(), SearchCriteria.Op.EQ);
-        LastHostSearch.and("role", LastHostSearch.entity().getRole(), SearchCriteria.Op.EQ);
-        LastHostSearch.done();
+        this.LastHostSearch = createSearchBuilder();
+        this.LastHostSearch.and("lastHost", this.LastHostSearch.entity().getLastHostId(), SearchCriteria.Op.EQ);
+        this.LastHostSearch.and("state", this.LastHostSearch.entity().getState(), SearchCriteria.Op.EQ);
+        this.LastHostSearch.and("role", this.LastHostSearch.entity().getRole(), SearchCriteria.Op.EQ);
+        this.LastHostSearch.done();
 
-        HostUpSearch = createSearchBuilder();
-        HostUpSearch.and("host", HostUpSearch.entity().getHostId(), SearchCriteria.Op.EQ);
-        HostUpSearch.and("states", HostUpSearch.entity().getState(), SearchCriteria.Op.NIN);
-        HostUpSearch.and("role", HostUpSearch.entity().getRole(), SearchCriteria.Op.EQ);
-        HostUpSearch.done();
+        this.HostUpSearch = createSearchBuilder();
+        this.HostUpSearch.and("host", this.HostUpSearch.entity().getHostId(), SearchCriteria.Op.EQ);
+        this.HostUpSearch.and("states", this.HostUpSearch.entity().getState(), SearchCriteria.Op.NIN);
+        this.HostUpSearch.and("role", this.HostUpSearch.entity().getRole(), SearchCriteria.Op.EQ);
+        this.HostUpSearch.done();
 
-        ZoneSearch = createSearchBuilder();
-        ZoneSearch.and("zone", ZoneSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
-        ZoneSearch.and("role", ZoneSearch.entity().getRole(), SearchCriteria.Op.EQ);
-        ZoneSearch.done();
+        this.ZoneSearch = createSearchBuilder();
+        this.ZoneSearch.and("zone", this.ZoneSearch.entity().getDataCenterId(), SearchCriteria.Op.EQ);
+        this.ZoneSearch.and("role", this.ZoneSearch.entity().getRole(), SearchCriteria.Op.EQ);
+        this.ZoneSearch.done();
 
-        StateChangeSearch = createSearchBuilder();
-        StateChangeSearch.and("id", StateChangeSearch.entity().getId(), SearchCriteria.Op.EQ);
-        StateChangeSearch.and("states", StateChangeSearch.entity().getState(), SearchCriteria.Op.EQ);
-        StateChangeSearch.and("host", StateChangeSearch.entity().getHostId(), SearchCriteria.Op.EQ);
-        StateChangeSearch.and("update", StateChangeSearch.entity().getUpdated(), SearchCriteria.Op.EQ);
-        StateChangeSearch.and("role", StateChangeSearch.entity().getUpdated(), SearchCriteria.Op.EQ);
-        StateChangeSearch.done();
+        this.StateChangeSearch = createSearchBuilder();
+        this.StateChangeSearch.and("id", this.StateChangeSearch.entity().getId(), SearchCriteria.Op.EQ);
+        this.StateChangeSearch.and("states", this.StateChangeSearch.entity().getState(), SearchCriteria.Op.EQ);
+        this.StateChangeSearch.and("host", this.StateChangeSearch.entity().getHostId(), SearchCriteria.Op.EQ);
+        this.StateChangeSearch.and("update", this.StateChangeSearch.entity().getUpdated(), SearchCriteria.Op.EQ);
+        this.StateChangeSearch.and("role", this.StateChangeSearch.entity().getUpdated(), SearchCriteria.Op.EQ);
+        this.StateChangeSearch.done();
 
-        _updateTimeAttr = _allAttributes.get("updateTime");
-        assert _updateTimeAttr != null : "Couldn't get this updateTime attribute";
+        this._updateTimeAttr = this._allAttributes.get("updateTime");
+        assert this._updateTimeAttr != null : "Couldn't get this updateTime attribute";
     }
 
     @Override
@@ -95,8 +95,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(final SecondaryStorageVm.Role role, final long dataCenterId, final State... states) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = DataCenterStatusSearch.create();
+    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(final SecondaryStorageVmRole role, final long dataCenterId, final State... states) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.DataCenterStatusSearch.create();
         sc.setParameters("states", (Object[]) states);
         sc.setParameters("dc", dataCenterId);
         if (role != null) {
@@ -106,8 +106,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(final SecondaryStorageVm.Role role, final State... states) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = StateSearch.create();
+    public List<SecondaryStorageVmVO> getSecStorageVmListInStates(final SecondaryStorageVmRole role, final State... states) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.StateSearch.create();
         sc.setParameters("states", (Object[]) states);
         if (role != null) {
             sc.setParameters("role", role);
@@ -117,8 +117,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> listByHostId(final SecondaryStorageVm.Role role, final long hostId) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = HostSearch.create();
+    public List<SecondaryStorageVmVO> listByHostId(final SecondaryStorageVmRole role, final long hostId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.HostSearch.create();
         sc.setParameters("host", hostId);
         if (role != null) {
             sc.setParameters("role", role);
@@ -127,8 +127,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> listByLastHostId(final SecondaryStorageVm.Role role, final long hostId) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = LastHostSearch.create();
+    public List<SecondaryStorageVmVO> listByLastHostId(final SecondaryStorageVmRole role, final long hostId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.LastHostSearch.create();
         sc.setParameters("lastHost", hostId);
         sc.setParameters("state", State.Stopped);
         if (role != null) {
@@ -139,8 +139,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> listUpByHostId(final SecondaryStorageVm.Role role, final long hostId) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = HostUpSearch.create();
+    public List<SecondaryStorageVmVO> listUpByHostId(final SecondaryStorageVmRole role, final long hostId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.HostUpSearch.create();
         sc.setParameters("host", hostId);
         sc.setParameters("states", new Object[]{State.Destroyed, State.Stopped, State.Expunging});
         if (role != null) {
@@ -150,8 +150,8 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
     }
 
     @Override
-    public List<SecondaryStorageVmVO> listByZoneId(final SecondaryStorageVm.Role role, final long zoneId) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = ZoneSearch.create();
+    public List<SecondaryStorageVmVO> listByZoneId(final SecondaryStorageVmRole role, final long zoneId) {
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.ZoneSearch.create();
         sc.setParameters("zone", zoneId);
         if (role != null) {
             sc.setParameters("role", role);
@@ -161,7 +161,7 @@ public class SecondaryStorageVmDaoImpl extends GenericDaoBase<SecondaryStorageVm
 
     @Override
     public SecondaryStorageVmVO findByInstanceName(final String instanceName) {
-        final SearchCriteria<SecondaryStorageVmVO> sc = InstanceSearch.create();
+        final SearchCriteria<SecondaryStorageVmVO> sc = this.InstanceSearch.create();
         sc.setParameters("instanceName", instanceName);
         final List<SecondaryStorageVmVO> list = listBy(sc);
         if (list == null || list.size() == 0) {

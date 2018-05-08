@@ -4,6 +4,8 @@ import static com.cloud.network.resource.NiciraNvpResource.NUM_RETRIES;
 
 import com.cloud.agent.api.UpdateLogicalSwitchPortAnswer;
 import com.cloud.agent.api.UpdateLogicalSwitchPortCommand;
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.network.nicira.NiciraNvpApi;
 import com.cloud.network.nicira.NiciraNvpApiException;
@@ -12,8 +14,6 @@ import com.cloud.network.nicira.VifAttachment;
 import com.cloud.network.resource.NiciraNvpResource;
 import com.cloud.network.resource.NiciraNvpUtilities;
 import com.cloud.network.utils.CommandRetryUtility;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.ResourceWrapper;
 
 import java.util.ArrayList;
 import java.util.List;

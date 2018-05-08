@@ -1,10 +1,10 @@
 package com.cloud.network.resource;
 
+import com.cloud.common.request.CommandWrapper;
+import com.cloud.common.request.RequestWrapper;
+import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.resource.CommandWrapper;
-import com.cloud.resource.RequestWrapper;
-import com.cloud.resource.ServerResource;
 
 import java.util.Hashtable;
 import java.util.Set;
@@ -20,7 +20,7 @@ public class NiciraNvpRequestWrapper extends RequestWrapper {
     }
 
     Reflections baseWrappers = new Reflections("com.cloud.network.resource.wrapper");
-    Set<Class<? extends CommandWrapper>> baseSet = baseWrappers.getSubTypesOf(CommandWrapper.class);
+    Set<Class<? extends CommandWrapper>> baseSet = this.baseWrappers.getSubTypesOf(CommandWrapper.class);
 
     private NiciraNvpRequestWrapper() {
         init();
@@ -28,9 +28,9 @@ public class NiciraNvpRequestWrapper extends RequestWrapper {
 
     private void init() {
         // NiciraNvpResource commands
-        final Hashtable<Class<? extends Command>, CommandWrapper> niciraCommands = processAnnotations(baseSet);
+        final Hashtable<Class<? extends Command>, CommandWrapper> niciraCommands = processAnnotations(this.baseSet);
 
-        resources.put(NiciraNvpResource.class, niciraCommands);
+        this.resources.put(NiciraNvpResource.class, niciraCommands);
     }
 
     public static NiciraNvpRequestWrapper getInstance() {

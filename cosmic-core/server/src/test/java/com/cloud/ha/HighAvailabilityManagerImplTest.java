@@ -20,7 +20,7 @@ import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.vm.VirtualMachine;
-import com.cloud.managed.context.ManagedContext;
+import com.cloud.common.managed.context.ManagedContext;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VirtualMachineType;

@@ -59,7 +59,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.Event;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
-import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.ImageFormat;

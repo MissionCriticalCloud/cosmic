@@ -1,6 +1,7 @@
 package com.cloud.storage.download;
 
 import com.cloud.agent.Listener;
+import com.cloud.common.managed.context.ManagedContextTimerTask;
 import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
@@ -25,12 +26,10 @@ import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
-import com.cloud.managed.context.ManagedContextTimerTask;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.ResourceManager;
-import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.download.DownloadState.DownloadEvent;
 import com.cloud.storage.upload.UploadListener;
 
@@ -52,11 +51,11 @@ public class DownloadListener implements Listener {
     public static final Logger s_logger = LoggerFactory.getLogger(DownloadListener.class.getName());
     public static final int SMALL_DELAY = 100;
     public static final long STATUS_POLL_INTERVAL = 10000L;
-    public static final String DOWNLOADED = Status.DOWNLOADED.toString();
-    public static final String NOT_DOWNLOADED = Status.NOT_DOWNLOADED.toString();
-    public static final String DOWNLOAD_ERROR = Status.DOWNLOAD_ERROR.toString();
-    public static final String DOWNLOAD_IN_PROGRESS = Status.DOWNLOAD_IN_PROGRESS.toString();
-    public static final String DOWNLOAD_ABANDONED = Status.ABANDONED.toString();
+    public static final String DOWNLOADED = VMTemplateStatus.DOWNLOADED.toString();
+    public static final String NOT_DOWNLOADED = VMTemplateStatus.NOT_DOWNLOADED.toString();
+    public static final String DOWNLOAD_ERROR = VMTemplateStatus.DOWNLOAD_ERROR.toString();
+    public static final String DOWNLOAD_IN_PROGRESS = VMTemplateStatus.DOWNLOAD_IN_PROGRESS.toString();
+    public static final String DOWNLOAD_ABANDONED = VMTemplateStatus.ABANDONED.toString();
     private final DownloadMonitorImpl _downloadMonitor;
     private final Map<String, DownloadState> _stateMap = new HashMap<>();
     private EndPoint _ssAgent;
@@ -85,48 +84,48 @@ public class DownloadListener implements Listener {
     public DownloadListener(final EndPoint ssAgent, final DataStore store, final DataObject object, final Timer timer, final DownloadMonitorImpl downloadMonitor, final
     DownloadCommand cmd,
                             final AsyncCompletionCallback<DownloadAnswer> callback) {
-        _ssAgent = ssAgent;
+        this._ssAgent = ssAgent;
         this.object = object;
-        _downloadMonitor = downloadMonitor;
-        _cmd = cmd;
+        this._downloadMonitor = downloadMonitor;
+        this._cmd = cmd;
         initStateMachine();
-        _currState = getState(Status.NOT_DOWNLOADED.toString());
+        this._currState = getState(VMTemplateStatus.NOT_DOWNLOADED.toString());
         this._timer = timer;
-        _timeoutTask = new TimeoutTask(this);
-        this._timer.schedule(_timeoutTask, 3 * STATUS_POLL_INTERVAL);
-        _callback = callback;
-        final DownloadAnswer answer = new DownloadAnswer("", Status.NOT_DOWNLOADED);
+        this._timeoutTask = new TimeoutTask(this);
+        this._timer.schedule(this._timeoutTask, 3 * STATUS_POLL_INTERVAL);
+        this._callback = callback;
+        final DownloadAnswer answer = new DownloadAnswer("", VMTemplateStatus.NOT_DOWNLOADED);
         callback(answer);
     }
 
     private void initStateMachine() {
-        _stateMap.put(Status.NOT_DOWNLOADED.toString(), new NotDownloadedState(this));
-        _stateMap.put(Status.DOWNLOADED.toString(), new DownloadCompleteState(this));
-        _stateMap.put(Status.DOWNLOAD_ERROR.toString(), new DownloadErrorState(this));
-        _stateMap.put(Status.DOWNLOAD_IN_PROGRESS.toString(), new DownloadInProgressState(this));
-        _stateMap.put(Status.ABANDONED.toString(), new DownloadAbandonedState(this));
+        this._stateMap.put(VMTemplateStatus.NOT_DOWNLOADED.toString(), new NotDownloadedState(this));
+        this._stateMap.put(VMTemplateStatus.DOWNLOADED.toString(), new DownloadCompleteState(this));
+        this._stateMap.put(VMTemplateStatus.DOWNLOAD_ERROR.toString(), new DownloadErrorState(this));
+        this._stateMap.put(VMTemplateStatus.DOWNLOAD_IN_PROGRESS.toString(), new DownloadInProgressState(this));
+        this._stateMap.put(VMTemplateStatus.ABANDONED.toString(), new DownloadAbandonedState(this));
     }
 
     private DownloadState getState(final String stateName) {
-        return _stateMap.get(stateName);
+        return this._stateMap.get(stateName);
     }
 
     public void callback(final DownloadAnswer answer) {
-        if (_callback != null) {
-            _callback.complete(answer);
+        if (this._callback != null) {
+            this._callback.complete(answer);
         }
     }
 
     public DownloadListener(final DownloadMonitorImpl monitor) {
-        _downloadMonitor = monitor;
+        this._downloadMonitor = monitor;
     }
 
     public AsyncCompletionCallback<DownloadAnswer> getCallback() {
-        return _callback;
+        return this._callback;
     }
 
-    public void setCurrState(final VMTemplateHostVO.Status currState) {
-        _currState = getState(currState.toString());
+    public void setCurrState(final VMTemplateStatus currState) {
+        this._currState = getState(currState.toString());
     }
 
     public void sendCommand(final RequestType reqType) {
@@ -136,10 +135,10 @@ public class DownloadListener implements Listener {
             }
             try {
                 final DownloadProgressCommand dcmd = new DownloadProgressCommand(getCommand(), getJobId(), reqType);
-                if (object.getType() == DataObjectType.VOLUME) {
+                if (this.object.getType() == DataObjectType.VOLUME) {
                     dcmd.setResourceType(ResourceType.VOLUME);
                 }
-                _ssAgent.sendMessageAsync(dcmd, new UploadListener.Callback(_ssAgent.getId(), this));
+                this._ssAgent.sendMessageAsync(dcmd, new UploadListener.Callback(this._ssAgent.getId(), this));
             } catch (final Exception e) {
                 s_logger.debug("Send command failed", e);
                 setDisconnected();
@@ -148,23 +147,23 @@ public class DownloadListener implements Listener {
     }
 
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     public void logWarn(final String message) {
-        s_logger.warn(message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+        s_logger.warn(message + ", " + this.object.getType() + ": " + this.object.getId() + " at host " + this._ssAgent.getId());
     }
 
     public void logDebug(final String message) {
-        s_logger.debug(message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+        s_logger.debug(message + ", " + this.object.getType() + ": " + this.object.getId() + " at host " + this._ssAgent.getId());
     }
 
     public void logTrace(final String message) {
-        s_logger.trace(message + ", " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+        s_logger.trace(message + ", " + this.object.getType() + ": " + this.object.getId() + " at host " + this._ssAgent.getId());
     }
 
     public DownloadCommand getCommand() {
-        return _cmd;
+        return this._cmd;
     }
 
     public void setDisconnected() {
@@ -172,15 +171,15 @@ public class DownloadListener implements Listener {
     }
 
     private synchronized void transition(final DownloadEvent event, final Object evtObj) {
-        if (_currState == null) {
+        if (this._currState == null) {
             return;
         }
-        final String prevName = _currState.getName();
-        final String nextState = _currState.handleEvent(event, evtObj);
+        final String prevName = this._currState.getName();
+        final String nextState = this._currState.handleEvent(event, evtObj);
         if (nextState != null) {
-            _currState = getState(nextState);
-            if (_currState != null) {
-                _currState.onEntry(prevName, event, evtObj);
+            this._currState = getState(nextState);
+            if (this._currState != null) {
+                this._currState.onEntry(prevName, event, evtObj);
             } else {
                 throw new CloudRuntimeException("Invalid next state: currState=" + prevName + ", evt=" + event + ", next=" + nextState);
             }
@@ -202,7 +201,7 @@ public class DownloadListener implements Listener {
     }
 
     public void logDisconnect() {
-        s_logger.warn("Unable to monitor download progress of " + object.getType() + ": " + object.getId() + " at host " + _ssAgent.getId());
+        s_logger.warn("Unable to monitor download progress of " + this.object.getType() + ": " + this.object.getId() + " at host " + this._ssAgent.getId());
     }
 
     @Override
@@ -236,14 +235,14 @@ public class DownloadListener implements Listener {
     @Override
     public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
         if (cmd instanceof StartupRoutingCommand) {
-            final List<HypervisorType> hypers = _resourceMgr.listAvailHypervisorInZone(agent.getId(), agent.getDataCenterId());
+            final List<HypervisorType> hypers = this._resourceMgr.listAvailHypervisorInZone(agent.getId(), agent.getDataCenterId());
             final HypervisorType hostHyper = agent.getHypervisorType();
             if (hypers.contains(hostHyper)) {
                 return;
             }
-            _imageSrv.handleSysTemplateDownload(hostHyper, agent.getDataCenterId());
+            this._imageSrv.handleSysTemplateDownload(hostHyper, agent.getDataCenterId());
             // update template_zone_ref for cross-zone templates
-            _imageSrv.associateCrosszoneTemplatesToZone(agent.getDataCenterId());
+            this._imageSrv.associateCrosszoneTemplatesToZone(agent.getDataCenterId());
         }
         /* This can be removed
         else if ( cmd instanceof StartupStorageCommand) {
@@ -257,10 +256,10 @@ public class DownloadListener implements Listener {
         }*/
         else if (cmd instanceof StartupSecondaryStorageCommand) {
             try {
-                final List<DataStore> imageStores = _storeMgr.getImageStoresByScope(new ZoneScope(agent.getDataCenterId()));
+                final List<DataStore> imageStores = this._storeMgr.getImageStoresByScope(new ZoneScope(agent.getDataCenterId()));
                 for (final DataStore store : imageStores) {
-                    _volumeSrv.handleVolumeSync(store);
-                    _imageSrv.handleTemplateSync(store);
+                    this._volumeSrv.handleVolumeSync(store);
+                    this._imageSrv.handleTemplateSync(store);
                 }
             } catch (final Exception e) {
                 s_logger.error("Caught exception while doing template/volume sync ", e);
@@ -294,59 +293,59 @@ public class DownloadListener implements Listener {
     }
 
     public void scheduleStatusCheck(final RequestType request) {
-        if (_statusTask != null) {
-            _statusTask.cancel();
+        if (this._statusTask != null) {
+            this._statusTask.cancel();
         }
 
-        _statusTask = new StatusTask(this, request);
-        _timer.schedule(_statusTask, STATUS_POLL_INTERVAL);
+        this._statusTask = new StatusTask(this, request);
+        this._timer.schedule(this._statusTask, STATUS_POLL_INTERVAL);
     }
 
     public void scheduleTimeoutTask(final long delay) {
-        if (_timeoutTask != null) {
-            _timeoutTask.cancel();
+        if (this._timeoutTask != null) {
+            this._timeoutTask.cancel();
         }
 
-        _timeoutTask = new TimeoutTask(this);
-        _timer.schedule(_timeoutTask, delay);
+        this._timeoutTask = new TimeoutTask(this);
+        this._timer.schedule(this._timeoutTask, delay);
         if (s_logger.isDebugEnabled()) {
             logDebug("Scheduling timeout at " + delay + " ms");
         }
     }
 
     public void scheduleImmediateStatusCheck(final RequestType request) {
-        if (_statusTask != null) {
-            _statusTask.cancel();
+        if (this._statusTask != null) {
+            this._statusTask.cancel();
         }
-        _statusTask = new StatusTask(this, request);
-        _timer.schedule(_statusTask, SMALL_DELAY);
+        this._statusTask = new StatusTask(this, request);
+        this._timer.schedule(this._statusTask, SMALL_DELAY);
     }
 
     public boolean isDownloadActive() {
-        return _downloadActive;
+        return this._downloadActive;
     }
 
     public void cancelStatusTask() {
-        if (_statusTask != null) {
-            _statusTask.cancel();
+        if (this._statusTask != null) {
+            this._statusTask.cancel();
         }
     }
 
     public Date getLastUpdated() {
-        return _lastUpdated;
+        return this._lastUpdated;
     }
 
     public void setLastUpdated() {
-        _lastUpdated = new Date();
+        this._lastUpdated = new Date();
     }
 
-    public void setDownloadInactive(final Status reason) {
-        _downloadActive = false;
+    public void setDownloadInactive(final VMTemplateStatus reason) {
+        this._downloadActive = false;
     }
 
     public void cancelTimeoutTask() {
-        if (_timeoutTask != null) {
-            _timeoutTask.cancel();
+        if (this._timeoutTask != null) {
+            this._timeoutTask.cancel();
         }
     }
 
@@ -358,13 +357,13 @@ public class DownloadListener implements Listener {
         private final RequestType reqType;
 
         public StatusTask(final DownloadListener dl, final RequestType req) {
-            reqType = req;
+            this.reqType = req;
             this.dl = dl;
         }
 
         @Override
         protected void runInContext() {
-            dl.sendCommand(reqType);
+            this.dl.sendCommand(this.reqType);
         }
     }
 
@@ -377,7 +376,7 @@ public class DownloadListener implements Listener {
 
         @Override
         protected void runInContext() {
-            dl.checkProgress();
+            this.dl.checkProgress();
         }
     }
 }

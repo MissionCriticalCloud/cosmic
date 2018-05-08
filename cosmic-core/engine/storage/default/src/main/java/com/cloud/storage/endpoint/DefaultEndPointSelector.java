@@ -7,18 +7,15 @@ import com.cloud.engine.subsystem.api.storage.EndPointSelector;
 import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.engine.subsystem.api.storage.SnapshotInfo;
 import com.cloud.engine.subsystem.api.storage.StorageAction;
-import com.cloud.engine.subsystem.api.storage.TemplateInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.storage.LocalHostEndpoint;
 import com.cloud.storage.RemoteHostEndPoint;
 import com.cloud.storage.ScopeType;
 import com.cloud.utils.db.DB;
@@ -99,12 +96,12 @@ public class DefaultEndPointSelector implements EndPointSelector {
         final String sql = sbuilder.toString();
         HostVO host = null;
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql)) {
+        try (final PreparedStatement pstmt = txn.prepareStatement(sql)) {
             pstmt.setLong(1, poolId);
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (final ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     final long id = rs.getLong(1);
-                    host = hostDao.findById(id);
+                    host = this.hostDao.findById(id);
                 }
             } catch (final SQLException e) {
                 s_logger.warn("can't find endpoint", e);
@@ -144,7 +141,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
                 poolId = destStore.getId();
             }
         }
-        return findEndPointInScope(selectedScope, findOneHostOnPrimaryStorage, poolId);
+        return findEndPointInScope(selectedScope, this.findOneHostOnPrimaryStorage, poolId);
     }
 
     @Override
@@ -161,18 +158,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
             } else {
                 selectedStore = destStore;
             }
-            EndPoint ep = findEndpointForImageStorage(selectedStore);
-            if (ep != null) {
-                return ep;
-            }
-            // handle special case where it is used in deploying ssvm for S3
-            if (srcData instanceof TemplateInfo) {
-                final TemplateInfo tmpl = (TemplateInfo) srcData;
-                if (tmpl.getTemplateType() == TemplateType.SYSTEM) {
-                    ep = LocalHostEndpoint.getEndpoint();
-                }
-            }
-            return ep;
+            return findEndpointForImageStorage(selectedStore);
         } else if (moveBetweenImages(srcStore, destStore)) {
             final EndPoint ep = findEndpointForImageStorage(destStore);
             return ep;
@@ -197,7 +183,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
     }
 
     protected EndPoint findEndpointForPrimaryStorage(final DataStore store) {
-        return findEndPointInScope(store.getScope(), findOneHostOnPrimaryStorage, store.getId());
+        return findEndPointInScope(store.getScope(), this.findOneHostOnPrimaryStorage, store.getId());
     }
 
     protected EndPoint findEndpointForImageStorage(final DataStore store) {
@@ -231,17 +217,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
     @Override
     public EndPoint select(final DataObject object) {
         final DataStore store = object.getDataStore();
-        final EndPoint ep = select(store);
-        if (ep != null) {
-            return ep;
-        }
-        if (object instanceof TemplateInfo) {
-            final TemplateInfo tmplInfo = (TemplateInfo) object;
-            if (store.getScope().getScopeType() == ScopeType.ZONE && store.getScope().getScopeId() == null && tmplInfo.getTemplateType() == TemplateType.SYSTEM) {
-                return LocalHostEndpoint.getEndpoint(); // for bootstrap system vm template downloading to region image store
-            }
-        }
-        return null;
+        return select(store);
     }
 
     @Override
@@ -257,7 +233,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
                 publicIp = publicIp.split("\\.")[0]; // We want xxx-xxx-xxx-xxx
                 publicIp = publicIp.replace("-", "."); // We not want the IP -  xxx.xxx.xxx.xxx
             }
-            host = hostDao.findByPublicIp(publicIp);
+            host = this.hostDao.findByPublicIp(publicIp);
             if (host != null) {
                 return RemoteHostEndPoint.getHypervisorHostEndPoint(host);
             }
@@ -286,7 +262,7 @@ public class DefaultEndPointSelector implements EndPointSelector {
     }
 
     private EndPoint getEndPointFromHostId(final Long hostId) {
-        final HostVO host = hostDao.findById(hostId);
+        final HostVO host = this.hostDao.findById(hostId);
         return RemoteHostEndPoint.getHypervisorHostEndPoint(host);
     }
 
@@ -317,13 +293,13 @@ public class DefaultEndPointSelector implements EndPointSelector {
 
     @Override
     public EndPoint select(final Scope scope, final Long storeId) {
-        return findEndPointInScope(scope, findOneHostOnPrimaryStorage, storeId);
+        return findEndPointInScope(scope, this.findOneHostOnPrimaryStorage, storeId);
     }
 
     @Override
     public EndPoint selectHypervisorHost(final Scope scope) {
         final StringBuilder sbuilder = new StringBuilder();
-        sbuilder.append(findOneHypervisorHostInScope);
+        sbuilder.append(this.findOneHypervisorHostInScope);
         if (scope.getScopeType() == ScopeType.ZONE) {
             sbuilder.append(" and h.data_center_id = ");
             sbuilder.append(scope.getScopeId());
@@ -338,12 +314,12 @@ public class DefaultEndPointSelector implements EndPointSelector {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
 
         try (
-                PreparedStatement pstmt = txn.prepareStatement(sql);
-                ResultSet rs = pstmt.executeQuery()
+                final PreparedStatement pstmt = txn.prepareStatement(sql);
+                final ResultSet rs = pstmt.executeQuery()
         ) {
             while (rs.next()) {
                 final long id = rs.getLong(1);
-                host = hostDao.findById(id);
+                host = this.hostDao.findById(id);
             }
         } catch (final SQLException e) {
             s_logger.warn("can't find endpoint", e);

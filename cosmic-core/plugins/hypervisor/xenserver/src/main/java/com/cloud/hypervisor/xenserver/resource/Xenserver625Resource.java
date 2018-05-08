@@ -1,10 +1,10 @@
 package com.cloud.hypervisor.xenserver.resource;
 
+import com.cloud.common.resource.ServerResource;
 import com.cloud.hypervisor.xenserver.XenServerResourceNewBase;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.resource.ServerResource;
-import com.cloud.storage.resource.StorageSubsystemCommandHandler;
-import com.cloud.storage.resource.StorageSubsystemCommandHandlerBase;
+import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandler;
+import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.utils.ssh.SSHCmdHelper;
 
 import javax.ejb.Local;
@@ -58,10 +58,10 @@ public class Xenserver625Resource extends XenServerResourceNewBase {
 
     @Override
     public boolean setupServer(final Connection conn, final Host host) {
-        final com.trilead.ssh2.Connection sshConnection = new com.trilead.ssh2.Connection(_host.getIp(), 22);
+        final com.trilead.ssh2.Connection sshConnection = new com.trilead.ssh2.Connection(this._host.getIp(), 22);
         try {
             sshConnection.connect(null, 60000, 60000);
-            if (!sshConnection.authenticateWithPassword(_username, _password.peek())) {
+            if (!sshConnection.authenticateWithPassword(this._username, this._password.peek())) {
                 throw new CloudRuntimeException("Unable to authenticate");
             }
 

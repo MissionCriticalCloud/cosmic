@@ -29,7 +29,7 @@ import com.cloud.storage.datastore.db.TemplateDataStoreDao;
 import com.cloud.storage.datastore.db.TemplateDataStoreVO;
 import com.cloud.storage.datastore.db.VolumeDataStoreDao;
 import com.cloud.storage.datastore.db.VolumeDataStoreVO;
-import com.cloud.storage.template.TemplateConstants;
+import com.cloud.common.storageprocessor.TemplateConstants;
 import com.cloud.utils.fsm.StateMachine2Transitions;
 
 import javax.inject.Inject;

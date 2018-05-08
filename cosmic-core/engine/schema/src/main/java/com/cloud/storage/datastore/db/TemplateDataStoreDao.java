@@ -3,8 +3,7 @@ package com.cloud.storage.datastore.db;
 import com.cloud.engine.subsystem.api.storage.DataObjectInStore;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc;
-import com.cloud.legacymodel.storage.VMTemplateStorageResourceAssoc.Status;
+import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.utils.db.GenericDao;
@@ -29,13 +28,13 @@ public interface TemplateDataStoreDao extends GenericDao<TemplateDataStoreVO, Lo
 
     List<TemplateDataStoreVO> listByTemplateStoreStatus(long templateId, long storeId, State... states);
 
-    List<TemplateDataStoreVO> listByTemplateStoreDownloadStatus(long templateId, long storeId, VMTemplateStorageResourceAssoc.Status... status);
+    List<TemplateDataStoreVO> listByTemplateStoreDownloadStatus(long templateId, long storeId, VMTemplateStatus... status);
 
-    List<TemplateDataStoreVO> listByTemplateZoneDownloadStatus(long templateId, Long zoneId, VMTemplateStorageResourceAssoc.Status... status);
+    List<TemplateDataStoreVO> listByTemplateZoneDownloadStatus(long templateId, Long zoneId, VMTemplateStatus... status);
 
-    TemplateDataStoreVO findByTemplateZoneDownloadStatus(long templateId, Long zoneId, VMTemplateStorageResourceAssoc.Status... status);
+    TemplateDataStoreVO findByTemplateZoneDownloadStatus(long templateId, Long zoneId, VMTemplateStatus... status);
 
-    TemplateDataStoreVO findByTemplateZoneStagingDownloadStatus(long templateId, Long zoneId, Status... status);
+    TemplateDataStoreVO findByTemplateZoneStagingDownloadStatus(long templateId, Long zoneId, VMTemplateStatus... status);
 
     TemplateDataStoreVO findByStoreTemplate(long storeId, long templateId);
 
