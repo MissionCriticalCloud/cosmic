@@ -151,7 +151,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1475,8 +1474,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                                       final String domainSuffix, final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork,
                                       final String customId, final String dns1, final String dns2, final String ipExclusionList) {
 
-        boolean restartNetwork = false;
-
         // verify input parameters
         final NetworkVO network = _networksDao.findById(networkId);
         if (network == null) {
@@ -1524,12 +1521,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (dns1 != null) {
             network.setDns1(dns1);
-            restartNetwork = true;
         }
 
         if (dns2 != null) {
             network.setDns2(dns2);
-            restartNetwork = true;
         }
 
         if (ipExclusionList != null) {
@@ -1587,9 +1582,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
 
             if (networkOfferingId != oldNetworkOfferingId) {
-                final Collection<String> newProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(networkOffering, network.getPhysicalNetworkId()).values();
-                final Collection<String> oldProviders = _networkMgr.finalizeServicesAndProvidersForNetwork(oldNtwkOff, network.getPhysicalNetworkId()).values();
-
                 if (changeCidr) {
                     if (!checkForNonStoppedVmInNetwork(network.getId())) {
                         final InvalidParameterValueException ex = new InvalidParameterValueException("All user vm of network of specified id should be stopped before changing " +
@@ -1603,7 +1595,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                     throw new InvalidParameterValueException("Can't upgrade from network offering " + oldNtwkOff.getUuid() + " to " + networkOffering.getUuid()
                             + "; check logs for more information");
                 }
-                restartNetwork = true;
                 networkOfferingChanged = true;
 
                 //Setting the new network's isRedundant to the new network offering's RedundantRouter.
@@ -1637,8 +1628,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
 
             network.setNetworkDomain(domainSuffix);
-            // have to restart the network
-            restartNetwork = true;
         }
 
         //IP reservation checks
@@ -1654,7 +1643,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                 throw new InvalidParameterValueException("Can only allow IP Reservation in networks with guest type " + GuestType.Isolated);
             }
             if (networkOfferingChanged == true) {
-                throw new InvalidParameterValueException("Cannot specify this nework offering change and guestVmCidr at same time. Specify only one.");
+                throw new InvalidParameterValueException("Cannot specify this network offering change and guestVmCidr at same time. Specify only one.");
             }
             if (!(network.getState() == Network.State.Implemented)) {
                 throw new InvalidParameterValueException("The network must be in " + Network.State.Implemented + " state. IP Reservation cannot be applied in "
@@ -1739,61 +1728,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         final ReservationContext context = new ReservationContextImpl(null, null, callerUser, callerAccount);
-        // 1) Shutdown all the elements and cleanup all the rules. Don't allow to shutdown network in intermediate
-        // states - Shutdown and Implementing
-        final boolean validStateToShutdown = network.getState() == Network.State.Implemented || network.getState() == Network.State.Setup || network.getState() == Network.State
-                .Allocated;
-        if (restartNetwork) {
-            if (validStateToShutdown) {
-                if (!changeCidr) {
-                    s_logger.debug("Shutting down elements and resources for network id=" + networkId + " as a part of network update");
-
-                    if (!_networkMgr.shutdownNetworkElementsAndResources(context, true, network)) {
-                        s_logger.warn("Failed to shutdown the network elements and resources as a part of network restart: " + network);
-                        final CloudRuntimeException ex = new CloudRuntimeException("Failed to shutdown the network elements and resources as a part of update to network of " +
-                                "specified id");
-                        ex.addProxyObject(network.getUuid(), "networkId");
-                        throw ex;
-                    }
-                } else {
-                    // We need to shutdown the network, since we want to re-implement the network.
-                    s_logger.debug("Shutting down network id=" + networkId + " as a part of network update");
-
-                    //check if network has reservation
-                    if (NetUtils.isNetworkAWithinNetworkB(network.getCidr(), network.getNetworkCidr())) {
-                        s_logger.warn("Existing IP reservation will become ineffective for the network with id =  " + networkId
-                                + " You need to reapply reservation after network reimplementation.");
-                        //set cidr to the newtork cidr
-                        network.setCidr(network.getNetworkCidr());
-                        //set networkCidr to null to bring network back to no IP reservation state
-                        network.setNetworkCidr(null);
-                    }
-
-                    if (!_networkMgr.shutdownNetwork(network.getId(), context, true)) {
-                        s_logger.warn("Failed to shutdown the network as a part of update to network with specified id");
-                        final CloudRuntimeException ex = new CloudRuntimeException("Failed to shutdown the network as a part of update of specified network id");
-                        ex.addProxyObject(network.getUuid(), "networkId");
-                        throw ex;
-                    }
-                }
-            } else {
-                final CloudRuntimeException ex = new CloudRuntimeException(
-                        "Failed to shutdown the network elements and resources as a part of update to network with specified id; network is in wrong state: " + network.getState());
-                ex.addProxyObject(network.getUuid(), "networkId");
-                throw ex;
-            }
-        }
-
-        // 2) Only after all the elements and rules are shutdown properly, update the network VO
-        // get updated network
-        final Network.State networkState = _networksDao.findById(networkId).getState();
-        final boolean validStateToImplement = networkState == Network.State.Implemented || networkState == Network.State.Setup || networkState == Network.State.Allocated;
-        if (restartNetwork && !validStateToImplement) {
-            final CloudRuntimeException ex = new CloudRuntimeException(
-                    "Failed to implement the network elements and resources as a part of update to network with specified id; network is in wrong state: " + networkState);
-            ex.addProxyObject(network.getUuid(), "networkId");
-            throw ex;
-        }
 
         if (networkOfferingId != null) {
             if (networkOfferingChanged) {
@@ -1813,8 +1747,6 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                                 s_logger.error("Vm for nic " + nic.getId() + " not found with Vm Id:" + vmId);
                                 continue;
                             }
-                            final long isDefault = nic.isDefaultNic() ? 1 : 0;
-                            final String nicIdString = Long.toString(nic.getId());
                         }
                     }
                 });
@@ -1827,28 +1759,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             _networksDao.update(networkId, network);
         }
 
-        // 3) Implement the elements and rules again
-        if (restartNetwork) {
-            if (network.getState() != Network.State.Allocated) {
-                final DeployDestination dest = new DeployDestination(zoneRepository.findById(network.getDataCenterId()).orElse(null), null, null, null);
-                s_logger.debug("Implementing the network " + network + " elements and resources as a part of network update");
-                try {
-                    if (!changeCidr) {
-                        _networkMgr.implementNetworkElementsAndResources(dest, context, network, _networkOfferingDao.findById(network.getNetworkOfferingId()));
-                    } else {
-                        _networkMgr.implementNetwork(network.getId(), dest, context);
-                    }
-                } catch (final Exception ex) {
-                    s_logger.warn("Failed to implement network " + network + " elements and resources as a part of network update due to ", ex);
-                    final CloudRuntimeException e = new CloudRuntimeException("Failed to implement network (with specified id) elements and resources as a part of network update");
-                    e.addProxyObject(network.getUuid(), "networkId");
-                    throw e;
-                }
-            }
-        }
-
-        // 4) if network has been upgraded from a non persistent ntwk offering to a persistent ntwk offering,
-        // implement the network if its not already
+        // if network has been upgraded from a non persistent ntwk offering to a persistent ntwk offering, implement the network if its not already
         if (networkOfferingChanged && !oldNtwkOff.getIsPersistent() && networkOffering.getIsPersistent()) {
             if (network.getState() == Network.State.Allocated) {
                 try {
