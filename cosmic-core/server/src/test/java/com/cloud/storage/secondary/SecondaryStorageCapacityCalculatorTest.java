@@ -36,7 +36,7 @@ public class SecondaryStorageCapacityCalculatorTest {
     }
 
     @Test
-    public void test_calculateRequiredCapacity() throws Exception {
+    public void test_calculateRequiredCapacity() {
         final SecondaryStorageCapacityCalculator calculator = new SecondaryStorageCapacityCalculator();
 
         final int requiredVms = calculator.calculateRequiredCapacity(commandsStandBy, commandsPerVm);

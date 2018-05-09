@@ -103,7 +103,7 @@
         <cs.rados.version>0.2.0</cs.rados.version>
         <cs.reflections.version>0.9.11</cs.reflections.version>
         <cs.selenium-server.version>1.0-20081010.060147</cs.selenium-server.version>
-        <cs.spock-core.version>0.7-groovy-2.0</cs.spock-core.version>
+        <cs.spock-core.version>1.1-groovy-2.4</cs.spock-core.version>
         <cs.trilead-ssh2.version>1.0.0-build217</cs.trilead-ssh2.version>
         <cs.xalan.version>2.7.2</cs.xalan.version>
         <cs.xen-api.version>6.2.0-3.1</cs.xen-api.version>
@@ -465,6 +465,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>

@@ -20,11 +20,6 @@
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
-            <artifactId>cloud-plugin-network-nvp</artifactId>
-            <version>6.0.16-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-client-ui</artifactId>
             <version>6.0.16-SNAPSHOT</version>
             <type>war</type>
