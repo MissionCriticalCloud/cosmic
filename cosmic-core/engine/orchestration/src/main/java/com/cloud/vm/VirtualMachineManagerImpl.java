@@ -139,6 +139,7 @@ import com.cloud.resource.ResourceManager;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
+import com.cloud.storage.GuestOS;
 import com.cloud.storage.ScopeType;
 import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.DiskOfferingDao;
@@ -421,18 +422,24 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 s_logger.debug("Allocating disks for " + vmFinal);
 
+                DiskControllerType diskController = diskControllerType;
+                if (diskController == null) {
+                    final GuestOS guestOs = _guestOSDao.findById(vm.getGuestOSId());
+                    diskController = DiskControllerType.getGuestDiskModel(guestOs.getDisplayName());
+                }
+
                 if (template.getFormat() == ImageFormat.ISO) {
                     volumeMgr.allocateRawVolume(VolumeType.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
-                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskControllerType);
+                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskController);
                 } else {
                     volumeMgr.allocateTemplatedVolume(VolumeType.ROOT, "ROOT-" + vmFinal.getId(), rootDiskOfferingInfo.getDiskOffering(), rootDiskOfferingInfo.getSize(),
-                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner, diskControllerType);
+                            rootDiskOfferingInfo.getMinIops(), rootDiskOfferingInfo.getMaxIops(), template, vmFinal, owner, diskController);
                 }
 
                 if (dataDiskOfferings != null) {
                     for (final DiskOfferingInfo dataDiskOfferingInfo : dataDiskOfferings) {
                         volumeMgr.allocateRawVolume(VolumeType.DATADISK, "DATA-" + vmFinal.getId(), dataDiskOfferingInfo.getDiskOffering(), dataDiskOfferingInfo.getSize(),
-                                dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, dataDiskOfferingInfo.getDiskControllerType());
+                                dataDiskOfferingInfo.getMinIops(), dataDiskOfferingInfo.getMaxIops(), vmFinal, template, owner, diskController);
                     }
                 }
             }
@@ -440,6 +447,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         s_logger.debug("Allocation completed for VM: " + vmFinal);
     }
+
 
     @Override
     public boolean stop() {
