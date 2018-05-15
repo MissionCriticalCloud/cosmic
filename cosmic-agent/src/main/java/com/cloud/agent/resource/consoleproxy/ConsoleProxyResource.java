@@ -166,7 +166,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
                 @Override
                 protected void runInContext() {
                     try {
-                        final Class<?> consoleProxyClazz = Class.forName("com.cloud.consoleproxy.ConsoleProxy");
+                        final Class<?> consoleProxyClazz = Class.forName("com.cloud.agent.resource.consoleproxy.ConsoleProxy");
                         try {
                             s_logger.info("Invoke setEncryptorPassword(), ecnryptorPassword: " + encryptorPassword);
                             final Method methodSetup = consoleProxyClazz.getMethod("setEncryptorPassword", String.class);
@@ -203,7 +203,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
             s_logger.info("com.cloud.consoleproxy.ConsoleProxy is already running");
 
             try {
-                final Class<?> consoleProxyClazz = Class.forName("com.cloud.consoleproxy.ConsoleProxy");
+                final Class<?> consoleProxyClazz = Class.forName("com.cloud.agent.resource.consoleproxy.ConsoleProxy");
                 final Method methodSetup = consoleProxyClazz.getMethod("setEncryptorPassword", String.class);
                 methodSetup.invoke(null, encryptorPassword);
             } catch (final SecurityException e) {
