@@ -1,7 +1,8 @@
 package com.cloud.agent.resource.kvm;
 
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef.AuthenticationType;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef.PoolType;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef.AuthenticationType;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef.PoolType;
 
 import junit.framework.TestCase;
 

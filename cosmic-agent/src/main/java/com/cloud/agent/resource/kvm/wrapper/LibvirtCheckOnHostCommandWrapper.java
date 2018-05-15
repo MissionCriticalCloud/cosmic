@@ -1,9 +1,9 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
-import com.cloud.agent.resource.kvm.KvmHaBase.NfsStoragePool;
-import com.cloud.agent.resource.kvm.KvmHaChecker;
-import com.cloud.agent.resource.kvm.KvmHaMonitor;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
+import com.cloud.agent.resource.kvm.ha.KvmHaBase;
+import com.cloud.agent.resource.kvm.ha.KvmHaChecker;
+import com.cloud.agent.resource.kvm.ha.KvmHaMonitor;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
@@ -25,7 +25,7 @@ public final class LibvirtCheckOnHostCommandWrapper
         final ExecutorService executors = Executors.newSingleThreadExecutor();
         final KvmHaMonitor monitor = libvirtComputingResource.getMonitor();
 
-        final List<NfsStoragePool> pools = monitor.getStoragePools();
+        final List<KvmHaBase.NfsStoragePool> pools = monitor.getStoragePools();
         final HostTO host = command.getHost();
         final NetworkTO privateNetwork = host.getPrivateNetwork();
         final KvmHaChecker ha = new KvmHaChecker(pools, privateNetwork.getIp());

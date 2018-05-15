@@ -27,8 +27,7 @@ public class LibvirtConnection {
                     return conn;
                 }
             } catch (final Exception e) {
-                LOGGER.debug(
-                        "Can not find " + hypervisor.toString() + " connection for Instance: " + vmName + ", continuing.");
+                LOGGER.debug("Can not find " + hypervisor.toString() + " connection for Instance: " + vmName + ", continuing.");
             }
         }
 

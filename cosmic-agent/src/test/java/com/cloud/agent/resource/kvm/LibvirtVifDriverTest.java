@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource.BridgeType;
+import com.cloud.agent.resource.kvm.vif.VifDriver;
 import com.cloud.model.enumeration.TrafficType;
 
 import javax.naming.ConfigurationException;

@@ -1,6 +1,7 @@
 package com.cloud.agent.resource.kvm;
 
-import com.cloud.agent.resource.kvm.LibvirtVmDef.ScsiDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.ScsiDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;

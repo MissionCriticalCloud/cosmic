@@ -1,8 +1,9 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
-import com.cloud.agent.resource.kvm.VifDriver;
+
+import com.cloud.agent.resource.kvm.vif.VifDriver;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.UnPlugNicAnswer;
@@ -33,9 +34,9 @@ public final class LibvirtUnPlugNicCommandWrapper
 
             final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(vmName);
             vm = libvirtComputingResource.getDomain(conn, vmName);
-            final List<InterfaceDef> pluggedNics = libvirtComputingResource.getInterfaces(conn, vmName);
+            final List<LibvirtVmDef.InterfaceDef> pluggedNics = libvirtComputingResource.getInterfaces(conn, vmName);
 
-            for (final InterfaceDef pluggedNic : pluggedNics) {
+            for (final LibvirtVmDef.InterfaceDef pluggedNic : pluggedNics) {
                 if (pluggedNic.getMacAddress().equalsIgnoreCase(nic.getMac())) {
                     vm.detachDevice(pluggedNic.toString());
                     // We don't know which "traffic type" is associated with

@@ -1,10 +1,10 @@
 package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.agent.resource.kvm.LibvirtConnection;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef.PoolType;
-import com.cloud.agent.resource.kvm.LibvirtStorageVolumeDef;
-import com.cloud.agent.resource.kvm.LibvirtStorageVolumeXmlParser;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef.PoolType;
+import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;

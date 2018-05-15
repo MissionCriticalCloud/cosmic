@@ -1,10 +1,10 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
-import com.cloud.agent.resource.kvm.VifDriver;
 import com.cloud.agent.resource.kvm.async.MigrateKvmAsync;
+import com.cloud.agent.resource.kvm.vif.VifDriver;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateAnswer;
@@ -38,7 +38,7 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
 
         String result = null;
 
-        List<InterfaceDef> ifaces = null;
+        List<LibvirtVmDef.InterfaceDef> ifaces = null;
         final List<LibvirtDiskDef> disks;
 
         Domain dm = null;
@@ -173,7 +173,7 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
         }
 
         if (result == null) {
-            for (final InterfaceDef iface : ifaces) {
+            for (final LibvirtVmDef.InterfaceDef iface : ifaces) {
                 // We don't know which "traffic type" is associated with
                 // each interface at this point, so inform all vif drivers
                 final List<VifDriver> allVifDrivers = libvirtComputingResource.getAllVifDrivers();

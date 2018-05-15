@@ -1,15 +1,15 @@
 package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.agent.resource.kvm.LibvirtConnection;
-import com.cloud.agent.resource.kvm.LibvirtSecretDef;
-import com.cloud.agent.resource.kvm.LibvirtSecretDef.Usage;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef.AuthenticationType;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolDef.PoolType;
-import com.cloud.agent.resource.kvm.LibvirtStoragePoolXmlParser;
-import com.cloud.agent.resource.kvm.LibvirtStorageVolumeDef;
-import com.cloud.agent.resource.kvm.LibvirtStorageVolumeDef.VolumeFormat;
-import com.cloud.agent.resource.kvm.LibvirtStorageVolumeXmlParser;
+import com.cloud.agent.resource.kvm.xml.LibvirtSecretDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtSecretDef.Usage;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef.AuthenticationType;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef.PoolType;
+import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolXmlParser;
+import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeDef.VolumeFormat;
+import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.storage.StorageProvisioningType;

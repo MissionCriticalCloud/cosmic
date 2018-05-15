@@ -1,6 +1,5 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.xml;
 
-import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.NicModel;
 import com.cloud.model.enumeration.RngBackendModel;
@@ -85,7 +84,7 @@ public class LibvirtVmDef {
         this.components.put(component.getClass().toString(), component);
     }
 
-    enum GuestType {
+    public enum GuestType {
         KVM, XEN, EXE
     }
 
@@ -178,7 +177,7 @@ public class LibvirtVmDef {
             }
         }
 
-        enum BootOrder {
+        public enum BootOrder {
             HARDISK("hd"), CDROM("cdrom"), FLOPPY("fd"), NETWORK("network");
             String order;
 
