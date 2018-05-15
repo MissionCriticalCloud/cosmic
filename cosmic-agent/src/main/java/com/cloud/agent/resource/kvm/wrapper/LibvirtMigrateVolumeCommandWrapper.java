@@ -36,10 +36,12 @@ public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<Mig
         LibvirtDiskDef disk = null;
         final List<LibvirtDiskDef> disks;
 
+        boolean isMigrationSuccessfull = false;
+
         Domain dm = null;
         Connect conn = null;
 
-        final String currentVolumePath;
+        String currentVolumePath = null;
         final String newVolumePath;
 
         final CountDownLatch completeSignal = new CountDownLatch(1);
@@ -103,9 +105,7 @@ public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<Mig
             final StoragePool storagePool = conn.storagePoolLookupByUUIDString(command.getPool().getUuid());
             storagePool.refresh(0);
 
-            logger.debug("Cleaning up old disk " + currentVolumePath);
-            final StorageVol storageVol = conn.storageVolLookupByPath(currentVolumePath);
-            storageVol.delete(0);
+            isMigrationSuccessfull = true;
         } catch (final LibvirtException | InterruptedException e) {
             logger.debug("Can't migrate disk: " + e.getMessage());
             result = e.getMessage();
@@ -122,6 +122,16 @@ public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<Mig
             } catch (final LibvirtException e) {
                 logger.debug("Ignoring libvirt error.", e);
             }
+        }
+
+        try {
+            if (isMigrationSuccessfull && conn != null) {
+                logger.debug("Cleaning up old disk " + currentVolumePath);
+                final StorageVol storageVol = conn.storageVolLookupByPath(currentVolumePath);
+                storageVol.delete(0);
+            }
+        } catch (final LibvirtException e) {
+            logger.error("Cleaning up old disk " + currentVolumePath + " failed!", e);
         }
 
         return new MigrateVolumeAnswer(command, result == null, result, command.getVolumePath());
