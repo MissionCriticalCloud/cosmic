@@ -58,10 +58,6 @@ public class SecondaryStorageVmAlertAdapter extends AdapterBase implements Alert
                     s_logger.debug("Secondary Storage Vm is up, zone: " + zone.getName() + ", secStorageVm: " + secStorageVm.getHostName() + ", public IP: " +
                             secStorageVm.getPublicIpAddress() + ", private IP: " + secStorageVm.getPrivateIpAddress());
                 }
-
-                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_SSVM, args.getZoneId(), secStorageVm.getPodIdToDeployIn(), "Secondary Storage Vm up in zone: " +
-                        zone.getName() + ", secStorageVm: " + secStorageVm.getHostName() + ", public IP: " + secStorageVm.getPublicIpAddress() + ", private IP: " +
-                        (secStorageVm.getPrivateIpAddress() == null ? "N/A" : secStorageVm.getPrivateIpAddress()), "Secondary Storage Vm up (zone " + zone.getName() + ")");
                 break;
 
             case SecStorageVmAlertEventArgs.SSVM_DOWN:
