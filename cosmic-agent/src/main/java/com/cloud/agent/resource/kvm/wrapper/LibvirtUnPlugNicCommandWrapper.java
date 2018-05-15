@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-
 import com.cloud.agent.resource.kvm.vif.VifDriver;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
 import com.cloud.common.request.ResourceWrapper;

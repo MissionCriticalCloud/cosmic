@@ -40,7 +40,7 @@ import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
 import com.cloud.legacymodel.communication.answer.CheckS2SVpnConnectionsAnswer;
 import com.cloud.legacymodel.communication.answer.GetDomRVersionAnswer;
 import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
-import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.AggregationControlCommand;
 import com.cloud.legacymodel.communication.command.AggregationControlCommand.Action;
 import com.cloud.legacymodel.communication.command.CheckRouterCommand;

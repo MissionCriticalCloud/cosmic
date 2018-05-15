@@ -7,6 +7,7 @@ import com.cloud.agent.manager.Commands;
 import com.cloud.agent.manager.allocator.HostAllocator;
 import com.cloud.alert.AlertManager;
 import com.cloud.capacity.CapacityManager;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
@@ -63,7 +64,6 @@ import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
 import com.cloud.legacymodel.communication.answer.StartAnswer;
 import com.cloud.legacymodel.communication.answer.StopAnswer;
 import com.cloud.legacymodel.communication.answer.UnPlugNicAnswer;
-import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.AttachOrDettachConfigDriveCommand;
 import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
 import com.cloud.legacymodel.communication.command.ClusterVMMetaDataSyncCommand;
@@ -80,6 +80,8 @@ import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
 import com.cloud.legacymodel.communication.command.StopCommand;
 import com.cloud.legacymodel.communication.command.UnPlugNicCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.ShutdownEventCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Host;
@@ -123,7 +125,6 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.Event;
 import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
@@ -447,7 +448,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         s_logger.debug("Allocation completed for VM: " + vmFinal);
     }
-
 
     @Override
     public boolean stop() {
@@ -958,6 +958,53 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     @Override
     public AgentControlAnswer processControlCommand(final long agentId, final AgentControlCommand cmd) {
+        s_logger.info("Retrieved a AgentControlCommand from agent: " + agentId + ",  command class: " + cmd.getClass().getSimpleName());
+
+        if (cmd instanceof ShutdownEventCommand) {
+            return processShutdownEventCommand((ShutdownEventCommand) cmd);
+        } else {
+            return null;
+        }
+    }
+
+    private AgentControlAnswer processShutdownEventCommand(final ShutdownEventCommand shutdownRequestCommand) {
+        final VMInstanceVO vmInstanceVO = _vmDao.findVMByInstanceName(shutdownRequestCommand.getInstanceName());
+
+        s_logger.info("ShutdownEventCommand retrieved for instance " + shutdownRequestCommand.getInstanceName() + ", state according to the db: " + vmInstanceVO.getState());
+
+        switch (vmInstanceVO.getState()) {
+            case Running:
+                // Put VM in a stopped state
+                vmInstanceVO.setState(State.Stopped);
+                vmInstanceVO.setHostId(null);
+                _vmDao.persist(vmInstanceVO);
+
+                if (vmInstanceVO.isHaEnabled()) {
+                    // Start it once more
+                    try {
+                        orchestrateStart(vmInstanceVO.getUuid(), null, null, null);
+                    } catch (final InsufficientCapacityException | ResourceUnavailableException e) {
+                        s_logger.error("Unable to start instance: " + vmInstanceVO.getInstanceName() + ", after retrieving a ShutdownEventCommand");
+                    }
+                } else {
+                    s_logger.info("Not starting instance: " + vmInstanceVO.getInstanceName() + ", due to HA not enabled for this instance");
+                }
+                break;
+            case Starting:
+            case Stopping:
+            case Stopped:
+            case Destroyed:
+            case Expunging:
+            case Migrating:
+            case Error:
+            case Paused:
+            case Unknown:
+            case Shutdowned:
+            default:
+                s_logger.debug("No action warranted for stopped VM: " + vmInstanceVO.getInstanceName() + ", in state: " + vmInstanceVO.getState());
+                break;
+        }
+
         return null;
     }
 
@@ -1808,7 +1855,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
                 final Account owner = _entityMgr.findById(Account.class, vm.getAccountId());
                 final VirtualMachineProfileImpl vmProfile = new VirtualMachineProfileImpl(vm, template, offering, owner, params);
-                DeployDestination dest = _dpMgr.planDeployment(vmProfile, plan, avoids, planner);
+                final DeployDestination dest = _dpMgr.planDeployment(vmProfile, plan, avoids, planner);
 
                 if (dest == null) {
                     if (planChangedByVolume) {
@@ -2258,12 +2305,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             }
         }
 
-        UserVmVO userVm = _userVmDao.findById(vm.getId());
+        final UserVmVO userVm = _userVmDao.findById(vm.getId());
         if (userVm != null) {
-            List<VMSnapshotVO> vmSnapshots = _vmSnapshotDao.findByVm(vm.getId());
-            RestoreVMSnapshotCommand command = _vmSnapshotMgr.createRestoreCommand(userVm, vmSnapshots);
+            final List<VMSnapshotVO> vmSnapshots = _vmSnapshotDao.findByVm(vm.getId());
+            final RestoreVMSnapshotCommand command = _vmSnapshotMgr.createRestoreCommand(userVm, vmSnapshots);
             if (command != null) {
-                RestoreVMSnapshotAnswer restoreVMSnapshotAnswer = (RestoreVMSnapshotAnswer) _agentMgr.send(hostId, command);
+                final RestoreVMSnapshotAnswer restoreVMSnapshotAnswer = (RestoreVMSnapshotAnswer) _agentMgr.send(hostId, command);
                 if (restoreVMSnapshotAnswer == null || !restoreVMSnapshotAnswer.getResult()) {
                     s_logger.warn("Unable to restore the vm snapshot from image file after live migration of vm with vmsnapshots: " + restoreVMSnapshotAnswer.getDetails());
                 }
@@ -4063,7 +4110,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         excludes.addHost(vm.getHostId());
         vm.setServiceOfferingId(newSvcOfferingId); // Need to find the destination host based on new svc offering
 
-        DeployDestination dest = _dpMgr.planDeployment(profile, plan, excludes, null);
+        final DeployDestination dest = _dpMgr.planDeployment(profile, plan, excludes, null);
 
         if (dest != null) {
             s_logger.debug(" Found " + dest + " for scaling the vm to.");

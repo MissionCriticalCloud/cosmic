@@ -1,4 +1,4 @@
-package com.cloud.legacymodel.communication.command;
+package com.cloud.legacymodel.communication.command.agentcontrolcommand;
 
 public class ConsoleAccessAuthenticationCommand extends AgentControlCommand {
 

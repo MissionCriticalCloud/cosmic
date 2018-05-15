@@ -13,7 +13,7 @@ import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.DownloadAnswer;
-import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.DownloadCommand;
 import com.cloud.legacymodel.communication.command.DownloadCommand.ResourceType;

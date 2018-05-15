@@ -10,7 +10,6 @@ import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MaintainAnswer;
 import com.cloud.legacymodel.communication.answer.StartupAnswer;
-import com.cloud.legacymodel.communication.command.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.CronCommand;
 import com.cloud.legacymodel.communication.command.MaintainCommand;
@@ -18,6 +17,7 @@ import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.legacymodel.communication.command.ShutdownCommand;
 import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NioConnectionException;
@@ -229,7 +229,7 @@ public class Agent implements HandlerFactory, IAgentControl {
             try {
                 link.send(request.toBytes());
             } catch (final ClosedChannelException e) {
-                logger.warn("Unable to send reques: " + request.toString());
+                logger.warn("Unable to send request: " + request.toString());
             }
         }
     }
@@ -777,6 +777,7 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         registerControlListener(listener);
         try {
+            logger.debug("Sending request to management server: " + request.toString());
             postRequest(request);
             synchronized (listener) {
                 try {
