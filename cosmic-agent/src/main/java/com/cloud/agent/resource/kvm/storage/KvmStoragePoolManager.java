@@ -333,9 +333,11 @@ public class KvmStoragePoolManager {
                     PhysicalDiskFormat.DIR, provisioningType,
                     size, destPool, timeout);
         } else {
-            return adaptor.createDiskFromTemplate(template, name,
-                    PhysicalDiskFormat.QCOW2, provisioningType,
-                    size, destPool, timeout);
+            PhysicalDiskFormat diskFormat = PhysicalDiskFormat.QCOW2;
+            if (provisioningType == StorageProvisioningType.RAW) {
+                diskFormat = PhysicalDiskFormat.RAW;
+            }
+            return adaptor.createDiskFromTemplate(template, name, diskFormat, provisioningType, size, destPool, timeout);
         }
     }
 

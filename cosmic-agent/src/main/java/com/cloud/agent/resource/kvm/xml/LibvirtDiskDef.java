@@ -35,6 +35,10 @@ public class LibvirtDiskDef {
         this.discard = discard;
     }
 
+    public void setDiskFmtType(final DiskFmtType diskFmtType) {
+        this.diskFmtType = diskFmtType;
+    }
+
     public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskControllerType bus, final DiskFmtType diskFmtType) {
         this.diskType = DiskType.FILE;
         this.deviceType = DeviceType.DISK;
@@ -97,16 +101,6 @@ public class LibvirtDiskDef {
         this.diskFmtType = DiskFmtType.RAW;
         this.diskCacheMode = DiskCacheMode.NONE;
         this.bus = DiskControllerType.IDE;
-    }
-
-    public void defBlockBasedDisk(final String diskName, final int devId, final DiskControllerType bus) {
-        this.diskType = DiskType.BLOCK;
-        this.deviceType = DeviceType.DISK;
-        this.diskFmtType = DiskFmtType.RAW;
-        this.diskCacheMode = DiskCacheMode.NONE;
-        this.sourcePath = diskName;
-        this.diskLabel = getDevLabel(devId, bus);
-        this.bus = bus;
     }
 
     public void defBlockBasedDisk(final String diskName, final String diskLabel, final DiskControllerType bus) {
