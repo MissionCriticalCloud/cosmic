@@ -126,6 +126,7 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.imagestore.ImageStoreUtil;
+import com.cloud.utils.qemu.QemuImg;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VmWork;
@@ -447,10 +448,14 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         if (cmd.getDiskController() != null) {
             diskControllerType = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
         }
-        final VolumeVO volume = commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size, minIops, maxIops, parentVolume,
-                userSpecifiedName, this._uuidMgr.generateUuid(Volume.class, cmd.getCustomId()), diskControllerType);
 
-        return volume;
+        ImageFormat diskFormat = ImageFormat.QCOW2;
+        if (cmd.getDiskFormat() != null) {
+            diskFormat = ImageFormat.valueOf(cmd.getDiskFormat().toUpperCase());
+        }
+
+        return commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size, minIops, maxIops, parentVolume,
+                userSpecifiedName, this._uuidMgr.generateUuid(Volume.class, cmd.getCustomId()), diskControllerType, diskFormat);
     }
 
     private DiskControllerType getDiskControllerType() {
@@ -495,7 +500,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
     private VolumeVO commitVolume(final CreateVolumeCmd cmd, final Account caller, final Account owner, final Boolean displayVolume, final Long zoneId, final Long diskOfferingId,
                                   final StorageProvisioningType provisioningType, final Long size, final Long minIops, final Long maxIops, final VolumeVO parentVolume,
-                                  final String userSpecifiedName, final String uuid, final DiskControllerType diskController) {
+                                  final String userSpecifiedName, final String uuid, final DiskControllerType diskController, final ImageFormat diskFormat) {
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
@@ -513,6 +518,9 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 volume.setInstanceId(null);
                 volume.setUpdated(new Date());
                 volume.setDisplayVolume(displayVolume);
+                if (diskFormat != null) {
+                    volume.setFormat(diskFormat);
+                }
 
                 if (diskController != null) {
                     volume.setDiskController(diskController);
@@ -1051,7 +1059,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 volumeToAttach.setDiskController(diskController);
             }
 
-            final DiskTO disk = new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType(), volumeToAttach.getDiskController());
+            final DiskTO disk = new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType(), volumeToAttach.getDiskController(), volumeToAttach.getFormat());
 
             final AttachCommand cmd = new AttachCommand(disk, vm.getInstanceName());
 
@@ -2037,7 +2045,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (sendCommand) {
             final DataTO volTO = this.volFactory.getVolume(volume.getId()).getTO();
-            final DiskTO disk = new DiskTO(volTO, volume.getDeviceId(), volume.getPath(), volume.getVolumeType(), volume.getDiskController());
+            final DiskTO disk = new DiskTO(volTO, volume.getDeviceId(), volume.getPath(), volume.getVolumeType(), volume.getDiskController(), volume.getFormat());
 
             final DettachCommand cmd = new DettachCommand(disk, vm.getInstanceName());
 

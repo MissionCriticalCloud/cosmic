@@ -830,7 +830,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
 
-            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), serial);
+            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
 
             return new AttachAnswer(disk);
         } catch (final LibvirtException e) {
@@ -879,7 +879,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
 
-            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), serial);
+            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
 
             this.storagePoolMgr.disconnectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
@@ -1106,8 +1106,9 @@ public class KvmStorageProcessor implements StorageProcessor {
         return new SnapshotAndCopyAnswer();
     }
 
-    protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId, final DiskControllerType
-            diskControllerType, final String serial) throws LibvirtException, InternalErrorException {
+    protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId,
+                                                     final DiskControllerType diskControllerType, final ImageFormat diskFormat, final String serial
+    ) throws LibvirtException, InternalErrorException {
         List<LibvirtDiskDef> disks = null;
         Domain dm = null;
         LibvirtDiskDef diskdef = null;
@@ -1149,10 +1150,10 @@ public class KvmStorageProcessor implements StorageProcessor {
                     diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), null,
                             null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
-                } else if (attachingDisk.getFormat() == PhysicalDiskFormat.QCOW2) {
+                } else if (diskFormat == ImageFormat.QCOW2) {
                     diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.QCOW2);
-                } else if (attachingDisk.getFormat() == PhysicalDiskFormat.RAW) {
-                    diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskControllerType);
+                } else if (diskFormat == ImageFormat.RAW) {
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.RAW);
                 }
             }
 

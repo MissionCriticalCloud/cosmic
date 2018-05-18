@@ -96,6 +96,7 @@ import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.OptimiseFor;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.RouterPrivateIpStrategy;
 import com.cloud.model.enumeration.StoragePoolType;
@@ -1654,6 +1655,10 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     disk.setDiscard(DiscardType.UNMAP);
                 }
 
+                if (volume.getDiskFormat() == ImageFormat.RAW) {
+                    disk.setDiskFmtType(LibvirtDiskDef.DiskFmtType.RAW);
+                }
+
                 if (pool.getType() == StoragePoolType.RBD) {
                     /*
                      * For RBD pools we use the secret mechanism in libvirt. We store the secret under the UUID of the pool,
@@ -1669,8 +1674,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(),
                             pool.getSourcePort(), null,
                             null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
-                } else if (pool.getType() == StoragePoolType.CLVM || physicalDisk.getFormat() == PhysicalDiskFormat.RAW) {
-                    disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
+                } else if (volume.getDiskFormat() == ImageFormat.RAW) {
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.RAW);
                 } else {
                     disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.QCOW2);
                 }
@@ -1694,6 +1699,9 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                 }
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));
+                }
+                if (volumeObjectTo.getFormat() == ImageFormat.RAW) {
+                    physicalDisk.setFormat(PhysicalDiskFormat.RAW);
                 }
             }
             logger.debug("Adding disk: " + disk.toString());

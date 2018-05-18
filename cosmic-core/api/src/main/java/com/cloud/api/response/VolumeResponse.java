@@ -6,6 +6,7 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.serializer.Param;
 
 import java.util.Date;
@@ -172,6 +173,9 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     @SerializedName(ApiConstants.DISK_CONTROLLER)
     @Param(description = "disk controller this volume is on")
     private DiskControllerType diskController;
+    @SerializedName(ApiConstants.FORMAT)
+    @Param(description = "format of the disk")
+    private ImageFormat diskFormat;
 
     public VolumeResponse() {
         tags = new LinkedHashSet<>();
@@ -465,5 +469,13 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setDiskController(final DiskControllerType diskController) {
         this.diskController = diskController;
+    }
+
+    public ImageFormat getDiskFormat() {
+        return diskFormat;
+    }
+
+    public void setDiskFormat(final ImageFormat diskFormat) {
+        this.diskFormat = diskFormat;
     }
 }
