@@ -829,8 +829,8 @@ public class KvmStorageProcessor implements StorageProcessor {
 
             final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
-
-            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
+            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial,
+                    LibvirtDiskDef.DiskCacheMode.valueOf(vol.getCacheMode().toString().toUpperCase()));
 
             return new AttachAnswer(disk);
         } catch (final LibvirtException e) {
@@ -879,7 +879,8 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
 
-            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
+            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial,
+                    LibvirtDiskDef.DiskCacheMode.valueOf(vol.getCacheMode().toString().toUpperCase()));
 
             this.storagePoolMgr.disconnectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
@@ -1107,8 +1108,8 @@ public class KvmStorageProcessor implements StorageProcessor {
     }
 
     protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId,
-                                                     final DiskControllerType diskControllerType, final ImageFormat diskFormat, final String serial
-    ) throws LibvirtException, InternalErrorException {
+                                                     final DiskControllerType diskControllerType, final ImageFormat diskFormat, final String serial, final LibvirtDiskDef.DiskCacheMode diskCacheMode
+                                                     ) throws LibvirtException, InternalErrorException {
         List<LibvirtDiskDef> disks = null;
         Domain dm = null;
         LibvirtDiskDef diskdef = null;
@@ -1151,9 +1152,9 @@ public class KvmStorageProcessor implements StorageProcessor {
                             attachingPool.getSourcePort(), null,
                             null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, ImageFormat.QCOW2);
                 } else if (diskFormat == ImageFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.QCOW2);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.QCOW2, diskCacheMode);
                 } else if (diskFormat == ImageFormat.RAW) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.RAW);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.RAW, diskCacheMode);
                 }
             }
 

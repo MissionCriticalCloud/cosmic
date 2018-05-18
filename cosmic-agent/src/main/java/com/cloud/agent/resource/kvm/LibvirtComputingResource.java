@@ -1696,9 +1696,11 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                             pool.getSourcePort(), null,
                             null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, ImageFormat.QCOW2);
                 } else if (volume.getDiskFormat() == ImageFormat.RAW) {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.RAW);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.RAW,
+                            LibvirtDiskDef.DiskCacheMode.valueOf(volume.getDiskFormat().toString().toUpperCase()));
                 } else {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.QCOW2);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.QCOW2,
+                            LibvirtDiskDef.DiskCacheMode.valueOf(volume.getDiskFormat().toString().toUpperCase()));
                 }
             }
 

@@ -94,7 +94,7 @@ public class LibvirtDomainXmlParser {
                             if (diskFormatType != null) {
                                 imageFormat = ImageFormat.valueOf(diskFormatType.toUpperCase());
                             }
-                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), imageFormat);
+                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), imageFormat, LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
                         } else if (device.equalsIgnoreCase("cdrom")) {
                             def.defIsoDisk(diskFile);
                         }
