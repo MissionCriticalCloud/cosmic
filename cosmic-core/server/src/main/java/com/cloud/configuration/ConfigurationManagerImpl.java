@@ -96,6 +96,7 @@ import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
@@ -1187,11 +1188,12 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final Long iopsReadRate = cmd.getIopsReadRate();
         final Long iopsWriteRate = cmd.getIopsWriteRate();
         final Integer hypervisorSnapshotReserve = cmd.getHypervisorSnapshotReserve();
+        final DiskOffering.DiskCacheMode cacheMode = cmd.getCacheMode();
 
         final Long userId = CallContext.current().getCallingUserId();
         return createDiskOffering(userId, domainId, name, description, provisioningType, numGibibytes, tags, isCustomized,
                 localStorageRequired, isDisplayOfferingEnabled, isCustomizedIops, minIops,
-                maxIops, bytesReadRate, bytesWriteRate, iopsReadRate, iopsWriteRate, hypervisorSnapshotReserve);
+                maxIops, bytesReadRate, bytesWriteRate, iopsReadRate, iopsWriteRate, hypervisorSnapshotReserve, cacheMode);
     }
 
     @Override
@@ -4705,7 +4707,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                                                 final Long numGibibytes, String tags, boolean isCustomized, final boolean localStorageRequired,
                                                 final boolean isDisplayOfferingEnabled, final Boolean isCustomizedIops, Long minIops, Long maxIops,
                                                 Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate,
-                                                final Integer hypervisorSnapshotReserve) {
+                                                final Integer hypervisorSnapshotReserve, final DiskOffering.DiskCacheMode cacheMode) {
         long diskSize = 0;// special case for custom disk offerings
         if (numGibibytes != null && numGibibytes <= 0) {
             throw new InvalidParameterValueException("Please specify a disk size of at least 1 Gb.");
@@ -4791,6 +4793,9 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
         if (iopsWriteRate != null && iopsWriteRate > 0) {
             newDiskOffering.setIopsWriteRate(iopsWriteRate);
+        }
+        if (cacheMode != null) {
+            newDiskOffering.setCacheMode(cacheMode);
         }
 
         if (hypervisorSnapshotReserve != null && hypervisorSnapshotReserve < 0) {

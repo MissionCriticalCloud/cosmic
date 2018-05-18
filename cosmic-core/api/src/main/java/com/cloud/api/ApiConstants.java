@@ -21,6 +21,7 @@ public class ApiConstants {
     public static final String BYTES_WRITE_RATE = "byteswriterate";
     public static final String CATEGORY = "category";
     public static final String CAN_REVERT = "canrevert";
+    public static final String CACHE_MODE = "cachemode";
     public static final String CERTIFICATE = "certificate";
     public static final String CERTIFICATE_CHAIN = "certchain";
     public static final String CERTIFICATE_FINGERPRINT = "fingerprint";
