@@ -1142,18 +1142,18 @@ public class KvmStorageProcessor implements StorageProcessor {
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
-                            attachingPool.getUuid(), devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
+                            attachingPool.getUuid(), devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, ImageFormat.RAW);
                 } else if (attachingPool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = attachingPool.getLocalPath();
                     final String path = attachingDisk.getPath();
                     final String glusterVolume = attachingPool.getSourceDir().replace("/", "");
                     diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(),
                             attachingPool.getSourcePort(), null,
-                            null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
+                            null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, ImageFormat.QCOW2);
                 } else if (diskFormat == ImageFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.QCOW2);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.QCOW2);
                 } else if (diskFormat == ImageFormat.RAW) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, LibvirtDiskDef.DiskFmtType.RAW);
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.RAW);
                 }
             }
 

@@ -5,6 +5,7 @@ import com.cloud.agent.resource.kvm.LibvirtVmDef.RngDef;
 import com.cloud.agent.resource.kvm.LibvirtVmDef.WatchDogDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NicModel;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.WatchDogAction;
@@ -57,7 +58,7 @@ public class LibvirtDomainXmlParser {
                 final String type = disk.getAttribute("type");
                 final LibvirtDiskDef def = new LibvirtDiskDef();
                 if (type.equalsIgnoreCase("network")) {
-                    final String diskFmtType = getAttrValue("driver", "type", disk);
+                    final String diskFormatType = getAttrValue("driver", "type", disk);
                     final String diskCacheMode = getAttrValue("driver", "cache", disk);
                     final String diskPath = getAttrValue("source", "name", disk);
                     final String protocol = getAttrValue("source", "protocol", disk);
@@ -68,17 +69,17 @@ public class LibvirtDomainXmlParser {
                     final String diskLabel = getAttrValue("target", "dev", disk);
                     final String bus = getAttrValue("target", "bus", disk);
 
-                    LibvirtDiskDef.DiskFmtType fmt = null;
-                    if (diskFmtType != null) {
-                        fmt = LibvirtDiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
+                    ImageFormat imageFormat = null;
+                    if (diskFormatType != null) {
+                        imageFormat = ImageFormat.valueOf(diskFormatType.toUpperCase());
                     }
 
                     def.defNetworkBasedDisk(diskPath, host, port, authUserName, poolUuid, diskLabel,
                             DiskControllerType.valueOf(bus.toUpperCase()),
-                            LibvirtDiskDef.DiskProtocol.valueOf(protocol.toUpperCase()), fmt);
+                            LibvirtDiskDef.DiskProtocol.valueOf(protocol.toUpperCase()), imageFormat);
                     def.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(diskCacheMode.toUpperCase()));
                 } else {
-                    final String diskFmtType = getAttrValue("driver", "type", disk);
+                    final String diskFormatType = getAttrValue("driver", "type", disk);
                     final String diskCacheMode = getAttrValue("driver", "cache", disk);
                     final String diskFile = getAttrValue("source", "file", disk);
                     final String diskDev = getAttrValue("source", "dev", disk);
@@ -89,11 +90,11 @@ public class LibvirtDomainXmlParser {
 
                     if (type.equalsIgnoreCase("file")) {
                         if (device.equalsIgnoreCase("disk")) {
-                            LibvirtDiskDef.DiskFmtType fmt = null;
-                            if (diskFmtType != null) {
-                                fmt = LibvirtDiskDef.DiskFmtType.valueOf(diskFmtType.toUpperCase());
+                            ImageFormat imageFormat = null;
+                            if (diskFormatType != null) {
+                                imageFormat = ImageFormat.valueOf(diskFormatType.toUpperCase());
                             }
-                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), fmt);
+                            def.defFileBasedDisk(diskFile, diskLabel, DiskControllerType.valueOf(bus.toUpperCase()), imageFormat);
                         } else if (device.equalsIgnoreCase("cdrom")) {
                             def.defIsoDisk(diskFile);
                         }
