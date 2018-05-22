@@ -955,7 +955,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         for (final VolumeVO vol : vols) {
             final DataTO volTO = this.volFactory.getVolume(vol.getId()).getTO();
-            final DiskTO disk = new DiskTO(volTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController());
+            final DiskTO disk = new DiskTO(volTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController(), vol.getFormat());
             final VolumeInfo volumeInfo = this.volFactory.getVolume(vol.getId());
             final DataStore dataStore = this.dataStoreMgr.getDataStore(vol.getPoolId(), DataStoreRole.Primary);
 
@@ -1038,7 +1038,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 vol = result.first();
             }
             final DataTO volumeTO = this.volFactory.getVolume(vol.getId()).getTO();
-            final DiskTO disk = new DiskTO(volumeTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController());
+            final DiskTO disk = new DiskTO(volumeTO, vol.getDeviceId(), vol.getPath(), vol.getVolumeType(), vol.getDiskController(), vol.getFormat());
             final VolumeInfo volumeInfo = this.volFactory.getVolume(vol.getId());
             final DataStore dataStore = this.dataStoreMgr.getDataStore(vol.getPoolId(), DataStoreRole.Primary);
 

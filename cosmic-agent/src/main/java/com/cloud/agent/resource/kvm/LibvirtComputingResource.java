@@ -87,6 +87,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.RouterPrivateIpStrategy;
 import com.cloud.model.enumeration.StoragePoolType;
@@ -1677,6 +1678,8 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                     disk.setDiscard(DiscardType.UNMAP);
                 }
 
+                disk.setImageFormat(volume.getDiskFormat());
+
                 if (pool.getType() == StoragePoolType.RBD) {
                     /*
                      * For RBD pools we use the secret mechanism in libvirt. We store the secret under the UUID of the pool,
@@ -1684,18 +1687,20 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                      */
                     disk.defNetworkBasedDisk(physicalDisk.getPath().replace("rbd:", ""), pool.getSourceHost(),
                             pool.getSourcePort(), pool.getAuthUserName(),
-                            pool.getUuid(), devId, volume.getDiskController(), DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
+                            pool.getUuid(), devId, volume.getDiskController(), DiskProtocol.RBD, ImageFormat.RAW);
                 } else if (pool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = pool.getLocalPath();
                     final String path = physicalDisk.getPath();
                     final String glusterVolume = pool.getSourceDir().replace("/", "");
                     disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(),
                             pool.getSourcePort(), null,
-                            null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
-                } else if (pool.getType() == StoragePoolType.CLVM || physicalDisk.getFormat() == PhysicalDiskFormat.RAW) {
-                    disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
+                            null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, ImageFormat.QCOW2);
+                } else if (volume.getDiskFormat() == ImageFormat.RAW) {
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.RAW,
+                            LibvirtDiskDef.DiskCacheMode.valueOf(volume.getDiskFormat().toString().toUpperCase()));
                 } else {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.QCOW2);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.QCOW2,
+                            LibvirtDiskDef.DiskCacheMode.valueOf(volume.getDiskFormat().toString().toUpperCase()));
                 }
             }
 
@@ -1717,6 +1722,9 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 }
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));
+                }
+                if (volumeObjectTo.getFormat() != null) {
+                    physicalDisk.setFormat(physicalDisk.getPhysicalDiskFormatFromImageFormat(volumeObjectTo.getFormat()));
                 }
             }
             logger.debug("Adding disk: " + disk.toString());

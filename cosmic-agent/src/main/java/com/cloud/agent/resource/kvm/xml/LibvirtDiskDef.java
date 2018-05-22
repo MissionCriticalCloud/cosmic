@@ -1,9 +1,10 @@
 package com.cloud.agent.resource.kvm.xml;
 
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
 
 public class LibvirtDiskDef {
-    private DeviceType deviceType; /* floppy, disk, cdrom */
+    private DeviceType deviceType;
     private DiskType diskType;
     private DiskProtocol diskProtocol;
     private String sourcePath;
@@ -13,7 +14,6 @@ public class LibvirtDiskDef {
     private String authSecretUuid;
     private String diskLabel;
     private DiskControllerType bus;
-    private DiskFmtType diskFmtType; /* qcow2, raw etc. */
     private boolean readonly;
     private boolean shareable;
     private boolean deferAttach;
@@ -26,6 +26,7 @@ public class LibvirtDiskDef {
     private boolean qemuDriver = true;
     private DiscardType discard = DiscardType.IGNORE;
     private Integer deviceId;
+    private ImageFormat imageFormat;
 
     public DiscardType getDiscard() {
         return this.discard;
@@ -35,23 +36,23 @@ public class LibvirtDiskDef {
         this.discard = discard;
     }
 
-    public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskControllerType bus, final DiskFmtType diskFmtType) {
+    public void defFileBasedDisk(final String filePath, final String diskLabel, final DiskControllerType bus, final ImageFormat imageFormat, final DiskCacheMode diskCacheMode) {
         this.diskType = DiskType.FILE;
         this.deviceType = DeviceType.DISK;
-        this.diskCacheMode = DiskCacheMode.NONE;
+        this.diskCacheMode = diskCacheMode;
         this.sourcePath = filePath;
         this.diskLabel = diskLabel;
-        this.diskFmtType = diskFmtType;
+        this.imageFormat = imageFormat;
         this.bus = bus;
     }
 
-    public void defFileBasedDisk(final String filePath, final int devId, final DiskControllerType bus, final DiskFmtType diskFmtType) {
+    public void defFileBasedDisk(final String filePath, final int devId, final DiskControllerType bus, final ImageFormat imageFormat, final DiskCacheMode diskCacheMode) {
         this.diskType = DiskType.FILE;
         this.deviceType = DeviceType.DISK;
-        this.diskCacheMode = DiskCacheMode.NONE;
+        this.diskCacheMode = diskCacheMode;
         this.sourcePath = filePath;
         this.diskLabel = getDevLabel(devId, bus);
-        this.diskFmtType = diskFmtType;
+        this.imageFormat = imageFormat;
         this.bus = bus;
     }
 
@@ -94,25 +95,15 @@ public class LibvirtDiskDef {
         this.deviceType = DeviceType.CDROM;
         this.sourcePath = volPath;
         this.diskLabel = "hdc";
-        this.diskFmtType = DiskFmtType.RAW;
+        this.imageFormat = ImageFormat.RAW;
         this.diskCacheMode = DiskCacheMode.NONE;
         this.bus = DiskControllerType.IDE;
-    }
-
-    public void defBlockBasedDisk(final String diskName, final int devId, final DiskControllerType bus) {
-        this.diskType = DiskType.BLOCK;
-        this.deviceType = DeviceType.DISK;
-        this.diskFmtType = DiskFmtType.RAW;
-        this.diskCacheMode = DiskCacheMode.NONE;
-        this.sourcePath = diskName;
-        this.diskLabel = getDevLabel(devId, bus);
-        this.bus = bus;
     }
 
     public void defBlockBasedDisk(final String diskName, final String diskLabel, final DiskControllerType bus) {
         this.diskType = DiskType.BLOCK;
         this.deviceType = DeviceType.DISK;
-        this.diskFmtType = DiskFmtType.RAW;
+        this.imageFormat = ImageFormat.RAW;
         this.diskCacheMode = DiskCacheMode.NONE;
         this.sourcePath = diskName;
         this.diskLabel = diskLabel;
@@ -121,10 +112,10 @@ public class LibvirtDiskDef {
 
     public void defNetworkBasedDisk(final String diskName, final String sourceHost, final int sourcePort, final String authUserName,
                                     final String authSecretUuid, final int devId, final DiskControllerType bus,
-                                    final DiskProtocol protocol, final DiskFmtType diskFmtType) {
+                                    final DiskProtocol protocol, final ImageFormat imageFormat) {
         this.diskType = DiskType.NETWORK;
         this.deviceType = DeviceType.DISK;
-        this.diskFmtType = diskFmtType;
+        this.imageFormat = imageFormat;
         this.diskCacheMode = DiskCacheMode.NONE;
         this.sourcePath = diskName;
         this.sourceHost = sourceHost;
@@ -138,10 +129,10 @@ public class LibvirtDiskDef {
 
     public void defNetworkBasedDisk(final String diskName, final String sourceHost, final int sourcePort, final String authUserName,
                                     final String authSecretUuid, final String diskLabel, final DiskControllerType bus,
-                                    final DiskProtocol protocol, final DiskFmtType diskFmtType) {
+                                    final DiskProtocol protocol, final ImageFormat imageFormat) {
         this.diskType = DiskType.NETWORK;
         this.deviceType = DeviceType.DISK;
-        this.diskFmtType = diskFmtType;
+        this.imageFormat = imageFormat;
         this.diskCacheMode = DiskCacheMode.NONE;
         this.sourcePath = diskName;
         this.sourceHost = sourceHost;
@@ -197,8 +188,8 @@ public class LibvirtDiskDef {
         return this.bus;
     }
 
-    public DiskFmtType getDiskFormatType() {
-        return this.diskFmtType;
+    public ImageFormat getDiskFormatType() {
+        return this.imageFormat;
     }
 
     public void setBytesReadRate(final Long bytesReadRate) {
@@ -239,6 +230,10 @@ public class LibvirtDiskDef {
 
     public void setDeviceId(final Integer deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public void setImageFormat(final ImageFormat imageFormat) {
+        this.imageFormat = imageFormat;
     }
 
     public enum DeviceType {
@@ -297,20 +292,6 @@ public class LibvirtDiskDef {
         }
     }
 
-    public enum DiskFmtType {
-        RAW("raw"), QCOW2("qcow2");
-        String fmtType;
-
-        DiskFmtType(final String fmt) {
-            this.fmtType = fmt;
-        }
-
-        @Override
-        public String toString() {
-            return this.fmtType;
-        }
-    }
-
     public enum DiskCacheMode {
         NONE("none"), WRITEBACK("writeback"), WRITETHROUGH("writethrough");
         String diskCacheMode;
@@ -355,7 +336,7 @@ public class LibvirtDiskDef {
         diskBuilder.append(" type='" + this.diskType + "'");
         diskBuilder.append(">\n");
         if (this.qemuDriver) {
-            diskBuilder.append("<driver name='qemu'" + " type='" + this.diskFmtType
+            diskBuilder.append("<driver name='qemu'" + " type='" + this.imageFormat.toString().toLowerCase()
                     + "' cache='" + this.diskCacheMode + "' ");
             if (this.discard != null && this.discard != DiscardType.IGNORE) {
                 diskBuilder.append("discard='" + this.discard.toString() + "' ");

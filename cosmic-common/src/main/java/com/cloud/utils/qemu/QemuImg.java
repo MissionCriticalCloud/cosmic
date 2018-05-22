@@ -210,8 +210,7 @@ public class QemuImg {
 
     /* Shouldn't we have KVMPhysicalDisk and LibvirtVMDef read this? */
     public static enum PhysicalDiskFormat {
-        RAW("raw"), QCOW2("qcow2"), VMDK("vmdk"), FILE("file"), RBD("rbd"), SHEEPDOG("sheepdog"), HTTP("http"), HTTPS(
-                "https"), TAR("tar"), DIR("dir");
+        RAW("raw"), QCOW2("qcow2"), FILE("file"), RBD("rbd"), TAR("tar"), DIR("dir");
         String format;
 
         private PhysicalDiskFormat(final String format) {

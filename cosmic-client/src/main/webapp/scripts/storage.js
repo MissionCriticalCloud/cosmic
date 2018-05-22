@@ -31,6 +31,9 @@
                         type: {
                             label: 'label.type'
                         },
+                        format: {
+                            label: 'label.format'
+                        },
                         diskcontroller: {
                             label: 'label.disk.controller'
                         },
@@ -168,14 +171,6 @@
                                         select: function (args) {
                                             var items = [];
                                             items.push({
-                                                id: '',
-                                                description: _l('label.default')
-                                            });
-                                            items.push({
-                                                id: 'IDE',
-                                                description: 'IDE (Legacy)'
-                                            });
-                                            items.push({
                                                 id: 'VIRTIO',
                                                 description: 'VirtIO (virtio-blk)'
                                             });
@@ -183,12 +178,33 @@
                                                 id: 'SCSI',
                                                 description: 'VirtIO SCSI (virtio-scsi)'
                                             });
+                                            items.push({
+                                                id: 'IDE',
+                                                description: 'IDE (Legacy)'
+                                            });
                                             args.response.success({
                                                 data: items
                                             });
                                         }
                                     },
-
+                                    format: {
+                                        label: 'label.format',
+                                        docID: 'helpVolumeFormat',
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: 'QCOW2',
+                                                description: 'QCOW2 (default and recommended)'
+                                            });
+                                            items.push({
+                                                id: 'RAW',
+                                                description: 'RAW'
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
                                     minIops: {
                                         label: 'label.disk.iops.min',
                                         validation: {
@@ -220,6 +236,12 @@
                                 if (args.data.diskController != "") {
                                     $.extend(data, {
                                         diskcontroller: args.data.diskController
+                                    });
+                                }
+
+                                if (args.data.format != "") {
+                                    $.extend(data, {
+                                        format: args.data.format
                                     });
                                 }
 
@@ -1677,6 +1699,9 @@
                                     deviceid: {
                                         label: 'label.device.id'
                                     },
+                                    format: {
+                                        label: 'label.format'
+                                    },
                                     storage: {
                                         label: 'label.storage'
                                     },
@@ -1701,8 +1726,8 @@
                                             return toClearInterval;
                                         }
                                     },
-                                    status: {
-                                        label: 'label.status'
+                                    path: {
+                                        label: 'label.path'
                                     },
                                     diskofferingdisplaytext: {
                                         label: 'label.disk.offering'

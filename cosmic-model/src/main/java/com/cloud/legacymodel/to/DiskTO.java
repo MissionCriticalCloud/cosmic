@@ -1,8 +1,10 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VolumeType;
 
+import java.awt.Image;
 import java.util.Map;
 
 public class DiskTO {
@@ -26,17 +28,19 @@ public class DiskTO {
     private VolumeType type;
     private Map<String, String> _details;
     private DiskControllerType diskController;
+    private ImageFormat diskFormat;
 
     public DiskTO() {
 
     }
 
-    public DiskTO(final DataTO data, final Long diskSeq, final String path, final VolumeType type, final DiskControllerType diskController) {
+    public DiskTO(final DataTO data, final Long diskSeq, final String path, final VolumeType type, final DiskControllerType diskController, final ImageFormat diskFormat) {
         this.data = data;
         this.diskSeq = diskSeq;
         this.path = path;
         this.type = type;
         this.diskController = diskController;
+        this.diskFormat = diskFormat;
     }
 
     public DiskTO(final DataTO data, final Long diskSeq, final String path, final VolumeType type) {
@@ -44,6 +48,7 @@ public class DiskTO {
         this.diskSeq = diskSeq;
         this.path = path;
         this.type = type;
+        this.diskFormat = ImageFormat.QCOW2;
     }
 
     public DataTO getData() {
@@ -92,5 +97,13 @@ public class DiskTO {
 
     public void setDiskController(final DiskControllerType diskController) {
         this.diskController = diskController;
+    }
+
+    public ImageFormat getDiskFormat() {
+        return diskFormat;
+    }
+
+    public void setDiskFormat(final ImageFormat diskFormat) {
+        this.diskFormat = diskFormat;
     }
 }

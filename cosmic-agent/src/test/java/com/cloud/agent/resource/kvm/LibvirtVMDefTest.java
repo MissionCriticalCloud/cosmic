@@ -5,6 +5,7 @@ import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestNetType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NicModel;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.RngModel;
@@ -64,10 +65,9 @@ public class LibvirtVMDefTest extends TestCase {
 
         final LibvirtDiskDef disk = new LibvirtDiskDef();
         final DiskControllerType bus = DiskControllerType.SCSI;
-        final LibvirtDiskDef.DiskFmtType type = LibvirtDiskDef.DiskFmtType.QCOW2;
+        final ImageFormat imageFormat = ImageFormat.QCOW2;
         final LibvirtDiskDef.DiskCacheMode cacheMode = LibvirtDiskDef.DiskCacheMode.WRITEBACK;
-        disk.defFileBasedDisk(filePath, diskLabel, bus, type);
-        disk.setCacheMode(cacheMode);
+        disk.defFileBasedDisk(filePath, diskLabel, bus, imageFormat, cacheMode);
         disk.setDeviceId(deviceId);
 
         assertEquals(filePath, disk.getDiskPath());
@@ -76,7 +76,7 @@ public class LibvirtVMDefTest extends TestCase {
         assertEquals(LibvirtDiskDef.DeviceType.DISK, disk.getDeviceType());
 
         final String xmlDef = disk.toString();
-        final String expectedXml = "<disk  device='disk' type='file'>\n<driver name='qemu' type='" + type.toString() + "' cache='"
+        final String expectedXml = "<disk  device='disk' type='file'>\n<driver name='qemu' type='" + imageFormat.toString().toLowerCase() + "' cache='"
                 + cacheMode.toString() + "' />\n" +
                 "<source file='" + filePath + "'/>\n<target dev='" + diskLabel + "' bus='" + bus.toString().toLowerCase() + "'/>\n" +
                 "<address type='drive' controller='0' bus='0' target='0' unit='1'/></disk>\n";
