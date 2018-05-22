@@ -3,7 +3,6 @@ package com.cloud.agent.resource.kvm.wrapper;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
 import com.cloud.agent.resource.kvm.VifDriver;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.PlugNicAnswer;
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = PlugNicCommand.class)
 public final class LibvirtPlugNicCommandWrapper
-        extends CommandWrapper<PlugNicCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<PlugNicCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtPlugNicCommandWrapper.class);
 

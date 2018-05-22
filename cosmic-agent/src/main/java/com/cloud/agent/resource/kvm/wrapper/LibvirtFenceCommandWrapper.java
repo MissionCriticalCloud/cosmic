@@ -4,7 +4,6 @@ import com.cloud.agent.resource.kvm.KvmHaBase.NfsStoragePool;
 import com.cloud.agent.resource.kvm.KvmHaChecker;
 import com.cloud.agent.resource.kvm.KvmHaMonitor;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.FenceAnswer;
@@ -20,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = FenceCommand.class)
-public final class LibvirtFenceCommandWrapper extends CommandWrapper<FenceCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtFenceCommandWrapper extends LibvirtCommandWrapper<FenceCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtFenceCommandWrapper.class);
 

@@ -1,5 +1,7 @@
 import os
 import subprocess
+import yaml
+
 
 class Utils:
     def __init__(self, cmdline) -> None:
@@ -165,12 +167,16 @@ AcceptEnv XMODIFIERS
         if not os.path.isdir(self.config_dir):
             os.makedirs(self.config_dir, 0o644, True)
 
-        agent_properties = []
+        agent_properties = { }
         for key, value in self.cmdline.items():
-            agent_properties.append("%s=%s" % (key, value))
+            if key == 'host':
+                agent_properties['hosts'] = [value]
+            else:
+                agent_properties[key] = value
 
-        with open(self.config_dir + "agent.properties", "w") as f:
-            f.write("\n".join(agent_properties))
+        config = { 'cosmic': agent_properties }
+        with open(self.config_dir + "application.yml", "w") as f:
+            yaml.dump(config, f, default_flow_style=False)
 
     def setup_banner(self):
         with open("/etc/redhat-release", "r") as f:

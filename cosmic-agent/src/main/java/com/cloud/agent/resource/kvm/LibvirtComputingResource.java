@@ -18,6 +18,8 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 
 import static java.util.UUID.randomUUID;
 
+import com.cloud.agent.resource.AgentResource;
+import com.cloud.agent.resource.AgentResourceBase;
 import com.cloud.agent.resource.kvm.LibvirtVmDef.ClockDef;
 import com.cloud.agent.resource.kvm.LibvirtVmDef.ConsoleDef;
 import com.cloud.agent.resource.kvm.LibvirtVmDef.CpuModeDef;
@@ -48,7 +50,6 @@ import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef.DeviceType;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef.DiscardType;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef.DiskProtocol;
 import com.cloud.common.resource.ServerResource;
-import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandler;
 import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandlerBase;
 import com.cloud.common.virtualnetwork.VirtualRoutingResource;
@@ -95,7 +96,6 @@ import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.utils.NumbersUtil;
-import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.hypervisor.HypervisorUtils;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
@@ -115,7 +115,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -131,7 +130,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -175,7 +173,7 @@ import org.xml.sax.SAXException;
  * hierarchy * }
  **/
 @Local(value = {ServerResource.class})
-public class LibvirtComputingResource extends ServerResourceBase implements ServerResource, VirtualRouterDeployer {
+public class LibvirtComputingResource extends AgentResourceBase implements AgentResource, VirtualRouterDeployer {
 
     public static final String SSHKEYSPATH = "/root/.ssh";
     public static final String SSHPRVKEYPATH = SSHKEYSPATH + File.separator + "id_rsa.cloud";
@@ -223,6 +221,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     private final LibvirtComputingResourceProperties libvirtComputingResourceProperties = new LibvirtComputingResourceProperties();
+
     private final Map<String, String> pifs = new HashMap<>();
     private final Map<String, VmStats> vmStats = new ConcurrentHashMap<>();
     private final LibvirtUtilitiesHelper libvirtUtilitiesHelper = new LibvirtUtilitiesHelper();
@@ -646,12 +645,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
     }
 
     @Override
-    protected String getDefaultScriptsDir() {
-        return null;
-    }
-
-    @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final Map<String, Object> params) throws ConfigurationException {
         this.libvirtComputingResourceProperties.load(params);
 
         // TODO: Do not use params anymore, it should eventually be removed from the interface definition
@@ -659,7 +653,7 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
 
         Map<String, Object> propertiesMap = this.libvirtComputingResourceProperties.buildPropertiesMap();
 
-        final boolean success = super.configure(name, propertiesMap);
+        final boolean success = super.configure(propertiesMap);
         if (!success) {
             return false;
         }
@@ -671,10 +665,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         }
 
         initScripts(this.libvirtComputingResourceProperties);
-
-        if (this.libvirtComputingResourceProperties.isDeveloper()) {
-            this.libvirtComputingResourceProperties.load(getDeveloperProperties());
-        }
 
         initConnectionToLibvirtDaemon(this.libvirtComputingResourceProperties);
         initMonitorThread();
@@ -888,41 +878,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         return conn;
     }
 
-    private Map<String, Object> getDeveloperProperties() throws ConfigurationException {
-
-        final File file = PropertiesUtil.findConfigFile("developer.properties");
-        if (file == null) {
-            throw new ConfigurationException("Unable to find developer.properties.");
-        }
-
-        logger.info("developer.properties found at " + file.getAbsolutePath());
-        try {
-            final Properties properties = PropertiesUtil.loadFromFile(file);
-
-            final String startMac = (String) properties.get("private.macaddr.start");
-            if (startMac == null) {
-                throw new ConfigurationException("Developers must specify start mac for private ip range");
-            }
-
-            final String startIp = (String) properties.get("private.ipaddr.start");
-            if (startIp == null) {
-                throw new ConfigurationException("Developers must specify start ip for private ip range");
-            }
-            final Map<String, Object> params = PropertiesUtil.toMap(properties);
-
-            String endIp = (String) properties.get("private.ipaddr.end");
-            if (endIp == null) {
-                endIp = getEndIpFromStartIp(startIp, 16);
-                params.put("private.ipaddr.end", endIp);
-            }
-            return params;
-        } catch (final FileNotFoundException ex) {
-            throw new CloudRuntimeException("Cannot find the file: " + file.getAbsolutePath(), ex);
-        } catch (final IOException ex) {
-            throw new CloudRuntimeException("IOException in reading " + file.getAbsolutePath(), ex);
-        }
-    }
-
     private boolean isHvmEnabled(final Connect conn) {
         final LibvirtCapXmlParser parser = new LibvirtCapXmlParser();
         try {
@@ -1099,17 +1054,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
                 this.diskActivityInactiveThresholdMilliseconds = inactiveTime;
             }
         }
-    }
-
-    private String getEndIpFromStartIp(final String startIp, final int numIps) {
-        final String[] tokens = startIp.split("[.]");
-        assert tokens.length == 4;
-        int lastbyte = Integer.parseInt(tokens[3]);
-        lastbyte = lastbyte + numIps;
-        tokens[3] = Integer.toString(lastbyte);
-        final StringBuilder end = new StringBuilder(15);
-        end.append(tokens[0]).append(".").append(tokens[1]).append(".").append(tokens[2]).append(".").append(tokens[3]);
-        return end.toString();
     }
 
     private String getPif(final String bridge) {
@@ -2656,24 +2600,6 @@ public class LibvirtComputingResource extends ServerResourceBase implements Serv
         } else {
             return true;
         }
-    }
-
-    @Override
-    public void setConfigParams(final Map<String, Object> params) {
-    }
-
-    @Override
-    public Map<String, Object> getConfigParams() {
-        return null;
-    }
-
-    @Override
-    public int getRunLevel() {
-        return 0;
-    }
-
-    @Override
-    public void setRunLevel(final int level) {
     }
 
     public long getTotalMemory() {

@@ -4,7 +4,7 @@ import static com.cloud.utils.StringUtils.join;
 
 import static java.util.Arrays.asList;
 
-import com.cloud.common.resource.ServerResourceBase;
+import com.cloud.agent.resource.AgentResourceBase;
 import com.cloud.common.storageprocessor.Processor;
 import com.cloud.common.storageprocessor.QCOW2Processor;
 import com.cloud.common.storageprocessor.RawImageProcessor;
@@ -124,7 +124,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NfsSecondaryStorageResource extends ServerResourceBase implements SecondaryStorageResource {
+public class NfsSecondaryStorageResource extends AgentResourceBase implements SecondaryStorageResource {
 
     private static final Logger s_logger = LoggerFactory.getLogger(NfsSecondaryStorageResource.class);
 
@@ -1332,7 +1332,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
     }
 
     @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final Map<String, Object> params) throws ConfigurationException {
         s_logger.info("Configuring resource {}", name);
 
         configurePrivateInterface(params);
@@ -1352,7 +1352,7 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         }
         this._storageNetmask = (String) params.get("storagenetmask");
         this._storageGateway = (String) params.get("storagegateway");
-        super.configure(name, params);
+        super.configure(params);
 
         this._params = params;
         final String value = (String) params.get("scripts.timeout");
@@ -1558,7 +1558,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
         return true;
     }
 
-    @Override
     protected String getDefaultScriptsDir() {
         return "./scripts/storage/secondary";
     }
@@ -1882,30 +1881,6 @@ public class NfsSecondaryStorageResource extends ServerResourceBase implements S
 
     @Override
     public void setName(final String name) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Map<String, Object> getConfigParams() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setConfigParams(final Map<String, Object> params) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public int getRunLevel() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setRunLevel(final int level) {
         // TODO Auto-generated method stub
 
     }

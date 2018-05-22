@@ -20,7 +20,6 @@ import com.cloud.legacymodel.exceptions.DiscoveredWithErrorException;
 import com.cloud.legacymodel.exceptions.DiscoveryException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
-import com.cloud.legacymodel.network.PhysicalNetworkSetupInfo;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.resource.Discoverer;
@@ -155,52 +154,12 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
                 return null;
             }
 
-            if (!SSHCmdHelper.sshExecuteCmd(sshConnection, "lsmod|grep kvm", 3)) {
+            if (!SSHCmdHelper.sshExecuteCmd(sshConnection, "lsmod | grep kvm", 3)) {
                 s_logger.debug("It's not a KVM enabled machine");
                 return null;
             }
 
-            final List<PhysicalNetworkSetupInfo> netInfos = this._networkMgr.getPhysicalNetworkInfo(dcId, getHypervisorType());
-            String kvmPrivateNic = null;
-            String kvmPublicNic = null;
-            String kvmGuestNic = null;
-
-            for (final PhysicalNetworkSetupInfo info : netInfos) {
-                if (info.getPrivateNetworkName() != null) {
-                    kvmPrivateNic = info.getPrivateNetworkName();
-                }
-                if (info.getPublicNetworkName() != null) {
-                    kvmPublicNic = info.getPublicNetworkName();
-                }
-                if (info.getGuestNetworkName() != null) {
-                    kvmGuestNic = info.getGuestNetworkName();
-                }
-            }
-
-            if (kvmPrivateNic == null && kvmPublicNic == null && kvmGuestNic == null) {
-                kvmPrivateNic = this._kvmPrivateNic;
-                kvmPublicNic = this._kvmPublicNic;
-                kvmGuestNic = this._kvmGuestNic;
-            }
-
-            if (kvmPublicNic == null) {
-                kvmPublicNic = (kvmGuestNic != null) ? kvmGuestNic : kvmPrivateNic;
-            }
-
-            if (kvmPrivateNic == null) {
-                kvmPrivateNic = (kvmPublicNic != null) ? kvmPublicNic : kvmGuestNic;
-            }
-
-            if (kvmGuestNic == null) {
-                kvmGuestNic = (kvmPublicNic != null) ? kvmPublicNic : kvmPrivateNic;
-            }
-
-            String parameters = " -m " + this._hostIp + " -z " + dcId + " -p " + podId + " -c " + clusterId + " -g " + guid + " -a";
-
-            parameters += " --pubNic=" + kvmPublicNic;
-            parameters += " --prvNic=" + kvmPrivateNic;
-            parameters += " --guestNic=" + kvmGuestNic;
-            parameters += " --hypervisor=" + cluster.getHypervisorType().toString().toLowerCase();
+            final String parameters = " -m " + this._hostIp + " -z " + dcId + " -p " + podId + " -c " + clusterId + " -g " + guid;
 
             String setupAgentCommand = "cosmic-setup-agent ";
             if (!username.equals("root")) {

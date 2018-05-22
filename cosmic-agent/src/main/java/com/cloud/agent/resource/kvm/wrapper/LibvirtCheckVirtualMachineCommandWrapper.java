@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
@@ -13,7 +12,7 @@ import org.libvirt.LibvirtException;
 
 @ResourceWrapper(handles = CheckVirtualMachineCommand.class)
 public final class LibvirtCheckVirtualMachineCommandWrapper
-        extends CommandWrapper<CheckVirtualMachineCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<CheckVirtualMachineCommand, Answer, LibvirtComputingResource> {
 
     @Override
     public Answer execute(final CheckVirtualMachineCommand command,

@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.virtualnetwork.VirtualRoutingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -10,7 +9,7 @@ import com.cloud.legacymodel.communication.command.RebootRouterCommand;
 
 @ResourceWrapper(handles = RebootRouterCommand.class)
 public final class LibvirtRebootRouterCommandWrapper
-        extends CommandWrapper<RebootRouterCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<RebootRouterCommand, Answer, LibvirtComputingResource> {
 
     @Override
     public Answer execute(final RebootRouterCommand command, final LibvirtComputingResource libvirtComputingResource) {

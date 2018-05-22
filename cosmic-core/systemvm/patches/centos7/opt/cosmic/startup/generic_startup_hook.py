@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 import time
+import yaml
 
 from setup_cpvm import ConsoleProxyVM
 from setup_routervm import RouterVM
@@ -15,7 +16,7 @@ CMDLINE_FILE = "cmdline"
 CMDLINE_DONE = "cmdline_incoming"
 CMDLINE_JSON = "/var/cache/cloud/cmd_line.json"
 
-AGENT_PROPERTIES = "/etc/cosmic/agent/agent.properties"
+AGENT_PROPERTIES = "/etc/cosmic/agent/application.yml"
 
 LOG_DIR = "/var/log/cosmic/startup/"
 
@@ -37,11 +38,8 @@ class App:
         self.cmdline = {}
 
         with open(AGENT_PROPERTIES, "r") as f:
-            for item in f:
-                key = item.split("=")[0].strip()
-                value = item.split("=")[1].strip()
-
-                self.cmdline[key] = value
+            config = yaml.load(f)
+            self.cmdline = config['cosmic']
 
     def write_cmdline_json(self):
         logging.info("Writing for cmd_line.json")

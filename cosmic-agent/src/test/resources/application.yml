@@ -1,0 +1,58 @@
+cosmic:
+  guid:
+  resource: 'com.cloud.agent.resource.kvm.LibvirtComputingResource'
+  workers: 5
+  hosts:
+  port: 8250
+  cluster:
+  pod:
+  zone:
+  host-reserved-mem-mb: 250
+  pid-dir: '/var/run'
+  ping-retries: 5
+  cmds:
+    timeout: 7200
+  domr:
+    scripts:
+      dir: 'scripts/network/domr/kvm'
+  guest:
+    cpu:
+      mode: 'custom'
+      model: 'kvm64'
+  hypervisor:
+    type: 'kvm'
+    uri: 'qemu:///system'
+  libvirt:
+    vif-driver: 'com.cloud.agent.resource.kvm.OvsVifDriver'
+  localstorage:
+    path: '/var/lib/libvirt/images/'
+    uuid:
+  network:
+    bridge:
+      type: 'OPENVSWITCH'
+    device:
+      management: 'cloudbr0'
+      pub: 'pub0'
+      guest: 'cloudbr0'
+  systemvm:
+    iso-path: '/opt/cosmic/agent/vms/systemvm.iso'
+  termpolicy:
+    router:
+      oncrash: 'restart'
+      onpoweroff: 'destroy'
+      onreboot: 'restart'
+    vm:
+      oncrash: 'destroy'
+      onpoweroff: 'destroy'
+      onreboot: 'destroy'
+  vm:
+    diskactivity:
+      checkenabled: false
+      checktimeout_s: 120
+      inactivetime_ms: 30000
+    memballoon:
+      disable: true
+    migrate:
+      downtime: 1000
+      pauseafter: 120000
+      speed: 0

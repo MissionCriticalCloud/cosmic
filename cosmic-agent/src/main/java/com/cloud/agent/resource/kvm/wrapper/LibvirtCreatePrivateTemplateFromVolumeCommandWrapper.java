@@ -4,7 +4,6 @@ import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.storage.KvmPhysicalDisk;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePool;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.storageprocessor.Processor;
 import com.cloud.common.storageprocessor.QCOW2Processor;
@@ -39,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = CreatePrivateTemplateFromVolumeCommand.class)
 public final class LibvirtCreatePrivateTemplateFromVolumeCommandWrapper
-        extends CommandWrapper<CreatePrivateTemplateFromVolumeCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<CreatePrivateTemplateFromVolumeCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory
             .getLogger(LibvirtCreatePrivateTemplateFromVolumeCommandWrapper.class);

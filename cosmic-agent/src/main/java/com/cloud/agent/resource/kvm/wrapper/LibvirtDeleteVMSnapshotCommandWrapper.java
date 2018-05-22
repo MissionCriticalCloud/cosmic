@@ -3,7 +3,6 @@ package com.cloud.agent.resource.kvm.wrapper;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.storage.KvmPhysicalDisk;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.DeleteVMSnapshotAnswer;
@@ -22,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = DeleteVMSnapshotCommand.class)
-public final class LibvirtDeleteVMSnapshotCommandWrapper extends CommandWrapper<DeleteVMSnapshotCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtDeleteVMSnapshotCommandWrapper extends LibvirtCommandWrapper<DeleteVMSnapshotCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtDeleteVMSnapshotCommandWrapper.class);
 

@@ -1,9 +1,9 @@
 package com.cloud.agent.service;
 
+import com.cloud.agent.resource.AgentResource;
 import com.cloud.common.agent.IAgentControl;
 import com.cloud.common.agent.IAgentControlListener;
 import com.cloud.common.managed.context.ManagedContextTimerTask;
-import com.cloud.common.resource.ServerResource;
 import com.cloud.common.transport.Request;
 import com.cloud.common.transport.Response;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
@@ -21,7 +21,6 @@ import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.NioConnectionException;
-import com.cloud.legacymodel.exceptions.TaskExecutionException;
 import com.cloud.utils.backoff.BackoffAlgorithm;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.nio.HandlerFactory;
@@ -32,7 +31,6 @@ import com.cloud.utils.nio.Task;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
 
-import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -68,13 +66,13 @@ public class Agent implements HandlerFactory, IAgentControl {
     private final ThreadPoolExecutor _urgentTaskPool;
     private final List<IAgentControlListener> _controlListeners = new ArrayList<>();
 
-    private final AgentProperties agentProperties;
+    private final AgentConfiguration agentConfiguration;
     private final BackoffAlgorithm backOffAlgorithm;
 
     private final HostRotator hostRotator = new HostRotator();
 
     private NioConnection _connection;
-    private final ServerResource resource;
+    private final AgentResource resource;
     private Link _link;
     private Long _id;
 
@@ -92,31 +90,45 @@ public class Agent implements HandlerFactory, IAgentControl {
     private boolean _reconnectAllowed = true;
     private final ExecutorService _executor;
 
-    public Agent(final AgentProperties agentProperties, final BackoffAlgorithm backOffAlgorithm, final ServerResource resource) throws ConfigurationException {
-        this.agentProperties = agentProperties;
+    public Agent(final AgentConfiguration agentConfiguration, final BackoffAlgorithm backOffAlgorithm, final AgentResource resource) {
+        this.agentConfiguration = agentConfiguration;
         this.backOffAlgorithm = backOffAlgorithm;
         this.resource = resource;
+
+        configDefaults();
+
         resource.setAgentControl(this);
 
-        this.hostRotator.addAll(agentProperties.getHosts());
+        this.hostRotator.addAll(this.agentConfiguration.getHosts());
 
-        createNioClient(agentProperties);
+        createNioClient(agentConfiguration);
 
         logger.debug("Adding shutdown hook");
         Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
 
-        this._urgentTaskPool = new ThreadPoolExecutor(agentProperties.getPingRetries(), 2 * agentProperties.getPingRetries(), 10, TimeUnit.MINUTES, new SynchronousQueue<>(),
+        this._urgentTaskPool = new ThreadPoolExecutor(agentConfiguration.getPingRetries(), 2 * agentConfiguration.getPingRetries(), 10, TimeUnit.MINUTES, new SynchronousQueue<>(),
                 new NamedThreadFactory("UrgentTask"));
 
-        this._executor =
-                new ThreadPoolExecutor(agentProperties.getWorkers(), 5 * agentProperties.getWorkers(), 1, TimeUnit.DAYS, new LinkedBlockingQueue<>(),
-                        new NamedThreadFactory("agentRequest-Handler"));
+        this._executor = new ThreadPoolExecutor(agentConfiguration.getWorkers(), 5 * agentConfiguration.getWorkers(), 1, TimeUnit.DAYS, new LinkedBlockingQueue<>(),
+                new NamedThreadFactory("agentRequest-Handler"));
 
-        logger.info("Agent [id = " + (this._id != null ? this._id : "new") + " : type = " + getResourceName() + " : zone = " + agentProperties.getZone() + " : pod = "
-                + agentProperties.getPod() + " : workers = " + agentProperties.getWorkers() + " : host = " + agentProperties.getHosts() + " : port = " + agentProperties.getPort());
+        logger.info("Agent [id = " + (this._id != null ? this._id : "new") + " : type = " + getResourceName() + " : zone = " + agentConfiguration.getZone() + " : pod = "
+                + agentConfiguration.getPod() + " : workers = " + agentConfiguration.getWorkers() + " : host = " + agentConfiguration.getHosts() + " : port = " + agentConfiguration.getPort());
     }
 
-    private void createNioClient(final AgentProperties agentProperties) {
+    private void configDefaults() {
+        if (this.agentConfiguration.getPingRetries() == null) {
+            this.agentConfiguration.setPingRetries(5);
+        }
+        if (this.agentConfiguration.getWorkers() == null) {
+            this.agentConfiguration.setWorkers(5);
+        }
+        if (this.agentConfiguration.getPort() == null) {
+            this.agentConfiguration.setPort(8250);
+        }
+    }
+
+    private void createNioClient(final AgentConfiguration agentProperties) {
         final String host = rotateHost();
         logger.debug("Creating new NIO Client");
         this._connection = new NioClient("Agent", host, agentProperties.getPort(), agentProperties.getWorkers(), this);
@@ -132,7 +144,7 @@ public class Agent implements HandlerFactory, IAgentControl {
         return this.resource.getClass().getSimpleName();
     }
 
-    public ServerResource getResource() {
+    public AgentResource getResource() {
         return this.resource;
     }
 
@@ -151,7 +163,7 @@ public class Agent implements HandlerFactory, IAgentControl {
         while (!this._connection.isStartup()) {
             logger.info("Backing off for a while before attempting to reconnect to management server");
             this.backOffAlgorithm.waitBeforeRetry();
-            createNioClient(this.agentProperties);
+            createNioClient(this.agentConfiguration);
             try {
                 connectToManagementServer();
             } catch (final NioConnectionException e) {
@@ -240,13 +252,10 @@ public class Agent implements HandlerFactory, IAgentControl {
         if (startup.getName() == null) {
             startup.setName(hostname);
         }
-        startup.setDataCenter(this.agentProperties.getZone());
-        startup.setPod(this.agentProperties.getPod());
+        startup.setDataCenter(this.agentConfiguration.getZone());
+        startup.setPod(this.agentConfiguration.getPod());
         startup.setGuid(getResourceGuid());
         startup.setResourceName(getResourceName());
-        if (startup.getVersion() == null) {
-            startup.setVersion(this.agentProperties.getVersion());
-        }
     }
 
     protected synchronized long getNextSequence() {
@@ -263,7 +272,7 @@ public class Agent implements HandlerFactory, IAgentControl {
     }
 
     public String getResourceGuid() {
-        final String guid = this.agentProperties.getGuid();
+        final String guid = this.agentConfiguration.getGuid();
         return guid + "-" + getResourceName();
     }
 
@@ -321,7 +330,7 @@ public class Agent implements HandlerFactory, IAgentControl {
         }
 
         do {
-            createNioClient(this.agentProperties);
+            createNioClient(this.agentConfiguration);
             logger.info("Reconnecting...");
             try {
                 this._connection.start();
@@ -535,8 +544,8 @@ public class Agent implements HandlerFactory, IAgentControl {
     public void processOtherTask(final Task task) {
         final Object obj = task.get();
         if (obj instanceof Response) {
-            if (System.currentTimeMillis() - this._lastPingResponseTime > this._pingInterval * this.agentProperties.getPingRetries()) {
-                logger.error("Ping Interval has gone past " + this._pingInterval * this.agentProperties.getPingRetries() + ". Won't reconnect to mgt server, as connection is still alive");
+            if (System.currentTimeMillis() - this._lastPingResponseTime > this._pingInterval * this.agentConfiguration.getPingRetries()) {
+                logger.error("Ping Interval has gone past " + this._pingInterval * this.agentConfiguration.getPingRetries() + ". Won't reconnect to mgt server, as connection is still alive");
                 return;
             }
 
@@ -710,7 +719,7 @@ public class Agent implements HandlerFactory, IAgentControl {
         }
 
         @Override
-        protected void doTask(final Task task) throws TaskExecutionException {
+        protected void doTask(final Task task) {
             final Request req = (Request) get();
             if (!(req instanceof Response)) {
                 processRequest(req, task.getLink());
@@ -728,7 +737,7 @@ public class Agent implements HandlerFactory, IAgentControl {
         }
 
         @Override
-        public void doTask(final Task task) throws TaskExecutionException {
+        public void doTask(final Task task) {
             if (task.getType() == Task.Type.CONNECT) {
                 Agent.this.backOffAlgorithm.reset();
                 setLink(task.getLink());

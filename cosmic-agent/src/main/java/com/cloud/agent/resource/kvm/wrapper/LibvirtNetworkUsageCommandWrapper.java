@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
@@ -9,7 +8,7 @@ import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
 
 @ResourceWrapper(handles = NetworkUsageCommand.class)
 public final class LibvirtNetworkUsageCommandWrapper
-        extends CommandWrapper<NetworkUsageCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<NetworkUsageCommand, Answer, LibvirtComputingResource> {
 
     @Override
     public Answer execute(final NetworkUsageCommand command, final LibvirtComputingResource libvirtComputingResource) {

@@ -3,7 +3,6 @@ package com.cloud.agent.resource.kvm.wrapper;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtVmDef;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.virtualnetwork.VirtualRoutingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -26,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = StartCommand.class)
-public final class LibvirtStartCommandWrapper extends CommandWrapper<StartCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtStartCommandWrapper extends LibvirtCommandWrapper<StartCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtStartCommandWrapper.class);
 

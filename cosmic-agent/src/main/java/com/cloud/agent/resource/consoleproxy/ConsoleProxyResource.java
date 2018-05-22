@@ -1,8 +1,8 @@
 package com.cloud.agent.resource.consoleproxy;
 
+import com.cloud.agent.resource.AgentResource;
+import com.cloud.agent.resource.AgentResourceBase;
 import com.cloud.common.managed.context.ManagedContextRunnable;
-import com.cloud.common.resource.ServerResource;
-import com.cloud.common.resource.ServerResourceBase;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
@@ -33,7 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -54,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * through it console proxy can build a communication channel with management
  * server.
  */
-public class ConsoleProxyResource extends ServerResourceBase implements ServerResource {
+public class ConsoleProxyResource extends AgentResourceBase implements AgentResource {
     static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyResource.class);
 
     private final Properties _properties = new Properties();
@@ -229,12 +228,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
     }
 
     @Override
-    public String getName() {
-        return this._name;
-    }
-
-    @Override
-    public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
+    public boolean configure(final Map<String, Object> params) throws ConfigurationException {
         this._localgw = (String) params.get("localgw");
         this._eth1mask = (String) params.get("eth1mask");
         this._eth1ip = (String) params.get("eth1ip");
@@ -251,7 +245,7 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
             s_logger.info("eth2ip parameter is not found, assuming that we are not inside a system vm");
         }
 
-        super.configure(name, params);
+        super.configure(params);
 
         for (final Map.Entry<String, Object> entry : params.entrySet()) {
             this._properties.put(entry.getKey(), entry.getValue());
@@ -297,11 +291,6 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
         }
 
         return true;
-    }
-
-    @Override
-    protected String getDefaultScriptsDir() {
-        return null;
     }
 
     @Override
@@ -358,23 +347,5 @@ public class ConsoleProxyResource extends ServerResourceBase implements ServerRe
 
     @Override
     public void setName(final String name) {
-    }
-
-    @Override
-    public Map<String, Object> getConfigParams() {
-        return new HashMap<>();
-    }
-
-    @Override
-    public void setConfigParams(final Map<String, Object> params) {
-    }
-
-    @Override
-    public int getRunLevel() {
-        return 0;
-    }
-
-    @Override
-    public void setRunLevel(final int level) {
     }
 }

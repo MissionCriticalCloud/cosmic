@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.PingTestCommand;
@@ -12,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = PingTestCommand.class)
 public final class LibvirtPingTestCommandWrapper
-        extends CommandWrapper<PingTestCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<PingTestCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtPingTestCommandWrapper.class);
 
