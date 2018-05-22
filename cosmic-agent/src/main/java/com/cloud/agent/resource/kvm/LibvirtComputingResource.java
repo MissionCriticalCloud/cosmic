@@ -1655,9 +1655,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     disk.setDiscard(DiscardType.UNMAP);
                 }
 
-                if (volume.getDiskFormat() == ImageFormat.RAW) {
-                    disk.setDiskFmtType(LibvirtDiskDef.DiskFmtType.RAW);
-                }
+                disk.setImageFormat(volume.getDiskFormat());
 
                 if (pool.getType() == StoragePoolType.RBD) {
                     /*
@@ -1666,18 +1664,18 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                      */
                     disk.defNetworkBasedDisk(physicalDisk.getPath().replace("rbd:", ""), pool.getSourceHost(),
                             pool.getSourcePort(), pool.getAuthUserName(),
-                            pool.getUuid(), devId, volume.getDiskController(), DiskProtocol.RBD, LibvirtDiskDef.DiskFmtType.RAW);
+                            pool.getUuid(), devId, volume.getDiskController(), DiskProtocol.RBD, ImageFormat.RAW);
                 } else if (pool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = pool.getLocalPath();
                     final String path = physicalDisk.getPath();
                     final String glusterVolume = pool.getSourceDir().replace("/", "");
                     disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(),
                             pool.getSourcePort(), null,
-                            null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, LibvirtDiskDef.DiskFmtType.QCOW2);
+                            null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, ImageFormat.QCOW2);
                 } else if (volume.getDiskFormat() == ImageFormat.RAW) {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.RAW);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.RAW);
                 } else {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), LibvirtDiskDef.DiskFmtType.QCOW2);
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.QCOW2);
                 }
             }
 
@@ -1700,8 +1698,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));
                 }
-                if (volumeObjectTo.getFormat() == ImageFormat.RAW) {
-                    physicalDisk.setFormat(PhysicalDiskFormat.RAW);
+                if (volumeObjectTo.getFormat() != null) {
+                    physicalDisk.setFormat(physicalDisk.getPhysicalDiskFormatFromImageFormat(volumeObjectTo.getFormat()));
                 }
             }
             logger.debug("Adding disk: " + disk.toString());

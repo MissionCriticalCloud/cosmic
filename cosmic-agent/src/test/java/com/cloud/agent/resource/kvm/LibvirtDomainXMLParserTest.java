@@ -7,6 +7,7 @@ import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.WatchDogDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestNetType;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NicModel;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.WatchDogAction;
@@ -24,7 +25,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
         final DiskControllerType diskBus = DiskControllerType.SCSI;
         final LibvirtDiskDef.DiskType diskType = LibvirtDiskDef.DiskType.FILE;
         final LibvirtDiskDef.DeviceType deviceType = LibvirtDiskDef.DeviceType.DISK;
-        final LibvirtDiskDef.DiskFmtType diskFormat = LibvirtDiskDef.DiskFmtType.QCOW2;
+        final ImageFormat imageFormat = ImageFormat.QCOW2;
         final LibvirtDiskDef.DiskCacheMode diskCache = LibvirtDiskDef.DiskCacheMode.NONE;
 
         final NicModel ifModel = NicModel.VIRTIO;
@@ -63,7 +64,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
                 "<devices>" +
                 "<emulator>/usr/bin/kvm-spice</emulator>" +
                 "<disk type='" + diskType.toString() + "' device='" + deviceType.toString() + "'>" +
-                "<driver name='qemu' type='" + diskFormat.toString() + "' cache='" + diskCache.toString() + "'/>" +
+                "<driver name='qemu' type='" + imageFormat.toString() + "' cache='" + diskCache.toString() + "'/>" +
                 "<source file='" + diskPath + "'/>" +
                 "<target dev='" + diskLabel + "' bus='" + diskBus.toString() + "'/>" +
                 "<alias name='virtio-disk0'/>" +
@@ -180,7 +181,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
         assertEquals(diskBus, disks.get(diskId).getBusType());
         assertEquals(diskType, disks.get(diskId).getDiskType());
         assertEquals(deviceType, disks.get(diskId).getDeviceType());
-        assertEquals(diskFormat, disks.get(diskId).getDiskFormatType());
+        assertEquals(imageFormat, disks.get(diskId).getDiskFormatType());
 
         final List<InterfaceDef> ifs = parser.getInterfaces();
         for (int i = 0; i < ifs.size(); i++) {
