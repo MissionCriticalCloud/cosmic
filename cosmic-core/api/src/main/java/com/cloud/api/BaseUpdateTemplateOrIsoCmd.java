@@ -3,6 +3,7 @@ package com.cloud.api;
 import com.cloud.api.command.user.iso.UpdateIsoCmd;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.TemplateResponse;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 
 import java.util.Collection;
@@ -57,6 +58,8 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
     private String cpuFlags;
     @Parameter(name = ApiConstants.MAC_LEARNING, type = CommandType.STRING, description = "Set mag learning boolean, defaults to false")
     private Boolean macLearning;
+    @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "Set maintenance policy to 'LiveMigrate' or 'ShutdownAndStart'")
+    private String maintenancePolicy;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -115,6 +118,15 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
             return OptimiseFor.valueOf(optimiseFor);
         } else {
             return OptimiseFor.Generic;
+        }
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+
+        if (maintenancePolicy != null) {
+            return MaintenancePolicy.valueOf(maintenancePolicy);
+        } else {
+            return MaintenancePolicy.LiveMigrate;
         }
     }
 

@@ -2,6 +2,7 @@ package com.cloud.vm;
 
 import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 
@@ -52,7 +53,8 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SystemVm {
 
     public SecondaryStorageVmVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
                                 final long dataCenterId, final long domainId, final long accountId, final long userId, final SecondaryStorageVmRole role, final boolean haEnabled,
-                                final OptimiseFor optimiseFor, final String manufacturerString, final String cpuFlags, final Boolean macLearning, final Boolean requiresRestart) {
+                                final OptimiseFor optimiseFor, final String manufacturerString, final String cpuFlags, final Boolean macLearning, final Boolean requiresRestart,
+                                final MaintenancePolicy maintenancePolicy) {
         super(id, serviceOfferingId, name, name, VirtualMachineType.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.role = role;
         this.dataCenterId = dataCenterId;
@@ -61,6 +63,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SystemVm {
         this.cpuFlags = cpuFlags;
         this.macLearning = macLearning;
         this.requiresRestart = requiresRestart;
+        this.maintenancePolicy = maintenancePolicy;
     }
 
     protected SecondaryStorageVmVO() {

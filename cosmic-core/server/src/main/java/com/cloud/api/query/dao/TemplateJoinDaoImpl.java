@@ -95,6 +95,7 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         templateResponse.setMacLearning(template.getMacLearning());
         templateResponse.setCpuFlags(template.getCpuFlags());
         templateResponse.setOptimiseFor(template.getOptimiseFor());
+        templateResponse.setMaintenancePolicy(template.getMaintenancePolicy());
 
         if (template.getTemplateType() != null) {
             templateResponse.setTemplateType(template.getTemplateType().toString());

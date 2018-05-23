@@ -1,6 +1,7 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 
@@ -40,6 +41,7 @@ public class VirtualMachineTO {
     private BootloaderType bootloader;
     private String manufacturerString;
     private OptimiseFor optimiseFor;
+    private MaintenancePolicy maintenancePolicy;
 
     public VirtualMachineTO(final long id, final String instanceName, final VirtualMachineType type, final int cpus, final long minRam, final long maxRam,
                             final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
@@ -305,5 +307,16 @@ public class VirtualMachineTO {
 
     public void setOptimiseFor(final OptimiseFor optimiseFor) {
         this.optimiseFor = optimiseFor;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        if (maintenancePolicy == null) {
+            return MaintenancePolicy.LiveMigrate;
+        }
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
     }
 }

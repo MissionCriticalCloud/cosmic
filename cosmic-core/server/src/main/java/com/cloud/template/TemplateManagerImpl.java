@@ -92,6 +92,7 @@ import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.VolumeType;
@@ -1504,6 +1505,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final String manufacturerString = command.getManufacturerString();
         final String cpuFlags = command.getCpuFlags();
         final Boolean macLearning = command.getMacLearning();
+        final MaintenancePolicy maintenancePolicy = command.getMaintenancePolicy();
 
         try {
             final TemplateInfo tmplInfo = this._tmplFactory.getTemplate(templateId, DataStoreRole.Image);
@@ -1580,6 +1582,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 privateTemplate.setMacLearning(macLearning);
                 privateTemplate.setManufacturerString(manufacturerString);
                 privateTemplate.setOptimiseFor(optimiseFor);
+                privateTemplate.setMaintenancePolicy(maintenancePolicy);
 
             } catch (final InterruptedException | ExecutionException e) {
                 s_logger.debug("Failed to create template", e);
@@ -1649,6 +1652,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final String manufacturerString = cmd.getManufacturerString();
         final String cpuFlags = cmd.getCpuFlags();
         final Boolean macLearning = cmd.getMacLearning();
+        final MaintenancePolicy maintenancePolicy = cmd.getMaintenancePolicy();
 
         // verify that template exists
         VMTemplateVO template = this._tmpltDao.findById(id);
@@ -1717,6 +1721,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         if (macLearning != null) {
             template.setMacLearning(macLearning);
+        }
+
+        if (maintenancePolicy != null) {
+            template.setMaintenancePolicy(maintenancePolicy);
         }
 
         final ImageFormat imageFormat;

@@ -121,6 +121,7 @@ import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
+import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.legacymodel.user.User;
@@ -135,6 +136,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.StoragePoolStatus;
@@ -179,6 +181,7 @@ import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.GuestOSCategoryVO;
 import com.cloud.storage.GuestOSVO;
+import com.cloud.storage.ScopeType;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.VMTemplateVO;
@@ -995,8 +998,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Override
     public UserVm updateVirtualMachine(final long id, String displayName, final String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                        Boolean isDynamicallyScalable, final HTTPMethod httpMethod, final String customId, String hostName, final String instanceName,
-                                       final String manufacturerString, final OptimiseFor optimiseFor, final Boolean requiresRestart) throws
-            ResourceUnavailableException, InsufficientCapacityException {
+                                       final String manufacturerString, final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy
+    ) throws ResourceUnavailableException, InsufficientCapacityException {
+
         final UserVmVO vm = _vmDao.findById(id);
         if (vm == null) {
             throw new CloudRuntimeException("Unable to find virual machine with id " + id);
@@ -1012,6 +1016,17 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (vm.getState() == State.Error || vm.getState() == State.Expunging) {
             s_logger.error("vm is not in the right state: " + id);
             throw new InvalidParameterValueException("Vm with id " + id + " is not in the right state");
+        }
+
+        if (vm.getMaintenancePolicy() != maintenancePolicy && MaintenancePolicy.LiveMigrate.equals(maintenancePolicy)) {
+            final List<VolumeVO> volumes = _volsDao.findByInstance(vm.getId());
+            for (final VolumeVO volume : volumes) {
+                final StoragePoolVO storagePool = _storagePoolDao.findById(volume.getPoolId());
+                if (ScopeType.HOST.equals(storagePool.getScope())) {
+                    throw new InvalidParameterValueException("Vm " + vm.getInstanceName() + " has volume(s) with scope HOST, so MaintenancePolicy "
+                            + maintenancePolicy.toString() + " is not allowed.");
+                }
+            }
         }
 
         if (displayName == null) {
@@ -1076,7 +1091,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             checkIfHostNameUniqueInNtwkDomain(hostName, vmNtwks);
         }
 
-        _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName, manufacturerString, optimiseFor, requiresRestart);
+        _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName, manufacturerString, optimiseFor,
+                requiresRestart, maintenancePolicy);
 
         if (updateUserdata) {
             final boolean result = updateUserDataInternal(_vmDao.findById(id));
@@ -1628,6 +1644,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final OptimiseFor optimiseFor = cmd.getOptimiseFor();
         final String manufacturerString = cmd.getManufacturerString();
         final Boolean requiresRestart = cmd.getRequiresRestart();
+        final MaintenancePolicy maintenancePolicy = cmd.getMaintenancePolicy();
 
         // Input validation and permission checks
         final UserVmVO vmInstance = _vmDao.findById(id);
@@ -1674,7 +1691,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, osTypeId, userData, isDynamicallyScalable, cmd.getHttpMethod(), cmd.getCustomId(), hostName,
-                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart);
+                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart, maintenancePolicy);
     }
 
     @Override
@@ -3867,6 +3884,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         String manufacturerString = template.getManufacturerString();
         Boolean macLarning = template.getMacLearning();
         String cpuFlags = template.getCpuFlags();
+        MaintenancePolicy maintenancePolicy = template.getMaintenancePolicy();
 
         final long accountId = owner.getId();
 
@@ -4146,7 +4164,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, userData, caller, isDisplayVm, keyboard, accountId, userId,
                 offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType, manufacturerString, optimiseFor,
-                macLarning, cpuFlags);
+                macLarning, cpuFlags, maintenancePolicy);
 
         // Assign instance to the group
         try {
@@ -4177,14 +4195,15 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                   final long accountId, final long userId, final ServiceOfferingVO offering, final boolean isIso, final String sshPublicKey,
                                   final LinkedHashMap<String, NicProfile> networkNicMap, final long id, final String instanceName, final String uuidName,
                                   final HypervisorType hypervisorType, final Map<String, String> customParameters, final DiskControllerType diskControllerType,
-                                  final String manufacturerString, final OptimiseFor optimiseFor, final Boolean macLearning, final String cpuFlags)
+                                  final String manufacturerString, final OptimiseFor optimiseFor, final Boolean macLearning, final String cpuFlags,
+                                  final MaintenancePolicy maintenancePolicy)
             throws InsufficientCapacityException {
         return Transaction.execute(new TransactionCallbackWithException<UserVmVO, InsufficientCapacityException>() {
             @Override
             public UserVmVO doInTransaction(final TransactionStatus status) throws InsufficientCapacityException {
                 final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType, template.getGuestOSId(),
                         offering.getOfferHA(), offering.getLimitCpuUse(), owner.getDomainId(), owner.getId(), userId, offering.getId(),
-                        userData, hostName, diskOfferingId, manufacturerString, optimiseFor, macLearning, cpuFlags);
+                        userData, hostName, diskOfferingId, manufacturerString, optimiseFor, macLearning, cpuFlags, maintenancePolicy);
                 vm.setUuid(uuidName);
                 vm.setDynamicallyScalable(template.isDynamicallyScalable());
 

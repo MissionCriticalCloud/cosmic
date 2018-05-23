@@ -5,6 +5,7 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.serializer.Param;
 
@@ -165,6 +166,9 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
     @SerializedName(ApiConstants.CPU_FLAGS)
     @Param(description = "Any CPU flags to pass to VM")
     private String cpuFlags;
+    @SerializedName(ApiConstants.MAINTENANCE_POLICY)
+    @Param(description = "The maintenance policy for the VM")
+    private MaintenancePolicy maintenancePolicy;
 
     // To avoid breaking backwards compatibility, we still treat a template at different zones as different templates, so not embedding
     // template_zone information in this TemplateZoneResponse set.
@@ -400,5 +404,13 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
 
     public void setCpuFlags(final String cpuFlags) {
         this.cpuFlags = cpuFlags;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
     }
 }

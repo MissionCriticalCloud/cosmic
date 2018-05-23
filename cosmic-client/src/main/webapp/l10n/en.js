@@ -884,6 +884,7 @@ var dictionary = {
     "label.logout": "Logout",
     "label.lun": "LUN",
     "label.macaddress": "MAC Address",
+    "label.maintenance.policy": "Maintenance Policy",
     "label.make.project.owner": "Make account project owner",
     "label.make.redundant": "Make redundant",
     "label.manage": "Manage",

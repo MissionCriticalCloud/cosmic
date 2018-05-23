@@ -48,6 +48,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -639,7 +640,8 @@ public class UserVmManagerTest {
         final Account oldAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
         final Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
 
-        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L, "Manufacturer", OptimiseFor.Generic, false, "");
+        final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L, "Manufacturer", OptimiseFor.Generic,
+                false, "", MaintenancePolicy.LiveMigrate);
         vm.setState(VirtualMachine.State.Stopped);
         when(_vmDao.findById(anyLong())).thenReturn(vm);
 

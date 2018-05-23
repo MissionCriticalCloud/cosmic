@@ -18,6 +18,8 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.model.enumeration.MaintenancePolicy;
+import com.cloud.model.enumeration.OptimiseFor;
 
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -105,6 +107,12 @@ public class RegisterTemplateCmd extends BaseCmd {
     private String templateTag;
     @Parameter(name = ApiConstants.PROJECT_ID, type = CommandType.UUID, entityType = ProjectResponse.class, description = "Register template for the project")
     private Long projectId;
+    @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
+    private String maintenancePolicy;
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+    @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
+    private String optimiseFor;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -176,6 +184,26 @@ public class RegisterTemplateCmd extends BaseCmd {
 
     public String getTemplateTag() {
         return templateTag;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        if (maintenancePolicy != null) {
+            return MaintenancePolicy.valueOf(maintenancePolicy);
+        } else {
+            return null;
+        }
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor != null) {
+            return OptimiseFor.valueOf(optimiseFor);
+        } else {
+            return OptimiseFor.Generic;
+        }
     }
 
     public Map getDetails() {

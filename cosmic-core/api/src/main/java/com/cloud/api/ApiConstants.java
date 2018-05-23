@@ -153,6 +153,7 @@ public class ApiConstants {
     public static final String MODE = "mode";
     public static final String KEEPALIVE_ENABLED = "keepaliveenabled";
     public static final String NAME = "name";
+    public static final String MAINTENANCE_POLICY = "maintenancepolicy";
     public static final String METHOD_NAME = "methodname";
     public static final String NETWORK_DOMAIN = "networkdomain";
     public static final String NETMASK = "netmask";

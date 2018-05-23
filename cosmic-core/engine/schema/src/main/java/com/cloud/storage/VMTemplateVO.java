@@ -4,6 +4,7 @@ import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.utils.db.GenericDao;
 
@@ -105,6 +106,8 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     private String cpuFlags;
     @Column(name = "mac_learning")
     private Boolean macLearning;
+    @Column(name = "maintenance_policy")
+    private MaintenancePolicy maintenancePolicy;
 
     public VMTemplateVO() {
         uuid = UUID.randomUUID().toString();
@@ -232,6 +235,7 @@ public class VMTemplateVO implements VirtualMachineTemplate {
         this.optimiseFor = OptimiseFor.Generic;
         this.macLearning = false;
         this.cpuFlags = "";
+        this.maintenancePolicy = MaintenancePolicy.LiveMigrate;
     }
 
     public static VMTemplateVO createPreHostIso(final Long id, final String uniqueName, final String name, final ImageFormat format, final boolean isPublic, final boolean
@@ -593,5 +597,13 @@ public class VMTemplateVO implements VirtualMachineTemplate {
 
     public void setMacLearning(final Boolean macLearning) {
         this.macLearning = macLearning;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
     }
 }

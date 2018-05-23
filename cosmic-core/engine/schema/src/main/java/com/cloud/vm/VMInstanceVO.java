@@ -3,6 +3,7 @@ package com.cloud.vm;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.Encrypt;
@@ -161,6 +162,8 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     transient String toString;
     @Column(name = "limit_cpu_use", updatable = true, nullable = true)
     private boolean limitCpuUse;
+    @Column(name = "maintenance_policy", updatable = true, nullable = true)
+    protected MaintenancePolicy maintenancePolicy;
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId,
                         final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
@@ -585,5 +588,14 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
 
     public void setRequiresRestart(final Boolean requiresRestart) {
         this.requiresRestart = requiresRestart;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
+
     }
 }

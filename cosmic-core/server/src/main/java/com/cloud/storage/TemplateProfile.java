@@ -3,6 +3,8 @@ package com.cloud.storage;
 import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
+import com.cloud.model.enumeration.OptimiseFor;
 
 import java.util.Map;
 
@@ -32,6 +34,9 @@ public class TemplateProfile {
     Map details;
     Boolean isDynamicallyScalable;
     TemplateType templateType;
+    MaintenancePolicy maintenancePolicy;
+    OptimiseFor optimiseFor;
+    String manufacturerString;
 
     public TemplateProfile(final Long userId, final VMTemplateVO template, final Long zoneId) {
         this.userId = userId;
@@ -41,10 +46,9 @@ public class TemplateProfile {
 
     public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
                            final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId,
-
                            final HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
-                           final String templateTag, final Map details,
-                           final Boolean sshKeyEnabled, final Long imageStoreId, final Boolean isDynamicallyScalable, final TemplateType templateType) {
+                           final String templateTag, final Map details, final Boolean sshKeyEnabled, final Long imageStoreId, final Boolean isDynamicallyScalable,
+                           final TemplateType templateType, final String manufacturerString, final OptimiseFor optimiseFor, final MaintenancePolicy maintenancePolicy) {
         this(templateId,
                 userId,
                 name,
@@ -69,6 +73,9 @@ public class TemplateProfile {
         this.templateTag = templateTag;
         this.isDynamicallyScalable = isDynamicallyScalable;
         this.templateType = templateType;
+        this.manufacturerString = manufacturerString;
+        this.optimiseFor = optimiseFor;
+        this.maintenancePolicy = maintenancePolicy;
     }
 
     public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
@@ -288,5 +295,29 @@ public class TemplateProfile {
 
     public void setTemplateType(final TemplateType templateType) {
         this.templateType = templateType;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
     }
 }

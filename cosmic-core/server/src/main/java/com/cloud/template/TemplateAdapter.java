@@ -11,6 +11,8 @@ import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.MaintenancePolicy;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.storage.TemplateProfile;
 import com.cloud.storage.VMTemplateVO;
 import com.cloud.utils.component.Adapter;
@@ -43,7 +45,8 @@ public interface TemplateAdapter extends Adapter {
 
     TemplateProfile prepare(boolean isIso, long userId, String name, String displayText, Integer bits, Boolean passwordEnabled, String url, Boolean isPublic, Boolean featured,
                             Boolean isExtractable, String format, Long guestOSId, Long zoneId, HypervisorType hypervisorType, String chksum, Boolean bootable, String templateTag,
-                            Account templateOwner, Map details, Boolean sshKeyEnabled, String imageStoreUuid, Boolean isDynamicallyScalable, TemplateType templateType
+                            Account templateOwner, Map details, Boolean sshKeyEnabled, String imageStoreUuid, Boolean isDynamicallyScalable, TemplateType templateType,
+                            String manufacturerString, OptimiseFor optimiseFor, MaintenancePolicy maintenancePolicy
     ) throws ResourceAllocationException;
 
     class TemplateAdapterType {

@@ -7,6 +7,7 @@ import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
@@ -178,6 +179,8 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String macLearning;
     @Column(name = "cpu_flags")
     private String cpuFlags;
+    @Column(name = "maintenance_policy")
+    private MaintenancePolicy maintenancePolicy;
 
     public TemplateJoinVO() {
     }
@@ -760,6 +763,14 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setCpuFlags(final String cpuFlags) {
         this.cpuFlags = cpuFlags;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
     }
 
     @Override
