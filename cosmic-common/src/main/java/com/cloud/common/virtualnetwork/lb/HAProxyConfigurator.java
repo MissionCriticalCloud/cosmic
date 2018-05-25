@@ -30,7 +30,7 @@ public class HAProxyConfigurator implements LoadBalancerConfigurator {
     private static final String[] defaultsSection = {"defaults", "\tlog     global", "\tmode    tcp", "\toption  dontlognull", "\tretries 3", "\toption redispatch",
             "\toption forwardfor", "\toption forceclose", "\ttimeout connect    5000", "\ttimeout client     60000", "\ttimeout server     60000"};
 
-    private static final String[] defaultListen = {"listen  vmops 0.0.0.0:9", "\toption transparent"};
+    private static final String[] defaultListen = {"listen  vmops 127.0.0.1:9", "\toption transparent"};
 
     @Override
     public String[] generateConfiguration(final List<PortForwardingRuleTO> fwRules) {
