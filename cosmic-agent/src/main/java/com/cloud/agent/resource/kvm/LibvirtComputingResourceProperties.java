@@ -124,7 +124,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     private String hypervisorUri;
     private String instance;
     private String kvmScriptsDir;
-    private boolean kvmclockDisable;
+    private boolean kvmClockDisable;
     private String localStoragePath = DEFAULT_LOCAL_STORAGE_PATH;
     private String localStorageUuid;
     private String mountPath = DEFAULT_MOUNT_PATH;
@@ -182,7 +182,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         this.hypervisorScriptsDir = parse(properties, PROPERTY_KEY_HYPERVISOR_SCRIPTS_DIR, this.hypervisorScriptsDir);
         this.hypervisorUri = parse(properties, PROPERTY_KEY_HYPERVISOR_URI, this.hypervisorUri);
         this.kvmScriptsDir = parse(properties, PROPERTY_KEY_KVM_SCRIPTS_DIR, this.kvmScriptsDir);
-        this.kvmclockDisable = parse(properties, PROPERTY_KEY_KVMCLOCK_DISABLE, this.kvmclockDisable);
+        this.kvmClockDisable = parse(properties, PROPERTY_KEY_KVMCLOCK_DISABLE, this.kvmClockDisable);
         this.localStoragePath = parse(properties, PROPERTY_KEY_LOCAL_STORAGE_PATH, this.localStoragePath);
         this.localStorageUuid = parse(properties, PROPERTY_KEY_LOCAL_STORAGE_UUID, this.localStorageUuid);
         this.mountPath = parse(properties, PROPERTY_KEY_MOUNT_PATH, this.mountPath);
@@ -255,7 +255,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         propertiesMap.put(PROPERTY_KEY_HYPERVISOR_TYPE, this.hypervisorType);
         propertiesMap.put(PROPERTY_KEY_HYPERVISOR_URI, this.hypervisorUri);
         propertiesMap.put(PROPERTY_KEY_KVM_SCRIPTS_DIR, this.kvmScriptsDir);
-        propertiesMap.put(PROPERTY_KEY_KVMCLOCK_DISABLE, this.kvmclockDisable);
+        propertiesMap.put(PROPERTY_KEY_KVMCLOCK_DISABLE, this.kvmClockDisable);
         propertiesMap.put(PROPERTY_KEY_LOCAL_STORAGE_PATH, this.localStoragePath);
         propertiesMap.put(PROPERTY_KEY_LOCAL_STORAGE_UUID, this.localStorageUuid);
         propertiesMap.put(PROPERTY_KEY_MOUNT_PATH, this.mountPath);
@@ -338,8 +338,8 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return this.hypervisorUri;
     }
 
-    public boolean isKvmclockDisable() {
-        return this.kvmclockDisable;
+    public boolean isKvmClockDisable() {
+        return this.kvmClockDisable;
     }
 
     public String getLocalStoragePath() {
