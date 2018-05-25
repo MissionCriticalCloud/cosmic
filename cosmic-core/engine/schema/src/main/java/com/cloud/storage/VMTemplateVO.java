@@ -4,6 +4,7 @@ import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -96,16 +97,23 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     private boolean enableSshKey;
     @Column(name = "size")
     private Long size;
+    @Column(name = "optimise_for")
+    private OptimiseFor optimiseFor;
+    @Column(name = "manufacturer_string")
+    private String manufacturerString;
+    @Column(name = "cpu_flags")
+    private String cpuFlags;
+    @Column(name = "mac_learning")
+    private Boolean macLearning;
 
     public VMTemplateVO() {
         uuid = UUID.randomUUID().toString();
     }
 
     public VMTemplateVO(final long id, final String name, final ImageFormat format, final boolean isPublic, final boolean featured, final boolean isExtractable, final
-    TemplateType type, final String url, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword, final long
-                                guestOSId, final boolean bootable,
-                        final HypervisorType hyperType, final String templateTag, final Map<String, String> details, final boolean sshKeyEnabled, final boolean
-                                isDynamicallyScalable) {
+    TemplateType type, final String url, final int bits, final long accountId, final String cksum, final String displayText, final boolean enablePassword,
+                        final long guestOSId, final boolean bootable, final HypervisorType hyperType, final String templateTag, final Map<String, String> details,
+                        final boolean sshKeyEnabled, final boolean isDynamicallyScalable) {
         this(id,
                 name,
                 format,
@@ -219,6 +227,11 @@ public class VMTemplateVO implements VirtualMachineTemplate {
         hypervisorType = hyperType;
         uuid = UUID.randomUUID().toString();
         state = State.Active;
+        // TODO: FIXME
+        this.manufacturerString = "Mission Critical Cloud";
+        this.optimiseFor = OptimiseFor.Generic;
+        this.macLearning = false;
+        this.cpuFlags = "";
     }
 
     public static VMTemplateVO createPreHostIso(final Long id, final String uniqueName, final String name, final ImageFormat format, final boolean isPublic, final boolean
@@ -548,5 +561,37 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     @Override
     public Class<?> getEntityType() {
         return VirtualMachineTemplate.class;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public void setCpuFlags(final String cpuFlags) {
+        this.cpuFlags = cpuFlags;
+    }
+
+    public Boolean getMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final Boolean macLearning) {
+        this.macLearning = macLearning;
     }
 }

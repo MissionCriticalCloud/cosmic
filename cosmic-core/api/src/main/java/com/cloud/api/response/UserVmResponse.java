@@ -8,6 +8,7 @@ import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
 
@@ -180,6 +181,15 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName(ApiConstants.DETAILS)
     @Param(description = "Vm details in key/value pairs.", since = "4.2.1")
     private Map details;
+    @SerializedName(ApiConstants.MANUFACTURER_STRING)
+    @Param(description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+    @SerializedName(ApiConstants.OPTIMISE_FOR)
+    @Param(description = "Optimise for 'Windows' or 'Generic'")
+    private OptimiseFor optimiseFor;
+    @SerializedName(ApiConstants.RESTART_REQUIRED)
+    @Param(description = "true if VM needs to a stop/start to receive updated VM specs on the hypervisor")
+    private Boolean requiresRestart;
 
     @SerializedName(ApiConstants.SSH_KEYPAIR)
     @Param(description = "ssh key-pair")
@@ -704,5 +714,29 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setRootDeviceController(final DiskControllerType rootDeviceController) {
         this.rootDeviceController = rootDeviceController;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    public Boolean getRequiresRestart() {
+        return requiresRestart;
+    }
+
+    public void setRequiresRestart(final Boolean requiresRestart) {
+        this.requiresRestart = requiresRestart;
     }
 }

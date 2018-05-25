@@ -5,6 +5,7 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.serializer.Param;
 
 import java.util.Date;
@@ -151,6 +152,19 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
     @SerializedName(ApiConstants.DETAILS)
     @Param(description = "additional key/value details tied with template")
     private Map details;
+
+    @SerializedName(ApiConstants.OPTIMISE_FOR)
+    @Param(description = "Optimise for Generic of Windows VMs")
+    private OptimiseFor optimiseFor;
+    @SerializedName(ApiConstants.MANUFACTURER_STRING)
+    @Param(description = "Manufacturer string in hardware")
+    private String manufacturerString;
+    @SerializedName(ApiConstants.MAC_LEARNING)
+    @Param(description = "Enable MAC learning true or false")
+    private String macLearning;
+    @SerializedName(ApiConstants.CPU_FLAGS)
+    @Param(description = "Any CPU flags to pass to VM")
+    private String cpuFlags;
 
     // To avoid breaking backwards compatibility, we still treat a template at different zones as different templates, so not embedding
     // template_zone information in this TemplateZoneResponse set.
@@ -354,5 +368,37 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
 
     public void setUrl(final String url) {
         this.url = url;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    public String getMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final String macLearning) {
+        this.macLearning = macLearning;
+    }
+
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public void setCpuFlags(final String cpuFlags) {
+        this.cpuFlags = cpuFlags;
     }
 }

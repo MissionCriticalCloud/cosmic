@@ -1,6 +1,7 @@
 package com.cloud.vm;
 
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 
 import javax.persistence.Column;
@@ -51,10 +52,16 @@ public class ConsoleProxyVO extends VMInstanceVO implements ConsoleProxy {
      * Correct constructor to use.
      */
     public ConsoleProxyVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
-                          final long dataCenterId, final long domainId, final long accountId, final long userId, final int activeSession, final boolean haEnabled) {
+                          final long dataCenterId, final long domainId, final long accountId, final long userId, final int activeSession, final boolean haEnabled,
+                          final OptimiseFor optimiseFor, final String manufacturerString, final String cpuFlags, final Boolean macLearning, final Boolean requiresRestart) {
         super(id, serviceOfferingId, name, name, VirtualMachineType.ConsoleProxy, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.activeSession = activeSession;
         this.dataCenterId = dataCenterId;
+        this.optimiseFor = optimiseFor;
+        this.manufacturerString = manufacturerString;
+        this.cpuFlags = cpuFlags;
+        this.macLearning = macLearning;
+        this.requiresRestart = requiresRestart;
     }
 
     protected ConsoleProxyVO() {

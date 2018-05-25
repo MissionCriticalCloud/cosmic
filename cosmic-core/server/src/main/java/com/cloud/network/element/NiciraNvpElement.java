@@ -324,7 +324,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         final VirtualMachine virtualMachine = vm.getVirtualMachine();
         boolean macLearning = false;
         if (virtualMachine != null) {
-            macLearning = this.guestOSDao.listByGuestOSId(virtualMachine.getGuestOSId()).isMacLearning();
+            macLearning = virtualMachine.getMacLearning();
         }
         final CreateLogicalSwitchPortCommand cmd = new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
                 context.getAccount().getAccountName(), nic.getName(), macLearning);

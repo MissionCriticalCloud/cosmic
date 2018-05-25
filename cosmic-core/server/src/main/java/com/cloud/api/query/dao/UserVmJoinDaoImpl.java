@@ -166,6 +166,9 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         userVmResponse.setPublicIp(userVm.getPublicIpAddress());
         userVmResponse.setKeyPairName(userVm.getKeypairName());
         userVmResponse.setOsTypeId(userVm.getGuestOsId());
+        userVmResponse.setManufacturerString(userVm.getManufacturerString());
+        userVmResponse.setOptimiseFor(userVm.getOptimiseFor());
+        userVmResponse.setRequiresRestart(userVm.getRequiresRestart());
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.stats)) {
             // stats calculation

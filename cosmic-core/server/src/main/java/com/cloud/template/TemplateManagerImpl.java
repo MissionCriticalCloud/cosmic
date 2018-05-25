@@ -92,6 +92,7 @@ import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.projects.Project;
@@ -1499,6 +1500,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final Long accountId = CallContext.current().getCallingAccountId();
         SnapshotVO snapshot = null;
         VolumeVO volume = null;
+        final OptimiseFor optimiseFor = command.getOptimiseFor();
+        final String manufacturerString = command.getManufacturerString();
+        final String cpuFlags = command.getCpuFlags();
+        final Boolean macLearning = command.getMacLearning();
 
         try {
             final TemplateInfo tmplInfo = this._tmplFactory.getTemplate(templateId, DataStoreRole.Image);
@@ -1571,6 +1576,11 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 }
 
                 privateTemplate = this._tmpltDao.findById(templateId);
+                privateTemplate.setCpuFlags(cpuFlags);
+                privateTemplate.setMacLearning(macLearning);
+                privateTemplate.setManufacturerString(manufacturerString);
+                privateTemplate.setOptimiseFor(optimiseFor);
+
             } catch (final InterruptedException | ExecutionException e) {
                 s_logger.debug("Failed to create template", e);
                 throw new CloudRuntimeException("Failed to create template", e);
@@ -1635,6 +1645,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final Map details = cmd.getDetails();
         final Account account = CallContext.current().getCallingAccount();
         final String url = cmd.getUrl();
+        final OptimiseFor optimiseFor = cmd.getOptimiseFor();
+        final String manufacturerString = cmd.getManufacturerString();
+        final String cpuFlags = cmd.getCpuFlags();
+        final Boolean macLearning = cmd.getMacLearning();
 
         // verify that template exists
         VMTemplateVO template = this._tmpltDao.findById(id);
@@ -1660,6 +1674,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                         displayText == null &&
                         format == null &&
                         guestOSId == null &&
+                        optimiseFor == null &&
+                        manufacturerString == null &&
+                        cpuFlags == null &&
+                        macLearning == null &&
                         passwordEnabled == null &&
                         bootable == null &&
                         sortKey == null &&
@@ -1683,6 +1701,22 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         if (sortKey != null) {
             template.setSortKey(sortKey);
+        }
+
+        if (optimiseFor != null) {
+            template.setOptimiseFor(optimiseFor);
+        }
+
+        if (manufacturerString != null) {
+            template.setManufacturerString(manufacturerString);
+        }
+
+        if (cpuFlags != null) {
+            template.setCpuFlags(cpuFlags);
+        }
+
+        if (macLearning != null) {
+            template.setMacLearning(macLearning);
         }
 
         final ImageFormat imageFormat;

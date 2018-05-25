@@ -3,6 +3,7 @@ package com.cloud.vm;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
@@ -130,11 +131,16 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     protected boolean dynamicallyScalable;
     @Column(name = "uuid")
     protected String uuid = UUID.randomUUID().toString();
-
-    /*
-    @Column(name="tags")
-    protected String tags;
-    */
+    @Column(name = "optimise_for")
+    protected OptimiseFor optimiseFor;
+    @Column(name = "manufacturer_string")
+    protected String manufacturerString;
+    @Column(name = "cpu_flags")
+    protected String cpuFlags;
+    @Column(name = "mac_learning")
+    protected Boolean macLearning;
+    @Column(name = "requires_restart")
+    protected Boolean requiresRestart;
     @Column(name = "disk_offering_id")
     protected Long diskOfferingId;
     //
@@ -536,5 +542,48 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
 
     public void setPowerHostId(final Long hostId) {
         powerHostId = hostId;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    @Override
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public void setCpuFlags(final String cpuFlags) {
+        this.cpuFlags = cpuFlags;
+    }
+
+    @Override
+    public Boolean getMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final Boolean macLearning) {
+        this.macLearning = macLearning;
+    }
+
+    @Override
+    public Boolean getRequiresRestart() {
+        return requiresRestart;
+    }
+
+    public void setRequiresRestart(final Boolean requiresRestart) {
+        this.requiresRestart = requiresRestart;
     }
 }

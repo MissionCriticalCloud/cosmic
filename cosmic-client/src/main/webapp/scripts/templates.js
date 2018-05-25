@@ -260,21 +260,12 @@
                                                     id: 'RAW',
                                                     description: 'RAW'
                                                 });
-                                                items.push({
-                                                    id: 'VHD',
-                                                    description: 'VHD'
-                                                });
-                                                items.push({
-                                                    id: 'VMDK',
-                                                    description: 'VMDK'
-                                                });
                                             }
                                             args.response.success({
                                                 data: items
                                             });
                                         }
                                     },
-
                                     osTypeId: {
                                         label: 'label.os.type',
                                         docID: 'helpRegisterTemplateOSType',
@@ -292,7 +283,24 @@
                                             });
                                         }
                                     },
-
+                                    optimisefor: {
+                                        label: 'label.optimisefor',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "Generic",
+                                                description: "Generic VM"
+                                            });
+                                            items.push({
+                                                id: "Windows",
+                                                description: "Windows VM"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
                                     isExtractable: {
                                         label: "label.extractable",
                                         docID: 'helpRegisterTemplateExtractable',
@@ -351,6 +359,7 @@
                                     passwordEnabled: (args.data.isPasswordEnabled == "on"),
                                     isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                     osTypeId: args.data.osTypeId,
+                                    optimisefor: args.data.optimisefor,
                                     hypervisor: args.data.hypervisor
                                 };
 
@@ -759,6 +768,7 @@
                                         name: args.data.name,
                                         displaytext: args.data.displaytext,
                                         ostypeid: args.data.ostypeid,
+                                        optimisefor: args.data.optimisefor,
                                         passwordenabled: (args.data.passwordenabled == "on"),
                                         isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                         url: args.data.url
@@ -1091,6 +1101,24 @@
                                     crossZones: {
                                         label: 'label.cross.zones',
                                         converter: cloudStack.converters.toBooleanText
+                                    },
+                                    optimisefor: {
+                                        label: 'label.optimisefor',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "Generic",
+                                                description: "Generic VM"
+                                            });
+                                            items.push({
+                                                id: "Windows",
+                                                description: "Windows VM"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
                                     },
                                     displaytext: {
                                         label: 'label.description',

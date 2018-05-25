@@ -3,6 +3,7 @@ package com.cloud.engine.cloud.entity.api.db;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.Encrypt;
 import com.cloud.utils.db.GenericDao;
@@ -141,6 +142,17 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State> {
     private String hostname = null;
     @Column(name = "display_name")
     private String displayname = null;
+    @Column(name = "manufacturer_string")
+    private String manufacturerString;
+    @Column(name = "optimise_for")
+    private OptimiseFor optimiseFor;
+    @Column(name = "cpu_flags")
+    private String cpuFlags;
+    @Column(name = "mac_learning")
+    private Boolean macLearning;
+    @Column(name = "requires_restart")
+    private Boolean requiresRestart;
+
     @Transient
     private VMReservationVO vmReservation;
 
@@ -519,5 +531,48 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State> {
     @Override
     public Class<?> getEntityType() {
         return VirtualMachine.class;
+    }
+
+    @Override
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    @Override
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    @Override
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public void setCpuFlags(final String cpuFlags) {
+        this.cpuFlags = cpuFlags;
+    }
+
+    public Boolean getMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final Boolean macLearning) {
+        this.macLearning = macLearning;
+    }
+
+    public Boolean getRequiresRestart() {
+        return requiresRestart;
+    }
+
+    public void setRequiresRestart(final Boolean requiresRestart) {
+        this.requiresRestart = requiresRestart;
     }
 }

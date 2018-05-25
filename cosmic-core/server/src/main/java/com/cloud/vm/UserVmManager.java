@@ -11,6 +11,7 @@ import com.cloud.legacymodel.storage.VmDiskStatsEntry;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VmStatsEntry;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.uservm.UserVm;
 
 import java.util.HashMap;
@@ -78,6 +79,7 @@ public interface UserVmManager extends UserVmService {
     void collectVmDiskStatistics(UserVmVO userVm);
 
     UserVm updateVirtualMachine(long id, String displayName, String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
-                                Boolean isDynamicallyScalable, HTTPMethod httpMethod, String customId, String hostName, String instanceName) throws ResourceUnavailableException,
+                                Boolean isDynamicallyScalable, HTTPMethod httpMethod, String customId, String hostName, String instanceName, String manufacturerString,
+                                OptimiseFor optimiseFor, Boolean requiresRestart) throws ResourceUnavailableException,
             InsufficientCapacityException;
 }

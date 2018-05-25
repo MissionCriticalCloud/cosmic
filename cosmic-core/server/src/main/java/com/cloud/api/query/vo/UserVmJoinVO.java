@@ -5,6 +5,7 @@ import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -261,6 +262,12 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String uuid;
     @Column(name = "dynamically_scalable")
     private boolean isDynamicallyScalable;
+    @Column(name = "optimise_for")
+    private OptimiseFor optimiseFor;
+    @Column(name = "manufacturer_string")
+    private String manufacturerString;
+    @Column(name = "requires_restart")
+    private Boolean requiresRestart;
 
     public UserVmJoinVO() {
     }
@@ -1184,5 +1191,17 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setVolumeDiskController(final DiskControllerType volumeDiskController) {
         this.volumeDiskController = volumeDiskController;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public Boolean getRequiresRestart() {
+        return requiresRestart;
     }
 }

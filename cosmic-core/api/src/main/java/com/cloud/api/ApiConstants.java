@@ -41,6 +41,7 @@ public class ApiConstants {
     public static final String CMD_EVENT_TYPE = "cmdeventtype";
     public static final String COMPONENT = "component";
     public static final String CPU_NUMBER = "cpunumber";
+    public static final String CPU_FLAGS = "cpuflags";
     public static final String CREATED = "created";
     public static final String CTX_ACCOUNT_ID = "ctxaccountid";
     public static final String CTX_DETAILS = "ctxDetails";
@@ -143,8 +144,10 @@ public class ApiConstants {
     public static final String LOCK = "lock";
     public static final String LUN = "lun";
     public static final String LBID = "lbruleid";
+    public static final String MANUFACTURER_STRING = "manufacturerstring";
     public static final String MAX = "max";
     public static final String MAC_ADDRESS = "macaddress";
+    public static final String MAC_LEARNING = "maclearning";
     public static final String MAX_SNAPS = "maxsnaps";
     public static final String MEMORY = "memory";
     public static final String MODE = "mode";
@@ -160,6 +163,7 @@ public class ApiConstants {
     public static final String IS_SYSTEM_OFFERING = "issystem";
     public static final String IS_DEFAULT_USE = "defaultuse";
     public static final String OP = "op";
+    public static final String OPTIMISE_FOR = "optimisefor";
     public static final String OS_CATEGORY_ID = "oscategoryid";
     public static final String OS_TYPE_ID = "ostypeid";
     public static final String OS_DISPLAY_NAME = "osdisplayname";

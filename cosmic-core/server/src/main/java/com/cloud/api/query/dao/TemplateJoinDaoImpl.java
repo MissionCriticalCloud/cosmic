@@ -91,6 +91,11 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         templateResponse.setCrossZones(template.isCrossZones());
         templateResponse.setFormat(template.getFormat());
         templateResponse.setUrl(template.getUrl());
+        templateResponse.setManufacturerString(template.getManufacturerString());
+        templateResponse.setMacLearning(template.getMacLearning());
+        templateResponse.setCpuFlags(template.getCpuFlags());
+        templateResponse.setOptimiseFor(template.getOptimiseFor());
+
         if (template.getTemplateType() != null) {
             templateResponse.setTemplateType(template.getTemplateType().toString());
         }

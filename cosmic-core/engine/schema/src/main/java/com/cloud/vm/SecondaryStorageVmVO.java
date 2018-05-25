@@ -2,6 +2,7 @@ package com.cloud.vm;
 
 import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 
 import javax.persistence.Column;
@@ -14,6 +15,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 /**
  * SecondaryStorageVmVO domain object
@@ -48,10 +51,16 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SystemVm {
     private Date lastUpdateTime;
 
     public SecondaryStorageVmVO(final long id, final long serviceOfferingId, final String name, final long templateId, final HypervisorType hypervisorType, final long guestOSId,
-                                final long dataCenterId, final long domainId, final long accountId, final long userId, final SecondaryStorageVmRole role, final boolean haEnabled) {
+                                final long dataCenterId, final long domainId, final long accountId, final long userId, final SecondaryStorageVmRole role, final boolean haEnabled,
+                                final OptimiseFor optimiseFor, final String manufacturerString, final String cpuFlags, final Boolean macLearning, final Boolean requiresRestart) {
         super(id, serviceOfferingId, name, name, VirtualMachineType.SecondaryStorageVm, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.role = role;
         this.dataCenterId = dataCenterId;
+        this.optimiseFor = optimiseFor;
+        this.manufacturerString = manufacturerString;
+        this.cpuFlags = cpuFlags;
+        this.macLearning = macLearning;
+        this.requiresRestart = requiresRestart;
     }
 
     protected SecondaryStorageVmVO() {
