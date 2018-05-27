@@ -88,5 +88,12 @@
                 <include>*.key</include>
             </includes>
         </fileSet>
+
+        <fileSet>
+            <directory>noVNC</directory>
+            <outputDirectory>noVNC</outputDirectory>
+            <directoryMode>555</directoryMode>
+            <fileMode>555</fileMode>
+        </fileSet>
     </fileSets>
 </assembly>
