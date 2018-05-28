@@ -7,11 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.Map;
-import java.util.Scanner;
 
 public class ConsoleProxyNoVncHandler implements HttpHandler {
     private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyNoVncHandler.class);
@@ -72,24 +71,14 @@ public class ConsoleProxyNoVncHandler implements HttpHandler {
         }
     }
 
-    private String getFile(String fileName) {
-        File file;
-        StringBuilder result = new StringBuilder();
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(fileName);
-        if (resource!=null) {
-            file = new File(resource.getFile());
-
-            try (Scanner scanner = new Scanner(file)) {
-
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    result.append(line);
-                }
-            } catch (IOException e) {
-                s_logger.error("IO exception occurred", e);
-            }
+    private String getFile(String fileName) throws IOException {
+        final File file = new File(fileName);
+        if (file.exists()) {
+            final byte[] buffer = new byte[(int)file.length()];
+            final FileInputStream fis = new FileInputStream(file);
+            fis.read(buffer);
+            return new String(buffer);
         }
-        return result.toString();
+        return "";
     }
 }

@@ -928,13 +928,16 @@ public class LibvirtVmDef {
         private final String keyMap;
         private short port = -2;
         private boolean autoPort = false;
+        private boolean websocket = false;
 
-        public GraphicDef(final String type, final short port, final boolean autoPort, final String passwd, final String keyMap) {
+        public GraphicDef(final String type, final short port, final boolean autoPort, final String passwd,
+                          final String keyMap, final boolean websocket) {
             this.type = type;
             this.port = port;
             this.autoPort = autoPort;
             this.passwd = StringEscapeUtils.escapeXml(passwd);
             this.keyMap = keyMap;
+            this.websocket = websocket;
         }
 
         @Override
@@ -945,6 +948,10 @@ public class LibvirtVmDef {
                 graphicBuilder.append(" autoport='yes'");
             } else if (this.port != -2) {
                 graphicBuilder.append(" port='" + this.port + "'");
+            }
+
+            if (this.websocket) {
+                graphicBuilder.append(" websocket='-1'");
             }
 
             graphicBuilder.append(" listen='0.0.0.0'");

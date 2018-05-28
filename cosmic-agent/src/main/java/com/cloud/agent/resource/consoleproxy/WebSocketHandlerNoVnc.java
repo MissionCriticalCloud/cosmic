@@ -1,21 +1,19 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.consoleproxy.vnc.RfbConstants;
 import com.cloud.consoleproxy.util.RawHTTP;
+import com.cloud.consoleproxy.vnc.RfbConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -26,19 +24,19 @@ import java.nio.ByteBuffer;
 import java.security.spec.KeySpec;
 import java.util.Map;
 
-@ServerEndpoint("/websockify")
-public class WebSocketHandlerForNovnc {
-    private static final Logger s_logger = LoggerFactory.getLogger(WebSocketHandlerForNovnc.class);
+public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
+    private static final Logger s_logger = LoggerFactory.getLogger(WebSocketHandlerNoVnc.class);
     private Socket vncSocket;
     private DataInputStream is;
     private DataOutputStream os;
-    private Session session;
+    private WebSocketSession session;
     private String hostPassword;
     private double rfbVersion;
 
     private static enum VncState {
         SERVER_VERSION_SENT, AUTH_TYPES_SENT, AUTH_RESULT_SENT, UNKNOWN
     }
+
     private static final byte[] M_VNC_AUTH_OK = new byte[]{0, 0, 0, 0};
     private static final byte[] M_VNC_AUTH_TYE_NOAUTH = new byte[]{01, 01};
     private VncState clientState;
@@ -67,11 +65,12 @@ public class WebSocketHandlerForNovnc {
         return c;
     }
 
-    @OnOpen
-    public void onOpen(Session session) {
-        s_logger.info("Connect: " + session.getUserProperties().get("javax.websocket.endpoint.remoteAddress"));
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        s_logger.info("Connect: " + session.getRemoteAddress());
+        s_logger.info(session.getUri().toString());
 
-        String queries = session.getQueryString();
+        String queries = session.getUri().getQuery();
         Map<String, String> queryMap = ConsoleProxyHttpHandlerHelper.getQueryMap(queries);
         String host = queryMap.get("host");
         String portStr = queryMap.get("port");
@@ -118,7 +117,7 @@ public class WebSocketHandlerForNovnc {
         }
     }
 
-    private void proxynoVNC(Session session, ConsoleProxyClientParam param) {
+    private void proxynoVNC(WebSocketSession session, ConsoleProxyClientParam param) {
         this.session = session;
         String tunnelUrl = param.getClientTunnelUrl();
         String tunnelSession = param.getClientTunnelSession();
@@ -172,7 +171,7 @@ public class WebSocketHandlerForNovnc {
                 e.printStackTrace();
             }
 
-            if (readBytes == -1){
+            if (readBytes == -1) {
                 break;
             }
 
@@ -184,30 +183,30 @@ public class WebSocketHandlerForNovnc {
         }
     }
 
-    private void sendResponseString(Session session, String s) {
+    private void sendResponseString(WebSocketSession session, String s) {
         try {
-            session.getBasicRemote().sendText(s);
+            session.sendMessage(new TextMessage(s));
         } catch (IOException e) {
             s_logger.error("unable to send response", e);
         }
     }
 
-    private void sendResponseBytes(Session session, byte[] bytes, int size) {
+    private void sendResponseBytes(WebSocketSession session, byte[] bytes, int size) {
         try {
-            session.getBasicRemote().sendBinary(ByteBuffer.wrap(bytes, 0, size));
+            session.sendMessage(new BinaryMessage(ByteBuffer.wrap(bytes, 0, size)));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @OnClose
-    public void onClose(Session session) {
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         shutdown();
     }
 
-    @OnError
-    public void onError(Session session, Throwable t) {
-        s_logger.error("Error in WebSocket Connection : ", t);
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable throwable) throws Exception {
+        s_logger.error("Error in WebSocket Connection : ", throwable);
     }
 
     private void doConnect(Socket socket) throws IOException {
@@ -308,18 +307,18 @@ public class WebSocketHandlerForNovnc {
 
     }
 
-    @OnMessage
-    public void onFrame(Session session, byte[] byteBuffer) throws IOException {
-        System.out.printf("Frame: %d\n", byteBuffer.length);
-        byte[] data = new byte[byteBuffer.length];
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage byteBuffer) throws Exception {
+        System.out.printf("Frame: %d\n", byteBuffer.getPayloadLength());
+        byte[] data = new byte[byteBuffer.getPayloadLength()];
 
-        switch (this.clientState){
+        switch (this.clientState) {
             case SERVER_VERSION_SENT: {
-                if (byteBuffer.length == 12){
-                    s_logger.debug("recieved noVNC handshakeServer");
+                if (byteBuffer.getPayloadLength() == 12) {
+                    s_logger.debug("received noVNC handshakeServer");
                 }
                 sendResponseBytes(session, M_VNC_AUTH_TYE_NOAUTH, 2);
-                this.clientState=VncState.AUTH_TYPES_SENT;
+                this.clientState = VncState.AUTH_TYPES_SENT;
                 break;
             }
 
@@ -328,7 +327,7 @@ public class WebSocketHandlerForNovnc {
                 // 1 for sending auth type used i.e no auth required
                 s_logger.warn("sending auth types and response");
                 sendResponseBytes(session, M_VNC_AUTH_OK, 4);
-                this.clientState=VncState.AUTH_RESULT_SENT;
+                this.clientState = VncState.AUTH_RESULT_SENT;
                 break;
             }
 
@@ -398,7 +397,7 @@ public class WebSocketHandlerForNovnc {
         byte[] buf = new byte[12];
         is.readFully(buf);
         String rfbProtocol = new String(buf);
-        String protocol = rfbProtocol.substring(4,11);
+        String protocol = rfbProtocol.substring(4, 11);
         switch (protocol) {
             case "003.003":
             case "003.006":  // UltraVNC

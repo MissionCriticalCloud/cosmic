@@ -1465,7 +1465,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
 
         // add the VNC port passwd here, get the passwd from the vmInstance.
         final String passwd = vmTo.getVncPassword();
-        final GraphicDef grap = new GraphicDef("vnc", (short) 0, true, passwd, null);
+        final GraphicDef grap = new GraphicDef("vnc", (short) 0, true, passwd, null, true);
         devices.addDevice(grap);
 
         final InputDef input = new InputDef("tablet", "usb");
