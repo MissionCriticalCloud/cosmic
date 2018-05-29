@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.virtualnetwork.VirtualRoutingResource;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = CheckSshCommand.class)
 public final class LibvirtCheckSshCommandWrapper
-        extends CommandWrapper<CheckSshCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<CheckSshCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtCheckSshCommandWrapper.class);
 

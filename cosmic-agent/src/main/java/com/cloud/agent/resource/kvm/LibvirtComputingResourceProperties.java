@@ -86,7 +86,6 @@ import static com.cloud.utils.CloudConstants.DEFAULT_POD;
 import static com.cloud.utils.CloudConstants.DEFAULT_ZONE;
 import static com.cloud.utils.CloudConstants.PROPERTY_KEY_CLUSTER;
 import static com.cloud.utils.CloudConstants.PROPERTY_KEY_HOST;
-import static com.cloud.utils.CloudConstants.PROPERTY_KEY_INSTANCE;
 import static com.cloud.utils.CloudConstants.PROPERTY_KEY_POD;
 import static com.cloud.utils.CloudConstants.PROPERTY_KEY_POOL;
 import static com.cloud.utils.CloudConstants.PROPERTY_KEY_ZONE;
@@ -182,7 +181,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         this.hostReservedMemMb = parse(properties, PROPERTY_KEY_HOST_RESERVED_MEM_MB, this.hostReservedMemMb);
         this.hypervisorScriptsDir = parse(properties, PROPERTY_KEY_HYPERVISOR_SCRIPTS_DIR, this.hypervisorScriptsDir);
         this.hypervisorUri = parse(properties, PROPERTY_KEY_HYPERVISOR_URI, this.hypervisorUri);
-        this.instance = parse(properties, PROPERTY_KEY_INSTANCE, this.instance);
         this.kvmScriptsDir = parse(properties, PROPERTY_KEY_KVM_SCRIPTS_DIR, this.kvmScriptsDir);
         this.kvmclockDisable = parse(properties, PROPERTY_KEY_KVMCLOCK_DISABLE, this.kvmclockDisable);
         this.localStoragePath = parse(properties, PROPERTY_KEY_LOCAL_STORAGE_PATH, this.localStoragePath);
@@ -256,7 +254,6 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         propertiesMap.put(PROPERTY_KEY_HYPERVISOR_SCRIPTS_DIR, this.hypervisorScriptsDir);
         propertiesMap.put(PROPERTY_KEY_HYPERVISOR_TYPE, this.hypervisorType);
         propertiesMap.put(PROPERTY_KEY_HYPERVISOR_URI, this.hypervisorUri);
-        propertiesMap.put(PROPERTY_KEY_INSTANCE, this.instance);
         propertiesMap.put(PROPERTY_KEY_KVM_SCRIPTS_DIR, this.kvmScriptsDir);
         propertiesMap.put(PROPERTY_KEY_KVMCLOCK_DISABLE, this.kvmclockDisable);
         propertiesMap.put(PROPERTY_KEY_LOCAL_STORAGE_PATH, this.localStoragePath);

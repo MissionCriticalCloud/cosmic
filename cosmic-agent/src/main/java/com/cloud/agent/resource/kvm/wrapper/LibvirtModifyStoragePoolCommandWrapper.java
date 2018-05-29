@@ -3,7 +3,6 @@ package com.cloud.agent.resource.kvm.wrapper;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePool;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ModifyStoragePoolAnswer;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 @ResourceWrapper(handles = ModifyStoragePoolCommand.class)
 public final class LibvirtModifyStoragePoolCommandWrapper
-        extends CommandWrapper<ModifyStoragePoolCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<ModifyStoragePoolCommand, Answer, LibvirtComputingResource> {
 
     @Override
     public Answer execute(final ModifyStoragePoolCommand command,

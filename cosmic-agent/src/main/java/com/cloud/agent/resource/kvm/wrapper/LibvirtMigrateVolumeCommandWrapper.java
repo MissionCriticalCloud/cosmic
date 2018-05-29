@@ -2,7 +2,6 @@ package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateVolumeAnswer;
@@ -23,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = MigrateVolumeCommand.class)
-public final class LibvirtMigrateVolumeCommandWrapper extends CommandWrapper<MigrateVolumeCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtMigrateVolumeCommandWrapper extends LibvirtCommandWrapper<MigrateVolumeCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger logger = LoggerFactory.getLogger(LibvirtMigrateVolumeCommandWrapper.class);
 

@@ -4,7 +4,6 @@ import com.cloud.agent.resource.kvm.KvmHaBase.NfsStoragePool;
 import com.cloud.agent.resource.kvm.KvmHaChecker;
 import com.cloud.agent.resource.kvm.KvmHaMonitor;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.CheckOnHostCommand;
@@ -19,7 +18,7 @@ import java.util.concurrent.Future;
 
 @ResourceWrapper(handles = CheckOnHostCommand.class)
 public final class LibvirtCheckOnHostCommandWrapper
-        extends CommandWrapper<CheckOnHostCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<CheckOnHostCommand, Answer, LibvirtComputingResource> {
 
     @Override
     public Answer execute(final CheckOnHostCommand command, final LibvirtComputingResource libvirtComputingResource) {

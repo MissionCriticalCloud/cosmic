@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.GetHostStatsAnswer;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = GetHostStatsCommand.class)
 public final class LibvirtGetHostStatsCommandWrapper
-        extends CommandWrapper<GetHostStatsCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<GetHostStatsCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtGetHostStatsCommandWrapper.class);
 

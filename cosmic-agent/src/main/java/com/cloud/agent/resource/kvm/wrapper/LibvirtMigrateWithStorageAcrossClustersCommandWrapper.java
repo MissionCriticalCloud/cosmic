@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateWithStorageAcrossClustersAnswer;
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 @ResourceWrapper(handles = MigrateWithStorageAcrossClustersCommand.class)
-public final class LibvirtMigrateWithStorageAcrossClustersCommandWrapper extends CommandWrapper<MigrateWithStorageAcrossClustersCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtMigrateWithStorageAcrossClustersCommandWrapper extends LibvirtCommandWrapper<MigrateWithStorageAcrossClustersCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtMigrateWithStorageAcrossClustersCommandWrapper.class);
 

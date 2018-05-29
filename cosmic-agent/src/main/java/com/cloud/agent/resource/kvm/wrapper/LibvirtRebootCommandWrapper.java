@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.RebootAnswer;
@@ -13,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = RebootCommand.class)
-public final class LibvirtRebootCommandWrapper extends CommandWrapper<RebootCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtRebootCommandWrapper extends LibvirtCommandWrapper<RebootCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtRebootCommandWrapper.class);
 

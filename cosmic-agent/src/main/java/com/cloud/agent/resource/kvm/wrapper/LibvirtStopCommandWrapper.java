@@ -4,7 +4,6 @@ import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
 import com.cloud.agent.resource.kvm.VifDriver;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.StopAnswer;
@@ -20,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = StopCommand.class)
-public final class LibvirtStopCommandWrapper extends CommandWrapper<StopCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtStopCommandWrapper extends LibvirtCommandWrapper<StopCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtStopCommandWrapper.class);
 

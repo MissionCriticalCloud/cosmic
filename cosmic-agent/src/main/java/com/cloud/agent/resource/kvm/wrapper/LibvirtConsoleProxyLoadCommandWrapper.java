@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
-import com.cloud.common.request.CommandWrapper;
-import com.cloud.common.resource.ServerResource;
+import com.cloud.agent.resource.AgentResource;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.Command;
@@ -16,8 +15,7 @@ import java.net.URLConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class LibvirtConsoleProxyLoadCommandWrapper<T extends Command,
-        A extends Answer, R extends ServerResource> extends CommandWrapper<Command, Answer, ServerResource> {
+public abstract class LibvirtConsoleProxyLoadCommandWrapper<T extends Command, A extends Answer, R extends AgentResource> extends LibvirtCommandWrapper<Command, Answer, AgentResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtConsoleProxyLoadCommandWrapper.class);
 

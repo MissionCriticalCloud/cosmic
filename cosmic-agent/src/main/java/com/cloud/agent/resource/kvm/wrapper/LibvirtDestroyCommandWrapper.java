@@ -3,7 +3,6 @@ package com.cloud.agent.resource.kvm.wrapper;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePool;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.DestroyCommand;
@@ -15,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = DestroyCommand.class)
 public final class LibvirtDestroyCommandWrapper
-        extends CommandWrapper<DestroyCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<DestroyCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtDestroyCommandWrapper.class);
 

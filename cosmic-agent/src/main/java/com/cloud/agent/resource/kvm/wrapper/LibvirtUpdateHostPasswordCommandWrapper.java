@@ -1,7 +1,6 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.UpdateHostPasswordCommand;
@@ -9,7 +8,7 @@ import com.cloud.utils.script.Script;
 
 @ResourceWrapper(handles = UpdateHostPasswordCommand.class)
 public final class LibvirtUpdateHostPasswordCommandWrapper
-        extends CommandWrapper<UpdateHostPasswordCommand, Answer, LibvirtComputingResource> {
+        extends LibvirtCommandWrapper<UpdateHostPasswordCommand, Answer, LibvirtComputingResource> {
 
     @Override
     public Answer execute(final UpdateHostPasswordCommand command,

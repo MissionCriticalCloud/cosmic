@@ -5,7 +5,6 @@ import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
 import com.cloud.agent.resource.kvm.VifDriver;
 import com.cloud.agent.resource.kvm.async.MigrateKvmAsync;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
-import com.cloud.common.request.CommandWrapper;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateAnswer;
@@ -29,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ResourceWrapper(handles = MigrateCommand.class)
-public final class LibvirtMigrateCommandWrapper extends CommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
+public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
 
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtMigrateCommandWrapper.class);
 

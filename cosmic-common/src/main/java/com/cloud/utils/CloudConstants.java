@@ -7,7 +7,6 @@ public abstract class CloudConstants {
     public static final String PROPERTY_KEY_POD = "pod";
     public static final String PROPERTY_KEY_CLUSTER = "cluster";
     public static final String PROPERTY_KEY_RESOURCE = "resource";
-    public static final String PROPERTY_KEY_INSTANCE = "instance";
     public static final String PROPERTY_KEY_POOL = "pool";
     public static final String PROPERTY_KEY_GUID = "guid";
     public static final String PROPERTY_KEY_DEVELOPER = "developer";
