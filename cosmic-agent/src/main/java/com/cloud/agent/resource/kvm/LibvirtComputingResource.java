@@ -45,17 +45,18 @@ import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.FeaturesDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.GraphicDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.GuestDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.GuestResourceDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.HyperVEnlightenmentFeatureDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InputDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InterfaceDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.MetadataDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.QemuGuestAgentDef;
-import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.HyperVEnlightenmentFeatureDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.RngDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.ScsiDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.SerialDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.TermPolicy;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.VideoDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.WatchDogDef;
+import com.cloud.agent.service.AgentConfiguration;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandler;
 import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandlerBase;
@@ -66,10 +67,10 @@ import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.communication.command.PingRoutingCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
-import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupLocalstorageCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.network.VRScripts;
@@ -95,12 +96,11 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
-import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.RouterPrivateIpStrategy;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
@@ -230,6 +230,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     }
 
     private final LibvirtComputingResourceProperties libvirtComputingResourceProperties = new LibvirtComputingResourceProperties();
+    private AgentConfiguration agentConfiguration;
 
     private final Map<String, String> pifs = new HashMap<>();
     private final Map<String, VmStats> vmStats = new ConcurrentHashMap<>();
@@ -713,6 +714,11 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         initLibvirtLifecycleListener();
 
         return true;
+    }
+
+    @Override
+    public void configure(final AgentConfiguration agentConfiguration) {
+        this.agentConfiguration = agentConfiguration;
     }
 
     private void initLibvirtLifecycleListener() {
@@ -1239,6 +1245,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
 
         if (pool.getType() == StoragePoolType.CLVM && volFormat == PhysicalDiskFormat.RAW) {
             return "CLVM";
+        } else if (pool.getType() == StoragePoolType.LVM && volFormat == PhysicalDiskFormat.RAW) {
+            return "LVM";
         } else if ((poolType == StoragePoolType.NetworkFilesystem
                 || poolType == StoragePoolType.SharedMountPoint
                 || poolType == StoragePoolType.Filesystem
@@ -1669,13 +1677,12 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     final String mountpoint = pool.getLocalPath();
                     final String path = physicalDisk.getPath();
                     final String glusterVolume = pool.getSourceDir().replace("/", "");
-                    disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(),
-                            pool.getSourcePort(), null,
-                            null, devId, volume.getDiskController(), DiskProtocol.GLUSTER, ImageFormat.QCOW2);
-                } else if (volume.getDiskFormat() == ImageFormat.RAW) {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.RAW);
-                } else {
-                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), ImageFormat.QCOW2);
+                    disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(), pool.getSourcePort(), null, null, devId, volume.getDiskController(), DiskProtocol
+                            .GLUSTER, ImageFormat.QCOW2);
+                } else if (pool.getType() == StoragePoolType.CLVM || pool.getType() == StoragePoolType.LVM) {
+                    disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
+                } else if (pool.getType() == StoragePoolType.NetworkFilesystem) {
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), volume.getDiskFormat());
                 }
             }
 
@@ -1743,12 +1750,20 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
 
     @Override
     public StartupCommand[] initialize() {
+        final List<StartupCommand> startupCommandList = new ArrayList<>();
 
         final List<Object> info = getHostInfo();
         this.totalMemory = (Long) info.get(1);
 
-        final StartupRoutingCommand cmd = new StartupRoutingCommand((Integer) info.get(0), (Long) info.get(1), (Long) info.get(3), (String) info.get(2), getHypervisorType(),
-                RouterPrivateIpStrategy.HostLocal);
+        final StartupRoutingCommand cmd = new StartupRoutingCommand(
+                (Integer) info.get(0),
+                (Long) info.get(1),
+                (Long) info.get(3),
+                (String) info.get(2),
+                getHypervisorType(),
+                RouterPrivateIpStrategy.HostLocal
+        );
+
         cmd.setCpuSockets((Integer) info.get(4));
         fillNetworkInformation(cmd);
         this.privateIp = cmd.getPrivateIpAddress();
@@ -1759,42 +1774,44 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         cmd.setIqn(getIqn());
         cmd.setVersion(LibvirtComputingResource.class.getPackage().getImplementationVersion());
 
-        StartupStorageCommand sscmd = null;
+        startupCommandList.add(cmd);
+        startupCommandList.addAll(initializeLocalstorage());
+
+        return startupCommandList.toArray(new StartupCommand[startupCommandList.size()]);
+    }
+
+    private List<StartupLocalstorageCommand> initializeLocalstorage() {
+        final List<StartupLocalstorageCommand> startupLocalstorageCommandList = new ArrayList<>();
+
         try {
+            for (final AgentConfiguration.Localstorage localstorage : this.agentConfiguration.getLocalstorages()) {
+                if (localstorage.getType() == StoragePoolType.LVM) {
+                    logger.debug("Found local LVM storage pool: " + localstorage.getPath() + ", with uuid: " + localstorage.getUuid() + ", in the agent configuration");
+                    final KvmStoragePool localStoragePool = this.storagePoolMgr.createStoragePool(localstorage.getUuid(), "localhost", -1, localstorage.getPath(), "", StoragePoolType.LVM);
 
-            final String localStoragePath = getLocalStoragePath();
-            final KvmStoragePool localStoragePool = this.storagePoolMgr.createStoragePool(getLocalStorageUuid(), "localhost", -1,
-                    localStoragePath, "", StoragePoolType.Filesystem);
-            final StoragePoolInfo pi = new StoragePoolInfo(localStoragePool.getUuid(),
-                    cmd.getPrivateIpAddress(), localStoragePath, localStoragePath,
-                    StoragePoolType.Filesystem, localStoragePool.getCapacity(), localStoragePool.getAvailable());
+                    final StoragePoolInfo storagePoolInfo = new StoragePoolInfo();
+                    storagePoolInfo.setUuid(localstorage.getUuid());
+                    storagePoolInfo.setHost(getName());
+                    storagePoolInfo.setLocalPath(localstorage.getPath());
+                    storagePoolInfo.setPoolType(StoragePoolType.LVM);
+                    storagePoolInfo.setCapacityBytes(localStoragePool.getCapacity());
+                    storagePoolInfo.setAvailableBytes(localStoragePool.getAvailable());
 
-            sscmd = new StartupStorageCommand();
-            sscmd.setPoolInfo(pi);
-            sscmd.setGuid(pi.getUuid());
-            sscmd.setDataCenter(getZone());
-            sscmd.setResourceType(StorageResourceType.STORAGE_POOL);
+                    final StartupLocalstorageCommand startupLocalstorageCommand = new StartupLocalstorageCommand();
+                    startupLocalstorageCommand.setPoolInfo(storagePoolInfo);
+
+                    startupLocalstorageCommandList.add(startupLocalstorageCommand);
+                }
+            }
         } catch (final CloudRuntimeException e) {
             logger.debug("Unable to initialize local storage pool: " + e);
         }
 
-        if (sscmd != null) {
-            return new StartupCommand[]{cmd, sscmd};
-        } else {
-            return new StartupCommand[]{cmd};
-        }
+        return startupLocalstorageCommandList;
     }
 
     private String getZone() {
         return this.libvirtComputingResourceProperties.getZone();
-    }
-
-    private String getLocalStoragePath() {
-        return this.libvirtComputingResourceProperties.getLocalStoragePath();
-    }
-
-    private String getLocalStorageUuid() {
-        return this.libvirtComputingResourceProperties.getLocalStorageUuid();
     }
 
     private String getCluster() {

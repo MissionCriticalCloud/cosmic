@@ -24,9 +24,7 @@ cosmic:
     uri: 'qemu:///system'
   libvirt:
     vif-driver: 'com.cloud.agent.resource.kvm.vif.OvsVifDriver'
-  localstorage:
-    path: '/var/lib/libvirt/images/'
-    uuid:
+  localstorages:
   network:
     bridge:
       type: 'OPENVSWITCH'

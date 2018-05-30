@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-from optparse import OptionParser
-
 import os
+import uuid
 import yaml
+from optparse import OptionParser
 
 if __name__ == '__main__':
     parser = OptionParser()
@@ -24,7 +24,18 @@ if __name__ == '__main__':
         config['cosmic']['cluster'] = options.cluster
         config['cosmic']['pod'] = options.pod
         config['cosmic']['zone'] = options.zone
-        config['cosmic']['localstorage']['uuid'] = options.guid
+        config['cosmic']['localstorages'] = [
+            {
+                'uuid': str(uuid.uuid4()),
+                'path': 'vg_vdb',
+                'type': 'LVM'
+            },
+            {
+                'uuid': str(uuid.uuid4()),
+                'path': 'vg_vdc',
+                'type': 'LVM'
+            }
+        ]
 
     with open('/etc/cosmic/agent/application.yml', 'w') as f:
         yaml.dump(config, f, default_flow_style=False)

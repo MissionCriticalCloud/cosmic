@@ -2,6 +2,7 @@ package com.cloud.agent.resource.consoleproxy;
 
 import com.cloud.agent.resource.AgentResource;
 import com.cloud.agent.resource.AgentResourceBase;
+import com.cloud.agent.service.AgentConfiguration;
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckHealthAnswer;
@@ -13,9 +14,9 @@ import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupProxyCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupProxyCommand;
 import com.cloud.model.enumeration.ExitStatus;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.NumbersUtil;
@@ -55,6 +56,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ConsoleProxyResource extends AgentResourceBase implements AgentResource {
     static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyResource.class);
+
+    private AgentConfiguration agentConfiguration;
 
     private final Properties _properties = new Properties();
     long _proxyVmId;
@@ -291,6 +294,11 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
         }
 
         return true;
+    }
+
+    @Override
+    public void configure(final AgentConfiguration agentConfiguration) {
+        this.agentConfiguration = agentConfiguration;
     }
 
     @Override

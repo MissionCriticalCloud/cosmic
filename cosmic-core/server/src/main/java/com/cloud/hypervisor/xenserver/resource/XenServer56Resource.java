@@ -1,7 +1,7 @@
 package com.cloud.hypervisor.xenserver.resource;
 
 import com.cloud.common.resource.ServerResource;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.utils.ssh.SSHCmdHelper;
 

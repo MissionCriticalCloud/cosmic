@@ -378,11 +378,19 @@ public class CloudStackPrimaryDataStoreLifeCycleImpl implements PrimaryDataStore
     protected boolean createStoragePool(final long hostId, final StoragePool pool) {
         s_logger.debug("creating pool " + pool.getName() + " on  host " + hostId);
 
-        if (pool.getPoolType() != StoragePoolType.NetworkFilesystem && pool.getPoolType() != StoragePoolType.Filesystem &&
-                pool.getPoolType() != StoragePoolType.IscsiLUN && pool.getPoolType() != StoragePoolType.Iscsi &&
-                pool.getPoolType() != StoragePoolType.SharedMountPoint && pool.getPoolType() != StoragePoolType.PreSetup && pool.getPoolType() != StoragePoolType.OCFS2 &&
-                pool.getPoolType() != StoragePoolType.RBD && pool.getPoolType() != StoragePoolType.CLVM && pool.getPoolType() != StoragePoolType.SMB &&
-                pool.getPoolType() != StoragePoolType.Gluster) {
+        if (pool.getPoolType() != StoragePoolType.NetworkFilesystem
+                && pool.getPoolType() != StoragePoolType.Filesystem
+                && pool.getPoolType() != StoragePoolType.IscsiLUN
+                && pool.getPoolType() != StoragePoolType.Iscsi
+                && pool.getPoolType() != StoragePoolType.SharedMountPoint
+                && pool.getPoolType() != StoragePoolType.PreSetup
+                && pool.getPoolType() != StoragePoolType.OCFS2
+                && pool.getPoolType() != StoragePoolType.RBD
+                && pool.getPoolType() != StoragePoolType.CLVM
+                && pool.getPoolType() != StoragePoolType.LVM
+                && pool.getPoolType() != StoragePoolType.SMB
+                && pool.getPoolType() != StoragePoolType.Gluster
+                ) {
             s_logger.warn(" Doesn't support storage pool type " + pool.getPoolType());
             return false;
         }

@@ -68,7 +68,7 @@ public final class LibvirtResizeVolumeCommandWrapper
              * libvirt doesn't support resizing (C)LVM devices, and corrupts QCOW2 in some scenarios, so we have to do these
              * via Bash script
              */
-            if (pool.getType() != StoragePoolType.CLVM && vol.getFormat() != PhysicalDiskFormat.QCOW2) {
+            if (pool.getType() != StoragePoolType.CLVM && pool.getType() != StoragePoolType.LVM && vol.getFormat() != PhysicalDiskFormat.QCOW2) {
                 s_logger.debug("Volume " + path + " can be resized by libvirt. Asking libvirt to resize the volume.");
                 try {
                     final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();

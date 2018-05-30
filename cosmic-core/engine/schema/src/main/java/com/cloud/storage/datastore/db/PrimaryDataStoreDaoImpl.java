@@ -132,6 +132,22 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
     }
 
     @Override
+    public List<StoragePoolVO> listByScopeAndZone(final ScopeType scope, final Long zoneId) {
+        final SearchCriteria<StoragePoolVO> sc = AllFieldSearch.create();
+        sc.setParameters("datacenterId", zoneId);
+        sc.setParameters("scope", scope);
+        return listBy(sc);
+    }
+
+    @Override
+    public List<StoragePoolVO> listByScopeAndCluster(final ScopeType scope, final Long clusterId) {
+        final SearchCriteria<StoragePoolVO> sc = AllFieldSearch.create();
+        sc.setParameters("clusterId", clusterId);
+        sc.setParameters("scope", scope);
+        return listBy(sc);
+    }
+
+    @Override
     public void updateCapacityBytes(final long id, final long capacityBytes) {
         final StoragePoolVO pool = createForUpdate(id);
         pool.setCapacityBytes(capacityBytes);
@@ -186,7 +202,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
         sql.delete(sql.length() - 4, sql.length());
         sql.append(DetailsSqlSuffix);
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
+        try (final PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
             final List<StoragePoolVO> pools = new ArrayList<>();
             int i = 1;
             pstmt.setLong(i++, dcId);
@@ -196,7 +212,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
                 pstmt.setLong(i++, clusterId);
             }
             pstmt.setInt(i++, details.size());
-            try (ResultSet rs = pstmt.executeQuery()) {
+            try (final ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     pools.add(toEntityBean(rs, false));
                 }
@@ -265,6 +281,15 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
     }
 
     @Override
+    public List<StoragePoolVO> listHostScopedPoolsByStorageHost(final String hostFqdnOrIp) {
+        final SearchCriteria<StoragePoolVO> sc = AllFieldSearch.create();
+        sc.setParameters("hostAddress", hostFqdnOrIp);
+        sc.setParameters("scope", ScopeType.HOST);
+
+        return listIncludingRemovedBy(sc);
+    }
+
+    @Override
     public StoragePoolVO findPoolByHostPath(final long datacenterId, final Long podId, final String host, final String path, final String uuid) {
         final SearchCriteria<StoragePoolVO> sc = AllFieldSearch.create();
         sc.setParameters("hostAddress", host);
@@ -312,11 +337,11 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
         final StringBuilder sql = new StringBuilder(FindPoolTagDetails);
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         final List<String> tags = new ArrayList<>();
-        try (PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
+        try (final PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
             if (pstmt != null) {
                 pstmt.setLong(1, poolId);
                 pstmt.setString(2, value);
-                try (ResultSet rs = pstmt.executeQuery()) {
+                try (final ResultSet rs = pstmt.executeQuery()) {
                     while (rs.next()) {
                         tags.add(rs.getString("name"));
                     }
@@ -406,7 +431,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
             sql.delete(sql.length() - 4, sql.length());
             sql.append(ZoneWideDetailsSqlSuffix);
             final TransactionLegacy txn = TransactionLegacy.currentTxn();
-            try (PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
+            try (final PreparedStatement pstmt = txn.prepareStatement(sql.toString())) {
                 final List<StoragePoolVO> pools = new ArrayList<>();
                 if (pstmt != null) {
                     int i = 1;
@@ -421,7 +446,7 @@ public class PrimaryDataStoreDaoImpl extends GenericDaoBase<StoragePoolVO, Long>
 
                     pstmt.setInt(i++, details.size());
 
-                    try (ResultSet rs = pstmt.executeQuery()) {
+                    try (final ResultSet rs = pstmt.executeQuery()) {
                         while (rs.next()) {
                             pools.add(toEntityBean(rs, false));
                         }

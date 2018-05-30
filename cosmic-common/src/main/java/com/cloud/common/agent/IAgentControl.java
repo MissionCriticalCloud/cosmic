@@ -1,7 +1,7 @@
 package com.cloud.common.agent;
 
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.AgentControlCommand;
 import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 
 public interface IAgentControl {

@@ -1,7 +1,7 @@
 package com.cloud.agent.resource.kvm.event;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.ShutdownEventCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.ShutdownEventCommand;
 import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 
 import org.libvirt.Domain;

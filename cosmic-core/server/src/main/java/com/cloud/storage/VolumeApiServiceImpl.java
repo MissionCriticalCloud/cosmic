@@ -1,5 +1,9 @@
 package com.cloud.storage;
 
+import static com.cloud.storage.ScopeType.CLUSTER;
+import static com.cloud.storage.ScopeType.HOST;
+import static com.cloud.storage.ScopeType.ZONE;
+
 import com.cloud.agent.AgentManager;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.user.volume.AttachVolumeCmd;
@@ -26,8 +30,6 @@ import com.cloud.engine.subsystem.api.storage.DataObject;
 import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
-import com.cloud.engine.subsystem.api.storage.HostScope;
-import com.cloud.engine.subsystem.api.storage.Scope;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
 import com.cloud.engine.subsystem.api.storage.VolumeDataFactory;
 import com.cloud.engine.subsystem.api.storage.VolumeInfo;
@@ -59,6 +61,7 @@ import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.DataCenter;
+import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.domain.Domain;
 import com.cloud.legacymodel.exceptions.CloudException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -69,7 +72,7 @@ import com.cloud.legacymodel.exceptions.PermissionDeniedException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.statemachine.StateMachine2;
-import com.cloud.legacymodel.storage.PrimaryDataStoreInfo;
+import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.storage.TemplateType;
@@ -86,10 +89,14 @@ import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
+import com.cloud.offering.ServiceOffering;
+import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
@@ -109,6 +116,7 @@ import com.cloud.user.ResourceLimitService;
 import com.cloud.user.VmDiskStatisticsVO;
 import com.cloud.user.dao.AccountDao;
 import com.cloud.user.dao.VmDiskStatisticsDao;
+import com.cloud.uservm.UserVm;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.EncryptionUtil;
 import com.cloud.utils.EnumUtils;
@@ -126,7 +134,6 @@ import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.identity.ManagementServerNode;
 import com.cloud.utils.imagestore.ImageStoreUtil;
-import com.cloud.utils.qemu.QemuImg;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VmWork;
@@ -149,12 +156,15 @@ import javax.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -196,6 +206,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     SnapshotDao _snapshotDao;
     @Inject
     ServiceOfferingDetailsDao _serviceOfferingDetailsDao;
+    @Inject
+    ServiceOfferingDao _serviceOfferingDao;
     @Inject
     StoragePoolDetailsDao storagePoolDetailsDao;
     @Inject
@@ -435,12 +447,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             throw new PermissionDeniedException("Cannot perform this operation, Zone is currently disabled: " + zoneId);
         }
 
-        // If local storage is disabled then creation of volume with local disk
-        // offering not allowed
-        if (!zone.isLocalStorageEnabled() && diskOffering.getUseLocalStorage()) {
-            throw new InvalidParameterValueException("Zone is not configured to use local storage but volume's disk offering " + diskOffering.getName() + " uses it");
-        }
-
         final String userSpecifiedName = getVolumeNameFromCommand(cmd);
 
         DiskControllerType diskControllerType = getDiskControllerType();
@@ -449,13 +455,13 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             diskControllerType = DiskControllerType.valueOf(cmd.getDiskController().toUpperCase());
         }
 
-        ImageFormat diskFormat = ImageFormat.QCOW2;
-        if (cmd.getDiskFormat() != null) {
-            diskFormat = ImageFormat.valueOf(cmd.getDiskFormat().toUpperCase());
+        ImageFormat fileFormat = ImageFormat.QCOW2;
+        if (cmd.getFileFormat() != null) {
+            fileFormat = ImageFormat.valueOf(cmd.getFileFormat().toUpperCase());
         }
 
         return commitVolume(cmd, caller, owner, displayVolume, zoneId, diskOfferingId, provisioningType, size, minIops, maxIops, parentVolume,
-                userSpecifiedName, this._uuidMgr.generateUuid(Volume.class, cmd.getCustomId()), diskControllerType, diskFormat);
+                userSpecifiedName, this._uuidMgr.generateUuid(Volume.class, cmd.getCustomId()), diskControllerType, fileFormat);
     }
 
     private DiskControllerType getDiskControllerType() {
@@ -682,16 +688,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             }
         }
 
-        // If local storage is disabled then attaching a volume with local disk
-        // offering not allowed
-        final DataCenterVO dataCenter = this._dcDao.findById(volumeToAttach.getDataCenterId());
-        if (!dataCenter.isLocalStorageEnabled()) {
-            final DiskOfferingVO diskOffering = this._diskOfferingDao.findById(volumeToAttach.getDiskOfferingId());
-            if (diskOffering.getUseLocalStorage()) {
-                throw new InvalidParameterValueException("Zone is not configured to use local storage but volume's disk offering " + diskOffering.getName() + " uses it");
-            }
-        }
-
         // if target VM has associated VM snapshots
         final List<VMSnapshotVO> vmSnapshots = this._vmSnapshotDao.findByVm(vmId);
         if (vmSnapshots.size() > 0) {
@@ -838,89 +834,212 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return workJob;
     }
 
+    /**
+     * Volume placement logic
+     */
+
+    private StoragePool findStoragePoolToCreateVolumeOn(final VolumeInfo volumeInfo, final UserVmVO virtualMachine) {
+        final DiskOffering diskOffering = this._diskOfferingDao.findById(volumeInfo.getDiskOfferingId());
+
+        final List<StoragePoolVO> storagePoolsInScopeWithVirtualMachine = findAllStoragePoolsInScopeWithVirtualMachine(virtualMachine);
+
+        final List<StoragePoolVO> storagePoolVOListMatchedTags = checkIfStoragePoolWithMatchingTags(storagePoolsInScopeWithVirtualMachine, Arrays.asList(diskOffering.getTagsArray()));
+
+        final List<StoragePoolVO> storagePoolVOListSufficientResources = checkIfStoragePoolHasSufficientResources(storagePoolVOListMatchedTags, volumeInfo);
+
+        return getStoragePoolLeastResourcesUsed(storagePoolVOListSufficientResources);
+    }
+
+    private List<StoragePoolVO> findAllStoragePoolsInScopeWithVirtualMachine(final UserVmVO virtualMachine) {
+        List<StoragePoolVO> storagePoolVOList;
+
+        final StoragePoolVO existingVolume = findMostSpecificStoragePoolForVirtualMachine(virtualMachine);
+
+        if (virtualMachine.getState().equals(State.Running)) {
+            // We know the host! Easy stuff.
+            final Host host = this._hostDao.findById(virtualMachine.getHostId());
+
+            // Gather all the storage pools reachable by this host
+            storagePoolVOList = listAllStoragePoolsReachableByHost(host);
+        } else {
+            // TODO We don't account for VM CPU / MEM capacity when selecting the storage location
+            final ServiceOffering serviceOffering = this._serviceOfferingDao.findById(null, virtualMachine.getServiceOfferingId());
+
+            // 1. Figure out on which hosts the vm can run!
+            final List<HostVO> hosts = this._hostDao.listByHostTag(HostType.Routing, null, null, virtualMachine.getDataCenterId(), serviceOffering.getHostTag());
+
+            // 2. Gather all the storage pools reachable by this host
+            storagePoolVOList = hosts.stream().flatMap(hostVO -> listAllStoragePoolsReachableByHost(hostVO).stream()).distinct().collect(Collectors.toList());
+
+            if (existingVolume != null) {
+                // 3. Gather all the available pools from this volume -> inner join with previously found pools
+                final List<StoragePoolVO> availableStoragePools = listStoragePoolsInScopeWithStoragePool(existingVolume);
+
+                storagePoolVOList = storagePoolVOList.stream().flatMap(storagePoolVO -> availableStoragePools.stream().filter(storagePoolVO::equals)).collect(Collectors.toList());
+            }
+        }
+
+        return storagePoolVOList;
+    }
+
+    private StoragePoolVO findMostSpecificStoragePoolForVirtualMachine(final UserVm userVm) {
+        final List<VolumeVO> volumesOfVirtualMachine = this._volsDao.findByInstance(userVm.getId());
+
+        final List<StoragePoolVO> storagePoolVOList = volumesOfVirtualMachine.stream().map(volumeVO -> this._storagePoolDao.findById(volumeVO.getPoolId())).collect(Collectors.toList());
+
+        final Optional<StoragePoolVO> volumeWithStoragePoolHost = storagePoolVOList.stream().filter(storagePoolVO -> storagePoolVO.getScope().equals(HOST)).findFirst();
+        if (volumeWithStoragePoolHost.isPresent()) {
+            return volumeWithStoragePoolHost.get();
+        }
+
+        final Optional<StoragePoolVO> volumeWithStoragePoolCluster = storagePoolVOList.stream().filter(storagePoolVO -> storagePoolVO.getScope().equals(CLUSTER)).findFirst();
+        if (volumeWithStoragePoolCluster.isPresent()) {
+            return volumeWithStoragePoolCluster.get();
+        }
+
+        final Optional<StoragePoolVO> volumeWithStoragePoolZone = storagePoolVOList.stream().filter(storagePoolVO -> storagePoolVO.getScope().equals(ZONE)).findFirst();
+        return volumeWithStoragePoolZone.orElse(null);
+    }
+
+    private List<StoragePoolVO> listAllStoragePoolsReachableByHost(final Host host) {
+        final List<StoragePoolVO> storagePools = new ArrayList<>();
+
+        // 1. Look for all storage pools on this host with ScopeType.HOST
+        storagePools.addAll(this._storagePoolDao.listHostScopedPoolsByStorageHost(host.getName()));
+
+        // 2. Look for all storage pools in this cluster with ScopeType.CLUSTER
+        storagePools.addAll(this._storagePoolDao.listByScopeAndCluster(ScopeType.CLUSTER, host.getClusterId()));
+
+        // 3. Look for all storage pools in this zone with ScopeType.ZONE
+        storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.ZONE, host.getDataCenterId()));
+
+        // Only return "Up" storage pools
+        return storagePools.stream().filter(storagePool -> storagePool.getStatus().equals(StoragePoolStatus.Up) && !storagePool.isInMaintenance() && storagePool.getRemoved() == null).collect
+                (Collectors.toList());
+    }
+
+    private List<StoragePoolVO> listStoragePoolsInScopeWithStoragePool(final StoragePoolVO storagePoolVO) {
+        final List<StoragePoolVO> storagePools = new ArrayList<>();
+
+        switch (storagePoolVO.getScope()) {
+            case HOST:
+                // 1. Look for all storage pools on this host with ScopeType.HOST
+                storagePools.addAll(this._storagePoolDao.listHostScopedPoolsByStorageHost(storagePoolVO.getHostAddress()));
+
+                // 2. Look for all storage pools in this cluster with ScopeType.CLUSTER
+                storagePools.addAll(this._storagePoolDao.listByScopeAndCluster(ScopeType.CLUSTER, storagePoolVO.getClusterId()));
+
+                // 3. Look for all storage pools in this zone with ScopeType.ZONE
+                storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.ZONE, storagePoolVO.getDataCenterId()));
+                break;
+            case CLUSTER:
+                // 1. Look for all storage pools in this cluster with ScopeType.HOST
+                storagePools.addAll(this._storagePoolDao.listByScopeAndCluster(ScopeType.HOST, storagePoolVO.getClusterId()));
+
+                // 2. Look for all storage pools in this cluster with ScopeType.CLUSTER
+                storagePools.addAll(this._storagePoolDao.listByScopeAndCluster(ScopeType.CLUSTER, storagePoolVO.getClusterId()));
+
+                // 3. Look for all storage pools in this zone with ScopeType.ZONE
+                storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.ZONE, storagePoolVO.getDataCenterId()));
+
+                break;
+            case ZONE:
+                // 1. Look for all storage pools in this zone with ScopeType.HOST
+                storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.HOST, storagePoolVO.getDataCenterId()));
+
+                // 2. Look for all storage pools in this zone with ScopeType.CLUSTER
+                storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.CLUSTER, storagePoolVO.getDataCenterId()));
+
+                // 3. Look for all storage pools in this zone with ScopeType.ZONE
+                storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.ZONE, storagePoolVO.getDataCenterId()));
+
+                break;
+        }
+
+        // Only return "Up" storage pools
+        return storagePools.stream().filter(storagePool -> storagePool.getStatus().equals(StoragePoolStatus.Up) && !storagePool.isInMaintenance() && storagePool.getRemoved() == null).collect
+                (Collectors.toList());
+    }
+
+    private StoragePoolVO getStoragePoolLeastResourcesUsed(final List<StoragePoolVO> storagePoolVOList) {
+        return storagePoolVOList.stream().min((a, b) -> {
+            final Long availablePercentageA = a.getUsedBytes() / a.getCapacityBytes();
+            final Long availablePercentageB = b.getUsedBytes() / b.getCapacityBytes();
+
+            return availablePercentageB.compareTo(availablePercentageA);
+        }).orElse(null);
+    }
+
+    private List<StoragePoolVO> checkIfStoragePoolWithMatchingTags(final List<StoragePoolVO> storagePoolVOList, final List<String> tags) {
+        return storagePoolVOList.stream().filter(storagePoolVO -> {
+            final Map<String, String> details = this._storagePoolDao.getDetails(storagePoolVO.getId());
+
+            for (final String tag : tags) {
+                if (!details.containsKey(tag)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }).collect(Collectors.toList());
+    }
+
+    private List<StoragePoolVO> checkIfStoragePoolHasSufficientResources(final List<StoragePoolVO> storagePoolVOList, final VolumeInfo volumeInfo) {
+        return storagePoolVOList.stream().filter(storagePoolVO -> (storagePoolVO.getCapacityBytes() - storagePoolVO.getUsedBytes()) > volumeInfo.getSize()).collect(Collectors.toList());
+    }
+
+    private boolean canVolumeBeAttachedToVirtualMachine(final VolumeInfo volumeInfo, final UserVmVO userVmVO) {
+        final StoragePoolVO storagePoolOfVolumeToAttach = this._storagePoolDao.findById(volumeInfo.getPoolId());
+
+        final List<StoragePoolVO> storagePoolsInScopeWithVirtualMachine = findAllStoragePoolsInScopeWithVirtualMachine(userVmVO);
+
+        return storagePoolsInScopeWithVirtualMachine.stream().filter(storagePoolOfVolumeToAttach::equals).count() == 1;
+    }
+
     private Volume orchestrateAttachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
-        final VolumeInfo volumeToAttach = this.volFactory.getVolume(volumeId);
+        VolumeInfo volumeToAttach = this.volFactory.getVolume(volumeId);
+        final UserVmVO virtualMachine = this._userVmDao.findById(vmId);
+        final List<VolumeVO> volumesOfVirtualMachine = this._volsDao.findByInstance(vmId);
 
         if (volumeToAttach.isAttachedVM()) {
             throw new CloudRuntimeException("This volume is already attached to a VM.");
         }
 
-        UserVmVO vm = this._userVmDao.findById(vmId);
-        VolumeVO exstingVolumeOfVm = null;
-        final List<VolumeVO> rootVolumesOfVm = this._volsDao.findByInstanceAndType(vmId, VolumeType.ROOT);
-        if (rootVolumesOfVm.size() > 1) {
-            throw new CloudRuntimeException("The VM " + vm.getHostName() + " has more than one ROOT volume and is in an invalid state.");
-        } else {
-            if (!rootVolumesOfVm.isEmpty()) {
-                exstingVolumeOfVm = rootVolumesOfVm.get(0);
-            } else {
-                // locate data volume of the vm
-                final List<VolumeVO> diskVolumesOfVm = this._volsDao.findByInstanceAndType(vmId, VolumeType.DATADISK);
-                for (final VolumeVO diskVolume : diskVolumesOfVm) {
-                    if (diskVolume.getState() != Volume.State.Allocated) {
-                        exstingVolumeOfVm = diskVolume;
-                        break;
-                    }
-                }
+        if (volumesOfVirtualMachine.stream().filter(volumeVO -> volumeVO.getVolumeType().equals(VolumeType.ROOT)).count() > 1) {
+            throw new CloudRuntimeException("The VM " + virtualMachine.getHostName() + " has more than one ROOT volume and is in an invalid state.");
+        }
+
+        // Is the volume created on a storage pool, yet?
+        if (volumeToAttach.getState().equals(Volume.State.Allocated)) {
+            // Nope! Let's go and find out where we're gonna create it.
+            final StoragePool storagePool = findStoragePoolToCreateVolumeOn(volumeToAttach, virtualMachine);
+
+            if (storagePool == null) {
+                throw new CloudRuntimeException("Failed to create volume on primary storage, no possible primary storage pool found!");
             }
-        }
 
-        final HypervisorType rootDiskHyperType = vm.getHypervisorType();
-        final HypervisorType volumeToAttachHyperType = this._volsDao.getHypervisorType(volumeToAttach.getId());
-
-        VolumeInfo newVolumeOnPrimaryStorage = volumeToAttach;
-
-        //don't create volume on primary storage if its being attached to the vm which Root's volume hasn't been created yet
-        StoragePoolVO destPrimaryStorage = null;
-        if (exstingVolumeOfVm != null && !exstingVolumeOfVm.getState().equals(Volume.State.Allocated)) {
-            destPrimaryStorage = this._storagePoolDao.findById(exstingVolumeOfVm.getPoolId());
-        }
-
-        final boolean volumeOnSecondary = volumeToAttach.getState() == Volume.State.Uploaded;
-
-        if (destPrimaryStorage != null && (volumeToAttach.getState() == Volume.State.Allocated || volumeOnSecondary)) {
             try {
-                newVolumeOnPrimaryStorage = this._volumeMgr.createVolumeOnPrimaryStorage(vm, volumeToAttach, rootDiskHyperType, destPrimaryStorage);
+                volumeToAttach = this._volumeMgr.createVolumeOnPrimaryStorage(virtualMachine, volumeToAttach, virtualMachine.getHypervisorType(), storagePool);
             } catch (final NoTransitionException e) {
                 s_logger.debug("Failed to create volume on primary storage", e);
                 throw new CloudRuntimeException("Failed to create volume on primary storage", e);
             }
-        }
-
-        // reload the volume from db
-        newVolumeOnPrimaryStorage = this.volFactory.getVolume(newVolumeOnPrimaryStorage.getId());
-        final boolean moveVolumeNeeded = needMoveVolume(exstingVolumeOfVm, newVolumeOnPrimaryStorage);
-
-        if (moveVolumeNeeded) {
-            final PrimaryDataStoreInfo primaryStore = (PrimaryDataStoreInfo) newVolumeOnPrimaryStorage.getDataStore();
-            if (primaryStore.isLocal()) {
-                throw new CloudRuntimeException("Failed to attach local data volume " + volumeToAttach.getName() + " to VM " + vm.getDisplayName()
-                        + " as migration of local data volume is not allowed");
-            }
-            final StoragePoolVO vmRootVolumePool = this._storagePoolDao.findById(exstingVolumeOfVm.getPoolId());
-
-            try {
-                newVolumeOnPrimaryStorage = this._volumeMgr.moveVolume(newVolumeOnPrimaryStorage, vmRootVolumePool.getDataCenterId(), vmRootVolumePool.getPodId(),
-                        vmRootVolumePool.getClusterId(), volumeToAttachHyperType);
-            } catch (final ConcurrentOperationException e) {
-                s_logger.debug("move volume failed", e);
-                throw new CloudRuntimeException("move volume failed", e);
-            } catch (final StorageUnavailableException e) {
-                s_logger.debug("move volume failed", e);
-                throw new CloudRuntimeException("move volume failed", e);
+        } else {
+            /**
+             * Check if storage pool of volume is in scope of most specific volume of virtualmachine
+             */
+            if (!canVolumeBeAttachedToVirtualMachine(volumeToAttach, virtualMachine)) {
+                throw new CloudRuntimeException("Can't attach volume to virtualmachine, volume is not in scope of virtualmachine.");
             }
         }
-        VolumeVO newVol = this._volsDao.findById(newVolumeOnPrimaryStorage.getId());
-        // Getting the fresh vm object in case of volume migration to check the current state of VM
-        if (moveVolumeNeeded || volumeOnSecondary) {
-            vm = this._userVmDao.findById(vmId);
-            if (vm == null) {
-                throw new InvalidParameterValueException("VM not found.");
-            }
-        }
-        newVol = sendAttachVolumeCommand(vm, newVol, deviceId, diskController);
-        return newVol;
+
+        final VolumeVO newVol = this._volsDao.findById(volumeToAttach.getId());
+        return sendAttachVolumeCommand(virtualMachine, newVol, deviceId, diskController);
     }
+
+    /**
+     * End volume placement logic
+     */
 
     public Outcome<Volume> attachVolumeToVmThroughJobQueue(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
 
@@ -955,60 +1074,6 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         AsyncJobExecutionContext.getCurrentExecutionContext().joinJob(workJob.getId());
 
         return new VmJobVolumeOutcome(workJob, volumeId);
-    }
-
-    private boolean needMoveVolume(final VolumeVO existingVolume, final VolumeInfo newVolume) {
-        if (existingVolume == null || existingVolume.getPoolId() == null || newVolume.getPoolId() == null) {
-            return false;
-        }
-
-        final DataStore storeForExistingVol = this.dataStoreMgr.getPrimaryDataStore(existingVolume.getPoolId());
-        final DataStore storeForNewVol = this.dataStoreMgr.getPrimaryDataStore(newVolume.getPoolId());
-
-        final Scope storeForExistingStoreScope = storeForExistingVol.getScope();
-        if (storeForExistingStoreScope == null) {
-            throw new CloudRuntimeException("Can't get scope of data store: " + storeForExistingVol.getId());
-        }
-
-        final Scope storeForNewStoreScope = storeForNewVol.getScope();
-        if (storeForNewStoreScope == null) {
-            throw new CloudRuntimeException("Can't get scope of data store: " + storeForNewVol.getId());
-        }
-
-        if (storeForNewStoreScope.getScopeType() == ScopeType.ZONE) {
-            return false;
-        }
-
-        if (storeForExistingStoreScope.getScopeType() != storeForNewStoreScope.getScopeType()) {
-            if (storeForNewStoreScope.getScopeType() == ScopeType.CLUSTER) {
-                Long vmClusterId = null;
-                if (storeForExistingStoreScope.getScopeType() == ScopeType.HOST) {
-                    final HostScope hs = (HostScope) storeForExistingStoreScope;
-                    vmClusterId = hs.getClusterId();
-                } else if (storeForExistingStoreScope.getScopeType() == ScopeType.ZONE) {
-                    final Long hostId = this._vmInstanceDao.findById(existingVolume.getInstanceId()).getHostId();
-                    if (hostId != null) {
-                        final HostVO host = this._hostDao.findById(hostId);
-                        vmClusterId = host.getClusterId();
-                    }
-                }
-                if (storeForNewStoreScope.getScopeId().equals(vmClusterId)) {
-                    return false;
-                } else {
-                    return true;
-                }
-            } else if (storeForNewStoreScope.getScopeType() == ScopeType.HOST
-                    && (storeForExistingStoreScope.getScopeType() == ScopeType.CLUSTER || storeForExistingStoreScope.getScopeType() == ScopeType.ZONE)) {
-                final Long hostId = this._vmInstanceDao.findById(existingVolume.getInstanceId()).getHostId();
-                if (storeForNewStoreScope.getScopeId().equals(hostId)) {
-                    return false;
-                }
-            }
-            throw new InvalidParameterValueException("Can't move volume between scope: " + storeForNewStoreScope.getScopeType() + " and " + storeForExistingStoreScope
-                    .getScopeType());
-        }
-
-        return !storeForExistingStoreScope.isSameScope(storeForNewStoreScope);
     }
 
     private VolumeVO sendAttachVolumeCommand(final UserVmVO vm, VolumeVO volumeToAttach, Long deviceId, final DiskControllerType diskController) {

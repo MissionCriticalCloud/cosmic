@@ -110,6 +110,16 @@ public class LibvirtDiskDef {
         this.bus = bus;
     }
 
+    public void defBlockBasedDisk(final String diskName, final int devId, final DiskControllerType bus) {
+        this.diskType = DiskType.BLOCK;
+        this.deviceType = DeviceType.DISK;
+        this.imageFormat = ImageFormat.RAW;
+        this.diskCacheMode = DiskCacheMode.NONE;
+        this.sourcePath = diskName;
+        this.diskLabel = getDevLabel(devId, bus);
+        this.bus = bus;
+    }
+
     public void defNetworkBasedDisk(final String diskName, final String sourceHost, final int sourcePort, final String authUserName,
                                     final String authSecretUuid, final int devId, final DiskControllerType bus,
                                     final DiskProtocol protocol, final ImageFormat imageFormat) {

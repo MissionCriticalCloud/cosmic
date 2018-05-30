@@ -35,7 +35,7 @@ import com.cloud.legacymodel.communication.command.DeleteLogicalSwitchCommand;
 import com.cloud.legacymodel.communication.command.DeleteLogicalSwitchPortCommand;
 import com.cloud.legacymodel.communication.command.FindLogicalSwitchPortCommand;
 import com.cloud.legacymodel.communication.command.PingCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.communication.command.UpdateLogicalSwitchPortCommand;
 import com.cloud.legacymodel.to.PortForwardingRuleTO;
 import com.cloud.legacymodel.to.StaticNatRuleTO;

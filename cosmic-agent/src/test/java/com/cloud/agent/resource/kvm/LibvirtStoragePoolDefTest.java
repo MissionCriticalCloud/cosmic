@@ -23,7 +23,7 @@ public class LibvirtStoragePoolDefTest extends TestCase {
         assertEquals(name, pool.getPoolName());
         assertEquals(host, pool.getSourceHost());
         assertEquals(port, pool.getSourcePort());
-        assertEquals(dir, pool.getSourceDir());
+        assertEquals(dir, pool.getSource());
         assertEquals(targetPath, pool.getTargetPath());
     }
 

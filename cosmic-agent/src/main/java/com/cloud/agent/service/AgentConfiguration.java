@@ -1,5 +1,7 @@
 package com.cloud.agent.service;
 
+import com.cloud.model.enumeration.StoragePoolType;
+
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,7 +27,7 @@ public class AgentConfiguration {
     private Guest guest;
     private Hypervisor hypervisor;
     private Libvirt libvirt;
-    private Localstorage localstorage;
+    private List<Localstorage> localstorages;
     private Network network;
     private Systemvm systemvm;
     private Termpolicy termpolicy;
@@ -189,12 +191,12 @@ public class AgentConfiguration {
         this.libvirt = libvirt;
     }
 
-    public Localstorage getLocalstorage() {
-        return localstorage;
+    public List<Localstorage> getLocalstorages() {
+        return localstorages;
     }
 
-    public void setLocalstorage(final Localstorage localstorage) {
-        this.localstorage = localstorage;
+    public void setLocalstorages(final List<Localstorage> localstorages) {
+        this.localstorages = localstorages;
     }
 
     public Network getNetwork() {
@@ -559,6 +561,7 @@ public class AgentConfiguration {
     public static class Localstorage {
         private String path;
         private String uuid;
+        private StoragePoolType type;
 
         public String getPath() {
             return path;
@@ -574,6 +577,14 @@ public class AgentConfiguration {
 
         public void setUuid(final String uuid) {
             this.uuid = uuid;
+        }
+
+        public StoragePoolType getType() {
+            return type;
+        }
+
+        public void setType(final StoragePoolType type) {
+            this.type = type;
         }
     }
 

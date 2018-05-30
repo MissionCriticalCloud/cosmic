@@ -348,7 +348,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                     }
                     requestedMac = NetUtils.standardizeMacAddress(requestedMac);
                 }
-                IpAddresses addrs = new IpAddresses(requestedIp, requestedIpv6, requestedMac);
+                final IpAddresses addrs = new IpAddresses(requestedIp, requestedIpv6, requestedMac);
                 ipToNetworkMap.put(networkId, addrs);
             }
         }
@@ -565,15 +565,6 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                 diskOffering = _entityMgr.findById(DiskOffering.class, diskOfferingId);
                 if (diskOffering == null) {
                     throw new InvalidParameterValueException("Unable to find disk offering " + diskOfferingId);
-                }
-            }
-
-            if (!zone.isLocalStorageEnabled()) {
-                if (serviceOffering.getUseLocalStorage()) {
-                    throw new InvalidParameterValueException("Zone is not configured to use local storage but service offering " + serviceOffering.getName() + " uses it");
-                }
-                if (diskOffering != null && diskOffering.getUseLocalStorage()) {
-                    throw new InvalidParameterValueException("Zone is not configured to use local storage but disk offering " + diskOffering.getName() + " uses it");
                 }
             }
 

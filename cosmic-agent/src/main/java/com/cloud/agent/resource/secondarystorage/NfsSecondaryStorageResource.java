@@ -5,6 +5,7 @@ import static com.cloud.utils.StringUtils.join;
 import static java.util.Arrays.asList;
 
 import com.cloud.agent.resource.AgentResourceBase;
+import com.cloud.agent.service.AgentConfiguration;
 import com.cloud.common.storageprocessor.Processor;
 import com.cloud.common.storageprocessor.QCOW2Processor;
 import com.cloud.common.storageprocessor.RawImageProcessor;
@@ -43,11 +44,11 @@ import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand;
 import com.cloud.legacymodel.communication.command.SecStorageFirewallCfgCommand.PortConfig;
 import com.cloud.legacymodel.communication.command.SecStorageSetupCommand;
 import com.cloud.legacymodel.communication.command.SecStorageVMSetupCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupSecondaryStorageCommand;
 import com.cloud.legacymodel.communication.command.TemplateOrVolumePostUploadCommand;
 import com.cloud.legacymodel.communication.command.UploadCommand;
 import com.cloud.legacymodel.communication.command.UploadStatusCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupSecondaryStorageCommand;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
@@ -127,6 +128,8 @@ import org.slf4j.LoggerFactory;
 public class NfsSecondaryStorageResource extends AgentResourceBase implements SecondaryStorageResource {
 
     private static final Logger s_logger = LoggerFactory.getLogger(NfsSecondaryStorageResource.class);
+
+    private AgentConfiguration agentConfiguration;
 
     private static final String TEMPLATE_ROOT_DIR = "template/tmpl";
     private static final String VOLUME_ROOT_DIR = "volumes";
@@ -1443,6 +1446,11 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void configure(final AgentConfiguration agentConfiguration) {
+        this.agentConfiguration = agentConfiguration;
     }
 
     private void configuringPublicInterface(final Map<String, Object> params) {

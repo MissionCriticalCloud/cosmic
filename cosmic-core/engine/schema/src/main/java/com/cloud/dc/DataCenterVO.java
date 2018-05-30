@@ -35,8 +35,6 @@ public class DataCenterVO implements DataCenter {
     @Column(name = "allocation_state")
     @Enumerated(value = EnumType.STRING)
     AllocationState allocationState;
-    @Column(name = "is_local_storage_enabled")
-    boolean localStorageEnabled;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -75,15 +73,14 @@ public class DataCenterVO implements DataCenter {
 
     public DataCenterVO(final long id, final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String guestCidr, final String
             domain, final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix) {
-        this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, false, null, null);
+        this(name, description, dns1, dns2, dns3, dns4, guestCidr, domain, domainId, zoneType, zoneToken, domainSuffix, null, null);
         this.id = id;
         this.allocationState = AllocationState.Enabled;
         this.uuid = UUID.randomUUID().toString();
     }
 
     public DataCenterVO(final String name, final String description, final String dns1, final String dns2, final String dns3, final String dns4, final String guestCidr, final
-    String domain, final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix, final boolean localStorageEnabled,
-                        final String ip6Dns1, final String ip6Dns2) {
+    String domain, final Long domainId, final NetworkType zoneType, final String zoneToken, final String domainSuffix, final String ip6Dns1, final String ip6Dns2) {
         this.name = name;
         this.description = description;
         this.dns1 = dns1;
@@ -97,7 +94,6 @@ public class DataCenterVO implements DataCenter {
         this.domainId = domainId;
         this.networkType = zoneType;
         this.allocationState = AllocationState.Enabled;
-        this.localStorageEnabled = localStorageEnabled;
 
         this.zoneToken = zoneToken;
         this.domain = domainSuffix;
@@ -209,15 +205,6 @@ public class DataCenterVO implements DataCenter {
     @Override
     public String getZoneToken() {
         return zoneToken;
-    }
-
-    @Override
-    public boolean isLocalStorageEnabled() {
-        return localStorageEnabled;
-    }
-
-    public void setLocalStorageEnabled(final boolean enabled) {
-        this.localStorageEnabled = enabled;
     }
 
     public void setInternalDns2(final String dns4) {

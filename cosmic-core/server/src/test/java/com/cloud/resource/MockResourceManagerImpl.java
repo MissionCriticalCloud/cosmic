@@ -14,8 +14,8 @@ import com.cloud.dc.HostPodVO;
 import com.cloud.dc.PodCluster;
 import com.cloud.gpu.HostGpuGroupsVO;
 import com.cloud.host.HostVO;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStats;
@@ -217,7 +217,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#createHostVOForConnectedAgent(com.cloud.legacymodel.communication.command.StartupCommand[])
+     * @see com.cloud.resource.ResourceManager#createHostVOForConnectedAgent(com.cloud.legacymodel.communication.command.startupcommand.StartupCommand[])
      */
     @Override
     public HostVO createHostVOForConnectedAgent(final StartupCommand[] cmds) {
@@ -235,7 +235,7 @@ public class MockResourceManagerImpl extends ManagerBase implements ResourceMana
     }
 
     /* (non-Javadoc)
-     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.legacymodel.communication.command.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
+     * @see com.cloud.resource.ResourceManager#fillRoutingHostVO(com.cloud.host.HostVO, com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand, com.cloud.hypervisor.Hypervisor
      * .HypervisorType, java.util.Map, java.util.List)
      */
     @Override

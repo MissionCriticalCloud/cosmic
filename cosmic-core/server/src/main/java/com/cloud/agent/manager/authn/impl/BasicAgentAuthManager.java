@@ -5,7 +5,7 @@ import com.cloud.agent.manager.authn.AgentAuthorizer;
 import com.cloud.common.agent.StartupCommandProcessor;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.host.dao.HostDao;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.utils.component.AdapterBase;
 
 import javax.inject.Inject;

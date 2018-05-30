@@ -37,8 +37,9 @@ public final class LibvirtCreateCommandWrapper extends LibvirtCommandWrapper<Cre
 
             if (command.getTemplateUrl() != null) {
                 if (primaryPool.getType() == StoragePoolType.CLVM) {
-                    vol = libvirtComputingResource.templateToPrimaryDownload(command.getTemplateUrl(), primaryPool,
-                            dskch.getPath());
+                    vol = libvirtComputingResource.templateToPrimaryDownload(command.getTemplateUrl(), primaryPool, dskch.getPath());
+                } else if (primaryPool.getType() == StoragePoolType.LVM) {
+                    vol = libvirtComputingResource.templateToPrimaryDownload(command.getTemplateUrl(), primaryPool, dskch.getPath());
                 } else {
                     baseVol = primaryPool.getPhysicalDisk(command.getTemplateUrl());
                     vol = storagePoolMgr.createDiskFromTemplate(baseVol, dskch.getPath(), dskch.getProvisioningType(),

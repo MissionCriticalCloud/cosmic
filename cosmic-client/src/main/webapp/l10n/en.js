@@ -684,7 +684,7 @@ var dictionary = {
     "label.firewall": "Firewall",
     "label.first.name": "First Name",
     "label.firstname.lower": "firstname",
-    "label.format": "Format",
+    "label.format": "File Format",
     "label.format.lower": "format",
     "label.friday": "Friday",
     "label.full": "Full",

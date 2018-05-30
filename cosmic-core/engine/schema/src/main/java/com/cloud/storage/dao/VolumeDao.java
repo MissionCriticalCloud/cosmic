@@ -98,7 +98,7 @@ public interface VolumeDao extends GenericDao<VolumeVO, Long>, StateDao<Volume.S
 
     /***
      * @param volumeId
-     * @return the scope of the storage pool where the volume is present (ZONE/CLUSTER)
+     * @return the scope of the storage pool where the volume is present (ZONE/CLUSTER/HOST)
      */
     ScopeType getVolumeStoragePoolScope(long volumeId);
 

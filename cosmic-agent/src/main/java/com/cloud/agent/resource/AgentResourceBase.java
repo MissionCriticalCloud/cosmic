@@ -1,7 +1,7 @@
 package com.cloud.agent.resource;
 
 import com.cloud.common.agent.IAgentControl;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.utils.net.NetUtils;
 
 import javax.naming.ConfigurationException;

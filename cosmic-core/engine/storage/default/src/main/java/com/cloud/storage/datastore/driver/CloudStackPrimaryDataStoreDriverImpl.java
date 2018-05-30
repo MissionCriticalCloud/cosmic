@@ -24,6 +24,7 @@ import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.CreateObjectCommand;
 import com.cloud.legacymodel.communication.command.DeleteCommand;
 import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
+import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.storage.StoragePool;
@@ -41,7 +42,6 @@ import com.cloud.storage.CreateSnapshotPayload;
 import com.cloud.storage.ResizeVolumePayload;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.command.CommandResult;
-import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
@@ -231,7 +231,7 @@ public class CloudStackPrimaryDataStoreDriverImpl implements PrimaryDataStoreDri
         if (store.getRole() == DataStoreRole.Primary && srcData.getType() == DataObjectType.TEMPLATE
                 && (destData.getType() == DataObjectType.TEMPLATE || destData.getType() == DataObjectType.VOLUME)) {
             final StoragePoolVO storagePoolVO = primaryStoreDao.findById(store.getId());
-            if (storagePoolVO != null && storagePoolVO.getPoolType() == StoragePoolType.CLVM) {
+            if (storagePoolVO != null && (storagePoolVO.getPoolType() == StoragePoolType.CLVM || storagePoolVO.getPoolType() == StoragePoolType.LVM)) {
                 return true;
             }
         }

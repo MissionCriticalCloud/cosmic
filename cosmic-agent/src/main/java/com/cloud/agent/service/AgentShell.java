@@ -122,8 +122,6 @@ public class AgentShell {
         addNotNull(this.allProperties, "cluster", this.agentConfiguration.getCluster());
         addNotNull(this.allProperties, "pod", this.agentConfiguration.getPod());
         addNotNull(this.allProperties, "zone", this.agentConfiguration.getZone());
-        addNotNull(this.allProperties, "local.storage.path", this.agentConfiguration.getLocalstorage().getPath());
-        addNotNull(this.allProperties, "local.storage.uuid", this.agentConfiguration.getLocalstorage().getUuid());
         addNotNull(this.allProperties, "domr.scripts.dir", this.agentConfiguration.getDomr().getScripts().getDir());
         addNotNull(this.allProperties, "hypervisor.type", this.agentConfiguration.getHypervisor().getType());
         addNotNull(this.allProperties, "hypervisor.uri", this.agentConfiguration.getHypervisor().getUri());
@@ -164,6 +162,7 @@ public class AgentShell {
         final String agentResourceName = agentResource.getClass().getSimpleName();
         logger.debug("Configuring agent resource {}", agentResourceName);
         agentResource.setName(agentResourceName);
+        agentResource.configure(this.agentConfiguration);
 
         if (!agentResource.configure(this.allProperties)) {
             throw new ConfigurationException("Unable to configure " + agentResourceName);

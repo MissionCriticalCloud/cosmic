@@ -2,7 +2,7 @@ package com.cloud.resource;
 
 import com.cloud.common.resource.ServerResource;
 import com.cloud.host.HostVO;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.utils.component.Adapter;
 

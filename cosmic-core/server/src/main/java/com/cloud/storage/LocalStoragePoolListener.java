@@ -5,15 +5,14 @@ import com.cloud.capacity.dao.CapacityDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupStorageCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupLocalstorageCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.storage.StoragePoolInfo;
-import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.utils.db.DB;
@@ -54,22 +53,16 @@ public class LocalStoragePoolListener implements Listener {
     @Override
     @DB
     public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (!(cmd instanceof StartupStorageCommand)) {
-            return;
+        if (cmd instanceof StartupLocalstorageCommand) {
+            final StartupLocalstorageCommand ssCmd = (StartupLocalstorageCommand) cmd;
+
+            final StoragePoolInfo pInfo = ssCmd.getPoolInfo();
+            if (pInfo == null) {
+                return;
+            }
+
+            this._storageMgr.createLocalStorage(host, pInfo);
         }
-
-        final StartupStorageCommand ssCmd = (StartupStorageCommand) cmd;
-
-        if (ssCmd.getResourceType() != StorageResourceType.STORAGE_POOL) {
-            return;
-        }
-
-        final StoragePoolInfo pInfo = ssCmd.getPoolInfo();
-        if (pInfo == null) {
-            return;
-        }
-
-        this._storageMgr.createLocalStorage(host, pInfo);
     }
 
     @Override
