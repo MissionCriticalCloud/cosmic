@@ -196,10 +196,12 @@
                                                 id: 'QCOW2',
                                                 description: 'QCOW2 (default and recommended)'
                                             });
-                                            items.push({
-                                                id: 'RAW',
-                                                description: 'RAW'
-                                            });
+                                            if (isAdmin()) {
+                                                items.push({
+                                                    id: 'RAW',
+                                                    description: 'RAW (Root-admin only)'
+                                                });
+                                            }
                                             args.response.success({
                                                 data: items
                                             });
