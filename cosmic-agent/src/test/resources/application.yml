@@ -37,7 +37,7 @@ cosmic:
   systemvm:
     iso-path: '/opt/cosmic/agent/vms/systemvm.iso'
   termpolicy:
-    router:
+    system:
       oncrash: 'restart'
       onpoweroff: 'destroy'
       onreboot: 'restart'

@@ -131,12 +131,14 @@ import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.NetworkModel;
+import com.cloud.network.VpcVirtualNetworkApplianceService;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.offering.DiskOfferingInfo;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
+import com.cloud.server.ManagementService;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.storage.DiskOfferingVO;
@@ -332,6 +334,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     DeploymentPlanningManager _dpMgr;
     @Inject
     ZoneRepository _zoneRepository;
+    @Inject
+    public VpcVirtualNetworkApplianceService _routerService;
+    @Inject
+    public ManagementService _mgtService;
 
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     Map<VirtualMachineType, VirtualMachineGuru> _vmGurus = new HashMap<>();
@@ -982,9 +988,18 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 if (vmInstanceVO.isHaEnabled()) {
                     // Start it once more
                     try {
-                        orchestrateStart(vmInstanceVO.getUuid(), null, null, null);
+                        if (VirtualMachineType.User.equals(vmInstanceVO.getType())) {
+                            orchestrateStart(vmInstanceVO.getUuid(), null, null, null);
+                        }
+                        if (VirtualMachineType.DomainRouter.equals(vmInstanceVO.getType())) {
+                            _routerService.startRouter(vmInstanceVO.getId());
+                        }
+                        if (VirtualMachineType.ConsoleProxy.equals(vmInstanceVO.getType()) || VirtualMachineType.SecondaryStorageVm.equals(vmInstanceVO.getType())) {
+                            s_logger.error("Not starting system instance " + vmInstanceVO.getInstanceName() + " of type " + vmInstanceVO.getType() + ", after retrieving a " +
+                                    "ShutdownEventCommand. Will be automatically started in a few minutes by their Manager.");
+                        }
                     } catch (final InsufficientCapacityException | ResourceUnavailableException e) {
-                        s_logger.error("Unable to start instance: " + vmInstanceVO.getInstanceName() + ", after retrieving a ShutdownEventCommand");
+                        s_logger.error("Unable to start instance: " + vmInstanceVO.getInstanceName() + " of type " + vmInstanceVO.getType() + ", after retrieving a ShutdownEventCommand");
                     }
                 } else {
                     s_logger.info("Not starting instance: " + vmInstanceVO.getInstanceName() + ", due to HA not enabled for this instance");

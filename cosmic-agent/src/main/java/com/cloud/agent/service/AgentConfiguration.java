@@ -653,15 +653,15 @@ public class AgentConfiguration {
     }
 
     public static class Termpolicy {
-        private Router router;
+        private System system;
         private Vm vm;
 
-        public Router getRouter() {
-            return router;
+        public System getSystem() {
+            return system;
         }
 
-        public void setRouter(final Router router) {
-            this.router = router;
+        public void setSystem(final System system) {
+            this.system = system;
         }
 
         public Vm getVm() {
@@ -672,7 +672,7 @@ public class AgentConfiguration {
             this.vm = vm;
         }
 
-        public static class Router {
+        public static class System {
             private String oncrash;
             private String onpoweroff;
             private String onreboot;

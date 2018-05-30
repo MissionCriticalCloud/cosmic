@@ -292,7 +292,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         if (this._serviceOffering == null || !this._serviceOffering.getSystemUse()) {
             final int ramSize = NumbersUtil.parseInt(this._configDao.getValue("ssvm.ram.size"), DEFAULT_SS_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = this._offeringDao.createSystemServiceOfferings("System Offering For Secondary Storage VM",
-                    ServiceOffering.ssvmDefaultOffUniqueName, 1, ramSize, null, null, false, null,
+                    ServiceOffering.ssvmDefaultOffUniqueName, 1, ramSize, null, null, true, null,
                     StorageProvisioningType.THIN, true, null, true, VirtualMachineType.SecondaryStorageVm, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {

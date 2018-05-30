@@ -144,9 +144,9 @@ public class AgentShell {
         addNotNull(this.allProperties, "vm.diskactivity.inactivetime_ms", this.agentConfiguration.getVm().getDiskactivity().getInactivetime_ms());
         addNotNull(this.allProperties, "systemvm.iso.path", this.agentConfiguration.getSystemvm().getIsoPath());
         addNotNull(this.allProperties, "host.reserved.mem.mb", this.agentConfiguration.getHostReservedMemMb());
-        addNotNull(this.allProperties, "termpolicy.router.oncrash", this.agentConfiguration.getTermpolicy().getRouter().getOncrash());
-        addNotNull(this.allProperties, "termpolicy.router.onpoweroff", this.agentConfiguration.getTermpolicy().getRouter().getOnpoweroff());
-        addNotNull(this.allProperties, "termpolicy.router.onreboot", this.agentConfiguration.getTermpolicy().getRouter().getOnreboot());
+        addNotNull(this.allProperties, "termpolicy.system.oncrash", this.agentConfiguration.getTermpolicy().getSystem().getOncrash());
+        addNotNull(this.allProperties, "termpolicy.system.onpoweroff", this.agentConfiguration.getTermpolicy().getSystem().getOnpoweroff());
+        addNotNull(this.allProperties, "termpolicy.system.onreboot", this.agentConfiguration.getTermpolicy().getSystem().getOnreboot());
         addNotNull(this.allProperties, "termpolicy.vm.oncrash", this.agentConfiguration.getTermpolicy().getVm().getOncrash());
         addNotNull(this.allProperties, "termpolicy.vm.onpoweroff", this.agentConfiguration.getTermpolicy().getVm().getOnpoweroff());
         addNotNull(this.allProperties, "termpolicy.vm.onreboot", this.agentConfiguration.getTermpolicy().getVm().getOnreboot());

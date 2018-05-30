@@ -20,11 +20,11 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_STOP_SCRIPT_TIMEOUT;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_STORAGE_SCRIPTS_DIR;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_SYSTEMVM_ISO_PATH;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_CRASH_ROUTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_CRASH_SYSTEM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_CRASH_VM;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_POWEROFF_ROUTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_POWEROFF_SYSTEM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_POWEROFF_VM;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_REBOOT_ROUTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_REBOOT_SYSTEM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_TERMPOLICY_REBOOT_VM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_DOWNTIME;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_PAUSEAFTER;
@@ -64,11 +64,11 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_STOP_SCRIPT_TIMEOUT;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_STORAGE_SCRIPTS_DIR;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_SYSTEMVM_ISO_PATH;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_CRASH_ROUTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_CRASH_SYSTEM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_CRASH_VM;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_POWEROFF_ROUTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_POWEROFF_SYSTEM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_POWEROFF_VM;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_REBOOT_ROUTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_REBOOT_SYSTEM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_TERMPOLICY_REBOOT_VM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MEMBALLOON_DISABLE;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_DOWNTIME;
@@ -157,9 +157,9 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     private int vmMigrateSpeed = DEFAULT_VM_MIGRATE_SPEED;
     private String zone = DEFAULT_ZONE;
 
-    private String termPolicyCrashRouter = DEFAULT_TERMPOLICY_CRASH_ROUTER;
-    private String termPolicyPowerOffRouter = DEFAULT_TERMPOLICY_POWEROFF_ROUTER;
-    private String termPolicyRebootRouter = DEFAULT_TERMPOLICY_REBOOT_ROUTER;
+    private String termPolicyCrashSystem = DEFAULT_TERMPOLICY_CRASH_SYSTEM;
+    private String termPolicyPowerOffSystem = DEFAULT_TERMPOLICY_POWEROFF_SYSTEM;
+    private String termPolicyRebootSystem = DEFAULT_TERMPOLICY_REBOOT_SYSTEM;
 
     private String termPolicyCrashVm = DEFAULT_TERMPOLICY_CRASH_VM;
     private String termPolicyPowerOffVm = DEFAULT_TERMPOLICY_POWEROFF_VM;
@@ -217,9 +217,9 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         this.vmWatchdogModel = parse(properties, PROPERTY_KEY_VM_WATCHDOG_MODEL, this.vmWatchdogModel, WatchDogModel.class);
         this.vmWatchdogAction = parse(properties, PROPERTY_KEY_VM_WATCHDOG_ACTION, this.vmWatchdogAction, WatchDogAction.class);
 
-        this.termPolicyCrashRouter = parse(properties, PROPERTY_KEY_TERMPOLICY_CRASH_ROUTER, this.termPolicyCrashRouter);
-        this.termPolicyPowerOffRouter = parse(properties, PROPERTY_KEY_TERMPOLICY_POWEROFF_ROUTER, this.termPolicyPowerOffRouter);
-        this.termPolicyRebootRouter = parse(properties, PROPERTY_KEY_TERMPOLICY_REBOOT_ROUTER, this.termPolicyRebootRouter);
+        this.termPolicyCrashSystem = parse(properties, PROPERTY_KEY_TERMPOLICY_CRASH_SYSTEM, this.termPolicyCrashSystem);
+        this.termPolicyPowerOffSystem = parse(properties, PROPERTY_KEY_TERMPOLICY_POWEROFF_SYSTEM, this.termPolicyPowerOffSystem);
+        this.termPolicyRebootSystem = parse(properties, PROPERTY_KEY_TERMPOLICY_REBOOT_SYSTEM, this.termPolicyRebootSystem);
 
         this.termPolicyCrashVm = parse(properties, PROPERTY_KEY_TERMPOLICY_CRASH_VM, this.termPolicyCrashVm);
         this.termPolicyPowerOffVm = parse(properties, PROPERTY_KEY_TERMPOLICY_POWEROFF_VM, this.termPolicyPowerOffVm);
@@ -422,16 +422,16 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return this.guestCpuFeatures;
     }
 
-    public String getRouterTermPolicyCrash() {
-        return this.termPolicyCrashRouter;
+    public String getSystemTermPolicyCrash() {
+        return this.termPolicyCrashSystem;
     }
 
-    public String getRouterTermPolicyPowerOff() {
-        return this.termPolicyPowerOffRouter;
+    public String getSystemTermPolicyPowerOff() {
+        return this.termPolicyPowerOffSystem;
     }
 
-    public String getRouterTermPolicyReboot() {
-        return this.termPolicyRebootRouter;
+    public String getSystemTermPolicyReboot() {
+        return this.termPolicyRebootSystem;
     }
 
     public String getVmTermPolicyCrash() {
@@ -534,9 +534,9 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final String PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER = "vm.migrate.pauseafter";
         public static final String PROPERTY_KEY_VM_MIGRATE_SPEED = "vm.migrate.speed";
 
-        public static final String PROPERTY_KEY_TERMPOLICY_CRASH_ROUTER = "termpolicy.router.oncrash";
-        public static final String PROPERTY_KEY_TERMPOLICY_POWEROFF_ROUTER = "termpolicy.router.onpoweroff";
-        public static final String PROPERTY_KEY_TERMPOLICY_REBOOT_ROUTER = "termpolicy.router.onreboot";
+        public static final String PROPERTY_KEY_TERMPOLICY_CRASH_SYSTEM = "termpolicy.system.oncrash";
+        public static final String PROPERTY_KEY_TERMPOLICY_POWEROFF_SYSTEM = "termpolicy.system.onpoweroff";
+        public static final String PROPERTY_KEY_TERMPOLICY_REBOOT_SYSTEM = "termpolicy.system.onreboot";
 
         public static final String PROPERTY_KEY_TERMPOLICY_CRASH_VM = "termpolicy.vm.oncrash";
         public static final String PROPERTY_KEY_TERMPOLICY_POWEROFF_VM = "termpolicy.vm.onpoweroff";
@@ -567,9 +567,9 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final int DEFAULT_VM_MIGRATE_PAUSEAFTER = -1;
         public static final int DEFAULT_VM_MIGRATE_SPEED = -1;
 
-        public static final String DEFAULT_TERMPOLICY_CRASH_ROUTER = "restart";
-        public static final String DEFAULT_TERMPOLICY_POWEROFF_ROUTER = "destroy";
-        public static final String DEFAULT_TERMPOLICY_REBOOT_ROUTER = "restart";
+        public static final String DEFAULT_TERMPOLICY_CRASH_SYSTEM = "restart";
+        public static final String DEFAULT_TERMPOLICY_POWEROFF_SYSTEM = "destroy";
+        public static final String DEFAULT_TERMPOLICY_REBOOT_SYSTEM = "restart";
 
         public static final String DEFAULT_TERMPOLICY_CRASH_VM = "destroy";
         public static final String DEFAULT_TERMPOLICY_POWEROFF_VM = "destroy";

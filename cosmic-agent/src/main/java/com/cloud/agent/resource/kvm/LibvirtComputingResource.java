@@ -1424,14 +1424,14 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
-        if (VirtualMachineType.DomainRouter.equals(vmTo.getType())) {
-            term.setCrashPolicy(getRouterTermpolicyCrash());
-            term.setPowerOffPolicy(getRouterTermpolicyPowerOff());
-            term.setRebootPolicy(getRouterTermpolicyReboot());
-        } else {
+        if (VirtualMachineType.User.equals(vmTo.getType())) {
             term.setCrashPolicy(getVmTermpolicyCrash());
             term.setPowerOffPolicy(getVmTermpolicyPowerOff());
             term.setRebootPolicy(getVmTermpolicyReboot());
+        } else {
+            term.setCrashPolicy(getSystemTermpolicyCrash());
+            term.setPowerOffPolicy(getSystemTermpolicyPowerOff());
+            term.setRebootPolicy(getSystemTermpolicyReboot());
         }
         vm.addComponent(term);
 
@@ -2538,16 +2538,16 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return this.libvirtComputingResourceProperties.getGuestCpuFeatures();
     }
 
-    public String getRouterTermpolicyCrash() {
-        return this.libvirtComputingResourceProperties.getRouterTermPolicyCrash();
+    public String getSystemTermpolicyCrash() {
+        return this.libvirtComputingResourceProperties.getSystemTermPolicyCrash();
     }
 
-    public String getRouterTermpolicyPowerOff() {
-        return this.libvirtComputingResourceProperties.getRouterTermPolicyPowerOff();
+    public String getSystemTermpolicyPowerOff() {
+        return this.libvirtComputingResourceProperties.getSystemTermPolicyPowerOff();
     }
 
-    public String getRouterTermpolicyReboot() {
-        return this.libvirtComputingResourceProperties.getRouterTermPolicyReboot();
+    public String getSystemTermpolicyReboot() {
+        return this.libvirtComputingResourceProperties.getSystemTermPolicyReboot();
     }
 
     public String getVmTermpolicyCrash() {

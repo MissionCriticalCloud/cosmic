@@ -516,7 +516,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         if (this._serviceOffering == null || !this._serviceOffering.getSystemUse()) {
             final int ramSize = NumbersUtil.parseInt(this._configDao.getValue("console.ram.size"), DEFAULT_PROXY_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = this._offeringDao.createSystemServiceOfferings("System Offering For Console Proxy",
-                    ServiceOffering.consoleProxyDefaultOffUniqueName, 1, ramSize, 0, 0, false, null,
+                    ServiceOffering.consoleProxyDefaultOffUniqueName, 1, ramSize, 0, 0, true, null,
                     StorageProvisioningType.THIN, true, null, true, VirtualMachineType.ConsoleProxy, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {

@@ -1,7 +1,7 @@
 import telnetlib
 import time
 from marvin.cloudstackAPI import (
-    rebootSystemVm,
+    stopSystemVm,
     destroySystemVm
 )
 from marvin.cloudstackTestCase import cloudstackTestCase
@@ -30,8 +30,8 @@ class TestSSVMs(cloudstackTestCase):
         self.services = self.testClient.getParsedTestDataConfig()
         self.zone = get_zone(self.apiclient, self.testClient.getZoneForTests())
 
-        self.services["sleep"] = 2
-        self.services["timeout"] = 240
+        self.services["sleep"] = 5
+        self.services["timeout"] = 600
         # Default value is 120 seconds. That's just too much.
         self.services["configurableData"]["systemVmDelay"] = 60
 
@@ -313,22 +313,24 @@ class TestSSVMs(cloudstackTestCase):
         old_public_ip = ssvm_response.publicip
         old_private_ip = ssvm_response.privateip
 
-        self.logger.debug("Rebooting SSVM: %s" % ssvm_response.id)
-        cmd = rebootSystemVm.rebootSystemVmCmd()
+        self.logger.debug("Stopping SSVM: %s (it should automatically return to running state)" % ssvm_response.id)
+        cmd = stopSystemVm.stopSystemVmCmd()
         cmd.id = ssvm_response.id
-        self.apiclient.rebootSystemVm(cmd)
+        self.apiclient.stopSystemVm(cmd)
 
         timeout = self.services["timeout"]
         while True:
             list_ssvm_response = list_ssvms(
                 self.apiclient,
-                id=ssvm_response.id
+                systemvmtype="secondarystoragevm"
             )
+            print "API response: %s" % list_ssvm_response
+
             if isinstance(list_ssvm_response, list):
                 if list_ssvm_response[0].state == 'Running':
                     break
             if timeout == 0:
-                raise Exception("List SSVM call failed!")
+                raise Exception("Did not find a Running SSVM before the timeout!")
 
             time.sleep(self.services["sleep"])
             timeout = timeout - 1
@@ -338,7 +340,7 @@ class TestSSVMs(cloudstackTestCase):
         self.assertEqual(
             'Running',
             str(ssvm_response.state),
-            "Check whether CPVM is running or not"
+            "Check whether SSVM is running or not"
         )
 
         self.assertEqual(
@@ -397,23 +399,24 @@ class TestSSVMs(cloudstackTestCase):
         old_public_ip = cpvm_response.publicip
         old_private_ip = cpvm_response.privateip
 
-        self.logger.debug("Rebooting CPVM: %s" % cpvm_response.id)
+        self.logger.debug("Stopping CPVM: %s (it should automatically return to running state)" % cpvm_response.id)
 
-        cmd = rebootSystemVm.rebootSystemVmCmd()
+        cmd = stopSystemVm.stopSystemVmCmd()
         cmd.id = cpvm_response.id
-        self.apiclient.rebootSystemVm(cmd)
+        self.apiclient.stopSystemVm(cmd)
 
         timeout = self.services["timeout"]
         while True:
             list_cpvm_response = list_ssvms(
                 self.apiclient,
-                id=cpvm_response.id
+                systemvmtype="consoleproxy"
             )
             if isinstance(list_cpvm_response, list):
+                print "API response: %s" % list_cpvm_response
                 if list_cpvm_response[0].state == 'Running':
                     break
             if timeout == 0:
-                raise Exception("List CPVM call failed!")
+                raise Exception("Did not find a Running CPVM before the timeout!")
 
             time.sleep(self.services["sleep"])
             timeout = timeout - 1
