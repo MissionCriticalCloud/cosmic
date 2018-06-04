@@ -981,10 +981,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         switch (vmInstanceVO.getState()) {
             case Running:
                 // Put VM in a stopped state
-                vmInstanceVO.setState(State.Stopped);
-                vmInstanceVO.setHostId(null);
-                _vmDao.persist(vmInstanceVO);
-
+                if (VirtualMachineType.User.equals(vmInstanceVO.getType()) || VirtualMachineType.DomainRouter.equals(vmInstanceVO.getType())) {
+                    vmInstanceVO.setState(State.Stopped);
+                    vmInstanceVO.setHostId(null);
+                    _vmDao.persist(vmInstanceVO);
+                }
                 if (vmInstanceVO.isHaEnabled()) {
                     // Start it once more
                     try {
@@ -993,10 +994,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         }
                         if (VirtualMachineType.DomainRouter.equals(vmInstanceVO.getType())) {
                             _routerService.startRouter(vmInstanceVO.getId());
-                        }
-                        if (VirtualMachineType.ConsoleProxy.equals(vmInstanceVO.getType()) || VirtualMachineType.SecondaryStorageVm.equals(vmInstanceVO.getType())) {
-                            s_logger.error("Not starting system instance " + vmInstanceVO.getInstanceName() + " of type " + vmInstanceVO.getType() + ", after retrieving a " +
-                                    "ShutdownEventCommand. Will be automatically started in a few minutes by their Manager.");
                         }
                     } catch (final InsufficientCapacityException | ResourceUnavailableException e) {
                         s_logger.error("Unable to start instance: " + vmInstanceVO.getInstanceName() + " of type " + vmInstanceVO.getType() + ", after retrieving a ShutdownEventCommand");
