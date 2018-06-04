@@ -1,5 +1,6 @@
 package com.cloud.hypervisor;
 
+import com.cloud.api.ApiDBUtils;
 import com.cloud.domain.DomainVO;
 import com.cloud.domain.dao.DomainDao;
 import com.cloud.gpu.GPU;
@@ -15,6 +16,7 @@ import com.cloud.network.dao.NetworkVO;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ConfigurationServer;
+import com.cloud.server.ResourceTag;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
@@ -31,6 +33,7 @@ import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -124,7 +127,21 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
 
         final DomainVO domain = _domainDao.findById(vm.getDomainId());
         metadataTO.setDomainUuid(domain.getUuid());
+        metadataTO.setCosmicDomainName(domain.getName());
+        metadataTO.setCosmicDomainPath(domain.getPath());
+        metadataTO.setInstanceName(vm.getInstanceName());
+        metadataTO.setVmId(vm.getId());
 
+        final Map<String, String> resourceDetails = ApiDBUtils.getResourceDetails(vm.getId(), ResourceTag.ResourceObjectType.UserVm);
+        final Map<String, String> resourceTags = new HashMap<String, String>();
+
+        final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceTag.ResourceObjectType.UserVm, vm.getId());
+        for (final ResourceTag tag : tags) {
+            resourceTags.put(tag.getKey(), tag.getValue());
+        }
+
+        metadataTO.setResourceDetails(resourceDetails);
+        metadataTO.setResourceTags(resourceTags);
         to.setMetadata(metadataTO);
 
         return to;
