@@ -294,6 +294,10 @@ cloudStack.docs = {
         desc: 'Select the Disk Controller to use',
         externalLink: ''
     },
+    helpVolumeFormat: {
+        desc: 'The disk image format of the volume is QCOW2 for KVM. Only in special cases RAW formatting should be used (Root-admin only).',
+        externalLink: ''
+    },
     // Add disk offering
     helpDiskOfferingName: {
         desc: 'Any desired name for the offering',

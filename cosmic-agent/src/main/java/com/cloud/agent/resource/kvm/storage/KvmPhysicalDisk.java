@@ -1,5 +1,6 @@
 package com.cloud.agent.resource.kvm.storage;
 
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 public class KvmPhysicalDisk {
@@ -78,5 +79,23 @@ public class KvmPhysicalDisk {
 
     public KvmStoragePool getPool() {
         return this.pool;
+    }
+
+    public PhysicalDiskFormat getPhysicalDiskFormatFromImageFormat(final ImageFormat imageFormat) {
+        if (imageFormat == null) {
+            return PhysicalDiskFormat.QCOW2;
+        }
+        switch (imageFormat) {
+            case RAW:
+                return PhysicalDiskFormat.RAW;
+            case QCOW2:
+                return PhysicalDiskFormat.QCOW2;
+            case DIR:
+                return PhysicalDiskFormat.DIR;
+            case TAR:
+                return PhysicalDiskFormat.TAR;
+            default:
+                return PhysicalDiskFormat.QCOW2;
+        }
     }
 }

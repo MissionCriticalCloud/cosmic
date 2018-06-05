@@ -5,7 +5,8 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 public enum StorageProvisioningType {
     THIN("thin"),
     SPARSE("sparse"),
-    FAT("fat");
+    FAT("fat"),
+    RAW("raw");
 
     private final String provisionType;
 
@@ -21,6 +22,8 @@ public enum StorageProvisioningType {
             return StorageProvisioningType.SPARSE;
         } else if (provisioningType.equals(FAT.provisionType)) {
             return StorageProvisioningType.FAT;
+        } else if (provisioningType.equals(RAW.provisionType)) {
+            return StorageProvisioningType.RAW;
         } else {
             throw new CloudRuntimeException("StorageProvisioningType: Unknown provisioning type: " + provisioningType);
         }
