@@ -1,6 +1,7 @@
 package com.cloud.agent.resource.kvm;
 
-import com.cloud.agent.resource.kvm.LibvirtSecretDef.Usage;
+import com.cloud.agent.resource.kvm.xml.LibvirtSecretDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtSecretDef.Usage;
 
 import junit.framework.TestCase;
 

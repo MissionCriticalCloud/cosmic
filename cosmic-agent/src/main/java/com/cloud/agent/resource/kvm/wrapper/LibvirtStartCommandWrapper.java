@@ -1,8 +1,8 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.agent.resource.kvm.LibvirtVmDef;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.common.virtualnetwork.VirtualRoutingResource;
 import com.cloud.legacymodel.communication.answer.Answer;

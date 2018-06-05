@@ -1,4 +1,4 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.xml;
 
 public class LibvirtStoragePoolDef {
     private final PoolType poolType;

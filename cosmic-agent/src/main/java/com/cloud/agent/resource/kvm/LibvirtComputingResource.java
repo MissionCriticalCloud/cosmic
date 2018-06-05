@@ -20,35 +20,41 @@ import static java.util.UUID.randomUUID;
 
 import com.cloud.agent.resource.AgentResource;
 import com.cloud.agent.resource.AgentResourceBase;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.ClockDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.ConsoleDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.CpuModeDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.CpuTuneDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.DevicesDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.FeaturesDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.GraphicDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.GuestDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.GuestResourceDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InputDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.MetadataDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.QemuGuestAgentDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.RngDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.ScsiDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.SerialDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.TermPolicy;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.VideoDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.WatchDogDef;
+import com.cloud.agent.resource.kvm.event.LifecycleListener;
+import com.cloud.agent.resource.kvm.ha.KvmHaMonitor;
 import com.cloud.agent.resource.kvm.storage.KvmPhysicalDisk;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePool;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
 import com.cloud.agent.resource.kvm.storage.KvmStorageProcessor;
+import com.cloud.agent.resource.kvm.vif.VifDriver;
 import com.cloud.agent.resource.kvm.wrapper.LibvirtRequestWrapper;
 import com.cloud.agent.resource.kvm.wrapper.LibvirtUtilitiesHelper;
+import com.cloud.agent.resource.kvm.xml.LibvirtCapXmlParser;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef.DeviceType;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef.DiscardType;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef.DiskProtocol;
+import com.cloud.agent.resource.kvm.xml.LibvirtDomainXmlParser;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.ClockDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.ConsoleDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.CpuModeDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.CpuTuneDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.DevicesDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.FeaturesDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.GraphicDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.GuestDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.GuestResourceDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InputDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InterfaceDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.MetadataDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.QemuGuestAgentDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.RngDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.ScsiDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.SerialDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.TermPolicy;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.VideoDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.WatchDogDef;
 import com.cloud.common.resource.ServerResource;
 import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandler;
 import com.cloud.common.storageprocessor.resource.StorageSubsystemCommandHandlerBase;
@@ -180,8 +186,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     public static final String SSHPUBKEYPATH = SSHKEYSPATH + File.separator + "id_rsa.pub.cloud";
     public static final String BASH_SCRIPT_PATH = "/bin/bash";
 
-    protected static final String DEFAULT_OVS_VIF_DRIVER_CLASS = "com.cloud.agent.resource.kvm.OvsVifDriver";
-    protected static final String DEFAULT_BRIDGE_VIF_DRIVER_CLASS = "com.cloud.agent.resource.kvm.BridgeVifDriver";
+    protected static final String DEFAULT_OVS_VIF_DRIVER_CLASS = "com.cloud.agent.resource.kvm.vif.OvsVifDriver";
+    protected static final String DEFAULT_BRIDGE_VIF_DRIVER_CLASS = "com.cloud.agent.resource.kvm.vif.BridgeVifDriver";
     protected static final HashMap<DomainState, PowerState> s_powerStatesTable;
     private static final Logger logger = LoggerFactory.getLogger(LibvirtComputingResource.class);
 
@@ -701,7 +707,21 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         storageProcessor.configure(name, propertiesMap);
         this.storageHandler = new StorageSubsystemCommandHandlerBase(storageProcessor);
 
+        initLibvirtLifecycleListener();
+
         return true;
+    }
+
+    private void initLibvirtLifecycleListener() {
+        try {
+            final Connect conn = LibvirtConnection.getConnection();
+
+            final LifecycleListener lifecycleListener = new LifecycleListener(this);
+
+            conn.addLifecycleListener(lifecycleListener);
+        } catch (final LibvirtException e) {
+            throw new CloudRuntimeException(e.getMessage());
+        }
     }
 
     private void initScripts(final LibvirtComputingResourceProperties libvirtComputingResourceProperties) throws ConfigurationException {
@@ -1404,14 +1424,14 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         vm.addComponent(features);
 
         final TermPolicy term = new TermPolicy();
-        if (VirtualMachineType.DomainRouter.equals(vmTo.getType())) {
-            term.setCrashPolicy(getRouterTermpolicyCrash());
-            term.setPowerOffPolicy(getRouterTermpolicyPowerOff());
-            term.setRebootPolicy(getRouterTermpolicyReboot());
-        } else {
+        if (VirtualMachineType.User.equals(vmTo.getType())) {
             term.setCrashPolicy(getVmTermpolicyCrash());
             term.setPowerOffPolicy(getVmTermpolicyPowerOff());
             term.setRebootPolicy(getVmTermpolicyReboot());
+        } else {
+            term.setCrashPolicy(getSystemTermpolicyCrash());
+            term.setPowerOffPolicy(getSystemTermpolicyPowerOff());
+            term.setRebootPolicy(getSystemTermpolicyReboot());
         }
         vm.addComponent(term);
 
@@ -1502,7 +1522,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return uuid;
     }
 
-    boolean isGuestVirtIoCapable(final String guestOsName) {
+    public boolean isGuestVirtIoCapable(final String guestOsName) {
         final DiskControllerType db = DiskControllerType.getGuestDiskModel(guestOsName);
         return db != DiskControllerType.IDE;
     }
@@ -2518,16 +2538,16 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return this.libvirtComputingResourceProperties.getGuestCpuFeatures();
     }
 
-    public String getRouterTermpolicyCrash() {
-        return this.libvirtComputingResourceProperties.getRouterTermPolicyCrash();
+    public String getSystemTermpolicyCrash() {
+        return this.libvirtComputingResourceProperties.getSystemTermPolicyCrash();
     }
 
-    public String getRouterTermpolicyPowerOff() {
-        return this.libvirtComputingResourceProperties.getRouterTermPolicyPowerOff();
+    public String getSystemTermpolicyPowerOff() {
+        return this.libvirtComputingResourceProperties.getSystemTermPolicyPowerOff();
     }
 
-    public String getRouterTermpolicyReboot() {
-        return this.libvirtComputingResourceProperties.getRouterTermPolicyReboot();
+    public String getSystemTermpolicyReboot() {
+        return this.libvirtComputingResourceProperties.getSystemTermPolicyReboot();
     }
 
     public String getVmTermpolicyCrash() {

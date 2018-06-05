@@ -1,8 +1,9 @@
 package com.cloud.agent.resource.kvm;
 
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.RngDef;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.WatchDogDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtDomainXmlParser;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InterfaceDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.RngDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.WatchDogDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestNetType;

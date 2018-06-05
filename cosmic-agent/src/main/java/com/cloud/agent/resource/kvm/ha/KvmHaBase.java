@@ -1,5 +1,6 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.ha;
 
+import com.cloud.agent.resource.kvm.LibvirtConnection;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.OutputInterpreter.AllLinesParser;
 import com.cloud.utils.script.Script;

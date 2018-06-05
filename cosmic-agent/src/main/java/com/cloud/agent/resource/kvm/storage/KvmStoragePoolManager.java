@@ -1,8 +1,8 @@
 package com.cloud.agent.resource.kvm.storage;
 
-import com.cloud.agent.resource.kvm.KvmHaBase;
-import com.cloud.agent.resource.kvm.KvmHaBase.PoolType;
-import com.cloud.agent.resource.kvm.KvmHaMonitor;
+import com.cloud.agent.resource.kvm.ha.KvmHaBase;
+import com.cloud.agent.resource.kvm.ha.KvmHaBase.PoolType;
+import com.cloud.agent.resource.kvm.ha.KvmHaMonitor;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;

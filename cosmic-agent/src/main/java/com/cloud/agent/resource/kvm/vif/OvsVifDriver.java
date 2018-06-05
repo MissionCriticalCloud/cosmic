@@ -1,6 +1,7 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.vif;
 
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InterfaceDef;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.model.enumeration.BroadcastDomainType;

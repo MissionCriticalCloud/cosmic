@@ -28,10 +28,10 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckSshAnswer;
 import com.cloud.legacymodel.communication.answer.ConsoleProxyLoadAnswer;
 import com.cloud.legacymodel.communication.command.CheckSshCommand;
-import com.cloud.legacymodel.communication.command.ConsoleProxyLoadReportCommand;
 import com.cloud.legacymodel.communication.command.RebootCommand;
 import com.cloud.legacymodel.communication.command.StartupCommand;
 import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.ConsoleProxyLoadReportCommand;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -516,7 +516,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         if (this._serviceOffering == null || !this._serviceOffering.getSystemUse()) {
             final int ramSize = NumbersUtil.parseInt(this._configDao.getValue("console.ram.size"), DEFAULT_PROXY_VM_RAMSIZE);
             final List<ServiceOfferingVO> offerings = this._offeringDao.createSystemServiceOfferings("System Offering For Console Proxy",
-                    ServiceOffering.consoleProxyDefaultOffUniqueName, 1, ramSize, 0, 0, false, null,
+                    ServiceOffering.consoleProxyDefaultOffUniqueName, 1, ramSize, 0, 0, true, null,
                     StorageProvisioningType.THIN, true, null, true, VirtualMachineType.ConsoleProxy, true);
             // this can sometimes happen, if DB is manually or programmatically manipulated
             if (offerings == null || offerings.size() < 2) {

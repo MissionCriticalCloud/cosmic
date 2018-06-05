@@ -1,7 +1,7 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
-import com.cloud.agent.resource.kvm.LibvirtVmDef.InterfaceDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
@@ -50,8 +50,8 @@ public final class LibvirtPvlanSetupCommandWrapper
                     final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
                     final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(dhcpName);
 
-                    final List<InterfaceDef> ifaces = libvirtComputingResource.getInterfaces(conn, dhcpName);
-                    final InterfaceDef guestNic = ifaces.get(0);
+                    final List<LibvirtVmDef.InterfaceDef> ifaces = libvirtComputingResource.getInterfaces(conn, dhcpName);
+                    final LibvirtVmDef.InterfaceDef guestNic = ifaces.get(0);
                     script.add(opr, "-b", guestBridgeName, "-p", primaryPvlan, "-i", isolatedPvlan, "-n", dhcpName, "-d", dhcpIp,
                             "-m", dhcpMac, "-I",
                             guestNic.getDevName());

@@ -1,5 +1,6 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.vif;
 
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef;
 import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.to.NicTO;
 

@@ -1,5 +1,6 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.ha;
 
+import com.cloud.agent.resource.kvm.LibvirtConnection;
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.utils.script.Script;
 

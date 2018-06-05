@@ -28,7 +28,7 @@ import com.cloud.hypervisor.xenserver.resource.Xenserver625Resource;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.SetupAnswer;
-import com.cloud.legacymodel.communication.command.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.SetupCommand;
 import com.cloud.legacymodel.communication.command.StartupCommand;

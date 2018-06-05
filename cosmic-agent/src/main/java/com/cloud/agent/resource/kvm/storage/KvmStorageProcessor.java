@@ -2,8 +2,8 @@ package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtConnection;
-import com.cloud.agent.resource.kvm.LibvirtDomainXmlParser;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtDomainXmlParser;
 import com.cloud.common.storageprocessor.Processor;
 import com.cloud.common.storageprocessor.QCOW2Processor;
 import com.cloud.common.storageprocessor.TemplateLocation;

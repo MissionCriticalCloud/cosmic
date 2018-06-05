@@ -1,4 +1,4 @@
-package com.cloud.agent.resource.kvm;
+package com.cloud.agent.resource.kvm.xml;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
