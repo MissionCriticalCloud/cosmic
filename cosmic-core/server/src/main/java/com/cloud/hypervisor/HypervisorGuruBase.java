@@ -11,8 +11,12 @@ import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.TrafficType;
+import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
+import com.cloud.network.vpc.VpcVO;
+import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
 import com.cloud.server.ConfigurationServer;
@@ -33,7 +37,9 @@ import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -57,8 +63,6 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
     @Inject
     NicSecondaryIpDao _nicSecIpDao;
     @Inject
-    ConfigurationServer _configServer;
-    @Inject
     ResourceManager _resourceMgr;
     @Inject
     ServiceOfferingDetailsDao _serviceOfferingDetailsDao;
@@ -66,6 +70,8 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
     ServiceOfferingDao _serviceOfferingDao;
     @Inject
     DomainDao _domainDao;
+    @Inject
+    VpcDao _vpcDao;
 
     protected HypervisorGuruBase() {
         super();
@@ -83,8 +89,15 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         final List<NicProfile> nicProfiles = vmProfile.getNics();
         final NicTO[] nics = new NicTO[nicProfiles.size()];
         int i = 0;
+        List<Long> vpcList = new ArrayList<>();
+
         for (final NicProfile nicProfile : nicProfiles) {
             nics[i++] = toNicTO(nicProfile);
+
+            if (TrafficType.Guest.equals(nicProfile.getTrafficType())) {
+                final NetworkVO network = _networkDao.findById(nicProfile.getNetworkId());
+                vpcList.add(network.getVpcId());
+            }
         }
 
         to.setNics(nics);
@@ -131,17 +144,32 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         metadataTO.setCosmicDomainPath(domain.getPath());
         metadataTO.setInstanceName(vm.getInstanceName());
         metadataTO.setVmId(vm.getId());
+        metadataTO.setHostname(vm.getHostName());
 
         final Map<String, String> resourceDetails = ApiDBUtils.getResourceDetails(vm.getId(), ResourceTag.ResourceObjectType.UserVm);
         final Map<String, String> resourceTags = new HashMap<String, String>();
+        final List<String> vpcNameList = new LinkedList<>();
 
-        final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceTag.ResourceObjectType.UserVm, vm.getId());
-        for (final ResourceTag tag : tags) {
-            resourceTags.put(tag.getKey(), tag.getValue());
+        if (VirtualMachineType.User.equals(vm.getType())) {
+            final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceTag.ResourceObjectType.UserVm, vm.getId());
+            for (final ResourceTag tag : tags) {
+                resourceTags.put("instance_" + tag.getKey(), tag.getValue());
+            }
+        }
+
+        for (final Long vpcId : vpcList) {
+            final VpcVO vpc = _vpcDao.findById(vpcId);
+            vpcNameList.add(vpc.getName());
+
+            final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceTag.ResourceObjectType.Vpc, vpcId);
+            for (final ResourceTag tag : tags) {
+                resourceTags.put("vpc_" + tag.getKey(), tag.getValue());
+            }
         }
 
         metadataTO.setResourceDetails(resourceDetails);
         metadataTO.setResourceTags(resourceTags);
+        metadataTO.setVpcNameList(vpcNameList);
         to.setMetadata(metadataTO);
 
         return to;

@@ -128,6 +128,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -1269,6 +1274,16 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         }
     }
 
+    public String getCurrentLocalDateTimeStamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public Long getCurrentEpoch() {
+        ZonedDateTime zdtNow = ZonedDateTime.now(ZoneOffset.UTC);
+        return zdtNow.with(LocalTime.MIDNIGHT).toInstant().toEpochMilli();
+
+    }
+
     public LibvirtVmDef createVmFromSpec(final VirtualMachineTO vmTo) {
         final LibvirtVmDef vm = new LibvirtVmDef();
         vm.setDomainName(vmTo.getName());
@@ -1286,6 +1301,17 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
             metadata.getNodes().put("cosmicDomainPath", metadataTo.getCosmicDomainPath());
             metadata.getNodes().put("cosmicInternalVmId", metadataTo.getVmId());
             metadata.getNodes().put("cosmicInstanceName", metadataTo.getInstanceName());
+            metadata.getNodes().put("cosmicXmlGeneratedInCosmicVersion", LibvirtComputingResource.class.getPackage().getImplementationVersion());
+            metadata.getNodes().put("cosmicXmlGeneratedDateTime", getCurrentLocalDateTimeStamp());
+            metadata.getNodes().put("cosmicXmlGeneratedEpoch", getCurrentEpoch());
+            metadata.getNodes().put("cosmicVmHostname", metadataTo.getHostname());
+
+            final List<String> vpcNameList = metadataTo.getVpcNameList();
+            if (vpcNameList != null) {
+                for (final String vpcName : vpcNameList) {
+                    metadata.getNodes().put("cosmicVPC", vpcName);
+                }
+            }
 
             final Map<String, String> vmDetails = metadataTo.getResourceDetails();
             if (vmDetails != null) {

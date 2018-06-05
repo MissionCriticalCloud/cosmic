@@ -1,5 +1,6 @@
 package com.cloud.legacymodel.to;
 
+import java.util.List;
 import java.util.Map;
 
 public class MetadataTO {
@@ -12,6 +13,7 @@ public class MetadataTO {
     private String instanceName;
     private Map<String, String> resourceDetails;
     private Map<String, String> resourceTags;
+    private List<String> vpcNameList;
 
     public String getDomainUuid() {
         return domainUuid;
@@ -75,5 +77,13 @@ public class MetadataTO {
 
     public void setResourceTags(final Map<String, String> resourceTags) {
         this.resourceTags = resourceTags;
+    }
+
+    public List<String> getVpcNameList() {
+        return vpcNameList;
+    }
+
+    public void setVpcNameList(final List<String> vpcNameList) {
+        this.vpcNameList = vpcNameList;
     }
 }
