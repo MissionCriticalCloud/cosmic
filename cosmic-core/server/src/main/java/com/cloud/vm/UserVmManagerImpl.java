@@ -136,6 +136,7 @@ import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.NetworkType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -993,7 +994,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     public UserVm updateVirtualMachine(final long id, String displayName, final String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
-                                       Boolean isDynamicallyScalable, final HTTPMethod httpMethod, final String customId, String hostName, final String instanceName) throws
+                                       Boolean isDynamicallyScalable, final HTTPMethod httpMethod, final String customId, String hostName, final String instanceName,
+                                       final String manufacturerString, final OptimiseFor optimiseFor, final Boolean requiresRestart) throws
             ResourceUnavailableException, InsufficientCapacityException {
         final UserVmVO vm = _vmDao.findById(id);
         if (vm == null) {
@@ -1074,7 +1076,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             checkIfHostNameUniqueInNtwkDomain(hostName, vmNtwks);
         }
 
-        _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName);
+        _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName, manufacturerString, optimiseFor, requiresRestart);
 
         if (updateUserdata) {
             final boolean result = updateUserDataInternal(_vmDao.findById(id));
@@ -1623,6 +1625,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final String hostName = cmd.getHostName();
         final Map<String, String> details = cmd.getDetails();
         final Account caller = CallContext.current().getCallingAccount();
+        final OptimiseFor optimiseFor = cmd.getOptimiseFor();
+        final String manufacturerString = cmd.getManufacturerString();
+        final Boolean requiresRestart = cmd.getRequiresRestart();
 
         // Input validation and permission checks
         final UserVmVO vmInstance = _vmDao.findById(id);
@@ -1668,8 +1673,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _vmDao.saveDetails(vmInstance);
         }
 
-        return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, osTypeId, userData, isDynamicallyScalable,
-                cmd.getHttpMethod(), cmd.getCustomId(), hostName, cmd.getInstanceName());
+        return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, osTypeId, userData, isDynamicallyScalable, cmd.getHttpMethod(), cmd.getCustomId(), hostName,
+                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart);
     }
 
     @Override
@@ -3854,6 +3859,15 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _templateDao.loadDetails(template);
         }
 
+        OptimiseFor optimiseFor = OptimiseFor.Generic;
+        if (template.getOptimiseFor() != null) {
+            optimiseFor = template.getOptimiseFor();
+        }
+
+        String manufacturerString = template.getManufacturerString();
+        Boolean macLarning = template.getMacLearning();
+        String cpuFlags = template.getCpuFlags();
+
         final long accountId = owner.getId();
 
         assert !(requestedIps != null && (defaultIps.getIp4Address() != null || defaultIps.getIp6Address() != null)) : "requestedIp list and defaultNetworkIp should never be " +
@@ -4131,7 +4145,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, userData, caller, isDisplayVm, keyboard, accountId, userId,
-                offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType);
+                offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType, manufacturerString, optimiseFor,
+                macLarning, cpuFlags);
 
         // Assign instance to the group
         try {
@@ -4161,14 +4176,15 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                   final Long diskOfferingId, final Long diskSize, final String userData, final Account caller, final Boolean isDisplayVm, final String keyboard,
                                   final long accountId, final long userId, final ServiceOfferingVO offering, final boolean isIso, final String sshPublicKey,
                                   final LinkedHashMap<String, NicProfile> networkNicMap, final long id, final String instanceName, final String uuidName,
-                                  final HypervisorType hypervisorType, final Map<String, String> customParameters, final DiskControllerType diskControllerType)
+                                  final HypervisorType hypervisorType, final Map<String, String> customParameters, final DiskControllerType diskControllerType,
+                                  final String manufacturerString, final OptimiseFor optimiseFor, final Boolean macLearning, final String cpuFlags)
             throws InsufficientCapacityException {
         return Transaction.execute(new TransactionCallbackWithException<UserVmVO, InsufficientCapacityException>() {
             @Override
             public UserVmVO doInTransaction(final TransactionStatus status) throws InsufficientCapacityException {
                 final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType, template.getGuestOSId(),
                         offering.getOfferHA(), offering.getLimitCpuUse(), owner.getDomainId(), owner.getId(), userId, offering.getId(),
-                        userData, hostName, diskOfferingId);
+                        userData, hostName, diskOfferingId, manufacturerString, optimiseFor, macLearning, cpuFlags);
                 vm.setUuid(uuidName);
                 vm.setDynamicallyScalable(template.isDynamicallyScalable());
 

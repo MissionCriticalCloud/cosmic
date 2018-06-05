@@ -24,6 +24,7 @@ import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
 
@@ -85,17 +86,13 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.OS_TYPE_ID,
             type = CommandType.UUID,
             entityType = GuestOSResponse.class,
-            required = true,
             description = "the ID of the OS Type that best represents the OS of this template.")
     private Long osTypeId;
     @Parameter(name = ApiConstants.PASSWORD_ENABLED,
             type = CommandType.BOOLEAN,
             description = "true if the template supports the password reset feature; default is false")
     private Boolean passwordEnabled;
-    @Deprecated
-    @Parameter(name = ApiConstants.URL,
-            type = CommandType.STRING,
-            description = "DEPRECATED SINCE 5.1.0: Optional, only for baremetal hypervisor. The directory name where template stored on CIFS server")
+    @Parameter(name = ApiConstants.URL, type = CommandType.STRING)
     private String url;
     @Parameter(name = ApiConstants.TEMPLATE_TAG, type = CommandType.STRING, description = "the tag for this template.")
     private String templateTag;
@@ -103,6 +100,16 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     private Long projectId;
     @Parameter(name = ApiConstants.HYPERVISOR, type = CommandType.STRING, description = "the target hypervisor for the template")
     private String hypervisor;
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+    @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
+    private String optimiseFor;
+    @Parameter(name = ApiConstants.CPU_FLAGS, type = CommandType.STRING, description = "Optionally specify CPU flags to pass to VM")
+    private String cpuFlags;
+    @Parameter(name = ApiConstants.MAC_LEARNING, type = CommandType.STRING, description = "Set mag learning boolean, defaults to false")
+    private Boolean macLearning;
+
+    // TODO: add cpuflags, mac learning,
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
@@ -154,6 +161,26 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
         return hypervisor;
     }
 
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor != null) {
+            return OptimiseFor.valueOf(optimiseFor);
+        } else {
+            return OptimiseFor.Generic;
+        }
+    }
+
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public Boolean getMacLearning() {
+        return macLearning;
+    }
+
     public Map getDetails() {
         if (details == null || details.isEmpty()) {
             return null;
@@ -194,7 +221,6 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     @Override
     public void create() throws ResourceAllocationException {
         VirtualMachineTemplate template = null;
-        //TemplateOwner should be the caller https://issues.citrite.net/browse/CS-17530
         template = _templateService.createPrivateTemplateRecord(this, _accountService.getAccount(getEntityOwnerId()));
         if (template != null) {
             setEntityId(template.getId());

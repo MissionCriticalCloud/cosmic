@@ -2,6 +2,7 @@ package com.cloud.vm.dao;
 
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.utils.db.GenericDao;
 import com.cloud.vm.UserVmVO;
@@ -10,6 +11,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 public interface UserVmDao extends GenericDao<UserVmVO, Long> {
     List<UserVmVO> listByAccountId(long id);
@@ -35,7 +38,7 @@ public interface UserVmDao extends GenericDao<UserVmVO, Long> {
      * @param instanceName
      */
     void updateVM(long id, String displayName, boolean enable, Long osTypeId, String userData, boolean displayVm, boolean isDynamicallyScalable, String customId, String
-            hostName, String instanceName);
+            hostName, String instanceName, String manufacturerString, OptimiseFor optimiseFor, Boolean requiresRestart);
 
     List<UserVmVO> findDestroyedVms(Date date);
 

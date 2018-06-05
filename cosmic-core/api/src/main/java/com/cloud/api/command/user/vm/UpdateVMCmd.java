@@ -18,6 +18,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.uservm.UserVm;
 
 import java.util.Collection;
@@ -74,6 +75,12 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     private String name;
     @Parameter(name = ApiConstants.INSTANCE_NAME, type = CommandType.STRING, description = "instance name of the user vm", since = "4.4", authorized = {RoleType.Admin})
     private String instanceName;
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+    @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
+    private String optimiseFor;
+    @Parameter(name = ApiConstants.RESTART_REQUIRED, type = CommandType.BOOLEAN, description = "true if VM needs to a stop/start to receive updated VM specs on the hypervisor", authorized = {RoleType.Admin})
+    protected Boolean requiresRestart;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -113,6 +120,10 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
 
     public String getInstanceName() {
         return instanceName;
+    }
+
+    public Boolean getRequiresRestart() {
+        return requiresRestart;
     }
 
     public Map<String, String> getDetails() {
@@ -169,5 +180,17 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
         if (getCustomId() != null) {
             _uuidMgr.checkUuid(getCustomId(), UserVm.class);
         }
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor != null) {
+            return OptimiseFor.valueOf(optimiseFor);
+        } else {
+            return OptimiseFor.Generic;
+        }
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
     }
 }

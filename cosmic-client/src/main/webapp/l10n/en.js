@@ -1099,6 +1099,7 @@ var dictionary = {
     "label.offer.ha": "Offer HA",
     "label.ok": "OK",
     "label.operator": "Operator",
+    "label.optimisefor": "Optimise For",
     "label.optional": "Optional",
     "label.order": "Order",
     "label.os.preference": "OS Preference",

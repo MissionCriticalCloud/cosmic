@@ -9,6 +9,7 @@ import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.legacymodel.statemachine.Transition.Impact;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 
 import java.util.Arrays;
@@ -110,6 +111,16 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
     HypervisorType getHypervisorType();
 
     Map<String, String> getDetails();
+
+    String getManufacturerString();
+
+    OptimiseFor getOptimiseFor();
+
+    String getCpuFlags();
+
+    Boolean getMacLearning();
+
+    Boolean getRequiresRestart();
 
     long getUpdated();
 

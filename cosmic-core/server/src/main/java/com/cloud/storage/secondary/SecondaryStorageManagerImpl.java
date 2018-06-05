@@ -1121,7 +1121,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
         SecondaryStorageVmVO secStorageVm =
                 new SecondaryStorageVmVO(id, serviceOffering.getId(), name, template.getId(), template.getHypervisorType(), template.getGuestOSId(), dataCenterId,
-                        systemAcct.getDomainId(), systemAcct.getId(), this._accountMgr.getSystemUser().getId(), role, serviceOffering.getOfferHA());
+                        systemAcct.getDomainId(), systemAcct.getId(), this._accountMgr.getSystemUser().getId(), role, serviceOffering.getOfferHA(), template.getOptimiseFor(),
+                        template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false);
         secStorageVm.setDynamicallyScalable(template.isDynamicallyScalable());
         secStorageVm = this._secStorageVmDao.persist(secStorageVm);
         try {

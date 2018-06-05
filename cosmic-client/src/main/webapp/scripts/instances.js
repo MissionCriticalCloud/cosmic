@@ -1051,7 +1051,7 @@
                                 id: args.context.instances[0].id,
                                 group: args.data.group,
                                 isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
-                                ostypeid: args.data.guestosid
+                                optimisefor: args.data.optimisefor
                             };
                             if (args.data.displayname != args.context.instances[0].displayname) {
                                 $.extend(data, {
@@ -1373,6 +1373,24 @@
                                         });
                                     }
                                 },
+                                optimisefor: {
+                                    label: 'label.optimisefor',
+                                    isEditable: true,
+                                    select: function (args) {
+                                        var items = [];
+                                        items.push({
+                                            id: "Generic",
+                                            description: "Generic VM"
+                                        });
+                                        items.push({
+                                            id: "Windows",
+                                            description: "Windows VM"
+                                        });
+                                        args.response.success({
+                                            data: items
+                                        });
+                                    }
+                                },
                                 isPublic: {
                                     label: 'label.public',
                                     isBoolean: true
@@ -1391,6 +1409,7 @@
                                 name: args.data.name,
                                 displayText: args.data.displayText,
                                 osTypeId: args.data.osTypeId,
+                                optimisefor: args.data.optimisefor,
                                 isPublic: (args.data.isPublic == "on"),
                                 url: args.data.url
                             };
@@ -2060,26 +2079,18 @@
                             templatename: {
                                 label: 'label.template'
                             },
-                            guestosid: {
-                                label: 'label.os.type',
+                            optimisefor: {
+                                label: 'label.optimisefor',
                                 isEditable: true,
                                 select: function (args) {
-                                    if (ostypeObjs == undefined) {
-                                        $.ajax({
-                                            url: createURL("listOsTypes"),
-                                            dataType: "json",
-                                            async: false,
-                                            success: function (json) {
-                                                ostypeObjs = json.listostypesresponse.ostype;
-                                            }
-                                        });
-                                    }
                                     var items = [];
-                                    $(ostypeObjs).each(function () {
-                                        items.push({
-                                            id: this.id,
-                                            description: this.description
-                                        });
+                                    items.push({
+                                        id: "Generic",
+                                        description: "Generic VM"
+                                    });
+                                    items.push({
+                                        id: "Windows",
+                                        description: "Windows VM"
                                     });
                                     args.response.success({
                                         data: items

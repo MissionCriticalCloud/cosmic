@@ -35,15 +35,6 @@ public class GuestOSVO implements GuestOS {
     @Column(name = "is_user_defined")
     private boolean isUserDefined;
 
-    @Column(name = "manufacturer_string")
-    String manufacturer;
-
-    @Column(name = "cpuflags")
-    String cpuflags;
-
-    @Column(name = "mac_learning")
-    boolean macLearning;
-
     @Override
     public long getId() {
         return id;
@@ -106,29 +97,5 @@ public class GuestOSVO implements GuestOS {
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(final String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    public String getCpuflags() {
-        return cpuflags;
-    }
-
-    public void setCpuflags(final String cpuflags) {
-        this.cpuflags = cpuflags;
-    }
-
-    public boolean isMacLearning() {
-        return macLearning;
-    }
-
-    public void setMacLearning(final boolean macLearning) {
-        this.macLearning = macLearning;
     }
 }

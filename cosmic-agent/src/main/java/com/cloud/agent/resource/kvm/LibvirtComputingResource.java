@@ -49,6 +49,7 @@ import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InputDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.InterfaceDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.MetadataDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.QemuGuestAgentDef;
+import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.HyperVEnlightenmentFeatureDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.RngDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.ScsiDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtVmDef.SerialDef;
@@ -94,6 +95,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.RouterPrivateIpStrategy;
 import com.cloud.model.enumeration.StoragePoolType;
@@ -1353,7 +1355,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         String uuid = vmTo.getUuid();
         uuid = getUuid(uuid);
         vm.setDomUuid(uuid);
-        vm.setDomDescription(vmTo.getOs());
+        vm.setDomDescription("This VM is optimised for: " + vmTo.getOptimiseFor().toString());
         vm.setPlatformEmulator(vmTo.getPlatformEmulator());
 
         final MetadataTO metadataTo = vmTo.getMetadata();
@@ -1418,10 +1420,19 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         vm.addComponent(ctd);
 
         final FeaturesDef features = new FeaturesDef();
-        features.addFeatures("pae");
-        features.addFeatures("apic");
-        features.addFeatures("acpi");
+        features.addFeature("pae");
+        features.addFeature("apic");
+        features.addFeature("acpi");
         vm.addComponent(features);
+
+        if (vmTo.getOptimiseFor() == OptimiseFor.Windows) {
+            final HyperVEnlightenmentFeatureDef hyperVFeatures = new HyperVEnlightenmentFeatureDef();
+            hyperVFeatures.addFeature("relaxed", true);
+            hyperVFeatures.addFeature("vapic", true);
+            hyperVFeatures.addFeature("spinlocks", true);
+            hyperVFeatures.setRetries(8191);
+            features.addHyperVFeature(hyperVFeatures);
+        }
 
         final TermPolicy term = new TermPolicy();
         if (VirtualMachineType.User.equals(vmTo.getType())) {
@@ -1436,18 +1447,20 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         vm.addComponent(term);
 
         final ClockDef clock = new ClockDef();
-        if (vmTo.getOs().startsWith("Windows")) {
+        Boolean kvmClockEnabled = !isKvmClockDisabled();
+        Boolean hypervClockEnabled = false;
+        if (vmTo.getOptimiseFor() == OptimiseFor.Windows) {
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
-        } else if (vmTo.getType() != VirtualMachineType.User || isGuestVirtIoCapable(vmTo.getOs())) {
-            if (this.hypervisorLibvirtVersion >= 9 * 1000 + 10) {
-                clock.addTimer("kvmclock", null, null, isKvmclockDisabled());
-            }
+            kvmClockEnabled = false;
+            hypervClockEnabled = true;
         }
+        clock.addTimer("kvmclock", null, kvmClockEnabled);
+        clock.addTimer("hypervclock", null, hypervClockEnabled);
 
         // Recommended default clock/timer settings - https://bugzilla.redhat.com/show_bug.cgi?id=1053847
-        clock.addTimer("rtc", "catchup", null);
-        clock.addTimer("pit", "delay", null);
-
+        clock.addTimer("rtc", "catchup");
+        clock.addTimer("pit", "delay");
+        clock.addTimer("hpet", null, false);
         vm.addComponent(clock);
 
         final DevicesDef devices = new DevicesDef();
@@ -1493,8 +1506,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return vm;
     }
 
-    private boolean isKvmclockDisabled() {
-        return this.libvirtComputingResourceProperties.isKvmclockDisable();
+    private boolean isKvmClockDisabled() {
+        return this.libvirtComputingResourceProperties.isKvmClockDisable();
     }
 
     private String getGuestCpuModel() {

@@ -183,7 +183,7 @@ public class LibvirtComputingResourceTest {
         assertXpath(domainDoc, "/domain/@type", vm.getHvsType());
         assertXpath(domainDoc, "/domain/name/text()", to.getName());
         assertXpath(domainDoc, "/domain/uuid/text()", to.getUuid());
-        assertXpath(domainDoc, "/domain/description/text()", to.getOs());
+        assertXpath(domainDoc, "/domain/description/text()", "This VM is optimised for: " + to.getOptimiseFor().toString());
         assertXpath(domainDoc, "/domain/clock/@offset", "utc");
         assertNodeExists(domainDoc, "/domain/features/pae");
         assertNodeExists(domainDoc, "/domain/features/apic");

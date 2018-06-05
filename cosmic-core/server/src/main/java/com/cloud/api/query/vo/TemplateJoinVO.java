@@ -7,6 +7,7 @@ import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate.State;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.storage.ScopeType;
 import com.cloud.utils.db.GenericDao;
@@ -169,6 +170,14 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String tagCustomer;
     @Column(name = "temp_zone_pair")
     private String tempZonePair; // represent a distinct (templateId, data_center_id) pair
+    @Column(name = "optimise_for")
+    private OptimiseFor optimiseFor;
+    @Column(name = "manufacturer_string")
+    private String manufacturerString;
+    @Column(name = "mac_learning")
+    private String macLearning;
+    @Column(name = "cpu_flags")
+    private String cpuFlags;
 
     public TemplateJoinVO() {
     }
@@ -719,6 +728,38 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setTemplateState(final State templateState) {
         this.templateState = templateState;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    public String getMacLearning() {
+        return macLearning;
+    }
+
+    public void setMacLearning(final String macLearning) {
+        this.macLearning = macLearning;
+    }
+
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public void setCpuFlags(final String cpuFlags) {
+        this.cpuFlags = cpuFlags;
     }
 
     @Override

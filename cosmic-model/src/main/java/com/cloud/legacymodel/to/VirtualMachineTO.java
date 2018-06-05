@@ -1,6 +1,7 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 
 import java.util.List;
@@ -37,6 +38,8 @@ public class VirtualMachineTO {
     private long id;
     private String name;
     private BootloaderType bootloader;
+    private String manufacturerString;
+    private OptimiseFor optimiseFor;
 
     public VirtualMachineTO(final long id, final String instanceName, final VirtualMachineType type, final int cpus, final long minRam, final long maxRam,
                             final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
@@ -283,5 +286,24 @@ public class VirtualMachineTO {
 
     public void setCpuflags(final String cpuflags) {
         this.cpuflags = cpuflags;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public void setManufacturerString(final String manufacturerString) {
+        this.manufacturerString = manufacturerString;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor == null) {
+            return optimiseFor.Generic;
+        }
+        return optimiseFor;
+    }
+
+    public void setOptimiseFor(final OptimiseFor optimiseFor) {
+        this.optimiseFor = optimiseFor;
     }
 }

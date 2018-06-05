@@ -3,6 +3,7 @@ package com.cloud.api;
 import com.cloud.api.command.user.iso.UpdateIsoCmd;
 import com.cloud.api.response.GuestOSResponse;
 import com.cloud.api.response.TemplateResponse;
+import com.cloud.model.enumeration.OptimiseFor;
 
 import java.util.Collection;
 import java.util.Map;
@@ -48,6 +49,14 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
             type = CommandType.STRING,
             description = "The URL where the templates originally was downloaded from")
     private String url;
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+    @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
+    private String optimiseFor;
+    @Parameter(name = ApiConstants.CPU_FLAGS, type = CommandType.STRING, description = "Optionally specify CPU flags to pass to VM")
+    private String cpuFlags;
+    @Parameter(name = ApiConstants.MAC_LEARNING, type = CommandType.STRING, description = "Set mag learning boolean, defaults to false")
+    private Boolean macLearning;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -95,6 +104,26 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor != null) {
+            return OptimiseFor.valueOf(optimiseFor);
+        } else {
+            return OptimiseFor.Generic;
+        }
+    }
+
+    public String getCpuFlags() {
+        return cpuFlags;
+    }
+
+    public Boolean getMacLearning() {
+        return macLearning;
     }
 
     public Map getDetails() {
