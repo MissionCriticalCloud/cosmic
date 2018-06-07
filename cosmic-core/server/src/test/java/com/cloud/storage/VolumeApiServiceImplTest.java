@@ -314,7 +314,7 @@ public class VolumeApiServiceImplTest {
     // Positive test - attach ROOT volume in correct state, to the vm not having root volume attached
     @Test
     public void attachRootVolumePositive() throws NoSuchFieldException, IllegalAccessException {
-        thrown.expect(NullPointerException.class);
+        thrown.expect(InvalidParameterValueException.class);
         _svc.attachVolumeToVM(2L, 6L, 0L, DiskControllerType.SCSI);
     }
 
