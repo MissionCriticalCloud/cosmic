@@ -226,7 +226,6 @@ public class ApiConstants {
     public static final String SNAPSHOT = "snapshot";
     public static final String SNAPSHOT_ID = "snapshotid";
     public static final String SNAPSHOT_TYPE = "snapshottype";
-    public static final String SNAPSHOT_QUIESCEVM = "quiescevm";
     public static final String SOURCE_ZONE_ID = "sourcezoneid";
     public static final String START_DATE = "startdate";
     public static final String START_IP = "startip";
@@ -514,7 +513,6 @@ public class ApiConstants {
     public static final String VM_SNAPSHOT_ID = "vmsnapshotid";
     public static final String VM_SNAPSHOT_DISK_IDS = "vmsnapshotdiskids";
     public static final String VM_SNAPSHOT_MEMORY = "snapshotmemory";
-    public static final String VM_SNAPSHOT_QUIESCEVM = "quiescevm";
     public static final String IMAGE_STORE_UUID = "imagestoreuuid";
     public static final String GUEST_VM_CIDR = "guestvmcidr";
     public static final String NETWORK_CIDR = "networkcidr";

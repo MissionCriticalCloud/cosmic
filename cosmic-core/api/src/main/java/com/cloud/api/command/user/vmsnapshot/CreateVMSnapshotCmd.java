@@ -38,9 +38,6 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.VM_SNAPSHOT_DISPLAYNAME, type = CommandType.STRING, description = "The display name of the snapshot")
     private String displayName;
 
-    @Parameter(name = ApiConstants.VM_SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, description = "quiesce vm if true")
-    private Boolean quiescevm;
-
     @Override
     public void create() throws ResourceAllocationException {
         final VMSnapshot vmsnapshot = _vmSnapshotService.allocVMSnapshot(getVmId(), getDisplayName(), getDescription());
@@ -76,7 +73,7 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("VM Id: " + getVmId());
-        final VMSnapshot result = _vmSnapshotService.createVMSnapshot(getVmId(), getEntityId(), isQuiescevm());
+        final VMSnapshot result = _vmSnapshotService.createVMSnapshot(getVmId(), getEntityId(), Boolean.FALSE);
         if (result != null) {
             final VMSnapshotResponse response = _responseGenerator.createVMSnapshotResponse(result);
             response.setResponseName(getCommandName());
@@ -84,10 +81,6 @@ public class CreateVMSnapshotCmd extends BaseAsyncCreateCmd {
         } else {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create vm snapshot due to an internal error creating snapshot for vm " + getVmId());
         }
-    }
-
-    public boolean isQuiescevm() {
-        return Boolean.TRUE.equals(quiescevm);
     }
 
     @Override

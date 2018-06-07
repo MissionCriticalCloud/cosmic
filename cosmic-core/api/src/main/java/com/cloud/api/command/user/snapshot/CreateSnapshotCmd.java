@@ -46,9 +46,6 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     @Parameter(name = ApiConstants.VOLUME_ID, type = CommandType.UUID, entityType = VolumeResponse.class, required = true, description = "The ID of the disk volume")
     private Long volumeId;
 
-    @Parameter(name = ApiConstants.SNAPSHOT_QUIESCEVM, type = CommandType.BOOLEAN, required = false, description = "quiesce vm if true")
-    private Boolean quiescevm;
-
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the snapshot")
     private String snapshotName;
 
@@ -148,7 +145,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
         CallContext.current().setEventDetails("Volume Id: " + getVolumeUuid());
         final Snapshot snapshot;
         try {
-            snapshot = _volumeService.takeSnapshot(getVolumeId(), getPolicyId(), getEntityId(), _accountService.getAccount(getEntityOwnerId()), getQuiescevm());
+            snapshot = _volumeService.takeSnapshot(getVolumeId(), getPolicyId(), getEntityId(), _accountService.getAccount(getEntityOwnerId()), Boolean.FALSE);
             if (snapshot != null) {
                 final SnapshotResponse response = _responseGenerator.createSnapshotResponse(snapshot);
                 response.setResponseName(getCommandName());
@@ -158,14 +155,6 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
             }
         } catch (final Exception e) {
             throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create snapshot due to an internal error creating snapshot for volume " + volumeId);
-        }
-    }
-
-    public Boolean getQuiescevm() {
-        if (quiescevm == null) {
-            return false;
-        } else {
-            return quiescevm;
         }
     }
 
