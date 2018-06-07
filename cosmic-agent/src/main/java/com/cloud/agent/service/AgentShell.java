@@ -100,6 +100,7 @@ public class AgentShell {
         addNotNull(this.allProperties, "publicmac", this.agentConfiguration.getPublicip());
         addNotNull(this.allProperties, "publicmask", this.agentConfiguration.getPublicmask());
         addNotNull(this.allProperties, "publicnic", this.agentConfiguration.getPublicnic());
+        addNotNull(this.allProperties, "premium", this.agentConfiguration.getPremium());
         addNotNull(this.allProperties, "resource", this.agentConfiguration.getResource());
         addNotNull(this.allProperties, "role", this.agentConfiguration.getRole());
         addNotNull(this.allProperties, "sslcopy", this.agentConfiguration.getSslcopy());

@@ -56,6 +56,7 @@ public class AgentConfiguration {
     private String publicmac;
     private String publicmask;
     private String publicnic;
+    private String premium;
     private String role;
     private String sslcopy;
     private String template;
@@ -420,6 +421,14 @@ public class AgentConfiguration {
 
     public void setPublicnic(final String publicnic) {
         this.publicnic = publicnic;
+    }
+
+    public String getPremium() {
+        return premium;
+    }
+
+    public void setPremium(final String premium) {
+        this.premium = premium;
     }
 
     public String getRole() {
