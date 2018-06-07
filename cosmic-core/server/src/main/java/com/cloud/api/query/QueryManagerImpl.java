@@ -1477,12 +1477,6 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
             if (driver == null) {
                 continue;
             }
-
-            final Map<String, String> caps = driver.getCapabilities();
-            if (caps != null) {
-                final boolean quiescevm = Boolean.parseBoolean(caps.get(DataStoreCapabilities.VOLUME_SNAPSHOT_QUIESCEVM.toString()));
-                vr.setNeedQuiescevm(quiescevm);
-            }
         }
         response.setResponses(volumeResponses, result.second());
         return response;

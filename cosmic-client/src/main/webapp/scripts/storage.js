@@ -882,16 +882,6 @@
                                     title: 'label.action.take.snapshot',
                                     desc: 'message.action.take.snapshot',
                                     fields: {
-                                        quiescevm: {
-                                            label: 'label.quiesce.vm',
-                                            isBoolean: true,
-                                            isHidden: function (args) {
-                                                if (args.context.volumes[0].quiescevm == true)
-                                                    return false;
-                                                else
-                                                    return true;
-                                            }
-                                        },
                                         name: {
                                             label: 'label.name'
                                         }
@@ -900,7 +890,6 @@
                                 action: function (args) {
                                     var data = {
                                         volumeId: args.context.volumes[0].id,
-                                        quiescevm: (args.data.quiescevm == 'on' ? true : false)
                                     };
                                     if (args.data.name != null && args.data.name.length > 0) {
                                         $.extend(data, {

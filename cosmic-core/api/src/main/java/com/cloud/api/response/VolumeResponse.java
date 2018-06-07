@@ -167,9 +167,6 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     @SerializedName(ApiConstants.STORAGE_ID)
     @Param(description = "id of the primary storage hosting the disk volume; returned to admin user only", since = "4.3")
     private String storagePoolId;
-    @SerializedName(ApiConstants.SNAPSHOT_QUIESCEVM)
-    @Param(description = "need quiesce vm or not when taking snapshot", since = "4.3")
-    private boolean needQuiescevm;
     @SerializedName(ApiConstants.DISK_CONTROLLER)
     @Param(description = "disk controller this volume is on")
     private DiskControllerType diskController;
@@ -405,14 +402,6 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setStoragePoolId(final String storagePoolId) {
         this.storagePoolId = storagePoolId;
-    }
-
-    public boolean isNeedQuiescevm() {
-        return this.needQuiescevm;
-    }
-
-    public void setNeedQuiescevm(final boolean quiescevm) {
-        this.needQuiescevm = quiescevm;
     }
 
     public String getIsoId() {
