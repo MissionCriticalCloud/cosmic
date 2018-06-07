@@ -170,7 +170,7 @@ AcceptEnv XMODIFIERS
         agent_properties = { }
         for key, value in self.cmdline.items():
             if key == 'host':
-                agent_properties['hosts'] = [value]
+                agent_properties['hosts'] = value.split(',')
             else:
                 agent_properties[key] = value
 
