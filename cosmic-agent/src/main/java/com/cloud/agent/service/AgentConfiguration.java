@@ -2,6 +2,8 @@ package com.cloud.agent.service;
 
 import com.cloud.model.enumeration.StoragePoolType;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,28 +12,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "cosmic")
 public class AgentConfiguration {
-    private String guid;
-    private String resource;
-    private Integer workers;
-    private List<String> hosts;
-    private Integer port;
-    private String cluster;
-    private String pod;
-    private String zone;
-    private String hostReservedMemMb;
-    private String pidDir;
-    private Integer pingRetries;
+    @NotNull private String guid;
+    @NotNull private String resource;
+    @NotNull private Integer workers = 5;
+    @NotNull private List<String> hosts;
+    @NotNull private Integer port = 8250;
+    @NotNull private String cluster;
+    @NotNull private String pod;
+    @NotNull private String zone;
+    @NotNull private Integer hostReservedMemMb = 0;
+    @NotNull private String pidDir = "/var/run";
+    @NotNull private Integer pingRetries = 5;
 
-    private Cmds cmds;
-    private Domr domr;
-    private Guest guest;
-    private Hypervisor hypervisor;
-    private Libvirt libvirt;
-    private List<Localstorage> localstorages;
-    private Network network;
-    private Systemvm systemvm;
-    private Termpolicy termpolicy;
-    private Vm vm;
+    @NotNull private Cmds cmds = new Cmds();
+    @NotNull private Domr domr = new Domr();
+    @NotNull private Guest guest = new Guest();
+    @NotNull private Hypervisor hypervisor = new Hypervisor();
+    @NotNull private Libvirt libvirt = new Libvirt();
+    @NotNull private List<Localstorage> localstorages = new ArrayList<>();
+    @NotNull private Network network = new Network();
+    @NotNull private Systemvm systemvm = new Systemvm();
+    @NotNull private Termpolicy termpolicy = new Termpolicy();
+    @NotNull private Vm vm = new Vm();
 
     // SystemVM
     private String controlip;
@@ -51,14 +53,14 @@ public class AgentConfiguration {
     private String mgtmac;
     private String mgtmask;
     private String mgtnic;
-    private String mtu;
+    private String mtu = "1500";
     private String name;
     private String proxy_vm;
     private String publicip;
     private String publicmac;
     private String publicmask;
     private String publicnic;
-    private String premium;
+    private String premium = "false";
     private String role;
     private String sslcopy;
     private String template;
@@ -128,11 +130,11 @@ public class AgentConfiguration {
         this.zone = zone;
     }
 
-    public String getHostReservedMemMb() {
+    public Integer getHostReservedMemMb() {
         return hostReservedMemMb;
     }
 
-    public void setHostReservedMemMb(final String hostReservedMemMb) {
+    public void setHostReservedMemMb(final Integer hostReservedMemMb) {
         this.hostReservedMemMb = hostReservedMemMb;
     }
 
@@ -466,7 +468,7 @@ public class AgentConfiguration {
     }
 
     public static class Cmds {
-        private Integer timeout;
+        @NotNull private Integer timeout = 7200;
 
         public Integer getTimeout() {
             return timeout;
@@ -478,7 +480,7 @@ public class AgentConfiguration {
     }
 
     public static class Domr {
-        private Scripts scripts;
+        @NotNull private Scripts scripts = new Scripts();
 
         public Scripts getScripts() {
             return scripts;
@@ -489,7 +491,7 @@ public class AgentConfiguration {
         }
 
         public static class Scripts {
-            private String dir;
+            @NotNull private String dir = "scripts/network/domr/kvm";
 
             public String getDir() {
                 return dir;
@@ -502,7 +504,7 @@ public class AgentConfiguration {
     }
 
     public static class Guest {
-        private Cpu cpu;
+        @NotNull private Cpu cpu = new Cpu();
 
         public Cpu getCpu() {
             return cpu;
@@ -513,8 +515,8 @@ public class AgentConfiguration {
         }
 
         public static class Cpu {
-            private String mode;
-            private String model;
+            @NotNull private String mode;
+            @NotNull private String model;
 
             public String getMode() {
                 return mode;
@@ -535,8 +537,8 @@ public class AgentConfiguration {
     }
 
     public static class Hypervisor {
-        private String type;
-        private String uri;
+        @NotNull private String type;
+        @NotNull private String uri;
 
         public String getType() {
             return type;
@@ -556,7 +558,7 @@ public class AgentConfiguration {
     }
 
     public static class Libvirt {
-        private String vifDriver;
+        @NotNull private String vifDriver = "com.cloud.agent.resource.kvm.vif.OvsVifDriver";
 
         public String getVifDriver() {
             return vifDriver;
@@ -568,9 +570,9 @@ public class AgentConfiguration {
     }
 
     public static class Localstorage {
-        private String path;
-        private String uuid;
-        private StoragePoolType type;
+        @NotNull private String path;
+        @NotNull private String uuid;
+        @NotNull private StoragePoolType type;
 
         public String getPath() {
             return path;
@@ -598,8 +600,8 @@ public class AgentConfiguration {
     }
 
     public static class Network {
-        private Bridge bridge;
-        private Device device;
+        @NotNull private Bridge bridge = new Bridge();
+        @NotNull private Device device = new Device();
 
         public Bridge getBridge() {
             return bridge;
@@ -618,7 +620,7 @@ public class AgentConfiguration {
         }
 
         public static class Bridge {
-            private String type;
+            @NotNull private String type = "OPENVSWITCH";
 
             public String getType() {
                 return type;
@@ -630,9 +632,9 @@ public class AgentConfiguration {
         }
 
         public static class Device {
-            private String management;
-            private String pub;
-            private String guest;
+            @NotNull private String management;
+            @NotNull private String pub;
+            @NotNull private String guest;
 
             public String getManagement() {
                 return management;
@@ -661,7 +663,7 @@ public class AgentConfiguration {
     }
 
     public static class Systemvm {
-        private String isoPath;
+        @NotNull private String isoPath = "/opt/cosmic/agent/vms/systemvm.iso";
 
         public String getIsoPath() {
             return isoPath;
@@ -673,8 +675,8 @@ public class AgentConfiguration {
     }
 
     public static class Termpolicy {
-        private System system;
-        private Vm vm;
+        @NotNull private System system = new System();
+        @NotNull private Vm vm = new Vm();
 
         public System getSystem() {
             return system;
@@ -693,9 +695,9 @@ public class AgentConfiguration {
         }
 
         public static class System {
-            private String oncrash;
-            private String onpoweroff;
-            private String onreboot;
+            @NotNull private String oncrash = "restart";
+            @NotNull private String onpoweroff = "destroy";
+            @NotNull private String onreboot = "restart";
 
             public String getOncrash() {
                 return oncrash;
@@ -723,9 +725,9 @@ public class AgentConfiguration {
         }
 
         public static class Vm {
-            private String oncrash;
-            private String onpoweroff;
-            private String onreboot;
+            @NotNull private String oncrash = "destroy";
+            @NotNull private String onpoweroff = "destroy";
+            @NotNull private String onreboot = "destroy";
 
             public String getOncrash() {
                 return oncrash;
@@ -754,9 +756,9 @@ public class AgentConfiguration {
     }
 
     public static class Vm {
-        private Diskactivity diskactivity;
-        private Memballoon memballoon;
-        private Migrate migrate;
+        @NotNull private Diskactivity diskactivity = new Diskactivity();
+        @NotNull private Memballoon memballoon = new Memballoon();
+        @NotNull private Migrate migrate = new Migrate();
 
         public Diskactivity getDiskactivity() {
             return diskactivity;
@@ -783,9 +785,9 @@ public class AgentConfiguration {
         }
 
         public static class Diskactivity {
-            private Boolean checkenabled;
-            private Integer checktimeout_s;
-            private Integer inactivetime_ms;
+            @NotNull private Boolean checkenabled = false;
+            @NotNull private Integer checktimeout_s = 120;
+            @NotNull private Integer inactivetime_ms = 30000;
 
             public Boolean getCheckenabled() {
                 return checkenabled;
@@ -813,7 +815,7 @@ public class AgentConfiguration {
         }
 
         public static class Memballoon {
-            private Boolean disable;
+            @NotNull private Boolean disable = false;
 
             public Boolean isDisable() {
                 return disable;
@@ -825,9 +827,9 @@ public class AgentConfiguration {
         }
 
         public static class Migrate {
-            private Integer downtime;
-            private Integer pauseafter;
-            private Integer speed;
+            @NotNull private Integer downtime = 1000;
+            @NotNull private Integer pauseafter = 120000;
+            @NotNull private Integer speed = 0;
 
             public Integer getDowntime() {
                 return downtime;
