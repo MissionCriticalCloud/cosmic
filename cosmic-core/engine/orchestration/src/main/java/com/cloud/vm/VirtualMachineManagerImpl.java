@@ -1021,30 +1021,32 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     @Override
-    public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (!(cmd instanceof StartupRoutingCommand)) {
-            return;
-        }
+    public void processConnect(final Host agent, final StartupCommand[] startupCommands, final boolean forRebalance) throws ConnectionException {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (!(startupCommand instanceof StartupRoutingCommand)) {
+                return;
+            }
 
-        s_logger.debug("Received startup command from hypervisor host. host id: " + agent.getId());
+            s_logger.debug("Received startup command from hypervisor host. host id: " + agent.getId());
 
-        _syncMgr.resetHostSyncState(agent.getId());
+            _syncMgr.resetHostSyncState(agent.getId());
 
-        if (forRebalance) {
-            s_logger.debug("Not processing listener " + this + " as connect happens on rebalance process");
-            return;
-        }
-        final Long clusterId = agent.getClusterId();
-        final long agentId = agent.getId();
+            if (forRebalance) {
+                s_logger.debug("Not processing listener " + this + " as connect happens on rebalance process");
+                return;
+            }
+            final Long clusterId = agent.getClusterId();
+            final long agentId = agent.getId();
 
-        if (agent.getHypervisorType() == HypervisorType.XenServer) { // only for Xen
-            // initiate the cron job
-            final ClusterVMMetaDataSyncCommand syncVMMetaDataCmd = new ClusterVMMetaDataSyncCommand(ClusterVMMetaDataSyncInterval.value(), clusterId);
-            try {
-                final long seq_no = _agentMgr.send(agentId, new Commands(syncVMMetaDataCmd), this);
-                s_logger.debug("Cluster VM metadata sync started with jobid " + seq_no);
-            } catch (final AgentUnavailableException e) {
-                s_logger.error("The Cluster VM metadata sync process failed for cluster id " + clusterId + " with ", e);
+            if (agent.getHypervisorType() == HypervisorType.XenServer) { // only for Xen
+                // initiate the cron job
+                final ClusterVMMetaDataSyncCommand syncVMMetaDataCmd = new ClusterVMMetaDataSyncCommand(ClusterVMMetaDataSyncInterval.value(), clusterId);
+                try {
+                    final long seq_no = _agentMgr.send(agentId, new Commands(syncVMMetaDataCmd), this);
+                    s_logger.debug("Cluster VM metadata sync started with jobid " + seq_no);
+                } catch (final AgentUnavailableException e) {
+                    s_logger.error("The Cluster VM metadata sync process failed for cluster id " + clusterId + " with ", e);
+                }
             }
         }
     }

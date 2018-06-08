@@ -52,16 +52,18 @@ public class LocalStoragePoolListener implements Listener {
 
     @Override
     @DB
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (cmd instanceof StartupLocalstorageCommand) {
-            final StartupLocalstorageCommand ssCmd = (StartupLocalstorageCommand) cmd;
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) throws ConnectionException {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (startupCommand instanceof StartupLocalstorageCommand) {
+                final StartupLocalstorageCommand ssCmd = (StartupLocalstorageCommand) startupCommand;
 
-            final StoragePoolInfo pInfo = ssCmd.getPoolInfo();
-            if (pInfo == null) {
-                return;
+                final StoragePoolInfo pInfo = ssCmd.getPoolInfo();
+                if (pInfo == null) {
+                    return;
+                }
+
+                this._storageMgr.createLocalStorage(host, pInfo);
             }
-
-            this._storageMgr.createLocalStorage(host, pInfo);
         }
     }
 

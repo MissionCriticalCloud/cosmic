@@ -100,7 +100,7 @@ public class RemoteHostEndPoint implements EndPoint {
         }
 
         @Override
-        public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
+        public void processConnect(final Host host, final StartupCommand[] cmd, final boolean forRebalance) throws ConnectionException {
             // TODO Auto-generated method stub
 
         }

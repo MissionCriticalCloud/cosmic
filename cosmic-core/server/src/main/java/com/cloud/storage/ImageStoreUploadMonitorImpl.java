@@ -23,7 +23,6 @@ import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine.State;
@@ -137,7 +136,7 @@ public class ImageStoreUploadMonitorImpl extends ManagerBase implements ImageSto
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
+    public void processConnect(final Host host, final StartupCommand[] cmd, final boolean forRebalance) {
     }
 
     @Override

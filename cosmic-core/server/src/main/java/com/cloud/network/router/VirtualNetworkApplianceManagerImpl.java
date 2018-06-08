@@ -1712,7 +1712,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) throws ConnectionException {
         final List<DomainRouterVO> routers = _routerDao.listIsolatedByHostId(host.getId());
         for (final DomainRouterVO router : routers) {
             if (router.isStopPending()) {

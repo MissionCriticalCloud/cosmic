@@ -49,7 +49,6 @@ import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
 import com.cloud.legacymodel.statemachine.StateListener;
 import com.cloud.legacymodel.statemachine.Transition;
@@ -1286,16 +1285,18 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (!(cmd instanceof StartupRoutingCommand)) {
-            return;
-        }
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (!(startupCommand instanceof StartupRoutingCommand)) {
+                return;
+            }
 
-        final PlannerHostReservationVO reservationEntry = _plannerHostReserveDao.findByHostId(host.getId());
-        if (reservationEntry == null) {
-            // record the host in this table
-            final PlannerHostReservationVO newHost = new PlannerHostReservationVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId());
-            _plannerHostReserveDao.persist(newHost);
+            final PlannerHostReservationVO reservationEntry = _plannerHostReserveDao.findByHostId(host.getId());
+            if (reservationEntry == null) {
+                // record the host in this table
+                final PlannerHostReservationVO newHost = new PlannerHostReservationVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId());
+                _plannerHostReserveDao.persist(newHost);
+            }
         }
     }
 

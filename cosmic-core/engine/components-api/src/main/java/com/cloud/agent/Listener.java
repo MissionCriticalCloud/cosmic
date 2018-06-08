@@ -57,7 +57,7 @@ public interface Listener {
      * @param agentId      id of the agent
      * @throws ConnectionException if host has problems and needs to put into maintenance state.
      */
-    void processConnect(Host host, StartupCommand cmd, boolean forRebalance) throws ConnectionException;
+    void processConnect(Host host, StartupCommand[] cmd, boolean forRebalance) throws ConnectionException;
 
     /**
      * This method is called by AgentManager when an agent disconnects
