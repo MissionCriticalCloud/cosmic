@@ -41,7 +41,7 @@ public class StorageSyncListener implements Listener {
     }
 
     @Override
-    public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) {
+    public void processConnect(final Host agent, final StartupCommand[] cmd, final boolean forRebalance) {
     }
 
     @Override

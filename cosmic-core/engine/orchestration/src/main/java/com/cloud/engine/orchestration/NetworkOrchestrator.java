@@ -3009,84 +3009,86 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (!(cmd instanceof StartupRoutingCommand)) {
-            return;
-        }
-        final long hostId = host.getId();
-        final StartupRoutingCommand startup = (StartupRoutingCommand) cmd;
-
-        final String dataCenter = startup.getDataCenter();
-
-        long dcId = -1;
-        Zone dc = _zoneRepository.findByName(dataCenter);
-        if (dc == null) {
-            try {
-                dcId = Long.parseLong(dataCenter);
-                dc = _zoneRepository.findById(dcId).orElse(null);
-            } catch (final NumberFormatException e) {
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) throws ConnectionException {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (!(startupCommand instanceof StartupRoutingCommand)) {
+                return;
             }
-        }
-        if (dc == null) {
-            throw new IllegalArgumentException("Host " + startup.getPrivateIpAddress() + " sent incorrect data center: " + dataCenter);
-        }
-        dcId = dc.getId();
-        final HypervisorType hypervisorType = startup.getHypervisorType();
+            final long hostId = host.getId();
+            final StartupRoutingCommand startup = (StartupRoutingCommand) startupCommand;
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Host's hypervisorType is: " + hypervisorType);
-        }
+            final String dataCenter = startup.getDataCenter();
 
-        final List<PhysicalNetworkSetupInfo> networkInfoList = new ArrayList<>();
-
-        // list all physicalnetworks in the zone & for each get the network names
-        final List<PhysicalNetworkVO> physicalNtwkList = _physicalNetworkDao.listByZone(dcId);
-        for (final PhysicalNetworkVO pNtwk : physicalNtwkList) {
-            final String publicName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Public, hypervisorType);
-            final String privateName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Management, hypervisorType);
-            final String guestName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Guest, hypervisorType);
-            final String storageName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Storage, hypervisorType);
-            // String controlName = _pNTrafficTypeDao._networkModel.getNetworkTag(pNtwk.getId(), TrafficType.Control, hypervisorType);
-            final PhysicalNetworkSetupInfo info = new PhysicalNetworkSetupInfo();
-            info.setPhysicalNetworkId(pNtwk.getId());
-            info.setGuestNetworkName(guestName);
-            info.setPrivateNetworkName(privateName);
-            info.setPublicNetworkName(publicName);
-            info.setStorageNetworkName(storageName);
-            final PhysicalNetworkTrafficTypeVO mgmtTraffic = _pNTrafficTypeDao.findBy(pNtwk.getId(), TrafficType.Management);
-            if (mgmtTraffic != null) {
-                final String vlan = mgmtTraffic.getVlan();
-                info.setMgmtVlan(vlan);
+            long dcId = -1;
+            Zone dc = _zoneRepository.findByName(dataCenter);
+            if (dc == null) {
+                try {
+                    dcId = Long.parseLong(dataCenter);
+                    dc = _zoneRepository.findById(dcId).orElse(null);
+                } catch (final NumberFormatException e) {
+                }
             }
-            networkInfoList.add(info);
-        }
-
-        // send the names to the agent
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Sending CheckNetworkCommand to check the Network is setup correctly on Agent");
-        }
-        final CheckNetworkCommand nwCmd = new CheckNetworkCommand(networkInfoList);
-
-        final CheckNetworkAnswer answer = (CheckNetworkAnswer) _agentMgr.easySend(hostId, nwCmd);
-
-        if (answer == null) {
-            s_logger.warn("Unable to get an answer to the CheckNetworkCommand from agent:" + host.getId());
-            throw new ConnectionException(true, "Unable to get an answer to the CheckNetworkCommand from agent: " + host.getId());
-        }
-
-        if (!answer.getResult()) {
-            s_logger.warn("Unable to setup agent " + hostId + " due to " + answer.getDetails());
-            final String msg = "Incorrect Network setup on agent, Reinitialize agent after network names are setup, details : " + answer.getDetails();
-            _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, dcId, host.getPodId(), msg, msg);
-            throw new ConnectionException(true, msg);
-        } else {
-            if (answer.needReconnect()) {
-                throw new ConnectionException(false, "Reinitialize agent after network setup.");
+            if (dc == null) {
+                throw new IllegalArgumentException("Host " + startup.getPrivateIpAddress() + " sent incorrect data center: " + dataCenter);
             }
+            dcId = dc.getId();
+            final HypervisorType hypervisorType = startup.getHypervisorType();
+
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Network setup is correct on Agent");
+                s_logger.debug("Host's hypervisorType is: " + hypervisorType);
             }
-            return;
+
+            final List<PhysicalNetworkSetupInfo> networkInfoList = new ArrayList<>();
+
+            // list all physicalnetworks in the zone & for each get the network names
+            final List<PhysicalNetworkVO> physicalNtwkList = _physicalNetworkDao.listByZone(dcId);
+            for (final PhysicalNetworkVO pNtwk : physicalNtwkList) {
+                final String publicName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Public, hypervisorType);
+                final String privateName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Management, hypervisorType);
+                final String guestName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Guest, hypervisorType);
+                final String storageName = _pNTrafficTypeDao.getNetworkTag(pNtwk.getId(), TrafficType.Storage, hypervisorType);
+                // String controlName = _pNTrafficTypeDao._networkModel.getNetworkTag(pNtwk.getId(), TrafficType.Control, hypervisorType);
+                final PhysicalNetworkSetupInfo info = new PhysicalNetworkSetupInfo();
+                info.setPhysicalNetworkId(pNtwk.getId());
+                info.setGuestNetworkName(guestName);
+                info.setPrivateNetworkName(privateName);
+                info.setPublicNetworkName(publicName);
+                info.setStorageNetworkName(storageName);
+                final PhysicalNetworkTrafficTypeVO mgmtTraffic = _pNTrafficTypeDao.findBy(pNtwk.getId(), TrafficType.Management);
+                if (mgmtTraffic != null) {
+                    final String vlan = mgmtTraffic.getVlan();
+                    info.setMgmtVlan(vlan);
+                }
+                networkInfoList.add(info);
+            }
+
+            // send the names to the agent
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Sending CheckNetworkCommand to check the Network is setup correctly on Agent");
+            }
+            final CheckNetworkCommand nwCmd = new CheckNetworkCommand(networkInfoList);
+
+            final CheckNetworkAnswer answer = (CheckNetworkAnswer) _agentMgr.easySend(hostId, nwCmd);
+
+            if (answer == null) {
+                s_logger.warn("Unable to get an answer to the CheckNetworkCommand from agent:" + host.getId());
+                throw new ConnectionException(true, "Unable to get an answer to the CheckNetworkCommand from agent: " + host.getId());
+            }
+
+            if (!answer.getResult()) {
+                s_logger.warn("Unable to setup agent " + hostId + " due to " + answer.getDetails());
+                final String msg = "Incorrect Network setup on agent, Reinitialize agent after network names are setup, details : " + answer.getDetails();
+                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_HOST, dcId, host.getPodId(), msg, msg);
+                throw new ConnectionException(true, msg);
+            } else {
+                if (answer.needReconnect()) {
+                    throw new ConnectionException(false, "Reinitialize agent after network setup.");
+                }
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("Network setup is correct on Agent");
+                }
+                return;
+            }
         }
     }
 

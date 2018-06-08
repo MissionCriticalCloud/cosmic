@@ -25,7 +25,6 @@ import com.cloud.legacymodel.communication.command.startup.StartupSecondaryStora
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -233,36 +232,28 @@ public class DownloadListener implements Listener {
     }
 
     @Override
-    public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (cmd instanceof StartupRoutingCommand) {
-            final List<HypervisorType> hypers = this._resourceMgr.listAvailHypervisorInZone(agent.getId(), agent.getDataCenterId());
-            final HypervisorType hostHyper = agent.getHypervisorType();
-            if (hypers.contains(hostHyper)) {
-                return;
-            }
-            this._imageSrv.handleSysTemplateDownload(hostHyper, agent.getDataCenterId());
-            // update template_zone_ref for cross-zone templates
-            this._imageSrv.associateCrosszoneTemplatesToZone(agent.getDataCenterId());
-        }
-        /* This can be removed
-        else if ( cmd instanceof StartupStorageCommand) {
-            StartupStorageCommand storage = (StartupStorageCommand)cmd;
-            if( storage.getResourceType() == Storage.StorageResourceType.SECONDARY_STORAGE ||
-                    storage.getResourceType() == Storage.StorageResourceType.LOCAL_SECONDARY_STORAGE  ) {
-                downloadMonitor.addSystemVMTemplatesToHost(agent, storage.getTemplateInfo());
-                downloadMonitor.handleTemplateSync(agent);
-                downloadMonitor.handleVolumeSync(agent);
-            }
-        }*/
-        else if (cmd instanceof StartupSecondaryStorageCommand) {
-            try {
-                final List<DataStore> imageStores = this._storeMgr.getImageStoresByScope(new ZoneScope(agent.getDataCenterId()));
-                for (final DataStore store : imageStores) {
-                    this._volumeSrv.handleVolumeSync(store);
-                    this._imageSrv.handleTemplateSync(store);
+    public void processConnect(final Host agent, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+
+            if (startupCommand instanceof StartupRoutingCommand) {
+                final List<HypervisorType> hypers = this._resourceMgr.listAvailHypervisorInZone(agent.getId(), agent.getDataCenterId());
+                final HypervisorType hostHyper = agent.getHypervisorType();
+                if (hypers.contains(hostHyper)) {
+                    return;
                 }
-            } catch (final Exception e) {
-                s_logger.error("Caught exception while doing template/volume sync ", e);
+                this._imageSrv.handleSysTemplateDownload(hostHyper, agent.getDataCenterId());
+                // update template_zone_ref for cross-zone templates
+                this._imageSrv.associateCrosszoneTemplatesToZone(agent.getDataCenterId());
+            } else if (startupCommand instanceof StartupSecondaryStorageCommand) {
+                try {
+                    final List<DataStore> imageStores = this._storeMgr.getImageStoresByScope(new ZoneScope(agent.getDataCenterId()));
+                    for (final DataStore store : imageStores) {
+                        this._volumeSrv.handleVolumeSync(store);
+                        this._imageSrv.handleTemplateSync(store);
+                    }
+                } catch (final Exception e) {
+                    s_logger.error("Caught exception while doing template/volume sync ", e);
+                }
             }
         }
     }

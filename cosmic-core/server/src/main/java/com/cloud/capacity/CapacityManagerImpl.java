@@ -841,7 +841,7 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) {
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) {
         // TODO Auto-generated method stub
 
     }

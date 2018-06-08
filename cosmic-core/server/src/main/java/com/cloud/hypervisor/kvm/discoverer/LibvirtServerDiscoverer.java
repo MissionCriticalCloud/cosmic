@@ -71,7 +71,7 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) {
+    public void processConnect(final Host host, final StartupCommand[] cmd, final boolean forRebalance) {
     }
 
     @Override

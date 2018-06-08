@@ -1161,15 +1161,16 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
     @DB
     @Override
-    public DataStore createLocalStorage(final Host host, final StoragePoolInfo pInfo) throws ConnectionException {
+    public StoragePool createLocalStorage(final Host host, final StoragePoolInfo pInfo) throws ConnectionException {
         final DataCenterVO dc = this._dcDao.findById(host.getDataCenterId());
         if (dc == null) {
             return null;
         }
 
         final DataStore store;
+        StoragePoolVO pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), host.getName(), pInfo.getLocalPath(), pInfo.getUuid());
+
         try {
-            StoragePoolVO pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), host.getName(), pInfo.getLocalPath(), pInfo.getUuid());
             if (pool == null) {
                 //the path can be different, but if they have the same uuid, assume they are the same storage
                 pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), host.getName(), null, pInfo.getUuid());
@@ -1207,7 +1208,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             throw new ConnectionException(true, "Unable to setup the local storage pool for " + host, e);
         }
 
-        return this._dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
+        // Enable the pool
+        pool.setStatus(StoragePoolStatus.Up);
+        this._storagePoolDao.persist(pool);
+
+        return pool;
     }
 
     @Override

@@ -15,7 +15,6 @@ import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
-import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.model.enumeration.HypervisorType;
 
 import org.slf4j.Logger;
@@ -51,20 +50,22 @@ public class SshKeysDistriMonitor implements Listener {
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (cmd instanceof StartupRoutingCommand) {
-            if (((StartupRoutingCommand) cmd).getHypervisorType() == HypervisorType.KVM || ((StartupRoutingCommand) cmd).getHypervisorType() == HypervisorType.XenServer) {
-                /*TODO: Get the private/public keys here*/
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (startupCommand instanceof StartupRoutingCommand) {
+                if (((StartupRoutingCommand) startupCommand).getHypervisorType() == HypervisorType.KVM || ((StartupRoutingCommand) startupCommand).getHypervisorType() == HypervisorType.XenServer) {
+                    /*TODO: Get the private/public keys here*/
 
-                final String pubKey = _configDao.getValue("ssh.publickey");
-                final String prvKey = _configDao.getValue("ssh.privatekey");
+                    final String pubKey = _configDao.getValue("ssh.publickey");
+                    final String prvKey = _configDao.getValue("ssh.privatekey");
 
-                try {
-                    final ModifySshKeysCommand cmds = new ModifySshKeysCommand(pubKey, prvKey);
-                    final Commands c = new Commands(cmds);
-                    _agentMgr.send(host.getId(), c, this);
-                } catch (final AgentUnavailableException e) {
-                    s_logger.debug("Failed to send keys to agent: " + host.getId());
+                    try {
+                        final ModifySshKeysCommand cmds = new ModifySshKeysCommand(pubKey, prvKey);
+                        final Commands c = new Commands(cmds);
+                        _agentMgr.send(host.getId(), c, this);
+                    } catch (final AgentUnavailableException e) {
+                        s_logger.debug("Failed to send keys to agent: " + host.getId());
+                    }
                 }
             }
         }

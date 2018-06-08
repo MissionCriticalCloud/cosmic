@@ -10,7 +10,6 @@ import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.communication.command.startup.StartupStorageCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
-import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.model.enumeration.StorageResourceType;
 import com.cloud.storage.StorageManager;
 
@@ -43,19 +42,20 @@ public class StorageCapacityListener implements Listener {
     }
 
     @Override
-    public void processConnect(final Host server, final StartupCommand startup, final boolean forRebalance) throws ConnectionException {
+    public void processConnect(final Host server, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (!(startupCommand instanceof StartupStorageCommand)) {
+                return;
+            }
 
-        if (!(startup instanceof StartupStorageCommand)) {
-            return;
-        }
-
-        final StartupStorageCommand ssCmd = (StartupStorageCommand) startup;
-        if (ssCmd.getResourceType() == StorageResourceType.STORAGE_HOST) {
-            final BigDecimal overProvFactor = BigDecimal.valueOf(CapacityManager.StorageOverprovisioningFactor.value());
-            final CapacityVO capacity =
-                    new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(
-                            server.getTotalSize()))).longValue(), Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
-            _capacityDao.persist(capacity);
+            final StartupStorageCommand ssCmd = (StartupStorageCommand) startupCommand;
+            if (ssCmd.getResourceType() == StorageResourceType.STORAGE_HOST) {
+                final BigDecimal overProvFactor = BigDecimal.valueOf(CapacityManager.StorageOverprovisioningFactor.value());
+                final CapacityVO capacity =
+                        new CapacityVO(server.getId(), server.getDataCenterId(), server.getPodId(), server.getClusterId(), 0L, (overProvFactor.multiply(new BigDecimal(
+                                server.getTotalSize()))).longValue(), Capacity.CAPACITY_TYPE_STORAGE_ALLOCATED);
+                _capacityDao.persist(capacity);
+            }
         }
     }
 

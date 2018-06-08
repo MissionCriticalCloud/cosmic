@@ -243,16 +243,18 @@ public class UploadListener implements Listener {
     }
 
     @Override
-    public void processConnect(final Host agent, final StartupCommand cmd, final boolean forRebalance) {
-        if (!(cmd instanceof StartupStorageCommand)) {
-            return;
-        }
+    public void processConnect(final Host agent, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (!(startupCommand instanceof StartupStorageCommand)) {
+                return;
+            }
 
-        final long agentId = agent.getId();
+            final long agentId = agent.getId();
 
-        final StartupStorageCommand storage = (StartupStorageCommand) cmd;
-        if (storage.getResourceType() == StorageResourceType.STORAGE_HOST || storage.getResourceType() == StorageResourceType.SECONDARY_STORAGE) {
-            this.uploadMonitor.handleUploadSync(agentId);
+            final StartupStorageCommand storage = (StartupStorageCommand) startupCommand;
+            if (storage.getResourceType() == StorageResourceType.STORAGE_HOST || storage.getResourceType() == StorageResourceType.SECONDARY_STORAGE) {
+                this.uploadMonitor.handleUploadSync(agentId);
+            }
         }
     }
 

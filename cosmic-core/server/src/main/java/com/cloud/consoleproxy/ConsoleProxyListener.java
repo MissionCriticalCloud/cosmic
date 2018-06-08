@@ -43,11 +43,13 @@ public class ConsoleProxyListener implements Listener {
     }
 
     @Override
-    public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) {
-        _proxyMgr.onAgentConnect(host, cmd);
+    public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+            _proxyMgr.onAgentConnect(host, startupCommand);
 
-        if (cmd instanceof StartupProxyCommand) {
-            _proxyMgr.startAgentHttpHandlerInVM((StartupProxyCommand) cmd);
+            if (startupCommand instanceof StartupProxyCommand) {
+                _proxyMgr.startAgentHttpHandlerInVM((StartupProxyCommand) startupCommand);
+            }
         }
     }
 

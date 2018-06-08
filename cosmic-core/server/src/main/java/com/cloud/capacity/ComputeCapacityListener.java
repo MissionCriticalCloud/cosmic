@@ -10,7 +10,6 @@ import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
-import com.cloud.legacymodel.exceptions.ConnectionException;
 
 public class ComputeCapacityListener implements Listener {
     CapacityDao _capacityDao;
@@ -40,11 +39,13 @@ public class ComputeCapacityListener implements Listener {
     }
 
     @Override
-    public void processConnect(final Host server, final StartupCommand startup, final boolean forRebalance) throws ConnectionException {
-        if (!(startup instanceof StartupRoutingCommand)) {
-            return;
+    public void processConnect(final Host server, final StartupCommand[] startupCommands, final boolean forRebalance) {
+        for (final StartupCommand startupCommand : startupCommands) {
+            if (!(startupCommand instanceof StartupRoutingCommand)) {
+                return;
+            }
+            _capacityMgr.updateCapacityForHost(server);
         }
-        _capacityMgr.updateCapacityForHost(server);
     }
 
     @Override

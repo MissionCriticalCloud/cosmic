@@ -529,80 +529,83 @@ public class XcpServerDiscoverer extends DiscovererBase implements Discoverer, L
     }
 
     @Override
-    public void processConnect(final com.cloud.legacymodel.dc.Host agent, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
-        if (!(cmd instanceof StartupRoutingCommand)) {
-            return;
-        }
-        final long agentId = agent.getId();
+    public void processConnect(final com.cloud.legacymodel.dc.Host agent, final StartupCommand[] startupCommands, final boolean forRebalance) throws ConnectionException {
+        for (final StartupCommand startupCommand : startupCommands) {
 
-        final StartupRoutingCommand startup = (StartupRoutingCommand) cmd;
-        if (startup.getHypervisorType() != HypervisorType.XenServer) {
-            s_logger.debug("Not XenServer so moving on.");
-            return;
-        }
-
-        final HostVO host = this._hostDao.findById(agentId);
-
-        final ClusterVO cluster = this._clusterDao.findById(host.getClusterId());
-        if (cluster.getGuid() == null) {
-            cluster.setGuid(startup.getPool());
-            this._clusterDao.update(cluster.getId(), cluster);
-        } else if (!cluster.getGuid().equals(startup.getPool())) {
-            final String msg = "pool uuid for cluster " + cluster.getId() + " changed from " + cluster.getGuid() + " to " + startup.getPool();
-            s_logger.warn(msg);
-            throw new CloudRuntimeException(msg);
-        }
-
-        final Map<String, String> details = startup.getHostDetails();
-        final String prodBrand = details.get("product_brand").trim();
-        final String prodVersion = details.get("product_version").trim();
-        final String hotfix = details.get(XenserverConfigs.XS620HotFix);
-        final String prodVersionTextShort = details.get("product_version_text_short");
-
-        final String resource = createServerResource(prodBrand, prodVersion, prodVersionTextShort, hotfix).getClass().getName();
-
-        if (!resource.equals(host.getResource())) {
-            final String msg = "host " + host.getPrivateIpAddress() + " changed from " + host.getResource() + " to " + resource;
-            s_logger.debug(msg);
-            host.setResource(resource);
-            host.setSetup(false);
-            this._hostDao.update(agentId, host);
-            throw new HypervisorVersionChangedException(msg);
-        }
-
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Setting up host " + agentId);
-        }
-        final HostEnvironment env = new HostEnvironment();
-
-        final SetupCommand setup = new SetupCommand(env);
-        if (this._setupMultipath) {
-            setup.setMultipathOn();
-        }
-        if (!host.isSetup()) {
-            setup.setNeedSetup(true);
-        }
-
-        try {
-            final Answer answer = this._agentMgr.send(agentId, setup);
-            if (answer != null && answer.getResult() && answer instanceof SetupAnswer) {
-                host.setSetup(true);
-                host.setLastPinged((System.currentTimeMillis() >> 10) - 5 * 60);
-                host.setHypervisorVersion(prodVersion);
-                this._hostDao.update(host.getId(), host);
-                if (((SetupAnswer) answer).needReconnect()) {
-                    throw new ConnectionException(false, "Reinitialize agent after setup.");
-                }
+            if (!(startupCommand instanceof StartupRoutingCommand)) {
                 return;
-            } else {
-                s_logger.warn("Unable to setup agent " + agentId + " due to " + ((answer != null) ? answer.getDetails() : "return null"));
             }
-        } catch (final AgentUnavailableException e) {
-            s_logger.warn("Unable to setup agent " + agentId + " because it became unavailable.", e);
-        } catch (final OperationTimedoutException e) {
-            s_logger.warn("Unable to setup agent " + agentId + " because it timed out", e);
+            final long agentId = agent.getId();
+
+            final StartupRoutingCommand startup = (StartupRoutingCommand) startupCommand;
+            if (startup.getHypervisorType() != HypervisorType.XenServer) {
+                s_logger.debug("Not XenServer so moving on.");
+                return;
+            }
+
+            final HostVO host = this._hostDao.findById(agentId);
+
+            final ClusterVO cluster = this._clusterDao.findById(host.getClusterId());
+            if (cluster.getGuid() == null) {
+                cluster.setGuid(startup.getPool());
+                this._clusterDao.update(cluster.getId(), cluster);
+            } else if (!cluster.getGuid().equals(startup.getPool())) {
+                final String msg = "pool uuid for cluster " + cluster.getId() + " changed from " + cluster.getGuid() + " to " + startup.getPool();
+                s_logger.warn(msg);
+                throw new CloudRuntimeException(msg);
+            }
+
+            final Map<String, String> details = startup.getHostDetails();
+            final String prodBrand = details.get("product_brand").trim();
+            final String prodVersion = details.get("product_version").trim();
+            final String hotfix = details.get(XenserverConfigs.XS620HotFix);
+            final String prodVersionTextShort = details.get("product_version_text_short");
+
+            final String resource = createServerResource(prodBrand, prodVersion, prodVersionTextShort, hotfix).getClass().getName();
+
+            if (!resource.equals(host.getResource())) {
+                final String msg = "host " + host.getPrivateIpAddress() + " changed from " + host.getResource() + " to " + resource;
+                s_logger.debug(msg);
+                host.setResource(resource);
+                host.setSetup(false);
+                this._hostDao.update(agentId, host);
+                throw new HypervisorVersionChangedException(msg);
+            }
+
+            if (s_logger.isDebugEnabled()) {
+                s_logger.debug("Setting up host " + agentId);
+            }
+            final HostEnvironment env = new HostEnvironment();
+
+            final SetupCommand setup = new SetupCommand(env);
+            if (this._setupMultipath) {
+                setup.setMultipathOn();
+            }
+            if (!host.isSetup()) {
+                setup.setNeedSetup(true);
+            }
+
+            try {
+                final Answer answer = this._agentMgr.send(agentId, setup);
+                if (answer != null && answer.getResult() && answer instanceof SetupAnswer) {
+                    host.setSetup(true);
+                    host.setLastPinged((System.currentTimeMillis() >> 10) - 5 * 60);
+                    host.setHypervisorVersion(prodVersion);
+                    this._hostDao.update(host.getId(), host);
+                    if (((SetupAnswer) answer).needReconnect()) {
+                        throw new ConnectionException(false, "Reinitialize agent after setup.");
+                    }
+                    return;
+                } else {
+                    s_logger.warn("Unable to setup agent " + agentId + " due to " + ((answer != null) ? answer.getDetails() : "return null"));
+                }
+            } catch (final AgentUnavailableException e) {
+                s_logger.warn("Unable to setup agent " + agentId + " because it became unavailable.", e);
+            } catch (final OperationTimedoutException e) {
+                s_logger.warn("Unable to setup agent " + agentId + " because it timed out", e);
+            }
+            throw new ConnectionException(true, "Reinitialize agent after setup.");
         }
-        throw new ConnectionException(true, "Reinitialize agent after setup.");
     }
 
     @Override
