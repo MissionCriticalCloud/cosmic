@@ -1783,9 +1783,9 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     private List<StartupLocalstorageCommand> initializeLocalstorage() {
         final List<StartupLocalstorageCommand> startupLocalstorageCommandList = new ArrayList<>();
 
-        try {
-            for (final AgentConfiguration.Localstorage localstorage : this.agentConfiguration.getLocalstorages()) {
-                if (localstorage.getType() == StoragePoolType.LVM) {
+        for (final AgentConfiguration.Localstorage localstorage : this.agentConfiguration.getLocalstorages()) {
+            if (localstorage.getType() == StoragePoolType.LVM) {
+                try {
                     logger.debug("Found local LVM storage pool: " + localstorage.getPath() + ", with uuid: " + localstorage.getUuid() + ", in the agent configuration");
                     final KvmStoragePool localStoragePool = this.storagePoolMgr.createStoragePool(localstorage.getUuid(), "localhost", -1, localstorage.getPath(), "", StoragePoolType.LVM);
 
@@ -1801,10 +1801,10 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     startupLocalstorageCommand.setPoolInfo(storagePoolInfo);
 
                     startupLocalstorageCommandList.add(startupLocalstorageCommand);
+                } catch (final CloudRuntimeException e) {
+                    logger.debug("Unable to initialize local storage pool: " + e);
                 }
             }
-        } catch (final CloudRuntimeException e) {
-            logger.debug("Unable to initialize local storage pool: " + e);
         }
 
         return startupLocalstorageCommandList;
