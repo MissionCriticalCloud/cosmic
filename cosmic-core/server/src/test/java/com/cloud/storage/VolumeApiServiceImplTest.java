@@ -314,7 +314,7 @@ public class VolumeApiServiceImplTest {
     // Positive test - attach ROOT volume in correct state, to the vm not having root volume attached
     @Test
     public void attachRootVolumePositive() throws NoSuchFieldException, IllegalAccessException {
-        thrown.expect(NullPointerException.class);
+        thrown.expect(InvalidParameterValueException.class);
         _svc.attachVolumeToVM(2L, 6L, 0L, DiskControllerType.SCSI);
     }
 
@@ -364,8 +364,8 @@ public class VolumeApiServiceImplTest {
     public void testResourceLimitCheckForUploadedVolume() throws NoSuchFieldException, IllegalAccessException, ResourceAllocationException {
         doThrow(new ResourceAllocationException("primary storage resource limit check failed", Resource.ResourceType.primary_storage)).when(_svc._resourceLimitMgr).checkResourceLimit(any(AccountVO
                 .class), any(Resource.ResourceType.class), any(Long.class));
-        UserVmVO vm = Mockito.mock(UserVmVO.class);
-        VolumeInfo volumeToAttach = Mockito.mock(VolumeInfo.class);
+        final UserVmVO vm = Mockito.mock(UserVmVO.class);
+        final VolumeInfo volumeToAttach = Mockito.mock(VolumeInfo.class);
         when(volumeToAttach.getId()).thenReturn(9L);
         when(volumeToAttach.getDataCenterId()).thenReturn(34L);
         when(volumeToAttach.getVolumeType()).thenReturn(VolumeType.DATADISK);
@@ -377,12 +377,11 @@ public class VolumeApiServiceImplTest {
         when(_svc._volsDao.findByInstanceAndType(anyLong(), any(VolumeType.class))).thenReturn(new ArrayList(10));
         when(_svc.volFactory.getVolume(9L)).thenReturn(volumeToAttach);
         when(volumeToAttach.getState()).thenReturn(Volume.State.Uploaded);
-        DataCenterVO zoneWithDisabledLocalStorage = Mockito.mock(DataCenterVO.class);
+        final DataCenterVO zoneWithDisabledLocalStorage = Mockito.mock(DataCenterVO.class);
         when(_svc._dcDao.findById(anyLong())).thenReturn(zoneWithDisabledLocalStorage);
-        when(zoneWithDisabledLocalStorage.isLocalStorageEnabled()).thenReturn(true);
         try {
             _svc.attachVolumeToVM(2L, 9L, null, DiskControllerType.SCSI);
-        } catch (InvalidParameterValueException e) {
+        } catch (final InvalidParameterValueException e) {
             Assert.assertEquals(e.getMessage(), ("primary storage resource limit check failed"));
         }
     }

@@ -3,7 +3,7 @@ package com.cloud.common.resource;
 import com.cloud.common.agent.IAgentControl;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
 

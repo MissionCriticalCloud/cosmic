@@ -32,8 +32,8 @@ import com.cloud.legacymodel.communication.command.CreateLogicalSwitchPortComman
 import com.cloud.legacymodel.communication.command.DeleteLogicalRouterCommand;
 import com.cloud.legacymodel.communication.command.DeleteLogicalSwitchPortCommand;
 import com.cloud.legacymodel.communication.command.FindLogicalSwitchPortCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupNiciraNvpCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupNiciraNvpCommand;
 import com.cloud.legacymodel.communication.command.UpdateLogicalSwitchPortCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.Vlan;

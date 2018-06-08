@@ -50,15 +50,13 @@ public class LibvirtStoragePool implements KvmStoragePool {
     }
 
     @Override
-    public KvmPhysicalDisk createPhysicalDisk(final String name,
-                                              final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
+    public KvmPhysicalDisk createPhysicalDisk(final String name, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
         return this.storageAdaptor.createPhysicalDisk(name, this, format, provisioningType, size);
     }
 
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String name, final StorageProvisioningType provisioningType, final long size) {
-        return this.storageAdaptor.createPhysicalDisk(name, this,
-                getDefaultFormat(), provisioningType, size);
+        return this.storageAdaptor.createPhysicalDisk(name, this, getDefaultFormat(), provisioningType, size);
     }
 
     public StoragePoolType getStoragePoolType() {
@@ -237,10 +235,13 @@ public class LibvirtStoragePool implements KvmStoragePool {
 
     @Override
     public PhysicalDiskFormat getDefaultFormat() {
-        if (getStoragePoolType() == StoragePoolType.CLVM || getStoragePoolType() == StoragePoolType.RBD) {
-            return PhysicalDiskFormat.RAW;
-        } else {
-            return PhysicalDiskFormat.QCOW2;
+        switch (getStoragePoolType()) {
+            case LVM:
+            case CLVM:
+            case RBD:
+                return PhysicalDiskFormat.RAW;
+            default:
+                return PhysicalDiskFormat.QCOW2;
         }
     }
 

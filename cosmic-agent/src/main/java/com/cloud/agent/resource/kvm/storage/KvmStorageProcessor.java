@@ -51,7 +51,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -77,9 +76,8 @@ import org.slf4j.LoggerFactory;
 
 public class KvmStorageProcessor implements StorageProcessor {
 
-    protected static final MessageFormat SnapshotXML = new MessageFormat(
-            "   <domainsnapshot>" + "       <name>{0}</name>" + "          <domain>"
-                    + "            <uuid>{1}</uuid>" + "        </domain>" + "    </domainsnapshot>");
+    private static final MessageFormat SnapshotXML = new MessageFormat("   <domainsnapshot>" + "       <name>{0}</name>" + "          <domain>"
+            + "            <uuid>{1}</uuid>" + "        </domain>" + "    </domainsnapshot>");
     private final Logger logger = LoggerFactory.getLogger(KvmStorageProcessor.class);
     private final KvmStoragePoolManager storagePoolMgr;
     private final LibvirtComputingResource resource;
@@ -116,7 +114,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         return true;
     }
 
-    protected String getDefaultStorageScriptsDir() {
+    private String getDefaultStorageScriptsDir() {
         return "scripts/storage/qcow2";
     }
 
@@ -250,8 +248,10 @@ public class KvmStorageProcessor implements StorageProcessor {
 
             if (primaryPool.getType() == StoragePoolType.CLVM) {
                 templatePath = imageStore.getUrl() + File.separator + templatePath;
-                vol = templateToPrimaryDownload(templatePath, primaryPool, volume.getUuid(), volume.getSize(),
-                        cmd.getWaitInMillSeconds());
+                vol = templateToPrimaryDownload(templatePath, primaryPool, volume.getUuid(), volume.getSize(), cmd.getWaitInMillSeconds());
+            } else if (primaryPool.getType() == StoragePoolType.LVM) {
+                templatePath = imageStore.getUrl() + File.separator + templatePath;
+                vol = templateToPrimaryDownload(templatePath, primaryPool, volume.getUuid(), volume.getSize(), cmd.getWaitInMillSeconds());
             } else {
                 if (templatePath.contains("/mnt")) {
                     // upgrade issue, if the path contains path, need to extract the volume uuid from path
@@ -741,17 +741,15 @@ public class KvmStorageProcessor implements StorageProcessor {
         try {
             final Connect conn = LibvirtConnection.getConnectionByVmName(cmd.getVmName());
             attachOrDetachIso(conn, cmd.getVmName(), nfsStore.getUrl() + File.separator + isoTo.getPath(), true);
-        } catch (final LibvirtException | URISyntaxException | InternalErrorException e) {
+        } catch (final LibvirtException e) {
             return new Answer(cmd, false, e.toString());
         }
 
         return new Answer(cmd);
     }
 
-    protected synchronized String attachOrDetachIso(final Connect conn, final String vmName, String isoPath,
-                                                    final boolean isAttach) throws LibvirtException, URISyntaxException,
-            InternalErrorException {
-        String isoXml = null;
+    private synchronized String attachOrDetachIso(final Connect conn, final String vmName, String isoPath, final boolean isAttach) throws LibvirtException {
+        final String isoXml;
         if (isoPath != null && isAttach) {
             final int index = isoPath.lastIndexOf("/");
             final String path = isoPath.substring(0, index);
@@ -781,8 +779,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         return result;
     }
 
-    protected synchronized String attachOrDetachDevice(final Connect conn, final boolean attach, final String vmName,
-                                                       final String xml) throws LibvirtException, InternalErrorException {
+    private synchronized String attachOrDetachDevice(final Connect conn, final boolean attach, final String vmName, final String xml) throws LibvirtException {
         Domain dm = null;
         try {
             dm = conn.domainLookupByName(vmName);
@@ -824,11 +821,9 @@ public class KvmStorageProcessor implements StorageProcessor {
         try {
             final Connect conn = LibvirtConnection.getConnectionByVmName(vmName);
 
-            this.storagePoolMgr.connectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath(),
-                    disk.getDetails());
+            this.storagePoolMgr.connectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath(), disk.getDetails());
 
-            final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
-                    vol.getPath());
+            final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
             attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
 
@@ -857,10 +852,6 @@ public class KvmStorageProcessor implements StorageProcessor {
             attachOrDetachIso(conn, cmd.getVmName(), nfsStore.getUrl() + File.separator + isoTo.getPath(), false);
         } catch (final LibvirtException e) {
             return new Answer(cmd, false, e.toString());
-        } catch (final URISyntaxException e) {
-            return new Answer(cmd, false, e.toString());
-        } catch (final InternalErrorException e) {
-            return new Answer(cmd, false, e.toString());
         }
 
         return new Answer(cmd);
@@ -884,10 +875,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             this.storagePoolMgr.disconnectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
             return new DettachAnswer(disk);
-        } catch (final LibvirtException e) {
-            this.logger.debug("Failed to attach volume: " + vol.getPath() + ", due to ", e);
-            return new DettachAnswer(e.toString());
-        } catch (final InternalErrorException e) {
+        } catch (final LibvirtException | InternalErrorException e) {
             this.logger.debug("Failed to attach volume: " + vol.getPath() + ", due to ", e);
             return new DettachAnswer(e.toString());
         }
@@ -898,8 +886,8 @@ public class KvmStorageProcessor implements StorageProcessor {
         final VolumeObjectTO volume = (VolumeObjectTO) cmd.getData();
         final PrimaryDataStoreTO primaryStore = (PrimaryDataStoreTO) volume.getDataStore();
 
-        KvmStoragePool primaryPool = null;
-        KvmPhysicalDisk vol = null;
+        final KvmStoragePool primaryPool;
+        final KvmPhysicalDisk vol;
         final long disksize;
         try {
             primaryPool = this.storagePoolMgr.getStoragePool(primaryStore.getPoolType(), primaryStore.getUuid());
@@ -910,8 +898,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             } else {
                 format = PhysicalDiskFormat.valueOf(volume.getFormat().toString().toUpperCase());
             }
-            vol = primaryPool.createPhysicalDisk(volume.getUuid(), format,
-                    volume.getProvisioningType(), disksize);
+            vol = primaryPool.createPhysicalDisk(volume.getUuid(), format, volume.getProvisioningType(), disksize);
 
             final VolumeObjectTO newVol = new VolumeObjectTO();
             if (vol != null) {
@@ -1106,10 +1093,9 @@ public class KvmStorageProcessor implements StorageProcessor {
         return new SnapshotAndCopyAnswer();
     }
 
-    protected synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId,
-                                                     final DiskControllerType diskControllerType, final ImageFormat diskFormat, final String serial
-    ) throws LibvirtException, InternalErrorException {
-        List<LibvirtDiskDef> disks = null;
+    private synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId, final DiskControllerType
+            diskControllerType, final ImageFormat diskFormat, final String serial) throws LibvirtException, InternalErrorException {
+        final List<LibvirtDiskDef> disks;
         Domain dm = null;
         LibvirtDiskDef diskdef = null;
         final KvmStoragePool attachingPool = attachingDisk.getPool();
@@ -1140,20 +1126,18 @@ public class KvmStorageProcessor implements StorageProcessor {
                 diskdef.setSerial(serial);
                 diskdef.setDeviceId(devId);
                 if (attachingPool.getType() == StoragePoolType.RBD) {
-                    diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(),
-                            attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
-                            attachingPool.getUuid(), devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, ImageFormat.RAW);
+                    diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(), attachingPool.getSourcePort(), attachingPool.getAuthUserName(), attachingPool.getUuid(),
+                            devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, ImageFormat.RAW);
                 } else if (attachingPool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = attachingPool.getLocalPath();
                     final String path = attachingDisk.getPath();
                     final String glusterVolume = attachingPool.getSourceDir().replace("/", "");
-                    diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(),
-                            attachingPool.getSourcePort(), null,
-                            null, devId, diskControllerType, LibvirtDiskDef.DiskProtocol.GLUSTER, ImageFormat.QCOW2);
-                } else if (diskFormat == ImageFormat.QCOW2) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.QCOW2);
-                } else if (diskFormat == ImageFormat.RAW) {
-                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, ImageFormat.RAW);
+                    diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(), attachingPool.getSourcePort(), null, null, devId, diskControllerType,
+                            LibvirtDiskDef.DiskProtocol.GLUSTER, ImageFormat.QCOW2);
+                } else if (attachingPool.getType() == StoragePoolType.NetworkFilesystem) {
+                    diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, diskFormat);
+                } else if (attachingPool.getType() == StoragePoolType.LVM) {
+                    diskdef.defBlockBasedDisk(attachingDisk.getPath(), devId, diskControllerType);
                 }
             }
 

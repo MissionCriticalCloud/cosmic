@@ -1,4 +1,4 @@
-package com.cloud.legacymodel.communication.command.agentcontrolcommand;
+package com.cloud.legacymodel.communication.command.agentcontrol;
 
 import com.cloud.legacymodel.communication.command.Command;
 

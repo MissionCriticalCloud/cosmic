@@ -2,7 +2,7 @@ package com.cloud.hypervisor.xenserver.resource;
 
 import com.cloud.common.resource.ServerResource;
 import com.cloud.legacymodel.communication.command.StartCommand;
-import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand;
 import com.cloud.legacymodel.to.GPUDeviceTO;
 import com.cloud.legacymodel.vm.VgpuTypesInfo;
 

@@ -137,8 +137,8 @@ public class KvmStoragePoolManager {
     }
 
     // Note: due to bug CLOUDSTACK-4459, createStoragepool can be called in parallel, so need to be synced.
-    private synchronized KvmStoragePool createStoragePool(final String name, final String host, final int port, final String path,
-                                                          final String userInfo, final StoragePoolType type, final boolean primaryStorage) {
+    private synchronized KvmStoragePool createStoragePool(final String name, final String host, final int port, final String path, final String userInfo, final StoragePoolType type, final boolean
+            primaryStorage) {
         final StorageAdaptor adaptor = getStorageAdaptor(type);
         final KvmStoragePool pool = adaptor.createStoragePool(name, host, port, path, userInfo, type);
 
@@ -285,8 +285,7 @@ public class KvmStoragePoolManager {
         }
     }
 
-    public KvmStoragePool createStoragePool(final String name, final String host, final int port, final String path, final String userInfo,
-                                            final StoragePoolType type) {
+    public KvmStoragePool createStoragePool(final String name, final String host, final int port, final String path, final String userInfo, final StoragePoolType type) {
         // primary storage registers itself through here
         return createStoragePool(name, host, port, path, userInfo, type, true);
     }
@@ -321,17 +320,13 @@ public class KvmStoragePoolManager {
 
         // LibvirtStorageAdaptor-specific statement
         if (destPool.getType() == StoragePoolType.RBD) {
-            return adaptor.createDiskFromTemplate(template, name,
-                    PhysicalDiskFormat.RAW, provisioningType,
-                    size, destPool, timeout);
+            return adaptor.createDiskFromTemplate(template, name, PhysicalDiskFormat.RAW, provisioningType, size, destPool, timeout);
         } else if (destPool.getType() == StoragePoolType.CLVM) {
-            return adaptor.createDiskFromTemplate(template, name,
-                    PhysicalDiskFormat.RAW, provisioningType,
-                    size, destPool, timeout);
+            return adaptor.createDiskFromTemplate(template, name, PhysicalDiskFormat.RAW, provisioningType, size, destPool, timeout);
+        } else if (destPool.getType() == StoragePoolType.LVM) {
+            return adaptor.createDiskFromTemplate(template, name, PhysicalDiskFormat.RAW, provisioningType, size, destPool, timeout);
         } else if (template.getFormat() == PhysicalDiskFormat.DIR) {
-            return adaptor.createDiskFromTemplate(template, name,
-                    PhysicalDiskFormat.DIR, provisioningType,
-                    size, destPool, timeout);
+            return adaptor.createDiskFromTemplate(template, name, PhysicalDiskFormat.DIR, provisioningType, size, destPool, timeout);
         } else {
             PhysicalDiskFormat diskFormat = PhysicalDiskFormat.QCOW2;
             if (provisioningType == StorageProvisioningType.RAW) {

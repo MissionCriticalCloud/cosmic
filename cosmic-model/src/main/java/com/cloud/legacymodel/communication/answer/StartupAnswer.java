@@ -1,6 +1,6 @@
 package com.cloud.legacymodel.communication.answer;
 
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 
 public class StartupAnswer extends Answer {
     long hostId;

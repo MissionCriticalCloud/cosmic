@@ -1,4 +1,4 @@
-package com.cloud.legacymodel.communication.command;
+package com.cloud.legacymodel.communication.command.startup;
 
 import com.cloud.legacymodel.storage.StoragePoolInfo;
 import com.cloud.legacymodel.storage.TemplateProp;

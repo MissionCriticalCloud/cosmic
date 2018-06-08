@@ -1,10 +1,11 @@
 package com.cloud.agent.resource;
 
+import com.cloud.agent.service.AgentConfiguration;
 import com.cloud.common.agent.IAgentControl;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.PingCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.model.enumeration.HostType;
 
 import javax.naming.ConfigurationException;
@@ -16,6 +17,8 @@ public interface AgentResource {
     void setName(String name);
 
     boolean configure(Map<String, Object> params) throws ConfigurationException;
+
+    void configure(AgentConfiguration agentConfiguration);
 
     boolean start();
 

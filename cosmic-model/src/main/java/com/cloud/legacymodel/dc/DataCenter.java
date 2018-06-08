@@ -40,6 +40,4 @@ public interface DataCenter extends Identity, InternalIdentity {
     AllocationState getAllocationState();
 
     String getZoneToken();
-
-    boolean isLocalStorageEnabled();
 }

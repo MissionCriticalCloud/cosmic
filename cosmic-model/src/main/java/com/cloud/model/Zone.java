@@ -26,7 +26,6 @@ public class Zone {
     private String ip6Dns1;
     private String ip6Dns2;
     private String loadBalancerProvider;
-    private boolean localStorageEnabled;
     private long macAddress = 1;
     private String name;
     private NetworkType networkType;
@@ -179,14 +178,6 @@ public class Zone {
 
     public void setLoadBalancerProvider(final String loadBalancerProvider) {
         this.loadBalancerProvider = loadBalancerProvider;
-    }
-
-    public boolean isLocalStorageEnabled() {
-        return localStorageEnabled;
-    }
-
-    public void setLocalStorageEnabled(final boolean localStorageEnabled) {
-        this.localStorageEnabled = localStorageEnabled;
     }
 
     public long getMacAddress() {

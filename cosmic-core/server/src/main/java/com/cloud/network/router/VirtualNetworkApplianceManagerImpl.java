@@ -12,6 +12,7 @@ import com.cloud.api.command.admin.router.UpgradeRouterCmd;
 import com.cloud.api.command.admin.router.UpgradeRouterTemplateCmd;
 import com.cloud.cluster.ManagementServerHostVO;
 import com.cloud.cluster.dao.ManagementServerHostDao;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ZoneConfig;
 import com.cloud.context.CallContext;
@@ -40,7 +41,6 @@ import com.cloud.legacymodel.communication.answer.CheckRouterAnswer;
 import com.cloud.legacymodel.communication.answer.CheckS2SVpnConnectionsAnswer;
 import com.cloud.legacymodel.communication.answer.GetDomRVersionAnswer;
 import com.cloud.legacymodel.communication.answer.NetworkUsageAnswer;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.AggregationControlCommand;
 import com.cloud.legacymodel.communication.command.AggregationControlCommand.Action;
 import com.cloud.legacymodel.communication.command.CheckRouterCommand;
@@ -50,7 +50,8 @@ import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.GetDomRVersionCommand;
 import com.cloud.legacymodel.communication.command.NetworkElementCommand;
 import com.cloud.legacymodel.communication.command.NetworkUsageCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
@@ -87,7 +88,6 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.TrafficType;
@@ -959,7 +959,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         _disableRpFilter = rpValue != null && rpValue.equalsIgnoreCase("true");
 
         String rpFilter = " ";
-        String type;
+        final String type;
         if (router.getVpcId() != null) {
             type = "vpcrouter";
             if (_disableRpFilter) {
@@ -1429,7 +1429,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         // restart network if restartNetwork = false is not specified in profile
         // parameters
-        boolean reprogramGuestNtwks = profile.getParameter(Param.ReProgramGuestNetworks) == null || (Boolean) profile.getParameter(Param.ReProgramGuestNetworks);
+        final boolean reprogramGuestNtwks = profile.getParameter(Param.ReProgramGuestNetworks) == null || (Boolean) profile.getParameter(Param.ReProgramGuestNetworks);
 
         final VirtualRouterProvider vrProvider = _vrProviderDao.findById(router.getElementId());
         if (vrProvider == null) {
@@ -1714,7 +1714,7 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
     @Override
     public void processConnect(final Host host, final StartupCommand cmd, final boolean forRebalance) throws ConnectionException {
         final List<DomainRouterVO> routers = _routerDao.listIsolatedByHostId(host.getId());
-        for (DomainRouterVO router : routers) {
+        for (final DomainRouterVO router : routers) {
             if (router.isStopPending()) {
                 s_logger.info("Stopping router " + router.getInstanceName() + " due to stop pending flag found!");
                 final VirtualMachine.State state = router.getState();

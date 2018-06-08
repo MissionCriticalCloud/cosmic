@@ -23,6 +23,10 @@ public interface PrimaryDataStoreDao extends GenericDao<StoragePoolVO, Long> {
      */
     List<StoragePoolVO> listBy(long datacenterId, Long podId, Long clusterId, ScopeType scope);
 
+    List<StoragePoolVO> listByScopeAndZone(ScopeType scope, Long zoneId);
+
+    List<StoragePoolVO> listByScopeAndCluster(ScopeType scope, Long clusterId);
+
     /**
      * Set capacity of storage pool in bytes
      *
@@ -61,6 +65,8 @@ public interface PrimaryDataStoreDao extends GenericDao<StoragePoolVO, Long> {
     List<StoragePoolVO> findPoolsByTags(long dcId, long podId, Long clusterId, String[] tags);
 
     List<StoragePoolVO> findDisabledPoolsByScope(long dcId, Long podId, Long clusterId, ScopeType scope);
+
+    List<StoragePoolVO> listHostScopedPoolsByStorageHost(String hostAddress);
 
     /**
      * Find pool by UUID.

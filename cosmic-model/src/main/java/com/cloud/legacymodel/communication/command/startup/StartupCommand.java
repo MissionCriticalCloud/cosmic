@@ -1,5 +1,6 @@
-package com.cloud.legacymodel.communication.command;
+package com.cloud.legacymodel.communication.command.startup;
 
+import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.model.enumeration.HostType;
 
 public class StartupCommand extends Command {

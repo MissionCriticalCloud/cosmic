@@ -133,12 +133,6 @@ public class Zone extends com.cloud.model.Zone {
     }
 
     @Access(AccessType.PROPERTY)
-    @Column(name = "is_local_storage_enabled")
-    public boolean isLocalStorageEnabled() {
-        return super.isLocalStorageEnabled();
-    }
-
-    @Access(AccessType.PROPERTY)
     @Column(name = "mac_address", nullable = false)
     @TableGenerator(name = "mac_address_sq", table = "data_center", pkColumnName = "id", valueColumnName = "mac_address", allocationSize = 1)
     public long getMacAddress() {

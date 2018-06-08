@@ -40,7 +40,6 @@ import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.Pod;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
-import com.cloud.legacymodel.exceptions.InsufficientStorageCapacityException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.exceptions.StorageUnavailableException;
@@ -246,7 +245,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             if (pool == null) {
                 return false;
             } else {
-                return (pool.getScope() == ScopeType.HOST) ? false : true;
+                return pool.getScope() != ScopeType.HOST;
             }
         }
     }
@@ -260,9 +259,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 return true;
             }
             final State state = vm.getState();
-            if (state.equals(State.Stopped) || state.equals(State.Destroyed)) {
-                return true;
-            }
+            return state.equals(State.Stopped) || state.equals(State.Destroyed);
         }
         return false;
     }
@@ -634,21 +631,19 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @Override
-    public VolumeInfo createVolumeOnPrimaryStorage(final VirtualMachine vm, final VolumeInfo volume, final HypervisorType rootDiskHyperType, final StoragePool storagePool)
-            throws NoTransitionException {
+    public VolumeInfo createVolumeOnPrimaryStorage(final VirtualMachine vm, final VolumeInfo volume, final HypervisorType rootDiskHyperType, final StoragePool storagePool) {
         final VirtualMachineTemplate rootDiskTmplt = this._entityMgr.findById(VirtualMachineTemplate.class, vm.getTemplateId());
         final DataCenter dcVO = this._entityMgr.findById(DataCenter.class, vm.getDataCenterId());
         final Pod pod = this._entityMgr.findById(Pod.class, storagePool.getPodId());
 
         final ServiceOffering svo = this._entityMgr.findById(ServiceOffering.class, vm.getServiceOfferingId());
         final DiskOffering diskVO = this._entityMgr.findById(DiskOffering.class, volume.getDiskOfferingId());
-        final Long clusterId = storagePool.getClusterId();
 
         VolumeInfo vol = null;
         if (volume.getState() == Volume.State.Allocated) {
-            vol = createVolume(volume, vm, rootDiskTmplt, dcVO, pod, clusterId, svo, diskVO, new ArrayList<>(), volume.getSize(), rootDiskHyperType);
+            vol = createVolume(storagePool, volume, rootDiskTmplt, dcVO, svo, diskVO, volume.getSize(), rootDiskHyperType);
         } else if (volume.getState() == Volume.State.Uploaded) {
-            vol = copyVolume(storagePool, volume, vm, rootDiskTmplt, dcVO, pod, diskVO, svo, rootDiskHyperType);
+            vol = copyVolume(storagePool, volume, vm, rootDiskTmplt, dcVO, pod, diskVO, rootDiskHyperType);
             if (vol != null) {
                 // Moving of Volume is successful, decrement the volume resource count from secondary for an account and increment it into primary storage under same account.
                 this._resourceLimitMgr.decrementResourceCount(volume.getAccountId(), ResourceType.secondary_storage, volume.getSize());
@@ -668,15 +663,12 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @DB
-    public VolumeInfo createVolume(VolumeInfo volume, final VirtualMachine vm, final VirtualMachineTemplate template, final DataCenter dc, final Pod pod, final Long clusterId,
-                                   final ServiceOffering offering,
-                                   final DiskOffering diskOffering, final List<StoragePool> avoids, final long size, final HypervisorType hyperType) {
+    public VolumeInfo createVolume(final StoragePool storagePool, VolumeInfo volume, final VirtualMachineTemplate template, final DataCenter dc, final ServiceOffering offering, final DiskOffering
+            diskOffering, final long size, final HypervisorType hyperType) {
         // update the volume's hv_ss_reserve (hypervisor snapshot reserve) from a disk offering (used for managed storage)
         volume = this.volService.updateHypervisorSnapshotReserveForVolume(diskOffering, volume.getId(), hyperType);
 
-        StoragePool pool = null;
-
-        DiskProfile dskCh = null;
+        final DiskProfile dskCh;
         if (volume.getVolumeType() == VolumeType.ROOT && ImageFormat.ISO != template.getFormat()) {
             dskCh = createDiskCharacteristics(volume, template, dc, offering);
         } else {
@@ -689,22 +681,14 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
 
         dskCh.setHyperType(hyperType);
 
-        final HashSet<StoragePool> avoidPools = new HashSet<>(avoids);
-
-        pool = findStoragePool(dskCh, dc, pod, clusterId, vm.getHostId(), vm, avoidPools);
-        if (pool == null) {
-            s_logger.warn("Unable to find suitable primary storage when creating volume " + volume.getName());
-            throw new CloudRuntimeException("Unable to find suitable primary storage when creating volume " + volume.getName());
-        }
-
         if (s_logger.isDebugEnabled()) {
-            s_logger.debug("Trying to create " + volume + " on " + pool);
+            s_logger.debug("Trying to create " + volume + " on " + storagePool);
         }
-        final DataStore store = this.dataStoreMgr.getDataStore(pool.getId(), DataStoreRole.Primary);
+        final DataStore store = this.dataStoreMgr.getDataStore(storagePool.getId(), DataStoreRole.Primary);
         for (int i = 0; i < 2; i++) {
             // retry one more time in case of template reload is required for Vmware case
-            AsyncCallFuture<VolumeService.VolumeApiResult> future = null;
-            final boolean isNotCreatedFromTemplate = volume.getTemplateId() == null ? true : false;
+            final AsyncCallFuture<VolumeService.VolumeApiResult> future;
+            final boolean isNotCreatedFromTemplate = volume.getTemplateId() == null;
             if (isNotCreatedFromTemplate) {
                 future = this.volService.createVolumeAsync(volume, store);
             } else {
@@ -724,10 +708,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 }
 
                 return result.getVolume();
-            } catch (final InterruptedException e) {
-                s_logger.error("create volume failed", e);
-                throw new CloudRuntimeException("create volume failed", e);
-            } catch (final ExecutionException e) {
+            } catch (final InterruptedException | ExecutionException e) {
                 s_logger.error("create volume failed", e);
                 throw new CloudRuntimeException("create volume failed", e);
             }
@@ -735,19 +716,15 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         throw new CloudRuntimeException("create volume failed even after template re-deploy");
     }
 
-    private VolumeInfo copyVolume(final StoragePool rootDiskPool, final VolumeInfo volume, final VirtualMachine vm, final VirtualMachineTemplate rootDiskTmplt, final DataCenter
-            dcVO, final Pod pod,
-                                  final DiskOffering diskVO, final ServiceOffering svo, final HypervisorType rootDiskHyperType) throws NoTransitionException {
+    private VolumeInfo copyVolume(final StoragePool rootDiskPool, final VolumeInfo volume, final VirtualMachine vm, final VirtualMachineTemplate rootDiskTmplt, final DataCenter dcVO, final Pod pod,
+                                  final DiskOffering diskVO, final HypervisorType rootDiskHyperType) {
 
         if (!isSupportedImageFormatForCluster(volume, rootDiskHyperType)) {
             throw new InvalidParameterValueException("Failed to attach volume to VM since volumes format " + volume.getFormat().getFileExtension()
                     + " is not compatible with the vm hypervisor type");
         }
 
-        final VolumeInfo volumeOnPrimary = copyVolumeFromSecToPrimary(volume, vm, rootDiskTmplt, dcVO, pod, rootDiskPool.getClusterId(), svo, diskVO, new ArrayList<>(),
-                volume.getSize(), rootDiskHyperType);
-
-        return volumeOnPrimary;
+        return copyVolumeFromSecToPrimary(volume, vm, rootDiskTmplt, dcVO, pod, rootDiskPool.getClusterId(), diskVO, new ArrayList<>());
     }
 
     protected DiskProfile createDiskCharacteristics(final VolumeInfo volume, final VirtualMachineTemplate template, final DataCenter dc, final DiskOffering diskOffering) {
@@ -770,10 +747,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @DB
-    public VolumeInfo copyVolumeFromSecToPrimary(final VolumeInfo volume, final VirtualMachine vm, final VirtualMachineTemplate template, final DataCenter dc, final Pod pod,
-                                                 final Long clusterId,
-                                                 final ServiceOffering offering, final DiskOffering diskOffering, final List<StoragePool> avoids, final long size, final
-                                                 HypervisorType hyperType) throws NoTransitionException {
+    public VolumeInfo copyVolumeFromSecToPrimary(final VolumeInfo volume, final VirtualMachine vm, final VirtualMachineTemplate template, final DataCenter dc, final Pod pod, final Long clusterId,
+                                                 final DiskOffering diskOffering, final List<StoragePool> avoids) {
 
         final HashSet<StoragePool> avoidPools = new HashSet<>(avoids);
         final DiskProfile dskCh = createDiskCharacteristics(volume, template, dc, diskOffering);
@@ -790,10 +765,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 throw new CloudRuntimeException("copy volume failed: " + result.getResult());
             }
             return result.getVolume();
-        } catch (final InterruptedException e) {
-            s_logger.debug("Failed to copy volume: " + volume.getId(), e);
-            throw new CloudRuntimeException("Failed to copy volume", e);
-        } catch (final ExecutionException e) {
+        } catch (final InterruptedException | ExecutionException e) {
             s_logger.debug("Failed to copy volume: " + volume.getId(), e);
             throw new CloudRuntimeException("Failed to copy volume", e);
         }
@@ -1002,7 +974,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @Override
-    public void prepare(final VirtualMachineProfile vm, final DeployDestination dest) throws StorageUnavailableException, InsufficientStorageCapacityException,
+    public void prepare(final VirtualMachineProfile vm, final DeployDestination dest) throws StorageUnavailableException,
             ConcurrentOperationException {
 
         if (dest == null) {
@@ -1236,7 +1208,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     }
 
     @DB
-    protected VolumeVO switchVolume(final VolumeVO existingVolume, final VirtualMachineProfile vm) throws StorageUnavailableException {
+    protected VolumeVO switchVolume(final VolumeVO existingVolume, final VirtualMachineProfile vm) {
         Long templateIdToUse = null;
         final Long volTemplateId = existingVolume.getTemplateId();
         final long vmTemplateId = vm.getTemplateId();
@@ -1481,7 +1453,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         return true;
     }
 
-    private static enum VolumeTaskType {
+    private enum VolumeTaskType {
         RECREATE, NOP, MIGRATE
     }
 

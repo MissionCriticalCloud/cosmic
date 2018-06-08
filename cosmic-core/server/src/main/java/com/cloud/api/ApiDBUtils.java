@@ -844,19 +844,19 @@ public class ApiDBUtils {
         HypervisorType type = s_storageMgr.getHypervisorTypeFromFormat(format);
 
         if (format == ImageFormat.RAW) {
-            // Currently, KVM only suppoorts RBD images of type RAW.
+            // Currently, KVM only supports RBD images of type RAW.
             // This results in a weird collision with OVM volumes which
             // can only be raw, thus making KVM RBD volumes show up as OVM
             // rather than RBD. This block of code can (hopefuly) by checking to
             // see if the pool is using either RBD or NFS. However, it isn't
             // quite clear what to do if both storage types are used. If the image
-            // format is RAW, it narrows the hypervisor choice down to OVM and KVM / RBD or KVM / CLVM
+            // format is RAW, it narrows the hypervisor choice down to OVM and KVM / RBD or KVM / CLVM or KVM / LVM
             // This would be better implemented at a cluster level.
             final List<StoragePoolVO> pools = s_storagePoolDao.listByDataCenterId(dcId);
             final ListIterator<StoragePoolVO> itr = pools.listIterator();
             while (itr.hasNext()) {
                 final StoragePoolVO pool = itr.next();
-                if (pool.getPoolType() == StoragePoolType.RBD || pool.getPoolType() == StoragePoolType.CLVM) {
+                if (pool.getPoolType() == StoragePoolType.RBD || pool.getPoolType() == StoragePoolType.CLVM || pool.getPoolType() == StoragePoolType.LVM) {
                     // This case will note the presence of non-qcow2 primary stores, suggesting KVM without NFS. Otherwse,
                     // If this check is not passed, the hypervisor type will remain OVM.
                     type = HypervisorType.KVM;

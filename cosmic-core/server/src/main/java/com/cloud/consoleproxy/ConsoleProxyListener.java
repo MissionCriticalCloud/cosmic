@@ -4,11 +4,11 @@ import com.cloud.agent.Listener;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupProxyCommand;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.ConsoleAccessAuthenticationCommand;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.ConsoleAccessAuthenticationCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupProxyCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 

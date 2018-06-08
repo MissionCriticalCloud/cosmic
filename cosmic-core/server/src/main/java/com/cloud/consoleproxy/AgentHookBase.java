@@ -13,10 +13,10 @@ import com.cloud.legacymodel.communication.answer.ConsoleAccessAuthenticationAns
 import com.cloud.legacymodel.communication.answer.GetVncPortAnswer;
 import com.cloud.legacymodel.communication.command.GetVncPortCommand;
 import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupProxyCommand;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.ConsoleAccessAuthenticationCommand;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.ConsoleAccessAuthenticationCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.ConsoleProxyLoadReportCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupProxyCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;

@@ -238,7 +238,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._accountVlanMapDao.listAccountVlanMapsByAccount(anyLong())).thenReturn(null);
 
         final DataCenterVO dc =
-                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Advanced, null, null, true, null, null);
+                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Advanced, null, null, null, null);
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
@@ -281,7 +281,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._accountVlanMapDao.listAccountVlanMapsByVlan(anyLong())).thenReturn(accountVlanMaps);
 
         final DataCenterVO dc =
-                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Advanced, null, null, true, null, null);
+                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Advanced, null, null, null, null);
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
@@ -307,7 +307,7 @@ public class ConfigurationManagerTest {
 
         // public ip range belongs to zone of type basic
         final DataCenterVO dc =
-                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Basic, null, null, true, null, null);
+                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Basic, null, null, null, null);
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         final List<IPAddressVO> ipAddressList = new ArrayList<>();
@@ -332,7 +332,7 @@ public class ConfigurationManagerTest {
         when(configurationMgr._accountVlanMapDao.listAccountVlanMapsByAccount(anyLong())).thenReturn(null);
 
         final DataCenterVO dc =
-                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Advanced, null, null, true, null, null);
+                new DataCenterVO(UUID.randomUUID().toString(), "test", "8.8.8.8", null, "10.0.0.1", null, "10.0.0.1/24", null, null, NetworkType.Advanced, null, null, null, null);
         when(configurationMgr._zoneDao.findById(anyLong())).thenReturn(dc);
 
         // one of the ip addresses of the range is allocated to different account

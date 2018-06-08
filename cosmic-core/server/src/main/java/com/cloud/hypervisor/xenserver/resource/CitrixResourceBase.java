@@ -23,10 +23,10 @@ import com.cloud.legacymodel.communication.command.PingRoutingWithNwGroupsComman
 import com.cloud.legacymodel.communication.command.RebootCommand;
 import com.cloud.legacymodel.communication.command.SetNetworkACLCommand;
 import com.cloud.legacymodel.communication.command.StartCommand;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
-import com.cloud.legacymodel.communication.command.StartupStorageCommand;
 import com.cloud.legacymodel.communication.command.StopCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupStorageCommand;
 import com.cloud.legacymodel.dc.HostStatsEntry;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.network.VirtualRouterDeployer;

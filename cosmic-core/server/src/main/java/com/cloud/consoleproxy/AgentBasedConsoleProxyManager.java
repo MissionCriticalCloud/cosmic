@@ -8,7 +8,7 @@ import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.answer.GetVncPortAnswer;
 import com.cloud.legacymodel.communication.command.GetVncPortCommand;
-import com.cloud.legacymodel.communication.command.StartupProxyCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupProxyCommand;
 import com.cloud.server.ManagementServer;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.component.ManagerBase;

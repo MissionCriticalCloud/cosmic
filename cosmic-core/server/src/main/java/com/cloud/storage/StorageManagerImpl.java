@@ -21,7 +21,6 @@ import com.cloud.cluster.ManagementServerHost;
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
-import com.cloud.configuration.ConfigurationManagerImpl;
 import com.cloud.context.CallContext;
 import com.cloud.dc.ClusterVO;
 import com.cloud.dc.DataCenterVO;
@@ -1167,24 +1166,15 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         if (dc == null) {
             return null;
         }
-        boolean useLocalStorageForSystemVM = false;
-        final Boolean isLocal = ConfigurationManagerImpl.SystemVMUseLocalStorage.valueIn(dc.getId());
-        if (isLocal != null) {
-            useLocalStorageForSystemVM = isLocal.booleanValue();
-        }
-        if (!(dc.isLocalStorageEnabled() || useLocalStorageForSystemVM)) {
-            return null;
-        }
+
         final DataStore store;
         try {
-            final String hostAddress = pInfo.getHost();
-            StoragePoolVO pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), hostAddress, pInfo.getHostPath(), pInfo.getUuid());
+            StoragePoolVO pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), host.getName(), pInfo.getLocalPath(), pInfo.getUuid());
             if (pool == null) {
                 //the path can be different, but if they have the same uuid, assume they are the same storage
-                pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), hostAddress, null,
-                        pInfo.getUuid());
+                pool = this._storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), host.getName(), null, pInfo.getUuid());
                 if (pool != null) {
-                    s_logger.debug("Found a storage pool: " + pInfo.getUuid() + ", but with different hostpath " + pInfo.getHostPath() + ", still treat it as the same pool");
+                    s_logger.debug("Found a storage pool: " + pInfo.getUuid() + ", but with different path " + pInfo.getLocalPath() + ", still treat it as the same pool");
                 }
             }
 
@@ -1192,12 +1182,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             final DataStoreLifeCycle lifeCycle = provider.getDataStoreLifeCycle();
             if (pool == null) {
                 final Map<String, Object> params = new HashMap<>();
-                final String name = host.getName() + " Local Storage";
                 params.put("zoneId", host.getDataCenterId());
                 params.put("clusterId", host.getClusterId());
                 params.put("podId", host.getPodId());
-                params.put("url", pInfo.getPoolType().toString() + "://" + pInfo.getHost() + "/" + pInfo.getHostPath());
-                params.put("name", name);
+                params.put("url", pInfo.getPoolType().toString() + "://" + host.getName() + "/" + pInfo.getLocalPath());
+                params.put("name", pInfo.getUuid());
                 params.put("localStorage", true);
                 params.put("details", pInfo.getDetails());
                 params.put("uuid", pInfo.getUuid());

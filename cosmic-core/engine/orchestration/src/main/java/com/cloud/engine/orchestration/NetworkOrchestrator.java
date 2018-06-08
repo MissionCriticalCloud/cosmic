@@ -3,6 +3,7 @@ package com.cloud.engine.orchestration;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
 import com.cloud.alert.AlertManager;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
 import com.cloud.dao.EntityManager;
@@ -31,11 +32,11 @@ import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckNetworkAnswer;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.CheckNetworkCommand;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.communication.command.StartupCommand;
-import com.cloud.legacymodel.communication.command.StartupRoutingCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupRoutingCommand;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Host;
@@ -74,7 +75,6 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -585,7 +585,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                             isDefaultNic = true;
                         }
 
-                        NicProfile vmNic = allocateNic(requested, config, isDefaultNic, vm);
+                        final NicProfile vmNic = allocateNic(requested, config, isDefaultNic, vm);
                         if (vmNic == null) {
                             continue;
                         }
@@ -2077,7 +2077,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
         final NicVO nic = _nicDao.findById(nicId);
 
-        NicProfile profile;
+        final NicProfile profile;
         if (nic.getReservationStrategy() == Nic.ReservationStrategy.Start) {
             nic.setState(Nic.State.Reserving);
             nic.setReservationId(context.getReservationId());

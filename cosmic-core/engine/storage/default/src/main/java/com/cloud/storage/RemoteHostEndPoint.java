@@ -3,6 +3,7 @@ package com.cloud.storage;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.Listener;
 import com.cloud.agent.manager.Commands;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.engine.subsystem.api.storage.EndPoint;
 import com.cloud.framework.async.AsyncCompletionCallback;
 import com.cloud.host.HostVO;
@@ -10,16 +11,15 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.HypervisorGuruManager;
 import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
-import com.cloud.legacymodel.communication.command.agentcontrolcommand.AgentControlCommand;
 import com.cloud.legacymodel.communication.command.Command;
-import com.cloud.legacymodel.communication.command.StartupCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.AgentControlCommand;
+import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.concurrency.NamedThreadFactory;
@@ -170,7 +170,7 @@ public class RemoteHostEndPoint implements EndPoint {
 
     @Override
     public Answer sendMessage(final Command cmd) {
-        String errMsg;
+        final String errMsg;
         try {
             return sendMessageOrBreak(cmd);
         } catch (final AgentUnavailableException | OperationTimedoutException e) {

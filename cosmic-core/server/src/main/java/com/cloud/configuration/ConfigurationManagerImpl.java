@@ -1353,7 +1353,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final String dhcpProvider = cmd.getDhcpProvider();
         final Map<?, ?> detailsMap = cmd.getDetails();
         final String networkDomain = cmd.getDomain();
-        final Boolean localStorageEnabled = cmd.getLocalStorageEnabled();
 
         final Map<String, String> newDetails = new HashMap<>();
         if (detailsMap != null) {
@@ -1459,9 +1458,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         zone.setInternalDns1(internalDns1);
         zone.setInternalDns2(internalDns2);
         zone.setGuestNetworkCidr(guestCidr);
-        if (localStorageEnabled != null) {
-            zone.setLocalStorageEnabled(localStorageEnabled.booleanValue());
-        }
 
         if (networkDomain != null) {
             if (networkDomain.isEmpty()) {
@@ -3414,7 +3410,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         // Create the new zone in the database
         final DataCenterVO zoneFinal = new DataCenterVO(zoneName, null, dns1, dns2, internalDns1, internalDns2, guestCidr, domain, domainId, zoneType, zoneToken, networkDomain,
-                isLocalStorageEnabled, ip6Dns1, ip6Dns2);
+                ip6Dns1, ip6Dns2);
         if (allocationStateStr != null && !allocationStateStr.isEmpty()) {
             final AllocationState allocationState = AllocationState.valueOf(allocationStateStr);
             zoneFinal.setAllocationState(allocationState);
