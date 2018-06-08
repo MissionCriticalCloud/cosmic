@@ -2,7 +2,6 @@ package com.cloud.storage;
 
 import com.cloud.agent.manager.Commands;
 import com.cloud.capacity.CapacityVO;
-import com.cloud.engine.subsystem.api.storage.DataStore;
 import com.cloud.engine.subsystem.api.storage.HypervisorHostListener;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -101,7 +100,7 @@ public interface StorageManager extends StorageService {
 
     void createCapacityEntry(long poolId);
 
-    DataStore createLocalStorage(Host host, StoragePoolInfo poolInfo) throws ConnectionException;
+    StoragePool createLocalStorage(Host host, StoragePoolInfo poolInfo) throws ConnectionException;
 
     BigDecimal getStorageOverProvisioningFactor(Long dcId);
 

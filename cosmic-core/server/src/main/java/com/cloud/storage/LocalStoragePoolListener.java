@@ -13,11 +13,15 @@ import com.cloud.legacymodel.dc.Host;
 import com.cloud.legacymodel.dc.HostStatus;
 import com.cloud.legacymodel.exceptions.ConnectionException;
 import com.cloud.legacymodel.storage.StoragePoolInfo;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.storage.dao.StoragePoolHostDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
+import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.db.DB;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +57,9 @@ public class LocalStoragePoolListener implements Listener {
     @Override
     @DB
     public void processConnect(final Host host, final StartupCommand[] startupCommands, final boolean forRebalance) throws ConnectionException {
+        final List<StoragePoolVO> registeredStoragePoolsForHost = this._storagePoolDao.listHostScopedPoolsByStorageHost(host.getName());
+        final List<StoragePoolVO> liveStoragePools = new ArrayList<>();
+
         for (final StartupCommand startupCommand : startupCommands) {
             if (startupCommand instanceof StartupLocalstorageCommand) {
                 final StartupLocalstorageCommand ssCmd = (StartupLocalstorageCommand) startupCommand;
@@ -62,9 +69,19 @@ public class LocalStoragePoolListener implements Listener {
                     return;
                 }
 
-                this._storageMgr.createLocalStorage(host, pInfo);
+                s_logger.info("Found storage pool in StartupCommand creating it now: " + pInfo.getUuid());
+                liveStoragePools.add((StoragePoolVO) this._storageMgr.createLocalStorage(host, pInfo));
             }
         }
+
+        registeredStoragePoolsForHost.removeAll(liveStoragePools);
+
+        registeredStoragePoolsForHost.forEach(storagePoolVO -> {
+            // Disable all storage pools not live right now!
+            s_logger.info("Disabling storage pool because it is not in the StartupCommand: " + storagePoolVO.getName());
+            storagePoolVO.setStatus(StoragePoolStatus.Disabled);
+            this._storagePoolDao.persist(storagePoolVO);
+        });
     }
 
     @Override
