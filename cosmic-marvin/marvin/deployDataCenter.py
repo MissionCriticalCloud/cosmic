@@ -169,9 +169,11 @@ class DeployDataCenters(object):
                 if primary.scope == 'zone' or clusterId is None:
                     primarycmd.scope = 'zone'
                     primarycmd.hypervisor = primary.hypervisor
+                    primarycmd.tags = 'zone'
                 else:
                     primarycmd.podid = podId
                     primarycmd.clusterid = clusterId
+                    primarycmd.tags = 'cluster'
                 primarycmd.zoneid = zoneId
 
                 ret = self.__apiClient.createStoragePool(primarycmd)
