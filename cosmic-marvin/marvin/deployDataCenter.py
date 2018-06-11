@@ -94,6 +94,7 @@ class DeployDataCenters(object):
                 hostcmd.username = host.username
                 hostcmd.zoneid = zoneId
                 hostcmd.hypervisor = hypervisor
+                hostcmd.hosttags = hypervisor
                 ret = self.__apiClient.addHost(hostcmd)
                 if ret:
                     self.__logger.info("=== Add Host Successful ===")
