@@ -287,9 +287,6 @@ cloudStack.docs = {
     helpCreateInstanceSnapshotDescription: {
         desc: 'A short description of for the snapshot'
     },
-    helpCreateInstanceSnapshotQuiesce: {
-        desc: 'Check this to snapshot the VM in "Quiesce" mode. It will allow the VM to achieve a consistent state. For example, flushing any outstanding writes.'
-    },
     helpDiskController: {
         desc: 'Select the Disk Controller to use',
         externalLink: ''
