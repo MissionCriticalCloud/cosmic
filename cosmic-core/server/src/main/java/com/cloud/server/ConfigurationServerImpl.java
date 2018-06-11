@@ -21,12 +21,10 @@ import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.configuration.Resource.ResourceOwnerType;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.exceptions.InternalErrorException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.network.Network.State;
 import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
-import com.cloud.legacymodel.user.User;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DHCPMode;
 import com.cloud.model.enumeration.GuestType;
@@ -139,17 +137,13 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
 
     @Override
     public boolean configure(final String name, final Map<String, Object> params) throws ConfigurationException {
-        try {
-            persistDefaultValues();
-            _configDepotAdmin.populateConfigurations();
-        } catch (final InternalErrorException e) {
-            throw new RuntimeException("Unhandled configuration exception", e);
-        }
+        persistDefaultValues();
+        _configDepotAdmin.populateConfigurations();
         return true;
     }
 
     @Override
-    public void persistDefaultValues() throws InternalErrorException {
+    public void persistDefaultValues() {
 
         // Create system user and admin user
         saveUser();
@@ -201,16 +195,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
 
             _configDao.update("user.authenticators.exclude", "PLAINTEXT");
             s_logger.debug("Configuration server excluded plaintext authenticator");
-
-            // Save default service offerings
-            createServiceOffering(User.UID_SYSTEM, "Small Instance", 1, 512, "Small Instance", StorageProvisioningType.THIN, false, false, null);
-            createServiceOffering(User.UID_SYSTEM, "Medium Instance", 1, 1024, "Medium Instance", StorageProvisioningType.THIN, false, false, null);
-            // Save default disk offerings
-            createdefaultDiskOffering(null, "Small", "Small Disk, 5 GB", StorageProvisioningType.THIN, 5, null, false, false);
-            createdefaultDiskOffering(null, "Medium", "Medium Disk, 20 GB", StorageProvisioningType.THIN, 20, null, false, false);
-            createdefaultDiskOffering(null, "Large", "Large Disk, 100 GB", StorageProvisioningType.THIN, 100, null, false, false);
-            createdefaultDiskOffering(null, "Large", "Large Disk, 100 GB", StorageProvisioningType.THIN, 100, null, false, false);
-            createdefaultDiskOffering(null, "Custom", "Custom Disk", StorageProvisioningType.THIN, 0, null, true, false);
 
             // Save the mount parent to the configuration table
             final String mountParent = getMountParent();
@@ -598,7 +582,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 final byte[] storeBytes = Base64.decodeBase64(dbString);
                 final String tmpKeystorePath = "/tmp/tmpkey";
                 try (
-                        FileOutputStream fo = new FileOutputStream(tmpKeystorePath)
+                        final FileOutputStream fo = new FileOutputStream(tmpKeystorePath)
                 ) {
                     fo.write(storeBytes);
                     final Script script = new Script(true, "cp", 5000, null);
@@ -978,7 +962,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         }
 
         if (keyfile.exists()) {
-            try (FileOutputStream kStream = new FileOutputStream(keyfile)) {
+            try (final FileOutputStream kStream = new FileOutputStream(keyfile)) {
                 if (kStream != null) {
                     kStream.write(key.getBytes());
                 }
@@ -1041,7 +1025,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             Script.runSimpleBashScript("if [ -f " + privkeyfile + " ]; then rm -f " + privkeyfile + "; fi; ssh-keygen -t rsa -N '' -f " + privkeyfile + " -q");
 
             final byte[] arr1 = new byte[4094]; // configuration table column value size
-            try (DataInputStream dis = new DataInputStream(new FileInputStream(privkeyfile))) {
+            try (final DataInputStream dis = new DataInputStream(new FileInputStream(privkeyfile))) {
                 dis.readFully(arr1);
             } catch (final EOFException e) {
                 s_logger.info("[ignored] eof reached");
@@ -1051,7 +1035,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
             }
             final String privateKey = new String(arr1).trim();
             final byte[] arr2 = new byte[4094]; // configuration table column value size
-            try (DataInputStream dis = new DataInputStream(new FileInputStream(pubkeyfile))) {
+            try (final DataInputStream dis = new DataInputStream(new FileInputStream(pubkeyfile))) {
                 dis.readFully(arr2);
             } catch (final EOFException e) {
                 s_logger.info("[ignored] eof reached");

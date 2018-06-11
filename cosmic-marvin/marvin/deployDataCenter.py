@@ -94,6 +94,7 @@ class DeployDataCenters(object):
                 hostcmd.username = host.username
                 hostcmd.zoneid = zoneId
                 hostcmd.hypervisor = hypervisor
+                hostcmd.hosttags = hypervisor
                 ret = self.__apiClient.addHost(hostcmd)
                 if ret:
                     self.__logger.info("=== Add Host Successful ===")
@@ -168,9 +169,11 @@ class DeployDataCenters(object):
                 if primary.scope == 'zone' or clusterId is None:
                     primarycmd.scope = 'zone'
                     primarycmd.hypervisor = primary.hypervisor
+                    primarycmd.tags = 'zone'
                 else:
                     primarycmd.podid = podId
                     primarycmd.clusterid = clusterId
+                    primarycmd.tags = 'cluster'
                 primarycmd.zoneid = zoneId
 
                 ret = self.__apiClient.createStoragePool(primarycmd)
