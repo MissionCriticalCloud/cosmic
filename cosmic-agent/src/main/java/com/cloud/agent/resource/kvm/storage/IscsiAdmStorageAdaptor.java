@@ -1,12 +1,12 @@
 package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.utils.StringUtils;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
 

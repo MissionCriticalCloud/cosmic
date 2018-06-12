@@ -1,10 +1,10 @@
 package com.cloud.storage;
 
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.db.GenericDao;
@@ -213,7 +213,7 @@ public class VolumeVO implements Volume {
     public VolumeVO(final String name, final long dcId, final Long podId, final long accountId,
                     final long domainId, final Long instanceId, final String folder, final String path, final StorageProvisioningType provisioningType,
                     final long size, final Long minIops, final Long maxIops, final String iScsiName,
-                    final VolumeType vType, DiskControllerType diskControllerType) {
+                    final VolumeType vType, final DiskControllerType diskControllerType) {
         this.name = name;
         this.accountId = accountId;
         this.domainId = domainId;

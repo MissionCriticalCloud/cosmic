@@ -2,7 +2,7 @@ package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;

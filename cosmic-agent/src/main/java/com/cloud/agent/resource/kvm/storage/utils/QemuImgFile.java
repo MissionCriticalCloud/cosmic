@@ -1,10 +1,12 @@
-package com.cloud.utils.qemu;
+package com.cloud.agent.resource.kvm.storage.utils;
+
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 
 public class QemuImgFile {
 
     private long size = 0;
     private String fileName;
-    private QemuImg.PhysicalDiskFormat format = QemuImg.PhysicalDiskFormat.RAW;
+    private PhysicalDiskFormat format = PhysicalDiskFormat.RAW;
 
     public QemuImgFile(final String fileName) {
         this.fileName = fileName;
@@ -15,13 +17,13 @@ public class QemuImgFile {
         this.size = size;
     }
 
-    public QemuImgFile(final String fileName, final long size, final QemuImg.PhysicalDiskFormat format) {
+    public QemuImgFile(final String fileName, final long size, final PhysicalDiskFormat format) {
         this.fileName = fileName;
         this.size = size;
         this.format = format;
     }
 
-    public QemuImgFile(final String fileName, final QemuImg.PhysicalDiskFormat format) {
+    public QemuImgFile(final String fileName, final PhysicalDiskFormat format) {
         this.fileName = fileName;
         this.format = format;
     }
@@ -42,11 +44,11 @@ public class QemuImgFile {
         this.size = size;
     }
 
-    public QemuImg.PhysicalDiskFormat getFormat() {
+    public PhysicalDiskFormat getFormat() {
         return format;
     }
 
-    public void setFormat(final QemuImg.PhysicalDiskFormat format) {
+    public void setFormat(final PhysicalDiskFormat format) {
         this.format = format;
     }
 }

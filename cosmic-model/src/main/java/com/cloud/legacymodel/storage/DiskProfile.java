@@ -1,6 +1,7 @@
 package com.cloud.legacymodel.storage;
 
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VolumeType;
 
 /**

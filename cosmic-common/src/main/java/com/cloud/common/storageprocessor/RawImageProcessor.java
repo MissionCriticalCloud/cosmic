@@ -34,14 +34,14 @@ public class RawImageProcessor extends AdapterBase implements Processor {
             return null;
         }
 
-        final String imgPath = templatePath + File.separator + templateName + "." + ImageFormat.RAW.getFileExtension();
+        final String imgPath = templatePath + File.separator + templateName + "." + ImageFormat.RAW.toString().toLowerCase();
         if (!this._storage.exists(imgPath)) {
             s_logger.debug("Unable to find raw image:" + imgPath);
             return null;
         }
         final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.RAW;
-        info.filename = templateName + "." + ImageFormat.RAW.getFileExtension();
+        info.filename = templateName + "." + ImageFormat.RAW.toString().toLowerCase();
         info.size = this._storage.getSize(imgPath);
         info.virtualSize = info.size;
         s_logger.debug("Process raw image " + info.filename + " successfully");

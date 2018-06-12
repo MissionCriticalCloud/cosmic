@@ -1,6 +1,5 @@
 package com.cloud.api.query.vo;
 
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.Volume;
@@ -8,6 +7,7 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.server.ResourceTag.ResourceObjectType;

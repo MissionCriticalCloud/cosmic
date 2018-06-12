@@ -1,6 +1,9 @@
 package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.agent.resource.kvm.LibvirtConnection;
+import com.cloud.agent.resource.kvm.storage.utils.QemuImg;
+import com.cloud.agent.resource.kvm.storage.utils.QemuImgException;
+import com.cloud.agent.resource.kvm.storage.utils.QemuImgFile;
 import com.cloud.agent.resource.kvm.xml.LibvirtSecretDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtSecretDef.Usage;
 import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolDef;
@@ -10,13 +13,11 @@ import com.cloud.agent.resource.kvm.xml.LibvirtStoragePoolXmlParser;
 import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeXmlParser;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
+import com.cloud.model.enumeration.PreallocationType;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.utils.qemu.QemuImg;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
-import com.cloud.utils.qemu.QemuImgException;
-import com.cloud.utils.qemu.QemuImgFile;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.StorageLayer;
 
@@ -150,24 +151,19 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
 
             if (pool.getType() == StoragePoolType.RBD) {
                 disk.setFormat(PhysicalDiskFormat.RAW);
+            } else if (pool.getType() == StoragePoolType.NetworkFilesystem) {
+                final QemuImg qemuImg = new QemuImg(60000);
+                final Map<String, String> info = qemuImg.info(new QemuImgFile(disk.getPath()));
+                disk.setFormat(PhysicalDiskFormat.valueOf(info.get("file_format").toUpperCase()));
             } else if (voldef.getFormat() == null) {
-                final File diskDir = new File(disk.getPath());
-                if (diskDir.exists() && diskDir.isDirectory()) {
-                    disk.setFormat(PhysicalDiskFormat.DIR);
-                } else if (volumeUuid.endsWith("tar") || volumeUuid.endsWith("TAR")) {
-                    disk.setFormat(PhysicalDiskFormat.TAR);
-                } else if (volumeUuid.endsWith("raw") || volumeUuid.endsWith("RAW")) {
-                    disk.setFormat(PhysicalDiskFormat.RAW);
-                } else {
-                    disk.setFormat(pool.getDefaultFormat());
-                }
+                disk.setFormat(pool.getDefaultFormat());
             } else if (voldef.getFormat() == LibvirtStorageVolumeDef.VolumeFormat.QCOW2) {
                 disk.setFormat(PhysicalDiskFormat.QCOW2);
             } else if (voldef.getFormat() == LibvirtStorageVolumeDef.VolumeFormat.RAW) {
                 disk.setFormat(PhysicalDiskFormat.RAW);
             }
             return disk;
-        } catch (final LibvirtException e) {
+        } catch (final LibvirtException | QemuImgException e) {
             this.logger.debug("Failed to get physical disk:", e);
             throw new CloudRuntimeException(e.toString());
         }
@@ -504,8 +500,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     @Override
     public KvmPhysicalDisk createPhysicalDisk(final String name, final KvmStoragePool pool, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
 
-        this.logger.info("Attempting to create volume " + name + " (" + pool.getType().toString() + ") in pool "
-                + pool.getUuid() + " with size " + size);
+        this.logger.info("Attempting to create volume " + name + " (" + pool.getType().toString() + ") in pool " + pool.getUuid() + " with size " + size);
 
         switch (pool.getType()) {
             case RBD:
@@ -576,7 +571,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
         final QemuImg qemu = new QemuImg(timeout);
         final Map<String, String> options = new HashMap<>();
         if (pool.getType() == StoragePoolType.NetworkFilesystem) {
-            options.put("preallocation", QemuImg.PreallocationType.getPreallocationType(provisioningType).toString());
+            options.put("preallocation", PreallocationType.getPreallocationType(provisioningType).toString().toLowerCase());
         }
 
         try {
@@ -586,6 +581,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
             actualSize = new File(destFile.getFileName()).length();
         } catch (final QemuImgException e) {
             this.logger.error("Failed to create " + volPath + " due to a failed executing of qemu-img: " + e.getMessage());
+            throw new CloudRuntimeException(e.toString());
         }
 
         final KvmPhysicalDisk disk = new KvmPhysicalDisk(volPath, name, pool);
@@ -799,7 +795,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
                         destFile.setSize(template.getVirtualSize());
                     }
                     final Map<String, String> options = new HashMap<>();
-                    options.put("preallocation", QemuImg.PreallocationType.getPreallocationType(provisioningType).toString());
+                    options.put("preallocation", PreallocationType.getPreallocationType(provisioningType).toString().toLowerCase());
                     switch (provisioningType) {
                         case THIN:
                             final QemuImgFile backingFile = new QemuImgFile(template.getPath(), template.getFormat());

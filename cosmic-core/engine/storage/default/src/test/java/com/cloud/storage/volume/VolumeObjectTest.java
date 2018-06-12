@@ -1,7 +1,7 @@
 package com.cloud.storage.volume;
 
 import com.cloud.engine.subsystem.api.storage.DataStore;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.VolumeType;

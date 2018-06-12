@@ -11,7 +11,6 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_DHCP_HOST;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_VM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_PING_TEST;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_RESIZE_VOLUME;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_ROUTER_PROXY;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_VERSIONS;
@@ -98,6 +97,7 @@ import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.OptimiseFor;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.RngBackendModel;
 import com.cloud.model.enumeration.RouterPrivateIpStrategy;
 import com.cloud.model.enumeration.StoragePoolType;
@@ -109,7 +109,6 @@ import com.cloud.utils.hypervisor.HypervisorUtils;
 import com.cloud.utils.linux.CpuStat;
 import com.cloud.utils.linux.MemStat;
 import com.cloud.utils.net.NetUtils;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.OutputInterpreter.AllLinesParser;
 import com.cloud.utils.script.Script;
@@ -128,7 +127,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -142,8 +140,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -157,6 +153,7 @@ import org.libvirt.DomainSnapshot;
 import org.libvirt.Library;
 import org.libvirt.LibvirtException;
 import org.libvirt.NodeInfo;
+import org.libvirt.flags.DomainDeviceModifyFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -265,7 +262,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     private String versionstringpath;
     private String sendConfigPropertiesPath;
     private String manageSnapshotPath;
-    private String resizeVolumePath;
     private String createTmplPath;
     private String heartBeatPath;
     private String ovsPvlanDhcpHostPath;
@@ -421,44 +417,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return this.libvirtComputingResourceProperties.getPrivateBridgeName();
     }
 
-    private String getBridgeNameFromTrafficType(final TrafficType trafficType) {
-        final String bridgeName;
-        switch (trafficType) {
-            case Public:
-                bridgeName = getPublicBridgeName();
-                break;
-            case Management:
-                bridgeName = getPrivBridgeName();
-                break;
-            case Guest:
-                bridgeName = getGuestBridgeName();
-                break;
-            case Control:
-                bridgeName = getLinkLocalBridgeName();
-                break;
-            default:
-                bridgeName = "";
-        }
-        return bridgeName;
-    }
-
-    private void vifHotPlug(final Connect conn, final String vmName, final String broadcastUri, final String macAddr)
-            throws InternalErrorException, LibvirtException {
-        final NicTO nicTo = new NicTO();
-        nicTo.setMac(macAddr);
-        nicTo.setType(TrafficType.Public);
-        if (broadcastUri == null) {
-            nicTo.setBroadcastType(BroadcastDomainType.Native);
-        } else {
-            final URI uri = BroadcastDomainType.fromString(broadcastUri);
-            nicTo.setBroadcastType(BroadcastDomainType.getSchemeValue(uri));
-            nicTo.setBroadcastUri(uri);
-        }
-
-        final Domain vm = getDomain(conn, vmName);
-        vm.attachDevice(getVifDriver(nicTo.getType()).plug(nicTo, "Default - VirtIO capable OS (64-bit)", "").toString());
-    }
-
     public String networkUsage(final String privateIpAddress, final String option, final String vif) {
         final Script getUsage = new Script(this.routerProxyPath, logger);
         getUsage.add("netusage.sh");
@@ -482,30 +440,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
             return null;
         }
         return usageParser.getLine();
-    }
-
-    private String getBroadcastUriFromBridge(final String brName) {
-        final String pif = matchPifFileInDirectory(brName);
-        final Pattern pattern = Pattern.compile("(\\D+)(\\d+)(\\D*)(\\d*)");
-        final Matcher matcher = pattern.matcher(pif);
-        logger.debug("getting broadcast uri for pif " + pif + " and bridge " + brName);
-        if (matcher.find()) {
-            if (brName.startsWith("brvx")) {
-                return BroadcastDomainType.Vxlan.toUri(matcher.group(2)).toString();
-            } else {
-                if (!matcher.group(4).isEmpty()) {
-                    return BroadcastDomainType.Vlan.toUri(matcher.group(4)).toString();
-                } else {
-                    // untagged or not matching (eth|bond|team)#.#
-                    logger.debug("failed to get vNet id from bridge " + brName
-                            + "attached to physical interface" + pif + ", perhaps untagged interface");
-                    return "";
-                }
-            }
-        } else {
-            logger.debug("failed to get vNet id from bridge " + brName + "attached to physical interface" + pif);
-            return "";
-        }
     }
 
     public Domain getDomain(final Connect conn, final String vmName) throws LibvirtException {
@@ -646,10 +580,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return this.ovsPvlanVmPath;
     }
 
-    public String getResizeVolumePath() {
-        return this.resizeVolumePath;
-    }
-
     public StorageSubsystemCommandHandler getStorageHandler() {
         return this.storageHandler;
     }
@@ -742,7 +672,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         this.sendConfigPropertiesPath = findScriptPath(kvmScriptsDir, PATH_PATCH_DIR, SCRIPT_SEND_CONFIG_PROPERTIES);
         this.heartBeatPath = findScriptPath(kvmScriptsDir, SCRIPT_KVM_HEART_BEAT);
         this.manageSnapshotPath = findScriptPath(storageScriptsDir, SCRIPT_MANAGE_SNAPSHOT);
-        this.resizeVolumePath = findScriptPath(storageScriptsDir, SCRIPT_RESIZE_VOLUME);
         this.createTmplPath = findScriptPath(storageScriptsDir, SCRIPT_CREATE_TEMPLATE);
         this.routerProxyPath = findScriptPath(PATH_SCRIPTS_NETWORK_DOMR, SCRIPT_ROUTER_PROXY);
         this.ovsPvlanDhcpHostPath = findScriptPath(networkScriptsDir, SCRIPT_OVS_PVLAN_DHCP_HOST);
@@ -1237,24 +1166,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                 this.storagePoolMgr.deleteStoragePool(secondaryPool.getType(), secondaryPool.getUuid());
             }
         }
-    }
-
-    public String getResizeScriptType(final KvmStoragePool pool, final KvmPhysicalDisk vol) {
-        final StoragePoolType poolType = pool.getType();
-        final PhysicalDiskFormat volFormat = vol.getFormat();
-
-        if (pool.getType() == StoragePoolType.CLVM && volFormat == PhysicalDiskFormat.RAW) {
-            return "CLVM";
-        } else if (pool.getType() == StoragePoolType.LVM && volFormat == PhysicalDiskFormat.RAW) {
-            return "LVM";
-        } else if ((poolType == StoragePoolType.NetworkFilesystem
-                || poolType == StoragePoolType.SharedMountPoint
-                || poolType == StoragePoolType.Filesystem
-                || poolType == StoragePoolType.Gluster)
-                && volFormat == PhysicalDiskFormat.QCOW2) {
-            return "QCOW2";
-        }
-        throw new CloudRuntimeException("Cannot determine resize type from pool type " + pool.getType());
     }
 
     public PowerState getVmState(final Connect conn, final String vmName) {
@@ -1908,10 +1819,10 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
             dm = conn.domainLookupByName(vmName);
             if (attach) {
                 logger.debug("Attaching device: " + xml);
-                dm.attachDevice(xml);
+                dm.attachDeviceFlags(xml, DomainDeviceModifyFlags.VIR_DOMAIN_DEVICE_MODIFY_CURRENT);
             } else {
                 logger.debug("Detaching device: " + xml);
-                dm.detachDevice(xml);
+                dm.detachDeviceFlags(xml, DomainDeviceModifyFlags.VIR_DOMAIN_DEVICE_MODIFY_CURRENT);
             }
         } catch (final LibvirtException e) {
             if (attach) {

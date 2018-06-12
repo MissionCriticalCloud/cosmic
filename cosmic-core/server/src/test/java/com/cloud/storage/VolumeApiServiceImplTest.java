@@ -25,7 +25,7 @@ import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;

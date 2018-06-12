@@ -1,8 +1,8 @@
-package com.cloud.utils.qemu;
+package com.cloud.agent.resource.kvm.storage.utils;
 
 import static org.junit.Assert.assertEquals;
 
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 
 import org.junit.Ignore;
 import org.junit.Test;

@@ -24,7 +24,7 @@ public class TARProcessor extends AdapterBase implements Processor {
             return null;
         }
 
-        final String tarPath = templatePath + File.separator + templateName + "." + ImageFormat.TAR.getFileExtension();
+        final String tarPath = templatePath + File.separator + templateName + "." + ImageFormat.TAR.toString().toLowerCase();
 
         if (!this._storage.exists(tarPath)) {
             s_logger.debug("Unable to find the tar file: " + tarPath);
@@ -33,7 +33,7 @@ public class TARProcessor extends AdapterBase implements Processor {
 
         final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.TAR;
-        info.filename = templateName + "." + ImageFormat.TAR.getFileExtension();
+        info.filename = templateName + "." + ImageFormat.TAR.toString().toLowerCase();
 
         final File tarFile = this._storage.getFile(tarPath);
 

@@ -2,6 +2,9 @@ package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtConnection;
+import com.cloud.agent.resource.kvm.storage.utils.QemuImg;
+import com.cloud.agent.resource.kvm.storage.utils.QemuImgException;
+import com.cloud.agent.resource.kvm.storage.utils.QemuImgFile;
 import com.cloud.agent.resource.kvm.xml.LibvirtDiskDef;
 import com.cloud.agent.resource.kvm.xml.LibvirtDomainXmlParser;
 import com.cloud.common.storageprocessor.Processor;
@@ -37,11 +40,8 @@ import com.cloud.legacymodel.to.VolumeObjectTO;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.utils.qemu.QemuImg;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
-import com.cloud.utils.qemu.QemuImgException;
-import com.cloud.utils.qemu.QemuImgFile;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.JavaStorageLayer;
 import com.cloud.utils.storage.StorageLayer;
@@ -71,6 +71,7 @@ import org.libvirt.DomainInfo;
 import org.libvirt.DomainInfo.DomainState;
 import org.libvirt.DomainSnapshot;
 import org.libvirt.LibvirtException;
+import org.libvirt.flags.DomainDeviceModifyFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -421,7 +422,7 @@ public class KvmStorageProcessor implements StorageProcessor {
         try {
             final String volumeName = UUID.randomUUID().toString();
 
-            final String destVolumeName = volumeName + "." + destFormat.getFileExtension();
+            final String destVolumeName = volumeName + "." + destFormat.toString().toLowerCase();
             final KvmPhysicalDisk volume = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     srcVolumePath);
             volume.setFormat(PhysicalDiskFormat.valueOf(srcFormat.toString()));
@@ -786,10 +787,10 @@ public class KvmStorageProcessor implements StorageProcessor {
 
             if (attach) {
                 this.logger.debug("Attaching device: " + xml);
-                dm.attachDevice(xml);
+                dm.attachDeviceFlags(xml, DomainDeviceModifyFlags.VIR_DOMAIN_DEVICE_MODIFY_CURRENT);
             } else {
                 this.logger.debug("Detaching device: " + xml);
-                dm.detachDevice(xml);
+                dm.detachDeviceFlags(xml, DomainDeviceModifyFlags.VIR_DOMAIN_DEVICE_MODIFY_CURRENT);
             }
         } catch (final LibvirtException e) {
             if (attach) {
@@ -831,10 +832,10 @@ public class KvmStorageProcessor implements StorageProcessor {
         } catch (final LibvirtException e) {
             this.logger.debug("Failed to attach volume: " + vol.getPath() + ", due to ", e);
             this.storagePoolMgr.disconnectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
-            return new AttachAnswer(e.toString());
-        } catch (final InternalErrorException e) {
+            return new AttachAnswer(e.getMessage());
+        } catch (final InternalErrorException | CloudRuntimeException e) {
             this.logger.debug("Failed to attach volume: " + vol.getPath() + ", due to ", e);
-            return new AttachAnswer(e.toString());
+            return new AttachAnswer(e.getMessage());
         }
     }
 
@@ -1012,7 +1013,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             try {
                 pool.getPhysicalDisk(vol.getPath());
             } catch (final Exception e) {
-                this.logger.debug("can't find volume: " + vol.getPath() + ", return true");
+                this.logger.debug("Can't find volume: " + vol.getPath() + ", return true");
                 return new Answer(null);
             }
             pool.deletePhysicalDisk(vol.getPath(), vol.getFormat());

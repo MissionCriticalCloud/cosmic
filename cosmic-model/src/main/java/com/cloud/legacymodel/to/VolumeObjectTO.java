@@ -1,10 +1,10 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.storage.DiskOffering.DiskCacheMode;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VolumeType;
 
 public class VolumeObjectTO implements DataTO {

@@ -1,10 +1,10 @@
-package com.cloud.utils.qemu;
+package com.cloud.agent.resource.kvm.storage.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.utils.script.Script;
 
 import java.io.File;
@@ -22,7 +22,7 @@ public class QemuImgTest {
     public void testCreateAndInfo() throws QemuImgException {
         final String filename = "/tmp/" + UUID.randomUUID() + ".qcow2";
 
-    /* 10TB virtual_size */
+        /* 10TB virtual_size */
         final long size = 10995116277760l;
         final QemuImgFile file = new QemuImgFile(filename, size, PhysicalDiskFormat.QCOW2);
 
@@ -48,7 +48,7 @@ public class QemuImgTest {
     public void testCreateAndInfoWithOptions() throws QemuImgException {
         final String filename = "/tmp/" + UUID.randomUUID() + ".qcow2";
 
-    /* 10TB virtual_size */
+        /* 10TB virtual_size */
         final long size = 10995116277760l;
         final QemuImgFile file = new QemuImgFile(filename, size, PhysicalDiskFormat.QCOW2);
         final String clusterSize = "131072";
@@ -77,7 +77,7 @@ public class QemuImgTest {
     public void testCreateSparseVolume() throws QemuImgException {
         final String filename = "/tmp/" + UUID.randomUUID() + ".qcow2";
 
-    /* 10TB virtual_size */
+        /* 10TB virtual_size */
         final long size = 10995116277760l;
         final QemuImgFile file = new QemuImgFile(filename, size, PhysicalDiskFormat.QCOW2);
         final String preallocation = "metadata";
@@ -187,7 +187,7 @@ public class QemuImgTest {
 
         final long startSize = 20480;
 
-    /* Negative new size, expect failure */
+        /* Negative new size, expect failure */
         final long endSize = -1;
         final QemuImgFile file = new QemuImgFile(filename, startSize, PhysicalDiskFormat.QCOW2);
 

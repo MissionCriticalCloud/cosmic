@@ -24,7 +24,7 @@ public class IsoProcessor extends AdapterBase implements Processor {
             return null;
         }
 
-        final String isoPath = templatePath + File.separator + templateName + "." + ImageFormat.ISO.getFileExtension();
+        final String isoPath = templatePath + File.separator + templateName + "." + ImageFormat.ISO.toString().toLowerCase();
 
         if (!this._storage.exists(isoPath)) {
             s_logger.debug("Unable to find the iso file: " + isoPath);
@@ -33,7 +33,7 @@ public class IsoProcessor extends AdapterBase implements Processor {
 
         final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.ISO;
-        info.filename = templateName + "." + ImageFormat.ISO.getFileExtension();
+        info.filename = templateName + "." + ImageFormat.ISO.toString().toLowerCase();
         info.size = this._storage.getSize(isoPath);
         info.virtualSize = info.size;
 

@@ -1,6 +1,6 @@
 package com.cloud.service;
 
-import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.storage.DiskOfferingVO;

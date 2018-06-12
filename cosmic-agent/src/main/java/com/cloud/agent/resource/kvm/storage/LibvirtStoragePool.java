@@ -1,10 +1,10 @@
 package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.model.enumeration.StorageProvisioningType;
 
 import java.io.File;
 import java.util.List;
@@ -95,7 +95,7 @@ public class LibvirtStoragePool implements KvmStoragePool {
         final File f = new File(localPoolPath + File.separator + volumeUuid);
         if (!f.exists()) {
             this.logger.debug("volume: " + volumeUuid + " not exist on storage pool");
-            throw new CloudRuntimeException("Can't find volume:" + volumeUuid);
+            throw new CloudRuntimeException("Can't find volume: " + volumeUuid);
         }
         disk = new KvmPhysicalDisk(f.getPath(), volumeUuid, this);
         disk.setFormat(PhysicalDiskFormat.QCOW2);

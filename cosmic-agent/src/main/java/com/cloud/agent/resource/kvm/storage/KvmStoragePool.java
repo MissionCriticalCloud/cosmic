@@ -1,9 +1,9 @@
 package com.cloud.agent.resource.kvm.storage;
 
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.model.enumeration.StorageProvisioningType;
 
 import java.util.List;
 import java.util.Map;

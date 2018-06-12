@@ -1,7 +1,7 @@
 package com.cloud.agent.resource.kvm.storage;
 
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 
 import junit.framework.TestCase;
 import org.libvirt.StoragePool;

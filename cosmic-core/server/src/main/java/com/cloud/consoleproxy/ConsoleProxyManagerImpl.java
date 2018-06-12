@@ -40,7 +40,7 @@ import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.exceptions.UnableDeleteHostException;
 import com.cloud.legacymodel.network.Network;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;

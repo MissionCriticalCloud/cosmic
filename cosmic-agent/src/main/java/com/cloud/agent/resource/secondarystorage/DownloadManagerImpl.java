@@ -197,7 +197,7 @@ public class DownloadManagerImpl extends ManagerBase implements DownloadManager 
             scr.add("-d", dnld.getDescription());
         }
         // add options common to ISO and template
-        final String extension = dnld.getFormat().getFileExtension();
+        final String extension = dnld.getFormat().toString().toLowerCase();
         String templateName = "";
         if (extension.equals("iso")) {
             templateName = this.jobs.get(jobId).getTmpltName().trim().replace(" ", "_");

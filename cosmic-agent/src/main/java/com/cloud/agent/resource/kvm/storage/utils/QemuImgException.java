@@ -1,4 +1,4 @@
-package com.cloud.utils.qemu;
+package com.cloud.agent.resource.kvm.storage.utils;
 
 public class QemuImgException extends Exception {
 
