@@ -11,6 +11,7 @@ import com.cloud.legacymodel.storage.VmDiskStatsEntry;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VmStatsEntry;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.uservm.UserVm;
 
@@ -80,6 +81,6 @@ public interface UserVmManager extends UserVmService {
 
     UserVm updateVirtualMachine(long id, String displayName, String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                 Boolean isDynamicallyScalable, HTTPMethod httpMethod, String customId, String hostName, String instanceName, String manufacturerString,
-                                OptimiseFor optimiseFor, Boolean requiresRestart) throws ResourceUnavailableException,
-            InsufficientCapacityException;
+                                OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy
+    ) throws ResourceUnavailableException, InsufficientCapacityException;
 }

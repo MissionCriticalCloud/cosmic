@@ -301,6 +301,24 @@
                                             });
                                         }
                                     },
+                                    maintenancepolicy: {
+                                        label: 'label.maintenance.policy',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "LiveMigrate",
+                                                description: "Live Migrate to another hypervisor"
+                                            });
+                                            items.push({
+                                                id: "ShutdownAndStart",
+                                                description: "Shutdown VM and Start after maintenance"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
                                     isExtractable: {
                                         label: "label.extractable",
                                         docID: 'helpRegisterTemplateExtractable',
@@ -360,7 +378,8 @@
                                     isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                     osTypeId: args.data.osTypeId,
                                     optimisefor: args.data.optimisefor,
-                                    hypervisor: args.data.hypervisor
+                                    hypervisor: args.data.hypervisor,
+                                    maintenancepolicy: args.data.maintenancepolicy
                                 };
 
                                 if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {
@@ -771,7 +790,8 @@
                                         optimisefor: args.data.optimisefor,
                                         passwordenabled: (args.data.passwordenabled == "on"),
                                         isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
-                                        url: args.data.url
+                                        url: args.data.url,
+                                        maintenancepolicy: args.data.maintenancepolicy
                                     };
                                     $.ajax({
                                         url: createURL('updateTemplate'),
@@ -1114,6 +1134,24 @@
                                             items.push({
                                                 id: "Windows",
                                                 description: "Windows VM"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+                                    maintenancepolicy: {
+                                        label: 'label.maintenance.policy',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "LiveMigrate",
+                                                description: "Live Migrate to another hypervisor"
+                                            });
+                                            items.push({
+                                                id: "ShutdownAndStart",
+                                                description: "Shutdown VM and Start after maintenance"
                                             });
                                             args.response.success({
                                                 data: items

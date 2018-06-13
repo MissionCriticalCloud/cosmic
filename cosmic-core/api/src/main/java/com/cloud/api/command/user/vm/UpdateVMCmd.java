@@ -18,6 +18,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.uservm.UserVm;
 
@@ -81,6 +82,8 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     private String optimiseFor;
     @Parameter(name = ApiConstants.RESTART_REQUIRED, type = CommandType.BOOLEAN, description = "true if VM needs to a stop/start to receive updated VM specs on the hypervisor", authorized = {RoleType.Admin})
     protected Boolean requiresRestart;
+    @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
+    private String maintenancePolicy;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -124,6 +127,14 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
 
     public Boolean getRequiresRestart() {
         return requiresRestart;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        if (maintenancePolicy != null) {
+            return MaintenancePolicy.valueOf(maintenancePolicy);
+        } else {
+            return null;
+        }
     }
 
     public Map<String, String> getDetails() {

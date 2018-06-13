@@ -1036,7 +1036,8 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         ConsoleProxyVO proxy =
                 new ConsoleProxyVO(id, serviceOffering.getId(), name, template.getId(), template.getHypervisorType(), template.getGuestOSId(), dataCenterId,
                         systemAcct.getDomainId(), systemAcct.getId(), this._accountMgr.getSystemUser().getId(), 0, serviceOffering.getOfferHA(),
-                        template.getOptimiseFor(), template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false);
+                        template.getOptimiseFor(), template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false,
+                        template.getMaintenancePolicy());
         proxy.setDynamicallyScalable(template.isDynamicallyScalable());
         proxy = this._consoleProxyDao.persist(proxy);
         try {

@@ -1051,6 +1051,11 @@
                                     displayName: args.data.displayname
                                 });
                             }
+                            if (args.data.maintenancepolicy != args.context.instances[0].maintenancepolicy) {
+                                $.extend(data, {
+                                    maintenancepolicy: args.data.maintenancepolicy
+                                });
+                            }
                             $.ajax({
                                 url: createURL('updateVirtualMachine'),
                                 data: data,
@@ -2084,6 +2089,24 @@
                                     items.push({
                                         id: "Windows",
                                         description: "Windows VM"
+                                    });
+                                    args.response.success({
+                                        data: items
+                                    });
+                                }
+                            },
+                            maintenancepolicy: {
+                                label: 'label.maintenance.policy',
+                                isEditable: true,
+                                select: function (args) {
+                                    var items = [];
+                                    items.push({
+                                        id: "LiveMigrate",
+                                        description: "Live Migrate to another hypervisor"
+                                    });
+                                    items.push({
+                                        id: "ShutdownAndStart",
+                                        description: "Shutdown VM and Start after maintenance"
                                     });
                                     args.response.success({
                                         data: items

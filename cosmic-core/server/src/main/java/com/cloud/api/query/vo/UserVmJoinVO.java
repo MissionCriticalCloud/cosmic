@@ -5,6 +5,7 @@ import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.model.enumeration.TrafficType;
@@ -268,6 +269,8 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String manufacturerString;
     @Column(name = "requires_restart")
     private Boolean requiresRestart;
+    @Column(name = "maintenance_policy")
+    private MaintenancePolicy maintenancePolicy;
 
     public UserVmJoinVO() {
     }
@@ -1203,5 +1206,13 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public Boolean getRequiresRestart() {
         return requiresRestart;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
     }
 }

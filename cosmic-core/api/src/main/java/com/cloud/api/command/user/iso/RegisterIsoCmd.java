@@ -17,6 +17,8 @@ import com.cloud.api.response.ZoneResponse;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.model.enumeration.MaintenancePolicy;
+import com.cloud.model.enumeration.OptimiseFor;
 
 import java.util.List;
 
@@ -80,6 +82,12 @@ public class RegisterIsoCmd extends BaseCmd {
     private Long projectId;
     @Parameter(name = ApiConstants.IMAGE_STORE_UUID, type = CommandType.STRING, description = "Image store UUID")
     private String imageStoreUuid;
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+    @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
+    private String maintenancePolicy;
+    @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
+    private String optimiseFor;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -139,6 +147,26 @@ public class RegisterIsoCmd extends BaseCmd {
 
     public Boolean isDynamicallyScalable() {
         return isDynamicallyScalable == null ? Boolean.FALSE : isDynamicallyScalable;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        if (maintenancePolicy != null) {
+            return MaintenancePolicy.valueOf(maintenancePolicy);
+        } else {
+            return null;
+        }
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor != null) {
+            return OptimiseFor.valueOf(optimiseFor);
+        } else {
+            return OptimiseFor.Generic;
+        }
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
     }
 
     /////////////////////////////////////////////////////

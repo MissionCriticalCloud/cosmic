@@ -4,6 +4,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.server.ResourceTag.ResourceObjectType;
@@ -239,7 +240,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     @Override
     public void updateVM(final long id, final String displayName, final boolean enable, final Long osTypeId, final String userData, final boolean displayVm,
                          final boolean isDynamicallyScalable, final String customId, final String hostName, final String instanceName, final String manufacturerString,
-                         final OptimiseFor optimiseFor, final Boolean requiresRestart) {
+                         final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy) {
+
         final UserVmVO vo = createForUpdate();
         vo.setDisplayName(displayName);
         vo.setHaEnabled(enable);
@@ -255,6 +257,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         }
         if (requiresRestart != null) {
             vo.setRequiresRestart(requiresRestart);
+        }
+        if (maintenancePolicy != null) {
+            vo.setMaintenancePolicy(maintenancePolicy);
         }
         if (hostName != null) {
             vo.setHostName(hostName);

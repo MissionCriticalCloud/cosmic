@@ -8,6 +8,7 @@ import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.serializer.Param;
 import com.cloud.uservm.UserVm;
@@ -214,6 +215,10 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName(ApiConstants.OS_TYPE_ID)
     @Param(description = "OS type id of the vm", since = "4.4")
     private Long osTypeId;
+
+    @SerializedName(ApiConstants.MAINTENANCE_POLICY)
+    @Param(description = "Maintenance Policy of the VM")
+    private MaintenancePolicy maintenancePolicy;
 
     public UserVmResponse() {
         nics = new LinkedHashSet<>();
@@ -738,5 +743,13 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setRequiresRestart(final Boolean requiresRestart) {
         this.requiresRestart = requiresRestart;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        return maintenancePolicy;
+    }
+
+    public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
+        this.maintenancePolicy = maintenancePolicy;
     }
 }

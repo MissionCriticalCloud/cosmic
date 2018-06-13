@@ -24,6 +24,7 @@ import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.projects.Project;
 import com.cloud.storage.Snapshot;
@@ -108,8 +109,8 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     private String cpuFlags;
     @Parameter(name = ApiConstants.MAC_LEARNING, type = CommandType.STRING, description = "Set mag learning boolean, defaults to false")
     private Boolean macLearning;
-
-    // TODO: add cpuflags, mac learning,
+    @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "Maintenance policy for this template, either LiveMigrate or ShutdownAndStart.")
+    private String maintenancePolicy;
 
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
@@ -170,6 +171,14 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
             return OptimiseFor.valueOf(optimiseFor);
         } else {
             return OptimiseFor.Generic;
+        }
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        if (maintenancePolicy != null) {
+            return MaintenancePolicy.valueOf(maintenancePolicy);
+        } else {
+            return MaintenancePolicy.LiveMigrate;
         }
     }
 
