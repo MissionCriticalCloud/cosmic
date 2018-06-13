@@ -38,7 +38,7 @@ public class VhdProcessor extends AdapterBase implements Processor {
             return null;
         }
 
-        final String vhdPath = templatePath + File.separator + templateName + "." + ImageFormat.VHD.getFileExtension();
+        final String vhdPath = templatePath + File.separator + templateName + "." + ImageFormat.VHD.toString().toLowerCase();
         if (!this._storage.exists(vhdPath)) {
             s_logger.debug("Unable to find the vhd file: " + vhdPath);
             return null;
@@ -48,7 +48,7 @@ public class VhdProcessor extends AdapterBase implements Processor {
 
         final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.VHD;
-        info.filename = templateName + "." + ImageFormat.VHD.getFileExtension();
+        info.filename = templateName + "." + ImageFormat.VHD.toString().toLowerCase();
         info.size = this._storage.getSize(vhdPath);
 
         try {

@@ -29,7 +29,7 @@ public class QCOW2Processor extends AdapterBase implements Processor {
             return null;
         }
 
-        final String qcow2Path = templatePath + File.separator + templateName + "." + ImageFormat.QCOW2.getFileExtension();
+        final String qcow2Path = templatePath + File.separator + templateName + "." + ImageFormat.QCOW2.toString().toLowerCase();
 
         if (!this._storage.exists(qcow2Path)) {
             s_logger.debug("Unable to find the qcow2 file: " + qcow2Path);
@@ -38,7 +38,7 @@ public class QCOW2Processor extends AdapterBase implements Processor {
 
         final TemplateFormatInfo info = new TemplateFormatInfo();
         info.format = ImageFormat.QCOW2;
-        info.filename = templateName + "." + ImageFormat.QCOW2.getFileExtension();
+        info.filename = templateName + "." + ImageFormat.QCOW2.toString().toLowerCase();
 
         final File qcow2File = this._storage.getFile(qcow2Path);
 

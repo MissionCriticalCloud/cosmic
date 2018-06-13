@@ -2,6 +2,7 @@ package com.cloud.legacymodel.storage;
 
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.model.enumeration.StorageProvisioningType;
 
 import java.util.Date;
 

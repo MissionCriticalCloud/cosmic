@@ -66,17 +66,17 @@ public class TemplateLocation {
         }
 
         for (final ImageFormat format : ImageFormat.values()) {
-            final String ext = this._props.getProperty(format.getFileExtension());
+            final String ext = this._props.getProperty(format.toString().toLowerCase());
             if (ext != null) {
                 final TemplateFormatInfo info = new TemplateFormatInfo();
                 info.format = format;
-                info.filename = this._props.getProperty(format.getFileExtension() + ".filename");
+                info.filename = this._props.getProperty(format.toString().toLowerCase() + ".filename");
                 if (info.filename == null) {
                     continue;
                 }
-                info.size = NumbersUtil.parseLong(this._props.getProperty(format.getFileExtension() + ".size"), -1);
+                info.size = NumbersUtil.parseLong(this._props.getProperty(format.toString().toLowerCase() + ".size"), -1);
                 this._props.setProperty("physicalSize", Long.toString(info.size));
-                info.virtualSize = NumbersUtil.parseLong(this._props.getProperty(format.getFileExtension() + ".virtualsize"), -1);
+                info.virtualSize = NumbersUtil.parseLong(this._props.getProperty(format.toString().toLowerCase() + ".virtualsize"), -1);
                 this._formats.add(info);
 
                 if (!checkFormatValidity(info)) {
@@ -115,10 +115,10 @@ public class TemplateLocation {
 
     public boolean save() {
         for (final TemplateFormatInfo info : this._formats) {
-            this._props.setProperty(info.format.getFileExtension(), "true");
-            this._props.setProperty(info.format.getFileExtension() + ".filename", info.filename);
-            this._props.setProperty(info.format.getFileExtension() + ".size", Long.toString(info.size));
-            this._props.setProperty(info.format.getFileExtension() + ".virtualsize", Long.toString(info.virtualSize));
+            this._props.setProperty(info.format.toString().toLowerCase(), "true");
+            this._props.setProperty(info.format.toString().toLowerCase() + ".filename", info.filename);
+            this._props.setProperty(info.format.toString().toLowerCase() + ".size", Long.toString(info.size));
+            this._props.setProperty(info.format.toString().toLowerCase() + ".virtualsize", Long.toString(info.virtualSize));
         }
         try (final FileOutputStream strm = new FileOutputStream(this._file)) {
             this._props.store(strm, "");
@@ -182,10 +182,10 @@ public class TemplateLocation {
             final TemplateFormatInfo info = it.next();
             if (info.format == format) {
                 it.remove();
-                this._props.remove(format.getFileExtension());
-                this._props.remove(format.getFileExtension() + ".filename");
-                this._props.remove(format.getFileExtension() + ".size");
-                this._props.remove(format.getFileExtension() + ".virtualsize");
+                this._props.remove(format.toString().toLowerCase());
+                this._props.remove(format.toString().toLowerCase() + ".filename");
+                this._props.remove(format.toString().toLowerCase() + ".size");
+                this._props.remove(format.toString().toLowerCase() + ".virtualsize");
                 return info;
             }
         }

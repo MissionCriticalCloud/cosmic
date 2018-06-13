@@ -74,7 +74,6 @@ import com.cloud.legacymodel.exceptions.StorageUnavailableException;
 import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.legacymodel.storage.StoragePool;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.VMTemplateStatus;
@@ -93,6 +92,7 @@ import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolStatus;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.offering.ServiceOffering;
@@ -1506,11 +1506,11 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         /*
          * get a list of hosts to send the commands to, try the system the
          * associated vm is running on first, then the last known place it ran.
-         * If not attached to a userVm, we pass 'none' and resizevolume.sh is ok
+         * If not attached to a userVm, we pass 'none' and the agent is ok
          * with that since it only needs the vm name to live resize
          */
         long[] hosts = null;
-        String instanceName = "none";
+        String instanceName = null;
         if (userVm != null) {
             instanceName = userVm.getInstanceName();
             if (userVm.getHostId() != null) {

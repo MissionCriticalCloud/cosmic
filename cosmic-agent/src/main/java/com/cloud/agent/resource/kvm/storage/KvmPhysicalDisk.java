@@ -1,7 +1,7 @@
 package com.cloud.agent.resource.kvm.storage;
 
 import com.cloud.model.enumeration.ImageFormat;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 
 public class KvmPhysicalDisk {
     private final String name;

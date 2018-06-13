@@ -215,9 +215,9 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
         final String origPath = destFile.getAbsolutePath();
         String extension = null;
         if (srcData.getObjectType() == DataObjectType.TEMPLATE) {
-            extension = ((TemplateObjectTO) srcData).getFormat().getFileExtension();
+            extension = ((TemplateObjectTO) srcData).getFormat().toString().toLowerCase();
         } else if (srcData.getObjectType() == DataObjectType.VOLUME) {
-            extension = ((VolumeObjectTO) srcData).getFormat().getFileExtension();
+            extension = ((VolumeObjectTO) srcData).getFormat().toString().toLowerCase();
         }
 
         final String templateName = UUID.randomUUID().toString();
@@ -348,7 +348,7 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             // get snapshot file name
             final String templateName = srcFile.getName();
             // add kvm file extension for copied template name
-            final String fileName = templateName + "." + srcFormat.getFileExtension();
+            final String fileName = templateName + "." + srcFormat.toString().toLowerCase();
             final String destFileFullPath = destFile.getAbsolutePath() + File.separator + fileName;
             s_logger.debug("copy snapshot " + srcFile.getAbsolutePath() + " to template " + destFileFullPath);
             Script.runSimpleBashScript("cp " + srcFile.getAbsolutePath() + " " + destFileFullPath);
@@ -2042,7 +2042,7 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
         }
 
         // add options common to ISO and template
-        final String extension = uploadEntity.getFormat().getFileExtension();
+        final String extension = uploadEntity.getFormat().toString().toLowerCase();
         String templateName = "";
         if (extension.equals("iso")) {
             templateName = uploadEntity.getUuid().trim().replace(" ", "_");

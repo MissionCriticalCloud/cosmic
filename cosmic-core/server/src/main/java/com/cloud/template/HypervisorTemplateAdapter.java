@@ -124,7 +124,7 @@ public class HypervisorTemplateAdapter extends TemplateAdapterBase {
     public TemplateProfile prepare(final RegisterIsoCmd cmd) throws ResourceAllocationException {
         final TemplateProfile profile = super.prepare(cmd);
         final String url = profile.getUrl();
-        UriUtils.validateUrl(ImageFormat.ISO.getFileExtension(), url);
+        UriUtils.validateUrl(ImageFormat.ISO.toString().toLowerCase(), url);
         profile.setUrl(url);
         // Check that the resource limit for secondary storage won't be exceeded
         this._resourceLimitMgr.checkResourceLimit(this._accountMgr.getAccount(cmd.getEntityOwnerId()), ResourceType.secondary_storage, UriUtils.getRemoteSize(url));

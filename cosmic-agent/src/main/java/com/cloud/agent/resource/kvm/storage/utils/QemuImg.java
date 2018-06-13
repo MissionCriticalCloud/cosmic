@@ -1,6 +1,5 @@
-package com.cloud.utils.qemu;
+package com.cloud.agent.resource.kvm.storage.utils;
 
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.utils.script.OutputInterpreter;
 import com.cloud.utils.script.Script;
 
@@ -8,12 +7,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class QemuImg {
 
     /* The qemu-img binary. We expect this to be in $PATH */
-    public String qemuImgPath = "qemu-img";
+    private String qemuImgPath = "qemu-img";
 
     private int timeout;
 
@@ -39,9 +36,7 @@ public class QemuImg {
     }
 
     /* These are all methods supported by the qemu-img tool */
-
-    public void create(final QemuImgFile file, final QemuImgFile backingFile, final Map<String, String> options)
-            throws QemuImgException {
+    public void create(final QemuImgFile file, final QemuImgFile backingFile, final Map<String, String> options) throws QemuImgException {
         final Script s = new Script(qemuImgPath, timeout);
         s.add("create");
 
@@ -66,11 +61,11 @@ public class QemuImg {
          */
         s.add("-f");
         if (backingFile != null) {
-            s.add(backingFile.getFormat().toString());
+            s.add(backingFile.getFormat().toString().toLowerCase());
             s.add("-b");
             s.add(backingFile.getFileName());
         } else {
-            s.add(file.getFormat().toString());
+            s.add(file.getFormat().toString().toLowerCase());
         }
 
         s.add(file.getFileName());
@@ -107,7 +102,7 @@ public class QemuImg {
         // s.add("-f");
         // s.add(srcFile.getFormat().toString());
         script.add("-O");
-        script.add(destFile.getFormat().toString());
+        script.add(destFile.getFormat().toString().toLowerCase());
 
         if (options != null && !options.isEmpty()) {
             script.add("-o");
@@ -164,7 +159,7 @@ public class QemuImg {
         s.execute();
     }
 
-    public void commit(final QemuImgFile file) throws QemuImgException {
+    public void commit(final QemuImgFile file) {
 
     }
 
@@ -199,56 +194,12 @@ public class QemuImg {
     }
 
     /* List, apply, create or delete snapshots in image */
-    public void snapshot() throws QemuImgException {
+    public void snapshot() {
 
     }
 
     /* Changes the backing file of an image */
-    public void rebase() throws QemuImgException {
-
-    }
-
-    /* Shouldn't we have KVMPhysicalDisk and LibvirtVMDef read this? */
-    public static enum PhysicalDiskFormat {
-        RAW("raw"), QCOW2("qcow2"), FILE("file"), RBD("rbd"), TAR("tar"), DIR("dir");
-        String format;
-
-        private PhysicalDiskFormat(final String format) {
-            this.format = format;
-        }
-
-        @Override
-        public String toString() {
-            return format;
-        }
-    }
-
-    public static enum PreallocationType {
-        Off("off"), Metadata("metadata"), Full("full");
-
-        private final String preallocationType;
-
-        private PreallocationType(final String preallocationType) {
-            this.preallocationType = preallocationType;
-        }
-
-        public static PreallocationType getPreallocationType(final StorageProvisioningType provisioningType) {
-            switch (provisioningType) {
-                case THIN:
-                    return PreallocationType.Off;
-                case SPARSE:
-                    return PreallocationType.Metadata;
-                case FAT:
-                    return PreallocationType.Full;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        @Override
-        public String toString() {
-            return preallocationType;
-        }
+    public void rebase() {
 
     }
 }

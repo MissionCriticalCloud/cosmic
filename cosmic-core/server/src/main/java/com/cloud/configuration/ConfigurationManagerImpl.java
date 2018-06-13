@@ -90,7 +90,6 @@ import com.cloud.legacymodel.network.Network.Capability;
 import com.cloud.legacymodel.network.Network.Provider;
 import com.cloud.legacymodel.network.Network.Service;
 import com.cloud.legacymodel.storage.DiskOffering;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
@@ -100,6 +99,7 @@ import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.IpAddressManager;
@@ -824,7 +824,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new InvalidParameterValueException("Unable to create service offering by id " + userId + " because it is not root-admin or domain-admin");
         }
 
-        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.getProvisioningType(provisioningType);
+        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.valueOf(provisioningType);
 
         tags = StringUtils.cleanupTags(tags);
 
@@ -4708,7 +4708,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         } else if (numGibibytes != null && numGibibytes > _maxVolumeSizeInGb) {
             throw new InvalidParameterValueException("The maximum size for a disk is " + _maxVolumeSizeInGb + " Gb.");
         }
-        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.getProvisioningType(provisioningType);
+        final StorageProvisioningType typedProvisioningType = StorageProvisioningType.valueOf(provisioningType);
 
         if (numGibibytes != null) {
             diskSize = numGibibytes * 1024 * 1024 * 1024;

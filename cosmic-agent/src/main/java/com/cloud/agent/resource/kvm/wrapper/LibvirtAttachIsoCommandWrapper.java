@@ -21,11 +21,7 @@ public final class LibvirtAttachIsoCommandWrapper extends LibvirtCommandWrapper<
 
             final Connect conn = libvirtUtilitiesHelper.getConnectionByVmName(command.getVmName());
             libvirtComputingResource.attachOrDetachIso(conn, command.getVmName(), command.getIsoPath(), command.isAttach());
-        } catch (final LibvirtException e) {
-            return new Answer(command, false, e.toString());
-        } catch (final URISyntaxException e) {
-            return new Answer(command, false, e.toString());
-        } catch (final InternalErrorException e) {
+        } catch (final LibvirtException | URISyntaxException | InternalErrorException e) {
             return new Answer(command, false, e.toString());
         }
 

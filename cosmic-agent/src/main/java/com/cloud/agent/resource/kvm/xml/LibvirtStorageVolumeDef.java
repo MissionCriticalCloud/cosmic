@@ -1,6 +1,6 @@
 package com.cloud.agent.resource.kvm.xml;
 
-import com.cloud.utils.qemu.QemuImg;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 
 import org.apache.commons.lang.NotImplementedException;
 
@@ -72,7 +72,7 @@ public class LibvirtStorageVolumeDef {
             return null;
         }
 
-        public static VolumeFormat getFormat(final QemuImg.PhysicalDiskFormat format) {
+        public static VolumeFormat getFormat(final PhysicalDiskFormat format) {
             switch (format) {
                 case RAW:
                     return RAW;

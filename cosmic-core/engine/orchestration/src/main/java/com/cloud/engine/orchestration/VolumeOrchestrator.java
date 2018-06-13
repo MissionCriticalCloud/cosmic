@@ -720,7 +720,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                                   final DiskOffering diskVO, final HypervisorType rootDiskHyperType) {
 
         if (!isSupportedImageFormatForCluster(volume, rootDiskHyperType)) {
-            throw new InvalidParameterValueException("Failed to attach volume to VM since volumes format " + volume.getFormat().getFileExtension()
+            throw new InvalidParameterValueException("Failed to attach volume to VM since volumes format " + volume.getFormat().toString().toLowerCase()
                     + " is not compatible with the vm hypervisor type");
         }
 

@@ -4,14 +4,14 @@ import com.cloud.agent.resource.kvm.ha.KvmHaBase;
 import com.cloud.agent.resource.kvm.ha.KvmHaBase.PoolType;
 import com.cloud.agent.resource.kvm.ha.KvmHaMonitor;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
-import com.cloud.legacymodel.storage.StorageProvisioningType;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.PrimaryDataStoreTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.to.VolumeObjectTO;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VolumeType;
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
 import com.cloud.utils.storage.StorageLayer;
 
 import java.net.URI;
@@ -253,36 +253,17 @@ public class KvmStoragePoolManager {
     }
 
     public KvmPhysicalDisk getPhysicalDisk(final StoragePoolType type, final String poolUuid, final String volName) {
-        int cnt = 0;
-        final int retries = 10;
-        KvmPhysicalDisk vol = null;
-        // harden get volume, try cnt times to get volume, in case volume is created on other host
-        String errMsg = "";
-        while (cnt < retries) {
-            try {
-                final KvmStoragePool pool = getStoragePool(type, poolUuid);
-                vol = pool.getPhysicalDisk(volName);
-                if (vol != null) {
-                    break;
-                }
-            } catch (final Exception e) {
-                s_logger.debug("Failed to find volume:" + volName + " due to" + e.toString() + ", retry:" + cnt);
-                errMsg = e.toString();
-            }
+        final KvmPhysicalDisk vol;
 
-            try {
-                Thread.sleep(30000);
-            } catch (final InterruptedException e) {
-                s_logger.debug("[ignored] interupted while trying to get storage pool.");
-            }
-            cnt++;
+        try {
+            final KvmStoragePool pool = getStoragePool(type, poolUuid);
+            vol = pool.getPhysicalDisk(volName);
+        } catch (final Exception e) {
+            s_logger.debug("Failed to find volume: " + volName + ", due to " + e.toString());
+            throw new CloudRuntimeException(e.getMessage());
         }
 
-        if (vol == null) {
-            throw new CloudRuntimeException(errMsg);
-        } else {
-            return vol;
-        }
+        return vol;
     }
 
     public KvmStoragePool createStoragePool(final String name, final String host, final int port, final String path, final String userInfo, final StoragePoolType type) {
@@ -328,29 +309,13 @@ public class KvmStoragePoolManager {
         } else if (template.getFormat() == PhysicalDiskFormat.DIR) {
             return adaptor.createDiskFromTemplate(template, name, PhysicalDiskFormat.DIR, provisioningType, size, destPool, timeout);
         } else {
-            PhysicalDiskFormat diskFormat = PhysicalDiskFormat.QCOW2;
-            if (provisioningType == StorageProvisioningType.RAW) {
-                diskFormat = PhysicalDiskFormat.RAW;
-            }
-            return adaptor.createDiskFromTemplate(template, name, diskFormat, provisioningType, size, destPool, timeout);
+            return adaptor.createDiskFromTemplate(template, name, template.getFormat(), provisioningType, size, destPool, timeout);
         }
-    }
-
-    public KvmPhysicalDisk createTemplateFromDisk(final KvmPhysicalDisk disk, final String name, final PhysicalDiskFormat format, final long size,
-                                                  final KvmStoragePool destPool) {
-        final StorageAdaptor adaptor = getStorageAdaptor(destPool.getType());
-        return adaptor.createTemplateFromDisk(disk, name, format, size, destPool);
     }
 
     public KvmPhysicalDisk copyPhysicalDisk(final KvmPhysicalDisk disk, final String name, final KvmStoragePool destPool, final int timeout) {
         final StorageAdaptor adaptor = getStorageAdaptor(destPool.getType());
         return adaptor.copyPhysicalDisk(disk, name, destPool, timeout);
-    }
-
-    public KvmPhysicalDisk createDiskFromSnapshot(final KvmPhysicalDisk snapshot, final String snapshotName, final String name,
-                                                  final KvmStoragePool destPool) {
-        final StorageAdaptor adaptor = getStorageAdaptor(destPool.getType());
-        return adaptor.createDiskFromSnapshot(snapshot, snapshotName, name, destPool);
     }
 
     private class StoragePoolInformation {

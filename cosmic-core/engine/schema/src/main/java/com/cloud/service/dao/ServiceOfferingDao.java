@@ -1,6 +1,6 @@
 package com.cloud.service.dao;
 
-import com.cloud.legacymodel.storage.StorageProvisioningType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.utils.db.GenericDao;

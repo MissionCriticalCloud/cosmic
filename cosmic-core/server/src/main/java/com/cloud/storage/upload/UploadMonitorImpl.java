@@ -257,7 +257,7 @@ public class UploadMonitorImpl extends ManagerBase implements UploadMonitor {
         try {
             // Create Symlink at ssvm
             final String path = vmTemplateHost.getInstallPath();
-            final String uuid = UUID.randomUUID().toString() + "." + template.getFormat().getFileExtension(); // adding "." + vhd/ova... etc.
+            final String uuid = UUID.randomUUID().toString() + "." + template.getFormat().toString().toLowerCase(); // adding "." + vhd/ova... etc.
             final CreateEntityDownloadURLCommand cmd = new CreateEntityDownloadURLCommand(((ImageStoreEntity) store).getMountPoint(), path, uuid, null);
             final Answer ans = ep.sendMessage(cmd);
             if (ans == null || !ans.getResult()) {

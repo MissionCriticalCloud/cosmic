@@ -9,6 +9,7 @@ import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VolumeType;
 
 import java.util.Arrays;

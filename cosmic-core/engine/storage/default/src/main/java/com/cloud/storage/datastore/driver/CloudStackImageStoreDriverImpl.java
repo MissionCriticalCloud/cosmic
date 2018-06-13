@@ -50,7 +50,7 @@ public class CloudStackImageStoreDriverImpl extends BaseImageStoreDriverImpl {
         final EndPoint ep = _epSelector.select(store);
         // Create Symlink at ssvm
         final String path = installPath;
-        final String uuid = UUID.randomUUID().toString() + "" + format.getFileExtension();
+        final String uuid = UUID.randomUUID().toString() + "" + format.toString().toLowerCase();
         final CreateEntityDownloadURLCommand cmd = new CreateEntityDownloadURLCommand(((ImageStoreEntity) store).getMountPoint(), path, uuid, dataObject.getTO());
         Answer ans = null;
         if (ep == null) {

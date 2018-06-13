@@ -103,16 +103,16 @@
                                         select: function (args) {
                                             var items = [];
                                             items.push({
-                                                id: 'thin',
-                                                description: 'thin'
+                                                id: 'THIN',
+                                                description: 'THIN'
                                             });
                                             items.push({
-                                                id: 'sparse',
-                                                description: 'sparse'
+                                                id: 'SPARSE',
+                                                description: 'SPARSE'
                                             });
                                             items.push({
-                                                id: 'fat',
-                                                description: 'fat'
+                                                id: 'FAT',
+                                                description: 'FAT'
                                             });
                                             args.response.success({
                                                 data: items
@@ -1057,16 +1057,16 @@
                                         select: function (args) {
                                             var items = [];
                                             items.push({
-                                                id: 'thin',
-                                                description: 'thin'
+                                                id: 'THIN',
+                                                description: 'THIN'
                                             });
                                             items.push({
-                                                id: 'sparse',
-                                                description: 'sparse'
+                                                id: 'SPARSE',
+                                                description: 'SPARSE'
                                             });
                                             items.push({
-                                                id: 'fat',
-                                                description: 'fat'
+                                                id: 'FAT',
+                                                description: 'FAT'
                                             });
                                             args.response.success({
                                                 data: items
@@ -1588,16 +1588,16 @@
                                         select: function (args) {
                                             var items = [];
                                             items.push({
-                                                id: 'thin',
-                                                description: 'thin'
+                                                id: 'THIN',
+                                                description: 'THIN'
                                             });
                                             items.push({
-                                                id: 'sparse',
-                                                description: 'sparse'
+                                                id: 'SPARSE',
+                                                description: 'SPARSE'
                                             });
                                             items.push({
-                                                id: 'fat',
-                                                description: 'fat'
+                                                id: 'FAT',
+                                                description: 'FAT'
                                             });
                                             args.response.success({
                                                 data: items

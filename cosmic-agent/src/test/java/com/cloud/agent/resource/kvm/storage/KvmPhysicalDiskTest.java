@@ -1,6 +1,6 @@
 package com.cloud.agent.resource.kvm.storage;
 
-import com.cloud.utils.qemu.QemuImg.PhysicalDiskFormat;
+import com.cloud.model.enumeration.PhysicalDiskFormat;
 
 import junit.framework.TestCase;
 import org.mockito.Mockito;
