@@ -19,10 +19,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.security.spec.KeySpec;
 import java.util.Map;
+import java.util.Objects;
 
 public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
     private static final Logger s_logger = LoggerFactory.getLogger(WebSocketHandlerNoVnc.class);
@@ -33,12 +33,12 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
     private String hostPassword;
     private double rfbVersion;
 
-    private static enum VncState {
+    private enum VncState {
         SERVER_VERSION_SENT, AUTH_TYPES_SENT, AUTH_RESULT_SENT, UNKNOWN
     }
 
     private static final byte[] M_VNC_AUTH_OK = new byte[]{0, 0, 0, 0};
-    private static final byte[] M_VNC_AUTH_TYE_NOAUTH = new byte[]{01, 01};
+    private static final byte[] M_VNC_AUTH_TYPE_NOAUTH = new byte[]{1, 1};
     private VncState clientState;
 
     /**
@@ -61,16 +61,14 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
         int b6_3 = (b & 0x20) >>> 3;
         int b7_2 = (b & 0x40) >>> 5;
         int b8_1 = (b & 0x80) >>> 7;
-        byte c = (byte) (b1_8 | b2_7 | b3_6 | b4_5 | b5_4 | b6_3 | b7_2 | b8_1);
-        return c;
+        return (byte) (b1_8 | b2_7 | b3_6 | b4_5 | b5_4 | b6_3 | b7_2 | b8_1);
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         s_logger.info("Connect: " + session.getRemoteAddress());
-        s_logger.info(session.getUri().toString());
 
-        String queries = session.getUri().getQuery();
+        String queries = Objects.requireNonNull(session.getUri()).getQuery();
         Map<String, String> queryMap = ConsoleProxyHttpHandlerHelper.getQueryMap(queries);
         String host = queryMap.get("host");
         String portStr = queryMap.get("port");
@@ -108,12 +106,10 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
                     new String[]{"<html><head></head><body>", "<div id=\"main_panel\" tabindex=\"1\">",
                             "<p>Access is denied for the console session check. Please close the window and retry again</p>", "</div></body></html>"};
 
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < content.length; i++)
-                sb.append(content[i]);
+            StringBuilder sb = new StringBuilder();
+            for (String aContent : content) sb.append(aContent);
 
             sendResponseString(session, sb.toString());
-            return;
         }
     }
 
@@ -130,28 +126,20 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
                 connectTo(
                         uri.getHost(), uri.getPort(),
                         uri.getPath() + "?" + uri.getQuery(),
-                        tunnelSession, "https".equalsIgnoreCase(uri.getScheme()),
-                        hostPassword);
+                        tunnelSession, "https".equalsIgnoreCase(uri.getScheme()));
             } else {
                 s_logger.info("Connect to VNC server directly. host: " + param.getClientHostAddress() + ", port: " + param.getClientHostPort());
                 vncSocket = new Socket(param.getClientHostAddress(), param.getClientHostPort());
                 doConnect(vncSocket);
             }
-        } catch (UnknownHostException e) {
-            s_logger.error("Unexpected exception", e);
-        } catch (IOException e) {
-            s_logger.error("Unexpected exception", e);
         } catch (Throwable e) {
             s_logger.error("Unexpected exception", e);
         }
     }
 
-    public void connectTo(String host, int port, String path, String session, boolean useSSL, String sid) throws UnknownHostException, IOException {
+    private void connectTo(String host, int port, String path, String session, boolean useSSL) throws IOException {
         if (port < 0) {
-            if (useSSL)
-                port = 443;
-            else
-                port = 80;
+            port = useSSL ? 443 : 80;
         }
 
         RawHTTP tunnel = new RawHTTP("CONNECT", host, port, path, session, useSSL);
@@ -200,12 +188,12 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
         shutdown();
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable throwable) throws Exception {
+    public void handleTransportError(WebSocketSession session, Throwable throwable) {
         s_logger.error("Error in WebSocket Connection : ", throwable);
     }
 
@@ -317,7 +305,7 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
                 if (byteBuffer.getPayloadLength() == 12) {
                     s_logger.debug("received noVNC handshakeServer");
                 }
-                sendResponseBytes(session, M_VNC_AUTH_TYE_NOAUTH, 2);
+                sendResponseBytes(session, M_VNC_AUTH_TYPE_NOAUTH, 2);
                 this.clientState = VncState.AUTH_TYPES_SENT;
                 break;
             }
@@ -453,16 +441,16 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
         return response;
     }
 
-    private void initialize() throws IOException {
-        s_logger.warn("asking for exclusive access");
-        os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
-        os.flush();
-
-        //   getting initializer parameter and sending them to server
-        byte[] b = new byte[1500];
-        int readBytes = -1;
-        vncSocket.setSoTimeout(0);
-        readBytes = is.read(b);
-        sendResponseBytes(session, b, readBytes);
-    }
+//    private void initialize() throws IOException {
+//        s_logger.warn("asking for exclusive access");
+//        os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
+//        os.flush();
+//
+//        //   getting initializer parameter and sending them to server
+//        byte[] b = new byte[1500];
+//        int readBytes = -1;
+//        vncSocket.setSoTimeout(0);
+//        readBytes = is.read(b);
+//        sendResponseBytes(session, b, readBytes);
+//    }
 }

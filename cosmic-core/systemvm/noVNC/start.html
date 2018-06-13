@@ -15,15 +15,7 @@
         http://example.com/#host=HOST&port=PORT&encrypt=1
     -->
     <title>noVNC</title>
-
-<<<<<<< HEAD
-<<<<<<< HEAD
     <base href="/resource/noVNC/">
-=======
->>>>>>> Use noVNC instead of the JPG tiles
-=======
-    <base href="/resource/noVNC/">
->>>>>>> Some fixes
     <meta charset="utf-8">
 
     <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
@@ -52,8 +44,8 @@
 
     <!-- Apple iOS Safari settings -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <!-- Home Screen Icons (favourites and bookmarks use the normal icons) -->
     <link rel="apple-touch-icon" sizes="60x60" type="image/png" href="app/images/icons/novnc-60x60.png">
     <link rel="apple-touch-icon" sizes="76x76" type="image/png" href="app/images/icons/novnc-76x76.png">
@@ -63,10 +55,10 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="app/styles/lite.css">
 
-     <!--
-    <script type='text/javascript'
-        src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
-    -->
+    <!--
+   <script type='text/javascript'
+       src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
+   -->
 
     <!-- promise polyfills promises for IE11 -->
     <script src="vendor/promise.js"></script>
@@ -75,7 +67,7 @@
         window._noVNC_has_module_support = true;
     </script>
     <script>
-        window.addEventListener("load", function() {
+        window.addEventListener("load", function () {
             if (window._noVNC_has_module_support) return;
             var loader = document.createElement("script");
             loader.src = "vendor/browser-es-module-loader/dist/browser-es-module-loader.js";
@@ -95,6 +87,7 @@
         function updateDesktopName(e) {
             desktopName = e.detail.name;
         }
+
         function credentials(e) {
             var html;
 
@@ -109,26 +102,32 @@
             document.getElementById('noVNC_status').appendChild(form);
             document.getElementById('noVNC_status').querySelector('label').textContent = 'Password Required: ';
         }
+
         function setPassword() {
-            rfb.sendCredentials({ password: document.getElementById('password_input').value });
+            rfb.sendCredentials({password: document.getElementById('password_input').value});
             return false;
         }
+
         function sendCtrlAltDel() {
             rfb.sendCtrlAltDel();
             return false;
         }
+
         function machineShutdown() {
             rfb.machineShutdown();
             return false;
         }
+
         function machineReboot() {
             rfb.machineReboot();
             return false;
         }
+
         function machineReset() {
             rfb.machineReset();
             return false;
         }
+
         function status(text, level) {
             switch (level) {
                 case 'normal':
@@ -145,7 +144,7 @@
         function connected(e) {
             document.getElementById('sendCtrlAltDelButton').disabled = false;
             if (WebUtil.getConfigVar('encrypt',
-                                     (window.location.protocol === "https:"))) {
+                (window.location.protocol === "https:"))) {
                 status("Connected (encrypted) to " + desktopName, "normal");
             } else {
                 status("Connected (unencrypted) to " + desktopName, "normal");
@@ -166,7 +165,7 @@
             var powerbuttons;
             powerbuttons = document.getElementById('noVNC_power_buttons');
             if (rfb.capabilities.power) {
-                powerbuttons.className= "noVNC_shown";
+                powerbuttons.className = "noVNC_shown";
             } else {
                 powerbuttons.className = "noVNC_hidden";
             }
@@ -186,10 +185,10 @@
         // if port == 80 (or 443) then it won't be present and should be
         // set manually
         if (!port) {
-            if (window.location.protocol.substring(0,5) == 'https') {
+            if (window.location.protocol.substring(0, 5) == 'https') {
                 port = 443;
             }
-            else if (window.location.protocol.substring(0,4) == 'http') {
+            else if (window.location.protocol.substring(0, 4) == 'http') {
                 port = 80;
             }
         }
@@ -207,7 +206,7 @@
             WebUtil.createCookie('token', token, 1)
         }
 
-        (function() {
+        (function () {
 
             status("Connecting", "normal");
 
@@ -218,26 +217,30 @@
             var url;
 
             if (WebUtil.getConfigVar('encrypt',
-                                     (window.location.protocol === "https:"))) {
+                (window.location.protocol === "https:"))) {
                 url = 'wss';
             } else {
                 url = 'ws';
             }
 
             url += '://' + host;
-            if(port) {
+            if (port) {
                 url += ':' + port;
             }
             url += '/' + path;
 
             rfb = new RFB(document.body, url,
-                          { repeaterID: WebUtil.getConfigVar('repeaterID', ''),
-                            shared: WebUtil.getConfigVar('shared', true),
-                            credentials: { password: password } });
+                {
+                    repeaterID: WebUtil.getConfigVar('repeaterID', ''),
+                    shared: WebUtil.getConfigVar('shared', true),
+                    credentials: {password: password}
+                });
             rfb.viewOnly = WebUtil.getConfigVar('view_only', false);
-            rfb.addEventListener("connect",  connected);
+            rfb.addEventListener("connect", connected);
             rfb.addEventListener("disconnect", disconnected);
-            rfb.addEventListener("capabilities", function () { updatePowerButtons(); });
+            rfb.addEventListener("capabilities", function () {
+                updatePowerButtons();
+            });
             rfb.addEventListener("credentialsrequired", credentials);
             rfb.addEventListener("desktopname", updateDesktopName);
             rfb.scaleViewport = WebUtil.getConfigVar('scale', false);
@@ -247,13 +250,13 @@
 </head>
 
 <body>
-  <div id="noVNC_status_bar">
+<div id="noVNC_status_bar">
     <div id="noVNC_left_dummy_elem"></div>
     <div id="noVNC_status">Loading</div>
     <div id="noVNC_buttons">
-      <input type=button value="Send CtrlAltDel"
-             id="sendCtrlAltDelButton" class="noVNC_shown">
-      <span id="noVNC_power_buttons" class="noVNC_hidden">
+        <input type=button value="Send CtrlAltDel"
+               id="sendCtrlAltDelButton" class="noVNC_shown">
+        <span id="noVNC_power_buttons" class="noVNC_hidden">
         <input type=button value="Shutdown"
                id="machineShutdownButton">
         <input type=button value="Reboot"
@@ -262,6 +265,6 @@
                id="machineResetButton">
       </span>
     </div>
-  </div>
+</div>
 </body>
 </html>
