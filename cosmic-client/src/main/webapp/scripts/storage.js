@@ -162,7 +162,7 @@
                                             required: true,
                                             number: true
                                         },
-                                        isHidden: true
+                                        isHidden: false
                                     },
 
                                     diskController: {
@@ -1500,8 +1500,6 @@
                                     preFilter: function (args) {
                                         if (args.context.volumes != null && args.context.volumes[0].type == 'ROOT') {
                                             args.$form.find('.form-item[rel=newdiskoffering]').hide();
-                                        } else {
-                                            args.$form.find('.form-item[rel=newsize]').hide();
                                         }
                                     },
                                     fields: {
@@ -1545,7 +1543,6 @@
                                                         return;
 
                                                     var $form = $(this).closest('form');
-
                                                     var $shrinkok = $form.find('.form-item[rel=shrinkok]');
                                                     //unit of args.context.volumes[0].size is "byte"
                                                     //unit of selectedDiskOfferingObj.disksize is "gigabyte" ("GB"), so transfer it into "byte" by multiply (1024 * 1024 * 1024)
@@ -1579,6 +1576,10 @@
                                             validation: {
                                                 required: true,
                                                 number: true
+                                            },
+                                            defaultValue: function (args) {
+                                                var _size = parseInt(args.volumes[0].size / (1024 * 1024 * 1024));
+                                                return _size < 1 ? 1 : _size;
                                             }
                                         },
                                         shrinkok: {

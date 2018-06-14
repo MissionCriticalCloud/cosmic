@@ -1266,7 +1266,14 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             newDiskOffering = this._diskOfferingDao.findById(cmd.getNewDiskOfferingId());
         }
 
-        /* Only works for KVM/XenServer/VMware (or "Any") for now, and volumes with 'None' since they're just allocated in DB */
+        if (newDiskOffering != null && !newDiskOffering.isCustomized()) {
+            throw new InvalidParameterValueException("The disk offering for volume " + volume.getName() + " can only be changed to an offering that supports a custom disk size.");
+        }
+
+        if (diskOffering.isCustomized() && newDiskOffering != null && !newDiskOffering.isCustomized()) {
+            throw new InvalidParameterValueException("Volume " + volume.getName() + " has a custom size disk offering. Cannot change the disk offering." +
+                    " Please change the size instead");
+        }
 
         final HypervisorType hypervisorType = this._volsDao.getHypervisorType(volume.getId());
 
