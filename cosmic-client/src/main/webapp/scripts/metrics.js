@@ -1008,6 +1008,20 @@
         title: 'label.metrics',
         listView: {
             id: 'primarystorages',
+            filters: {
+                all: {
+                    label: 'ui.listView.filters.all'
+                },
+                host: {
+                    label: 'label.host'
+                },
+                zone: {
+                    label: 'label.zone'
+                },
+                cluster: {
+                    label: 'label.cluster'
+                }
+            },
             fields: {
                 name: {
                     label: 'label.metrics.name'
@@ -1072,6 +1086,7 @@
             },
             dataProvider: function (args) {
                 var data = {};
+                var array = [];
                 listViewDataProvider(args, data);
 
                 if ("zones" in args.context && args.context.zones[0]) {
@@ -1090,8 +1105,19 @@
                     data[args.context.metricsFilterData.key] = args.context.metricsFilterData.value;
                 }
 
+                if ("primarystorages" in args.context) {
+                    switch (args.filterBy.kind) {
+                        case "all":
+                            array.push("&listAll=true");
+                            break;
+                        default:
+                            array.push("&listAll=true&scope="+args.filterBy.kind);
+                            break;
+                    }
+                }
+
                 $.ajax({
-                    url: createURL('listStoragePools'),
+                    url: createURL('listStoragePools' + array.join("")),
                     data: data,
                     success: function (json) {
                         var items = [];

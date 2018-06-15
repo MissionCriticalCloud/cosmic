@@ -1519,12 +1519,18 @@
                                                     success: function (json) {
                                                         diskofferingObjs = json.listdiskofferingsresponse.diskoffering;
                                                         var items = [];
+                                                        var current_offering = args.context.volumes[0].diskofferingid;
                                                         $(diskofferingObjs).each(function () {
                                                             items.push({
                                                                 id: this.id,
                                                                 description: this.displaytext
                                                             });
                                                         });
+                                                        //Hack to get current offering as default in selection
+                                                        var index = items.findIndex(function(args) {
+                                                            return args.id === current_offering;
+                                                        });
+                                                        items.splice(0,0,items.splice(index,1)[0]);
                                                         args.response.success({
                                                             data: items
                                                         });
