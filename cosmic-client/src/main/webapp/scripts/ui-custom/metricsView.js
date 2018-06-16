@@ -35,6 +35,7 @@
             } else if (args.resource == 'storagepool') {
                 metricsLabel = _l('label.primary.storage') + ' ' + metricsLabel;
                 metricsListView = cloudStack.sections.metrics.storagepool.listView;
+                metricsListView.filter = cloudStack.sections.metrics.storagepool.listView.filter;
 
             } else if (args.resource == 'vms') {
                 metricsLabel = _l('label.instances') + ' ' + metricsLabel;
