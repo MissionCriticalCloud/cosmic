@@ -91,6 +91,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -1188,6 +1189,13 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (diskstats == null) {
                 diskstats = new VmDiskStatisticsVO(vm.getAccountId(), vm.getDataCenterId(), vm.getId(), volumeToAttach.getId());
                 this._vmDiskStatsDao.persist(diskstats);
+            }
+
+            // Change MaintenancePolicy when adding disk with HOST scope
+            if (volumeToAttachStoragePool != null && ScopeType.HOST.equals(volumeToAttachStoragePool.getScope())) {
+                vm.setMaintenancePolicy(MaintenancePolicy.ShutdownAndStart);
+                s_logger.debug("Setting MaintenancePolicy to '" + MaintenancePolicy.ShutdownAndStart.toString() + "' for VM " + vm.getInstanceName());
+                _vmInstanceDao.persist(vm);
             }
 
             return this._volsDao.findById(volumeToAttach.getId());
