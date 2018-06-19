@@ -285,38 +285,38 @@ public class VolumeApiServiceImplTest {
     // Negative test - try to attach non-root non-datadisk volume
     @Test(expected = InvalidParameterValueException.class)
     public void attachIncorrectDiskType() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(1L, 5L, 0L, DiskControllerType.SCSI);
+        _svc.attachVolumeToVM(1L, 5L, 0L);
     }
 
     // Negative test - attach root volume to running vm
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskToRunningVm() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(1L, 6L, 0L, DiskControllerType.SCSI);
+        _svc.attachVolumeToVM(1L, 6L, 0L);
     }
 
     // Negative test - attach root volume from the managed data store
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskOfManagedDataStore() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(2L, 7L, 0L, DiskControllerType.SCSI);
+        _svc.attachVolumeToVM(2L, 7L, 0L);
     }
 
     // Negative test - root volume can't be attached to the vm already having a root volume attached
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootDiskToVmHavingRootDisk() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(4L, 6L, 0L, DiskControllerType.SCSI);
+        _svc.attachVolumeToVM(4L, 6L, 0L);
     }
 
     // Negative test - root volume in uploaded state can't be attached
     @Test(expected = InvalidParameterValueException.class)
     public void attachRootInUploadedState() throws NoSuchFieldException, IllegalAccessException {
-        _svc.attachVolumeToVM(2L, 8L, 0L, DiskControllerType.SCSI);
+        _svc.attachVolumeToVM(2L, 8L, 0L);
     }
 
     // Positive test - attach ROOT volume in correct state, to the vm not having root volume attached
     @Test
     public void attachRootVolumePositive() throws NoSuchFieldException, IllegalAccessException {
         thrown.expect(InvalidParameterValueException.class);
-        _svc.attachVolumeToVM(2L, 6L, 0L, DiskControllerType.SCSI);
+        _svc.attachVolumeToVM(2L, 6L, 0L);
     }
 
     // volume not Ready
@@ -381,7 +381,7 @@ public class VolumeApiServiceImplTest {
         final DataCenterVO zoneWithDisabledLocalStorage = Mockito.mock(DataCenterVO.class);
         when(_svc._dcDao.findById(anyLong())).thenReturn(zoneWithDisabledLocalStorage);
         try {
-            _svc.attachVolumeToVM(2L, 9L, null, DiskControllerType.SCSI);
+            _svc.attachVolumeToVM(2L, 9L, null);
         } catch (final InvalidParameterValueException e) {
             Assert.assertEquals(e.getMessage(), ("primary storage resource limit check failed"));
         }

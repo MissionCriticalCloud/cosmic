@@ -578,7 +578,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 // if VM Id is provided, attach the volume to the VM
                 if (cmd.getVirtualMachineId() != null) {
                     try {
-                        attachVolumeToVM(cmd.getVirtualMachineId(), volume.getId(), volume.getDeviceId(), diskController);
+                        attachVolumeToVM(cmd.getVirtualMachineId(), volume.getId(), volume.getDeviceId());
                     } catch (final Exception ex) {
                         final StringBuilder message = new StringBuilder("Volume: ");
                         message.append(volume.getUuid());
@@ -625,7 +625,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return this._volsDao.findById(createdVolume.getId());
     }
 
-    public Volume attachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId, final DiskControllerType diskController) {
+    public Volume attachVolumeToVM(final Long vmId, final Long volumeId, final Long deviceId) {
         final Account caller = CallContext.current().getCallingAccount();
 
         // Check that the volume ID is valid
@@ -745,12 +745,12 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             final VmWorkJobVO placeHolder;
             placeHolder = createPlaceHolderWork(vmId);
             try {
-                return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId, diskController);
+                return orchestrateAttachVolumeToVM(vmId, volumeId, deviceId, volumeToAttach.getDiskController());
             } finally {
                 this._workJobDao.expunge(placeHolder.getId());
             }
         } else {
-            final Outcome<Volume> outcome = attachVolumeToVmThroughJobQueue(vmId, volumeId, deviceId, diskController);
+            final Outcome<Volume> outcome = attachVolumeToVmThroughJobQueue(vmId, volumeId, deviceId, volumeToAttach.getDiskController());
 
             Volume vol = null;
             try {
@@ -1978,7 +1978,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_ATTACH, eventDescription = "attaching volume", async = true)
     public Volume attachVolumeToVM(final AttachVolumeCmd command) {
-        return attachVolumeToVM(command.getVirtualMachineId(), command.getId(), command.getDeviceId(), command.getDiskController());
+        return attachVolumeToVM(command.getVirtualMachineId(), command.getId(), command.getDeviceId());
     }
 
     @Override

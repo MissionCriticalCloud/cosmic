@@ -49,12 +49,6 @@ public class AttachVolumeCmd extends BaseAsyncCmd {
             required = true, description = "    the ID of the virtual machine")
     private Long virtualMachineId;
 
-    @Parameter(name = ApiConstants.DISK_CONTROLLER,
-            required = false,
-            type = CommandType.STRING,
-            description = "the disk controller to use. Either 'IDE', 'VIRTIO' or 'SCSI'")
-    private String diskController;
-
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -120,13 +114,5 @@ public class AttachVolumeCmd extends BaseAsyncCmd {
             return Account.ACCOUNT_ID_SYSTEM; // bad id given, parent this command to SYSTEM so ERROR events are tracked
         }
         return volume.getAccountId();
-    }
-
-    public DiskControllerType getDiskController() {
-        if (diskController != null) {
-            return DiskControllerType.valueOf(diskController);
-        } else {
-            return null;
-        }
     }
 }
