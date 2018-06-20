@@ -42,15 +42,23 @@ class Firewall:
             elif interface['metadata']['type'] == 'private':
                 self.add_private_vpc_rules(device, interface['ipv4_addresses'][0]['cidr'])
 
+        vpn_open = False
         if public_device is not None and 'vpn' in self.config.dbag_network_overview:
             if 'site2site' in self.config.dbag_network_overview['vpn']:
                 for site2site in self.config.dbag_network_overview['vpn']['site2site']:
                     self.add_site2site_vpn_rules(public_device, site2site)
+                    vpn_open = True
             if 'remote_access' in self.config.dbag_network_overview['vpn']:
                 if public_ip is not None:
                     self.add_remote_access_vpn_rules(
                         public_device, public_ip, self.config.dbag_network_overview['vpn']['remote_access']
                     )
+                vpn_open = True
+
+        # default block VPN ports
+        logging.info("VPN_open is %s and public_ip is %s" % (vpn_open, public_ip))
+        if not vpn_open and public_ip is not None:
+            self.block_vpn_rules(public_device, public_ip)
 
     def add_default_vpc_rules(self):
         logging.info("Configuring default VPC rules")
@@ -235,6 +243,8 @@ class Firewall:
             self.config.fw.append(["mangle", "",
                                    "-A INPUT -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (
                                    net, site2site['left_subnet'])])
+        # Block anything else
+        self.block_vpn_rules(device, site2site['left'])
 
     def add_remote_access_vpn_rules(self, device, publicip, remote_access):
         logging.info("Configuring RemoteAccess VPN rules")
@@ -242,11 +252,11 @@ class Firewall:
         localcidr = remote_access['local_cidr']
         local_ip = remote_access['local_ip']
 
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j ACCEPT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j ACCEPT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j ACCEPT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s -p ah -j ACCEPT" % device])
-        self.config.fw.append(["", "", "-A INPUT -i %s -p esp -j ACCEPT" % device])
+        self.config.fw.append(["", "", "-I INPUT -i %s --dst %s -p udp -m udp --dport 500 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(["", "", "-I INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(["", "", "-I INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j ACCEPT" % (device, publicip)])
+        self.config.fw.append(["", "", "-I INPUT -i %s -p ah -j ACCEPT" % device])
+        self.config.fw.append(["", "", "-I INPUT -i %s -p esp -j ACCEPT" % device])
         self.config.fw.append(["", "", " -N VPN_FORWARD"])
         self.config.fw.append(["", "", "-I FORWARD -i ppp+ -j VPN_FORWARD"])
         self.config.fw.append(["", "", "-I FORWARD -o ppp+ -j VPN_FORWARD"])
@@ -254,6 +264,17 @@ class Firewall:
         self.config.fw.append(["", "", "-A VPN_FORWARD -s  %s -j RETURN" % localcidr])
         self.config.fw.append(["", "", "-A VPN_FORWARD -i ppp+ -d %s -j RETURN" % localcidr])
         self.config.fw.append(["", "", "-A VPN_FORWARD -i ppp+  -o ppp+ -j RETURN"])
-        self.config.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
-        self.config.fw.append(["", "", "-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
+        self.config.fw.append(["", "", "-I INPUT -i ppp+ -m udp -p udp --dport 53 -j ACCEPT"])
+        self.config.fw.append(["", "", "-I INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
         self.config.fw.append(["nat", "front", "-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
+
+    def block_vpn_rules(self, device, publicip):
+        logging.info("Dropping VPN rules")
+
+        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j REJECT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j REJECT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j REJECT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p ah -j REJECT" % device])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p esp -j REJECT" % device])
+        self.config.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j REJECT"])
+        self.config.fw.append(["", "", "-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j REJECT"])
