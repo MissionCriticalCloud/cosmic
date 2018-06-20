@@ -2013,47 +2013,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     }
 
     public String rebootVm(final Connect conn, final String vmName) {
-        Domain dm = null;
-        String msg = null;
-        try {
-            dm = conn.domainLookupByName(vmName);
-            // Get XML Dump including the secure information such as VNC password
-            // By passing 1, or VIR_DOMAIN_XML_SECURE flag
-            // https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainXMLFlags
-            String vmDef = dm.getXMLDesc(1);
-            final LibvirtDomainXmlParser parser = new LibvirtDomainXmlParser();
-            parser.parseDomainXml(vmDef);
-            for (final InterfaceDef nic : parser.getInterfaces()) {
-                if (nic.getNetType() == GuestNetType.BRIDGE && nic.getBrName().startsWith("cloudVirBr")) {
-                    try {
-                        final int vnetId = Integer.parseInt(nic.getBrName().replaceFirst("cloudVirBr", ""));
-                        final String pifName = getPif(getGuestBridgeName());
-                        final String newBrName = "br" + pifName + "-" + vnetId;
-                        vmDef = vmDef.replaceAll("'" + nic.getBrName() + "'", "'" + newBrName + "'");
-                        logger.debug("VM bridge name is changed from " + nic.getBrName() + " to " + newBrName);
-                    } catch (final NumberFormatException e) {
-                        continue;
-                    }
-                }
-            }
-            logger.debug(vmDef);
-            msg = stopVm(conn, vmName, false);
-            msg = startVm(conn, vmName, vmDef);
-            return null;
-        } catch (final LibvirtException | InternalErrorException e) {
-            logger.warn("Failed to create vm", e);
-            msg = e.getMessage();
-        } finally {
-            try {
-                if (dm != null) {
-                    dm.free();
-                }
-            } catch (final LibvirtException e) {
-                logger.trace("Ignoring libvirt error.", e);
-            }
-        }
-
-        return msg;
+        // On reboot just stop the VM. The event handler will start it later
+        return stopVm(conn, vmName, false);
     }
 
     public String stopVm(final Connect conn, final String vmName, final boolean forceStop) {
