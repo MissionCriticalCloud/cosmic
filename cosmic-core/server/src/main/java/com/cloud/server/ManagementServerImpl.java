@@ -2777,7 +2777,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         final List<VolumeVO> volumes = _volumeDao.findCreatedByInstance(vmProfile.getId());
         boolean usesLocal = false;
         for (final VolumeVO volume : volumes) {
-            final DiskOfferingVO diskOffering = _diskOfferingDao.findById(volume.getDiskOfferingId());
+            final DiskOfferingVO diskOffering = _diskOfferingDao.findByIdIncludingRemoved(volume.getDiskOfferingId());
             final DiskProfile diskProfile = new DiskProfile(volume, diskOffering, vmProfile.getHypervisorType());
             if (diskProfile.useLocalStorage()) {
                 usesLocal = true;
