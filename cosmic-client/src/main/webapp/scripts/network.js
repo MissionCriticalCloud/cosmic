@@ -510,7 +510,6 @@
                                         },
 
                                         select: function (args) {
-                                            var data = {};
                                             $.ajax({
                                                 url: createURL('listVPCOfferings'),
                                                 data: {},
@@ -520,10 +519,10 @@
                                                         return offering.state == 'Enabled';
                                                     });
                                                     args.response.success({
-                                                        data: $.map(filteredofferings, function (vpco) {
+                                                        data: $.map(filteredofferings, function (offering) {
                                                             return {
-                                                                id: vpco.id,
-                                                                description: vpco.name
+                                                                id: offering.id,
+                                                                description: offering.displaytext
                                                             };
                                                         })
                                                     });
@@ -837,11 +836,14 @@
                                                 dataType: "json",
                                                 async: false,
                                                 success: function (json) {
-                                                    var vpcOfferingObjs = json.listvpcofferingsresponse.vpcoffering;
-                                                    $(vpcOfferingObjs).each(function () {
+                                                    var offerings = json.listvpcofferingsresponse.vpcoffering;
+                                                    var filteredofferings = $.grep(offerings, function (offering) {
+                                                        return offering.state == 'Enabled';
+                                                    });
+                                                    $(filteredofferings).each(function (offering) {
                                                         items.push({
-                                                            id: this.id,
-                                                            description: this.displaytext
+                                                            id: offering.id,
+                                                            description: offering.displaytext
                                                         });
                                                     });
                                                 }
@@ -850,7 +852,7 @@
                                             //include currently selected vpc offering to dropdown
                                             items.push({
                                                 id: args.context.vpc[0].vpcofferingid,
-                                                description: args.context.vpc[0].vpcofferingdisplaytext + " (Current offering)"
+                                                description: args.context.vpc[0].vpcoffering + " (Current offering)"
                                             });
 
                                             args.response.success({
