@@ -17,6 +17,7 @@ public class ApiConstants {
     public static final String BOOTABLE = "bootable";
     public static final String BIND_DN = "binddn";
     public static final String BIND_PASSWORD = "bindpass";
+    public static final String BOOT_MENU_TIMEOUT = "bootmenutimeout";
     public static final String BYTES_READ_RATE = "bytesreadrate";
     public static final String BYTES_WRITE_RATE = "byteswriterate";
     public static final String CATEGORY = "category";

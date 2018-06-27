@@ -84,6 +84,8 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     protected Boolean requiresRestart;
     @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
     private String maintenancePolicy;
+    @Parameter(name = ApiConstants.BOOT_MENU_TIMEOUT, type = CommandType.LONG, description = "Timeout (in ms) to for the boot menu")
+    private Long bootMenuTimeout;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -203,5 +205,9 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
 
     public String getManufacturerString() {
         return manufacturerString;
+    }
+
+    public Long getBootMenuTimeout() {
+        return bootMenuTimeout;
     }
 }

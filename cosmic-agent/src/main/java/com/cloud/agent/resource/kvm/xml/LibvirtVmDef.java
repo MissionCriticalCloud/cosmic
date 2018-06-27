@@ -100,6 +100,7 @@ public class LibvirtVmDef {
         private String uuid;
         private String machine;
         private String manufacturer;
+        private Long bootMenuTimeout = 0L;
 
         public GuestType getGuestType() {
             return this.type;
@@ -140,6 +141,10 @@ public class LibvirtVmDef {
             this.manufacturer = manufacturer;
         }
 
+        public void setBootMenuTimeout(final Long bootMenuTimeout) {
+            this.bootMenuTimeout = bootMenuTimeout;
+        }
+
         @Override
         public String toString() {
             if (this.type == GuestType.KVM) {
@@ -170,6 +175,13 @@ public class LibvirtVmDef {
                     }
                 }
                 guestDef.append("<smbios mode='sysinfo'/>\n");
+
+                if (this.bootMenuTimeout != null) {
+                    if (this.bootMenuTimeout > 0) {
+                        guestDef.append("<bootmenu enable='yes' timeout='" + this.bootMenuTimeout + "'/>\n");
+                    }
+                }
+
                 guestDef.append("</os>\n");
                 return guestDef.toString();
             } else {

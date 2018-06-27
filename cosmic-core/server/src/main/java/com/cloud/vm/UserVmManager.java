@@ -81,6 +81,6 @@ public interface UserVmManager extends UserVmService {
 
     UserVm updateVirtualMachine(long id, String displayName, String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                 Boolean isDynamicallyScalable, HTTPMethod httpMethod, String customId, String hostName, String instanceName, String manufacturerString,
-                                OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy
+                                OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy, Long bootMenuTimeout
     ) throws ResourceUnavailableException, InsufficientCapacityException;
 }

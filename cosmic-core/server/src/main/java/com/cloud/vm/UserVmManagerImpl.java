@@ -998,7 +998,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     @Override
     public UserVm updateVirtualMachine(final long id, String displayName, final String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                        Boolean isDynamicallyScalable, final HTTPMethod httpMethod, final String customId, String hostName, final String instanceName,
-                                       final String manufacturerString, final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy
+                                       final String manufacturerString, final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy,
+                                       final Long bootMenuTimeout
     ) throws ResourceUnavailableException, InsufficientCapacityException {
 
         final UserVmVO vm = _vmDao.findById(id);
@@ -1092,7 +1093,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName, manufacturerString, optimiseFor,
-                requiresRestart, maintenancePolicy);
+                requiresRestart, maintenancePolicy, bootMenuTimeout);
 
         if (updateUserdata) {
             final boolean result = updateUserDataInternal(_vmDao.findById(id));
@@ -1645,6 +1646,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final String manufacturerString = cmd.getManufacturerString();
         final Boolean requiresRestart = cmd.getRequiresRestart();
         final MaintenancePolicy maintenancePolicy = cmd.getMaintenancePolicy();
+        final Long bootMenuTimeout = cmd.getBootMenuTimeout();
 
         // Input validation and permission checks
         final UserVmVO vmInstance = _vmDao.findById(id);
@@ -1691,7 +1693,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, osTypeId, userData, isDynamicallyScalable, cmd.getHttpMethod(), cmd.getCustomId(), hostName,
-                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart, maintenancePolicy);
+                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart, maintenancePolicy, bootMenuTimeout);
     }
 
     @Override
@@ -2223,7 +2225,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                                final HypervisorType hypervisor, final HTTPMethod httpmethod, final String userData, final String sshKeyPair,
                                                final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps, final Boolean displayvm, final String keyboard,
                                                final List<Long> affinityGroupIdList, final Map<String, String> customParametrs, final String customId,
-                                               final DiskControllerType diskControllerType)
+                                               final DiskControllerType diskControllerType, final Long bootMenuTimeout)
             throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException {
 
         final Account caller = CallContext.current().getCallingAccount();
@@ -2273,7 +2275,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, group, httpmethod, userData, sshKeyPair,
-                hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId, diskControllerType);
+                hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId, diskControllerType, bootMenuTimeout);
     }
 
     private void checkHypervisorEnabled(final Zone zone, final VirtualMachineTemplate template) {
@@ -3863,7 +3865,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                         final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final String group, final HTTPMethod httpmethod, final String userData,
                                         final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps,
                                         final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId,
-                                        final DiskControllerType diskControllerType)
+                                        final DiskControllerType diskControllerType, final Long bootMenuTimeout)
             throws InsufficientCapacityException, ResourceUnavailableException, ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
 
         _accountMgr.checkAccess(caller, null, true, owner);
@@ -4164,7 +4166,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, userData, caller, isDisplayVm, keyboard, accountId, userId,
                 offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType, manufacturerString, optimiseFor,
-                macLarning, cpuFlags, maintenancePolicy);
+                macLarning, cpuFlags, maintenancePolicy, bootMenuTimeout);
 
         // Assign instance to the group
         try {
@@ -4196,14 +4198,14 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                   final LinkedHashMap<String, NicProfile> networkNicMap, final long id, final String instanceName, final String uuidName,
                                   final HypervisorType hypervisorType, final Map<String, String> customParameters, final DiskControllerType diskControllerType,
                                   final String manufacturerString, final OptimiseFor optimiseFor, final Boolean macLearning, final String cpuFlags,
-                                  final MaintenancePolicy maintenancePolicy)
+                                  final MaintenancePolicy maintenancePolicy, final Long bootMenuTimeout)
             throws InsufficientCapacityException {
         return Transaction.execute(new TransactionCallbackWithException<UserVmVO, InsufficientCapacityException>() {
             @Override
             public UserVmVO doInTransaction(final TransactionStatus status) throws InsufficientCapacityException {
                 final UserVmVO vm = new UserVmVO(id, instanceName, displayName, template.getId(), hypervisorType, template.getGuestOSId(),
                         offering.getOfferHA(), offering.getLimitCpuUse(), owner.getDomainId(), owner.getId(), userId, offering.getId(),
-                        userData, hostName, diskOfferingId, manufacturerString, optimiseFor, macLearning, cpuFlags, maintenancePolicy);
+                        userData, hostName, diskOfferingId, manufacturerString, optimiseFor, macLearning, cpuFlags, maintenancePolicy, bootMenuTimeout);
                 vm.setUuid(uuidName);
                 vm.setDynamicallyScalable(template.isDynamicallyScalable());
 

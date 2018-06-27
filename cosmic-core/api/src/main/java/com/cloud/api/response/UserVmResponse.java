@@ -220,6 +220,10 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @Param(description = "Maintenance Policy of the VM")
     private MaintenancePolicy maintenancePolicy;
 
+    @SerializedName(ApiConstants.BOOT_MENU_TIMEOUT)
+    @Param(description = "Timeout of the boot menu (in ms)")
+    private Long bootMenuTimeout;
+
     public UserVmResponse() {
         nics = new LinkedHashSet<>();
         tags = new LinkedHashSet<>();
@@ -751,5 +755,13 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public Long getBootMenuTimeout() {
+        return bootMenuTimeout;
+    }
+
+    public void setBootMenuTimeout(final Long bootMenuTimeout) {
+        this.bootMenuTimeout = bootMenuTimeout;
     }
 }

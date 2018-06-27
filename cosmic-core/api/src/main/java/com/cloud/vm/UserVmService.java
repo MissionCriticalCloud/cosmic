@@ -159,7 +159,7 @@ public interface UserVmService {
     UserVm createAdvancedVirtualMachine(Zone zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> networkIdList, Account owner,
                                         String hostName, String displayName, Long diskOfferingId, Long diskSize, String group, HypervisorType hypervisor, HTTPMethod httpmethod,
                                         String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps, Boolean displayVm, String keyboard, List<Long>
-                                                affinityGroupIdList, Map<String, String> customParameters, String customId, DiskControllerType diskControllerType)
+                                        affinityGroupIdList, Map<String, String> customParameters, String customId, DiskControllerType diskControllerType, Long bootMenuTimeout)
             throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, ResourceAllocationException;
 
     /**

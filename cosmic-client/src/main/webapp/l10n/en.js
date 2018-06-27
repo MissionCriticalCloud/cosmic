@@ -28,6 +28,7 @@ var dictionary = {
     "image.directory": "Image Directory",
     "inline": "Inline",
     "instances.actions.reboot.label": "Reboot instance",
+    "label.boot.menu.timeout": "Boot menu timeout (ms)",
     "label.CIDR.list": "CIDR list",
     "label.CIDR.of.destination.network": "CIDR of destination network",
     "label.CPU.cap": "CPU Cap",

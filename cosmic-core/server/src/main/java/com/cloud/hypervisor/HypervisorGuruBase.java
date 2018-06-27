@@ -114,6 +114,7 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         to.setManufacturer(vmInstance.getManufacturerString());
         to.setOptimiseFor(vmInstance.getOptimiseFor());
         to.setMaintenancePolicy(vmInstance.getMaintenancePolicy());
+        to.setBootMenuTimeout(vmInstance.getBootMenuTimeout());
         to.setVmData(vmProfile.getVmData());
         to.setConfigDriveLabel(vmProfile.getConfigDriveLabel());
         to.setConfigDriveIsoRootFolder(vmProfile.getConfigDriveIsoRootFolder());

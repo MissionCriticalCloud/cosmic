@@ -1296,6 +1296,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         guest.setMachineType("pc");
         guest.setUuid(uuid);
         guest.setManufacturer(vmTo.getManufacturer());
+        guest.setBootMenuTimeout(vmTo.getBootMenuTimeout());
         guest.setBootOrder(GuestDef.BootOrder.CDROM);
         guest.setBootOrder(GuestDef.BootOrder.HARDISK);
 
