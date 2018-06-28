@@ -369,34 +369,16 @@ public class ParamProcessWorker implements DispatchWorker {
             return -1L;
         }
         Long internalId = null;
-        // If annotation's empty, the cmd existed before 3.x try conversion to long
-        final boolean isPre3x = annotation.since().isEmpty();
         // Match against Java's UUID regex to check if input is uuid string
         final boolean isUuid = uuid.matches("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
-        // Enforce that it's uuid for newly added apis from version 3.x
-        if (!isPre3x && !isUuid) {
-            return null;
+        // Enforce that it's uuid
+        if (!isUuid) {
+            throw new InvalidParameterValueException("Invalid parameter value: Not a uuid: " + uuid);
         }
 
         // There may be multiple entities defined on the @EntityReference of a Response.class
         // UUID CommandType would expect only one entityType, so use the first entityType
         final Class<?>[] entities = annotation.entityType()[0].getAnnotation(EntityReference.class).value();
-
-        // Allow both uuid and internal id for pre3x apis
-        if (isPre3x && !isUuid) {
-            try {
-                internalId = Long.parseLong(uuid);
-            } catch (final NumberFormatException e) {
-                internalId = null;
-            }
-            if (internalId != null) {
-                // Populate CallContext for each of the entity.
-                for (final Class<?> entity : entities) {
-                    CallContext.current().putContextParameter(entity, internalId);
-                }
-                return internalId;
-            }
-        }
 
         // Go through each entity which is an interface to a VO class and get a VO object
         // Try to getId() for the object using reflection, break on first non-null value

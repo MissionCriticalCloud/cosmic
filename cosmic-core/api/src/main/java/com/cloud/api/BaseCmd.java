@@ -12,6 +12,7 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.Displayable;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
@@ -351,8 +352,7 @@ public abstract class BaseCmd {
         // entityId can be internal db id or UUID so accordingly call findbyId or findByUUID
 
         if (entityId instanceof Long) {
-            // Its internal db id - use findById
-            return _entityMgr.findById(entityType, (Long) entityId);
+            throw new InvalidParameterValueException("We do not support integer resource IDs any more. Please use UUID instead.");
         } else if (entityId instanceof String) {
             try {
                 // In case its an async job the internal db id would be a string because of json deserialization

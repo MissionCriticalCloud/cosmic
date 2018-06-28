@@ -8,6 +8,7 @@ import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.framework.events.EventBus;
 import com.cloud.framework.events.EventBusException;
 import com.cloud.legacymodel.Identity;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.projects.Project;
@@ -171,9 +172,7 @@ public class ActionEventUtils {
         // entityId can be internal db id or UUID so accordingly call findbyId or return uuid directly
 
         if (entityId instanceof Long) {
-            // Its internal db id - use findById
-            final Object objVO = s_entityMgr.findById(entityType, (Long) entityId);
-            return ((Identity) objVO).getUuid();
+            throw new InvalidParameterValueException("We do not support integer resource IDs any more. Please use UUID instead.");
         } else if (entityId instanceof String) {
             try {
                 // In case its an async job the internal db id would be a string because of json deserialization
