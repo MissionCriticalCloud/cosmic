@@ -1372,6 +1372,20 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             }
 
             hyperType = this._volumeDao.getHypervisorType(volumeId);
+
+            // Try to find a better one than None
+            if (hyperType == HypervisorType.None) {
+                try {
+                    final String hypers = _configDao.getValue(Config.HypervisorList.key());
+                    final String[] hypervisors = hypers.split(",");
+                    final String defaultHyper = hypervisors[0];
+                    hyperType = HypervisorType.valueOf(defaultHyper);
+                } catch (IllegalArgumentException e) {
+                    s_logger.debug("Unable to get hypervisor from global settings");
+                    hyperType = HypervisorType.None;
+                }
+            }
+
         } else { // create template from snapshot
             snapshot = this._snapshotDao.findById(snapshotId);
             if (snapshot == null) {
