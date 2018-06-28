@@ -39,7 +39,9 @@ public interface UserVmDao extends GenericDao<UserVmVO, Long> {
      * @param instanceName
      */
     void updateVM(long id, String displayName, boolean enable, Long osTypeId, String userData, boolean displayVm, boolean isDynamicallyScalable, String customId,
-                  String hostName, String instanceName, String manufacturerString, OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy);
+                  String hostName, String instanceName, String manufacturerString, OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy,
+                  Long bootMenuTimeout
+                  );
 
     List<UserVmVO> findDestroyedVms(Date date);
 

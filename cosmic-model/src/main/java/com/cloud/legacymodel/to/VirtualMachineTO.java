@@ -42,6 +42,7 @@ public class VirtualMachineTO {
     private String manufacturerString;
     private OptimiseFor optimiseFor;
     private MaintenancePolicy maintenancePolicy;
+    private Long bootMenuTimeout;
 
     public VirtualMachineTO(final long id, final String instanceName, final VirtualMachineType type, final int cpus, final long minRam, final long maxRam,
                             final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
@@ -318,5 +319,13 @@ public class VirtualMachineTO {
 
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public Long getBootMenuTimeout() {
+        return bootMenuTimeout;
+    }
+
+    public void setBootMenuTimeout(final Long bootMenuTimeout) {
+        this.bootMenuTimeout = bootMenuTimeout;
     }
 }

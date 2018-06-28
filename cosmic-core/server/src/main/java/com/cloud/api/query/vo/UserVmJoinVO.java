@@ -271,6 +271,8 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private Boolean requiresRestart;
     @Column(name = "maintenance_policy")
     private MaintenancePolicy maintenancePolicy;
+    @Column(name = "boot_menu_timeout")
+    private Long bootMenuTimeout;
 
     public UserVmJoinVO() {
     }
@@ -1214,5 +1216,13 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public Long getBootMenuTimeout() {
+        return bootMenuTimeout;
+    }
+
+    public void setBootMenuTimeout(final Long bootMenuTimeout) {
+        this.bootMenuTimeout = bootMenuTimeout;
     }
 }

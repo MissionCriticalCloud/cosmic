@@ -1044,7 +1044,8 @@
                                 id: args.context.instances[0].id,
                                 group: args.data.group,
                                 isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
-                                optimisefor: args.data.optimisefor
+                                optimisefor: args.data.optimisefor,
+                                bootmenutimeout: args.data.bootmenutimeout
                             };
                             if (args.data.displayname != args.context.instances[0].displayname) {
                                 $.extend(data, {
@@ -2112,6 +2113,10 @@
                                         data: items
                                     });
                                 }
+                            },
+                            bootmenutimeout: {
+                                label: 'label.boot.menu.timeout',
+                                isEditable: true
                             },
                             rootdevicecontroller: {
                                 label: 'label.root.disk.controller'

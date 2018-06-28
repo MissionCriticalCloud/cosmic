@@ -164,6 +164,8 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     private boolean limitCpuUse;
     @Column(name = "maintenance_policy", updatable = true, nullable = true)
     protected MaintenancePolicy maintenancePolicy;
+    @Column(name = "boot_menu_timeout", updatable = true, nullable = true)
+    protected Long bootMenuTimeout;
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId,
                         final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
@@ -597,5 +599,13 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
 
+    }
+
+    public Long getBootMenuTimeout() {
+        return bootMenuTimeout;
+    }
+
+    public void setBootMenuTimeout(final Long bootMenuTimeout) {
+        this.bootMenuTimeout = bootMenuTimeout;
     }
 }

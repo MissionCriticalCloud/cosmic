@@ -144,8 +144,7 @@ public class VolumeApiServiceImplTest {
                     null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(1L)).thenReturn(volumeOfRunningVm);
 
-            final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
-                    false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate);
+            final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L);
             runningVm.setState(State.Running);
             runningVm.setDataCenterId(1L);
             when(_svc._userVmDao.findById(1L)).thenReturn(runningVm);
@@ -156,8 +155,7 @@ public class VolumeApiServiceImplTest {
             volumeOfStoppedVm.setPoolId(1L);
             when(_svc._volsDao.findById(2L)).thenReturn(volumeOfStoppedVm);
 
-            final UserVmVO stoppedVm = new UserVmVO(2L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
-                    false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate);
+            final UserVmVO stoppedVm = new UserVmVO(2L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L);
             stoppedVm.setState(State.Stopped);
             stoppedVm.setDataCenterId(1L);
             when(_svc._userVmDao.findById(2L)).thenReturn(stoppedVm);
@@ -208,8 +206,7 @@ public class VolumeApiServiceImplTest {
             when(_svc._volsDao.findById(7L)).thenReturn(managedVolume1);
 
             // vm having root volume
-            final UserVmVO vmHavingRootVolume = new UserVmVO(4L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
-                    false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate);
+            final UserVmVO vmHavingRootVolume = new UserVmVO(4L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false, false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L);
             vmHavingRootVolume.setState(State.Stopped);
             vmHavingRootVolume.setDataCenterId(1L);
             when(_svc._userVmDao.findById(4L)).thenReturn(vmHavingRootVolume);

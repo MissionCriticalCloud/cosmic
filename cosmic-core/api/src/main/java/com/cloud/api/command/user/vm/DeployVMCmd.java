@@ -192,6 +192,9 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             since = "4.4", authorized = {RoleType.Admin})
     private String deploymentPlanner;
 
+    @Parameter(name = ApiConstants.BOOT_MENU_TIMEOUT, type = CommandType.LONG, description = "Timeout (in ms) to for the boot menu")
+    private Long bootMenuTimeout;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -397,6 +400,13 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         }
     }
 
+    public Long getBootMenuTimeout() {
+        if (bootMenuTimeout != null) {
+            return bootMenuTimeout;
+        }
+        return 0L;
+    }
+
     @Override
     public String getEventType() {
         return EventTypes.EVENT_VM_CREATE;
@@ -571,7 +581,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             final IpAddresses addrs = new IpAddresses(ipAddress, ip6Address, getMacAddress());
             final UserVm vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
                     getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
-                    getCustomId(), getDiskController());
+                    getCustomId(), getDiskController(), getBootMenuTimeout());
 
             if (vm != null) {
                 setEntityId(vm.getId());
