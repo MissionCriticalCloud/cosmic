@@ -33,7 +33,7 @@ public class ConsoleProxyHttpHandlerHelper {
         // This is a ugly solution for now. We will do encryption/decryption translation
         // here to make it transparent to rest of the code.
         if (map.get("token") != null) {
-            final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(ConsoleProxy.getEncryptorPassword());
+            final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(ConsoleProxy.getEncryptorPassword(), ConsoleProxy.getAuthenticationKey());
 
             final ConsoleProxyClientParam param = encryptor.decryptObject(ConsoleProxyClientParam.class, map.get("token"));
 

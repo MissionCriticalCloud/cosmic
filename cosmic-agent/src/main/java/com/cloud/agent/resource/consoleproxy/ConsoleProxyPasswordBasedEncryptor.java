@@ -1,20 +1,16 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
 
 /**
  * @author Kelven Yang
@@ -29,9 +25,13 @@ public class ConsoleProxyPasswordBasedEncryptor {
     // key/IV will be set in 128 bit strength
     private final KeyIVPair keyIvPair;
 
-    public ConsoleProxyPasswordBasedEncryptor(final String password) {
+    // Authentication key
+    private final byte[] authenticationKey;
+
+    public ConsoleProxyPasswordBasedEncryptor(final String password, final String authkey) {
         this.gson = new GsonBuilder().create();
         this.keyIvPair = this.gson.fromJson(password, KeyIVPair.class);
+        this.authenticationKey = Base64.decodeBase64(authkey);
     }
 
     public <T> String encryptObject(final Class<?> clz, final T obj) {
@@ -55,23 +55,12 @@ public class ConsoleProxyPasswordBasedEncryptor {
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(this.keyIvPair.getIvBytes()));
 
             final byte[] encryptedBytes = cipher.doFinal(text.getBytes());
-            return Base64.encodeBase64URLSafeString(encryptedBytes);
-        } catch (final NoSuchAlgorithmException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final NoSuchPaddingException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final IllegalBlockSizeException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final BadPaddingException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final InvalidKeyException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final InvalidAlgorithmParameterException e) {
+
+            final byte[] ivcipher = concat(this.keyIvPair.getIvBytes(), encryptedBytes);
+            final byte[] hmac = generateHMAC(this.authenticationKey, ivcipher);
+
+            return Base64.encodeBase64URLSafeString(concat(ivcipher, hmac));
+        } catch (Exception e) {
             s_logger.error("Unexpected exception ", e);
             return null;
         }
@@ -92,34 +81,51 @@ public class ConsoleProxyPasswordBasedEncryptor {
         }
 
         try {
+            final byte[] encryptedBytes = Base64.decodeBase64(encryptedText);
+            byte[] iv = Arrays.copyOf(encryptedBytes, this.keyIvPair.getIvSize());
+            int maclength = hmacLength(this.authenticationKey);
+            byte[] hmac1 = Arrays.copyOfRange(encryptedBytes, encryptedBytes.length - maclength, encryptedBytes.length);
+            byte[] ciphertext = Arrays.copyOfRange(encryptedBytes, this.keyIvPair.getIvSize(), encryptedBytes.length - maclength);
+            byte[] data = concat(iv, ciphertext);
+            byte[] hmac2 = generateHMAC(this.authenticationKey, data);
+            if (!Arrays.equals(hmac1, hmac2)) {
+                s_logger.error("Incorrect HMAC");
+                return null;
+            }
+
             final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             final SecretKeySpec keySpec = new SecretKeySpec(this.keyIvPair.getKeyBytes(), "AES");
             cipher.init(Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(this.keyIvPair.getIvBytes()));
 
-            final byte[] encryptedBytes = Base64.decodeBase64(encryptedText);
-            return new String(cipher.doFinal(encryptedBytes));
-        } catch (final NoSuchAlgorithmException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final NoSuchPaddingException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final IllegalBlockSizeException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final BadPaddingException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final InvalidKeyException e) {
-            s_logger.error("Unexpected exception ", e);
-            return null;
-        } catch (final InvalidAlgorithmParameterException e) {
+            return new String(cipher.doFinal(ciphertext));
+        } catch (Exception e) {
             s_logger.error("Unexpected exception ", e);
             return null;
         }
     }
 
+    private byte[] generateHMAC(byte[] skey, byte[] data) throws Exception {
+        SecretKeySpec key = new SecretKeySpec(skey, "HmacSHA256");
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        sha256_HMAC.init(key);
+        return sha256_HMAC.doFinal(data);
+    }
+
+    private int hmacLength(byte[] skey) throws Exception {
+        SecretKeySpec key = new SecretKeySpec(skey, "HmacSHA256");
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        sha256_HMAC.init(key);
+        return sha256_HMAC.getMacLength();
+    }
+
+    private byte[] concat(byte[] first, byte[] second) {
+        byte[] result = Arrays.copyOf(first, first.length + second.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
+    }
+
     public static class KeyIVPair {
+        private int IV_SIZE = 16;
         String base64EncodedKeyBytes;
         String base64EncodedIvBytes;
 
@@ -145,6 +151,10 @@ public class ConsoleProxyPasswordBasedEncryptor {
 
         public void setIvBytes(final byte[] ivBytes) {
             this.base64EncodedIvBytes = Base64.encodeBase64URLSafeString(ivBytes);
+        }
+
+        public int getIvSize() {
+            return IV_SIZE;
         }
     }
 }

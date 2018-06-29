@@ -26,16 +26,15 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.servlet.ConsoleProxyPasswordBasedEncryptor;
 import com.cloud.servlet.ConsoleProxyServlet;
 import com.cloud.vm.dao.VMInstanceDao;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Date;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Date;
 
 /**
  * Utility class to manage interactions with agent-based console access
@@ -204,7 +203,7 @@ public abstract class AgentHookBase implements AgentHook {
                 //ks manager raises exception if ksBits are null, hence no need to explicltly handle the condition
             }
 
-            cmd = new StartConsoleProxyAgentHttpHandlerCommand(ksBits, storePassword);
+            cmd = new StartConsoleProxyAgentHttpHandlerCommand(ksBits, storePassword, _keysMgr.getAuthenticationKey());
             cmd.setEncryptorPassword(getEncryptorPassword());
 
             final HostVO consoleProxyHost = findConsoleProxyHost(startupCmd);

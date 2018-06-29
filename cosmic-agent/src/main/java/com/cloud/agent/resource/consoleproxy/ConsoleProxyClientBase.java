@@ -419,7 +419,7 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
 
     public void setClientParam(final ConsoleProxyClientParam clientParam) {
         this.clientParam = clientParam;
-        final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(ConsoleProxy.getEncryptorPassword());
+        final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(ConsoleProxy.getEncryptorPassword(), ConsoleProxy.getAuthenticationKey());
         this.clientToken = encryptor.encryptObject(ConsoleProxyClientParam.class, clientParam);
     }
 }

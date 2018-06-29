@@ -1,6 +1,11 @@
 package com.cloud.agent.resource.consoleproxy;
 
 import com.cloud.utils.PropertiesUtil;
+import com.google.gson.Gson;
+import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,12 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import com.google.gson.Gson;
-import com.sun.net.httpserver.HttpServer;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * ConsoleProxy, singleton class that manages overall activities in console proxy process. To make legacy code work, we still
  */
@@ -37,6 +36,7 @@ public class ConsoleProxy {
     // dynamically changing to customer supplied certificate)
     public static byte[] ksBits;
     public static String ksPassword;
+    public static String ksAuthenticationKey;
 
     public static Method authMethod;
     public static Method reportMethod;
@@ -82,7 +82,7 @@ public class ConsoleProxy {
         }
     }
 
-    public static void startWithContext(final Properties conf, final Object context, final byte[] ksBits, final String ksPassword) {
+    public static void startWithContext(final Properties conf, final Object context, final byte[] ksBits, final String ksPassword, final String ksAuthenticationKey) {
         s_logger.info("Start console proxy with context");
         if (conf != null) {
             for (final Object key : conf.keySet()) {
@@ -94,6 +94,7 @@ public class ConsoleProxy {
         ConsoleProxy.context = context;
         ConsoleProxy.ksBits = ksBits;
         ConsoleProxy.ksPassword = ksPassword;
+        ConsoleProxy.ksAuthenticationKey = ksAuthenticationKey;
         try {
             final Class<?> contextClazz = Class.forName("com.cloud.agent.resource.consoleproxy.ConsoleProxyResource");
             authMethod = contextClazz.getDeclaredMethod("authenticateConsoleAccess", String.class, String.class, String.class, String.class, String.class, Boolean.class);
@@ -406,7 +407,7 @@ public class ConsoleProxy {
             try {
                 result =
                         authMethod.invoke(ConsoleProxy.context, param.getClientHostAddress(), String.valueOf(param.getClientHostPort()), param.getClientTag(),
-                                param.getClientHostPassword(), param.getTicket(), new Boolean(reauthentication));
+                                param.getClientHostPassword(), param.getTicket(), reauthentication);
             } catch (final IllegalAccessException e) {
                 s_logger.error("Unable to invoke authenticateConsoleAccess due to IllegalAccessException" + " for vm: " + param.getClientTag(), e);
                 authResult.setSuccess(false);
@@ -451,6 +452,10 @@ public class ConsoleProxy {
 
     public static void setEncryptorPassword(final String password) {
         encryptorPassword = password;
+    }
+
+    public static String getAuthenticationKey() {
+        return ksAuthenticationKey;
     }
 
     static class ThreadExecutor implements Executor {

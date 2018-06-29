@@ -408,7 +408,8 @@ public class ConsoleProxyServlet extends HttpServlet {
 
         final String ticket = genAccessTicket(parsedHostInfo.first(), String.valueOf(port), sid, tag);
 
-        final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(getEncryptorPassword());
+        final String authkey = _keysMgr.getAuthenticationKey();
+        final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(getEncryptorPassword(), authkey);
         final ConsoleProxyClientParam param = new ConsoleProxyClientParam();
         param.setClientHostAddress(parsedHostInfo.first());
         param.setClientHostPort(portInfo.second());
@@ -452,7 +453,8 @@ public class ConsoleProxyServlet extends HttpServlet {
         final String tag = vm.getUuid();
 
         final String ticket = genAccessTicket(parsedHostInfo.first(), String.valueOf(port), sid, tag);
-        final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(getEncryptorPassword());
+        final String authkey = _keysMgr.getAuthenticationKey();
+        final ConsoleProxyPasswordBasedEncryptor encryptor = new ConsoleProxyPasswordBasedEncryptor(getEncryptorPassword(), authkey);
         final ConsoleProxyClientParam param = new ConsoleProxyClientParam();
         param.setClientHostAddress(parsedHostInfo.first());
         param.setClientHostPort(port);

@@ -85,6 +85,15 @@ public class KeysManagerImpl implements KeysManager, Configurable {
         return HashKey.value();
     }
 
+    @Override
+    public String getAuthenticationKey() {
+        final String value = AuthenticationKey.value();
+        if (value == null) {
+            _configDao.getValueAndInitIfNotExist(AuthenticationKey.key(), AuthenticationKey.category(), getBase64EncodedRandomKey(128), AuthenticationKey.description());
+        }
+        return AuthenticationKey.value();
+    }
+
     private static String getBase64EncodedRandomKey(final int nBits) {
         final SecureRandom random;
         try {
@@ -105,6 +114,6 @@ public class KeysManagerImpl implements KeysManager, Configurable {
 
     @Override
     public ConfigKey<?>[] getConfigKeys() {
-        return new ConfigKey<?>[]{EncryptionKey, EncryptionIV, HashKey};
+        return new ConfigKey<?>[]{EncryptionKey, EncryptionIV, HashKey, AuthenticationKey};
     }
 }
