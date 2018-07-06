@@ -247,7 +247,7 @@ public class LibvirtVmDef {
                 resBuidler.append("<devices>\n" + "<memballoon model='none'/>\n" + "</devices>\n");
             }
             if (this.vcpu != -1) {
-                resBuidler.append("<vcpu>" + this.vcpu + "</vcpu>\n");
+                resBuidler.append("<vcpu placement='static' current='" + this.vcpu + "'>16</vcpu>\n");
             }
             return resBuidler.toString();
         }

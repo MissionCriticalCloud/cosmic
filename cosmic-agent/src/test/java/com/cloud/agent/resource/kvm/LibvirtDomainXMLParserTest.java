@@ -40,7 +40,7 @@ public class LibvirtDomainXMLParserTest extends TestCase {
                 "<description>Debian GNU/Linux 6(64-bit)</description>" +
                 "<memory unit='KiB'>262144</memory>" +
                 "<currentMemory unit='KiB'>262144</currentMemory>" +
-                "<vcpu placement='static'>1</vcpu>" +
+                "<vcpu placement='static' current='1'>16</vcpu>" +
                 "<cputune>" +
                 "<shares>250</shares>" +
                 "</cputune>" +
