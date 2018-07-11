@@ -292,7 +292,7 @@ cloudStack.docs = {
         externalLink: ''
     },
     helpVolumeFormat: {
-        desc: 'The disk image format of the volume is QCOW2 for KVM. Only in special cases RAW formatting should be used (Root-admin only).',
+        desc: 'The disk image format of the volume is QCOW2 for KVM. Only in special cases use RAW.',
         externalLink: ''
     },
     // Add disk offering
