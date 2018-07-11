@@ -75,8 +75,7 @@ public class CreateVolumeCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.FORMAT,
             required = false,
             type = CommandType.STRING,
-            description = "the file format to use. Either 'QCOW2' or 'RAW'. Root admin only.",
-            authorized = {RoleType.Admin})
+            description = "the disk format to use. Either 'QCOW2' or 'RAW'")
     private String fileFormat;
 
     @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "the name of the disk volume")
