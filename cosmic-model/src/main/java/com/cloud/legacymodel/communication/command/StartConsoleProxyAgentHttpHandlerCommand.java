@@ -10,14 +10,17 @@ public class StartConsoleProxyAgentHttpHandlerCommand extends Command {
     private String keystorePassword;
     @LogLevel(Level.Off)
     private String encryptorPassword;
+    @LogLevel(Level.Off)
+    private String authenticationKey;
 
     public StartConsoleProxyAgentHttpHandlerCommand() {
         super();
     }
 
-    public StartConsoleProxyAgentHttpHandlerCommand(final byte[] ksBits, final String ksPassword) {
+    public StartConsoleProxyAgentHttpHandlerCommand(final byte[] ksBits, final String ksPassword, final String ksAuthenticationKey) {
         this.keystoreBits = ksBits;
         this.keystorePassword = ksPassword;
+        this.authenticationKey = ksAuthenticationKey;
     }
 
     @Override
@@ -47,5 +50,13 @@ public class StartConsoleProxyAgentHttpHandlerCommand extends Command {
 
     public void setEncryptorPassword(final String encryptorPassword) {
         this.encryptorPassword = encryptorPassword;
+    }
+
+    public String getAuthenticationKey() {
+        return authenticationKey;
+    }
+
+    public void setAuthenticationKey(String authenticationKey) {
+        this.authenticationKey = authenticationKey;
     }
 }

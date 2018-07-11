@@ -22,6 +22,8 @@ import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.NumbersUtil;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.utils.script.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.BufferedReader;
@@ -36,9 +38,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * I don't want to introduce extra cross-cutting concerns into console proxy
@@ -119,7 +118,7 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
 
     private Answer execute(final StartConsoleProxyAgentHttpHandlerCommand cmd) {
         s_logger.info("Invoke launchConsoleProxy() in responding to StartConsoleProxyAgentHttpHandlerCommand");
-        launchConsoleProxy(cmd.getKeystoreBits(), cmd.getKeystorePassword(), cmd.getEncryptorPassword());
+        launchConsoleProxy(cmd.getKeystoreBits(), cmd.getKeystorePassword(), cmd.getEncryptorPassword(), cmd.getAuthenticationKey());
         return new Answer(cmd);
     }
 
@@ -161,7 +160,7 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
         return new ConsoleProxyLoadAnswer(cmd, proxyVmId, proxyVmName, success, result);
     }
 
-    private void launchConsoleProxy(final byte[] ksBits, final String ksPassword, final String encryptorPassword) {
+    private void launchConsoleProxy(final byte[] ksBits, final String ksPassword, final String encryptorPassword, final String ksAuthenticationKey) {
         final Object resource = this;
         if (this._consoleProxyMain == null) {
             this._consoleProxyMain = new Thread(new ManagedContextRunnable() {
@@ -170,13 +169,13 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
                     try {
                         final Class<?> consoleProxyClazz = Class.forName("com.cloud.agent.resource.consoleproxy.ConsoleProxy");
                         try {
-                            s_logger.info("Invoke setEncryptorPassword(), ecnryptorPassword: " + encryptorPassword);
+                            s_logger.info("Invoke setEncryptorPassword(), encryptorPassword: " + encryptorPassword);
                             final Method methodSetup = consoleProxyClazz.getMethod("setEncryptorPassword", String.class);
                             methodSetup.invoke(null, encryptorPassword);
 
                             s_logger.info("Invoke startWithContext()");
-                            final Method method = consoleProxyClazz.getMethod("startWithContext", Properties.class, Object.class, byte[].class, String.class);
-                            method.invoke(null, ConsoleProxyResource.this._properties, resource, ksBits, ksPassword);
+                            final Method method = consoleProxyClazz.getMethod("startWithContext", Properties.class, Object.class, byte[].class, String.class, String.class);
+                            method.invoke(null, ConsoleProxyResource.this._properties, resource, ksBits, ksPassword, ksAuthenticationKey);
                         } catch (final SecurityException e) {
                             s_logger.error("Unable to launch console proxy due to SecurityException", e);
                             System.exit(ExitStatus.Error.value());
