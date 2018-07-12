@@ -861,6 +861,13 @@
                 });
             }
 
+            var optimisefor = args.data.optimisefor;
+            if (optimisefor != null && optimisefor.length > 0) {
+                $.extend(deployVmData, {
+                    optimisefor: optimisefor
+                });
+            }
+
             var userdata = args.data.userdata;
             if (userdata != null && userdata.length > 0) {
                 $.extend(deployVmData, {
