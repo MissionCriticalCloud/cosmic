@@ -305,7 +305,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
                 bootable = Boolean.TRUE;
             }
             final GuestOS noneGuestOs = ApiDBUtils.findGuestOSByDisplayName(ApiConstants.ISO_GUEST_OS_NONE);
-            if ((guestOSId == null || guestOSId == noneGuestOs.getId()) && bootable == true) {
+            if ((guestOSId == null || noneGuestOs == null || guestOSId == noneGuestOs.getId()) && bootable == true) {
                 throw new InvalidParameterValueException("Please pass a valid GuestOS Id");
             }
             if (bootable == false) {
