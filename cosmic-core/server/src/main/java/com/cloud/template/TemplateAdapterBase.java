@@ -160,7 +160,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
 
         return prepare(true, CallContext.current().getCallingUserId(), cmd.getIsoName(), cmd.getDisplayText(), 64, false, cmd.getUrl(), cmd.isPublic(),
                 cmd.isFeatured(), cmd.isExtractable(), ImageFormat.ISO.toString(), cmd.getOsTypeId(), zoneId, HypervisorType.None, cmd.getChecksum(), cmd.isBootable(), null,
-                owner, null, false, cmd.getImageStoreUuid(), cmd.isDynamicallyScalable(), TemplateType.USER, "Mission Critical Cloud", OptimiseFor.Generic, MaintenancePolicy.LiveMigrate);
+                owner, null, false, cmd.getImageStoreUuid(), cmd.isDynamicallyScalable(), TemplateType.USER, cmd.getManufacturerString(), cmd.getOptimiseFor(), cmd.getMaintenancePolicy());
     }
 
     @Override
