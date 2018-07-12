@@ -1739,7 +1739,24 @@
                                             }
                                         }
                                     },
-
+                                    optimisefor: {
+                                        label: 'label.optimisefor',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "Generic",
+                                                description: "Generic VM"
+                                            });
+                                            items.push({
+                                                id: "Windows",
+                                                description: "Windows VM"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
                                     isBootable: {
                                         label: "label.bootable",
                                         docID: 'helpRegisterISOBootable',
@@ -1807,6 +1824,7 @@
                                     displayText: args.data.description,
                                     url: args.data.url,
                                     zoneid: args.data.zone,
+                                    optimisefor: args.data.optimisefor,
                                     isextractable: (args.data.isExtractable == "on"),
                                     bootable: (args.data.isBootable == "on")
                                 };
@@ -1999,7 +2017,8 @@
                                         //zoneid: args.context.isos[0].zoneid, //can't update template/ISO in only one zone. It always get updated in all zones.
                                         name: args.data.name,
                                         displaytext: args.data.displaytext,
-                                        ostypeid: args.data.ostypeid
+                                        ostypeid: args.data.ostypeid,
+                                        optimisefor: args.data.optimisefor
                                     };
                                     $.ajax({
                                         url: createURL('updateIso'),
@@ -2191,7 +2210,24 @@
                                         label: 'label.cross.zones',
                                         converter: cloudStack.converters.toBooleanText
                                     },
-
+                                    optimisefor: {
+                                        label: 'label.optimisefor',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "Generic",
+                                                description: "Generic VM"
+                                            });
+                                            items.push({
+                                                id: "Windows",
+                                                description: "Windows VM"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
                                     ostypeid: {
                                         label: 'label.os.type',
                                         isEditable: true,

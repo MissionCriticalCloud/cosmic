@@ -161,7 +161,7 @@ public class RegisterIsoCmd extends BaseCmd {
         if (optimiseFor != null) {
             return OptimiseFor.valueOf(optimiseFor);
         } else {
-            return OptimiseFor.Generic;
+            return null;
         }
     }
 

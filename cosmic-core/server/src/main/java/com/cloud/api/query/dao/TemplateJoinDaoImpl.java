@@ -203,6 +203,8 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         isoResponse.setPublic(iso.isPublicTemplate());
         isoResponse.setChecksum(iso.getChecksum());
 
+        isoResponse.setOptimiseFor(iso.getOptimiseFor());
+
         isoResponse.setOsTypeId(iso.getGuestOSUuid());
         isoResponse.setOsTypeName(iso.getGuestOSName());
 

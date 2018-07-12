@@ -2225,7 +2225,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                                final HypervisorType hypervisor, final HTTPMethod httpmethod, final String userData, final String sshKeyPair,
                                                final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps, final Boolean displayvm, final String keyboard,
                                                final List<Long> affinityGroupIdList, final Map<String, String> customParametrs, final String customId,
-                                               final DiskControllerType diskControllerType, final Long bootMenuTimeout)
+                                               final DiskControllerType diskControllerType, final Long bootMenuTimeout, MaintenancePolicy maintenancePolicy,
+                                               OptimiseFor optimiseFor, String manufacturerString)
             throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, StorageUnavailableException, ResourceAllocationException {
 
         final Account caller = CallContext.current().getCallingAccount();
@@ -2275,7 +2276,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         return createVirtualMachine(zone, serviceOffering, template, hostName, displayName, owner, diskOfferingId, diskSize, networkList, group, httpmethod, userData, sshKeyPair,
-                hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId, diskControllerType, bootMenuTimeout);
+                hypervisor, caller, requestedIps, defaultIps, displayvm, keyboard, affinityGroupIdList, customParametrs, customId, diskControllerType, bootMenuTimeout,
+                maintenancePolicy, optimiseFor, manufacturerString);
     }
 
     private void checkHypervisorEnabled(final Zone zone, final VirtualMachineTemplate template) {
@@ -3865,7 +3867,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                         final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final String group, final HTTPMethod httpmethod, final String userData,
                                         final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps,
                                         final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId,
-                                        final DiskControllerType diskControllerType, final Long bootMenuTimeout)
+                                        final DiskControllerType diskControllerType, final Long bootMenuTimeout, MaintenancePolicy maintenancePolicy, OptimiseFor optimiseFor,
+                                        String manufacturerString)
             throws InsufficientCapacityException, ResourceUnavailableException, ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
 
         _accountMgr.checkAccess(caller, null, true, owner);
@@ -3878,15 +3881,24 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             _templateDao.loadDetails(template);
         }
 
-        OptimiseFor optimiseFor = OptimiseFor.Generic;
-        if (template.getOptimiseFor() != null) {
-            optimiseFor = template.getOptimiseFor();
+        if (optimiseFor == null) {
+            if (template.getOptimiseFor() != null) {
+                optimiseFor = template.getOptimiseFor();
+            } else {
+                optimiseFor = OptimiseFor.Generic;
+            }
         }
 
-        String manufacturerString = template.getManufacturerString();
+        if (manufacturerString == null) {
+            manufacturerString = template.getManufacturerString();
+        }
+
+        if (maintenancePolicy == null) {
+            maintenancePolicy = template.getMaintenancePolicy();
+        }
+
         Boolean macLarning = template.getMacLearning();
         String cpuFlags = template.getCpuFlags();
-        MaintenancePolicy maintenancePolicy = template.getMaintenancePolicy();
 
         final long accountId = owner.getId();
 

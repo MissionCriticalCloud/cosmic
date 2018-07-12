@@ -39,6 +39,8 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.model.enumeration.MaintenancePolicy;
+import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.uservm.UserVm;
 import com.cloud.utils.net.NetUtils;
@@ -195,6 +197,16 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.BOOT_MENU_TIMEOUT, type = CommandType.LONG, description = "Timeout (in ms) to for the boot menu")
     private Long bootMenuTimeout;
 
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    private String manufacturerString;
+
+    @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
+    private String optimiseFor;
+
+    @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
+    private String maintenancePolicy;
+
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -277,6 +289,26 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
     public Long getZoneId() {
         return zoneId;
+    }
+
+    public MaintenancePolicy getMaintenancePolicy() {
+        if (maintenancePolicy != null) {
+            return MaintenancePolicy.valueOf(maintenancePolicy);
+        } else {
+            return null;
+        }
+    }
+
+    public OptimiseFor getOptimiseFor() {
+        if (optimiseFor != null) {
+            return OptimiseFor.valueOf(optimiseFor);
+        } else {
+            return OptimiseFor.Generic;
+        }
+    }
+
+    public String getManufacturerString() {
+        return manufacturerString;
     }
 
     public DiskControllerType getDiskController() {
@@ -581,7 +613,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             final IpAddresses addrs = new IpAddresses(ipAddress, ip6Address, getMacAddress());
             final UserVm vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
                     getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
-                    getCustomId(), getDiskController(), getBootMenuTimeout());
+                    getCustomId(), getDiskController(), getBootMenuTimeout(), getMaintenancePolicy(), getOptimiseFor(), getManufacturerString());
 
             if (vm != null) {
                 setEntityId(vm.getId());
