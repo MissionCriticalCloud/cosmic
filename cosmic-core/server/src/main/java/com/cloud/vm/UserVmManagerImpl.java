@@ -31,6 +31,7 @@ import com.cloud.api.command.user.vmgroup.CreateVMGroupCmd;
 import com.cloud.api.command.user.vmgroup.DeleteVMGroupCmd;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
+import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
@@ -121,7 +122,6 @@ import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
-import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.SSHKeyPair;
 import com.cloud.legacymodel.user.User;
@@ -129,7 +129,6 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.legacymodel.vm.VmStatsEntry;
-import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
@@ -237,9 +236,13 @@ import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -256,10 +259,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class UserVmManagerImpl extends ManagerBase implements UserVmManager, VirtualMachineGuru, UserVmService, Configurable {
     private static final ConfigKey<Integer> VmIpFetchWaitInterval = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmip.retrieval.interval", "180",
@@ -1051,6 +1050,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (userData != null) {
             // check and replace newlines
             userData = userData.replace("\\n", "");
+            try {
+                userData = java.net.URLDecoder.decode(userData, "UTF-8");
+            } catch (final UnsupportedEncodingException e) {
+                throw new InvalidParameterValueException("Unsupported encoding");
+            }
             validateUserData(userData, httpMethod);
             // update userData on domain router.
             updateUserdata = true;
@@ -3161,8 +3165,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), GuestType.Isolated);
                     if (virtualNetworks.isEmpty()) {
                         final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zone.getId(), requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
-                                                                                                                                                              .getTrafficType
-                                                                                                                                                                      ());
+                                .getTrafficType
+                                        ());
                         // Validate physical network
                         final PhysicalNetwork physicalNetwork = _physicalNetworkDao.findById(physicalNetworkId);
                         if (physicalNetwork == null) {
@@ -4031,8 +4035,15 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         // Check templates permissions
         _accountMgr.checkAccess(owner, AccessType.UseEntry, false, template);
 
+        // Decode userData
+        String decodedUserData;
+        try {
+            decodedUserData = java.net.URLDecoder.decode(userData, "UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+            throw new InvalidParameterValueException("Unsupported encoding");
+        }
         // check if the user data is correct
-        validateUserData(userData, httpmethod);
+        validateUserData(decodedUserData, httpmethod);
 
         // Find an SSH public key corresponding to the key pair name, if one is
         // given
@@ -4176,7 +4187,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
         }
 
-        final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, userData, caller, isDisplayVm, keyboard, accountId, userId,
+        final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, decodedUserData, caller, isDisplayVm, keyboard, accountId, userId,
                 offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType, manufacturerString, optimiseFor,
                 macLarning, cpuFlags, maintenancePolicy, bootMenuTimeout);
 
