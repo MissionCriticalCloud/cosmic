@@ -4036,9 +4036,11 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         _accountMgr.checkAccess(owner, AccessType.UseEntry, false, template);
 
         // Decode userData
-        String decodedUserData;
+        String decodedUserData = null;
         try {
-            decodedUserData = java.net.URLDecoder.decode(userData, "UTF-8");
+            if (userData != null) {
+                decodedUserData = java.net.URLDecoder.decode(userData, "UTF-8");
+            }
         } catch (final UnsupportedEncodingException e) {
             throw new InvalidParameterValueException("Unsupported encoding");
         }
