@@ -214,7 +214,7 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     @SerializedName(ApiConstants.OS_TYPE_ID)
     @Param(description = "OS type id of the vm", since = "4.4")
-    private String osTypeId;
+    private Long osTypeId;
 
     @SerializedName(ApiConstants.MAINTENANCE_POLICY)
     @Param(description = "Maintenance Policy of the VM")
@@ -713,7 +713,7 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
         this.details = details;
     }
 
-    public void setOsTypeId(final String osTypeId) {
+    public void setOsTypeId(final Long osTypeId) {
         this.osTypeId = osTypeId;
     }
 
