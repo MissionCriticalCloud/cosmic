@@ -1,5 +1,7 @@
+# coding=utf-8
 import os
 import subprocess
+
 import yaml
 
 
@@ -167,14 +169,14 @@ AcceptEnv XMODIFIERS
         if not os.path.isdir(self.config_dir):
             os.makedirs(self.config_dir, 0o644, True)
 
-        agent_properties = { }
+        agent_properties = {}
         for key, value in self.cmdline.items():
             if key == 'host':
                 agent_properties['hosts'] = value.split(',')
             else:
                 agent_properties[key] = value
 
-        config = { 'cosmic': agent_properties }
+        config = {'cosmic': agent_properties}
         with open(self.config_dir + "application.yml", "w") as f:
             yaml.dump(config, f, default_flow_style=False)
 
@@ -184,8 +186,8 @@ AcceptEnv XMODIFIERS
 
         link_local_ip = self.cmdline["controlip"]
 
-        prelogin_banner = """
-Cosmic sytemvm powered by %s
+        prelogin_banner = r"""
+Cosmic systemvm powered by %s
 
                            *   	   +
                              ╔═╗╔═╗╔═╗╔╦╗╦╔═╗  *
@@ -206,9 +208,9 @@ Cosmic sytemvm powered by %s
                  _..--""``````""--.._
            _.-'``                    ``'-._
          -'                                '-
-  ____________________________________________
+  __________________________________________
  ( Void 100%% of your warranty @ %s )
-  --------------------------------------------
+  ------------------------------------------
 """ % (release, link_local_ip)
 
         with open("/etc/issue", "w") as f:
@@ -216,7 +218,7 @@ Cosmic sytemvm powered by %s
         with open("/etc/issue.net", "w") as f:
             f.write(prelogin_banner)
 
-        motd = """
+        motd = r"""
 Cosmic sytemvm powered by %s
   ______________________________________
  ( Booo! 0%% of your warranty remaining! )
