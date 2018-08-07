@@ -8,12 +8,11 @@ import com.cloud.server.ResourceTag.ResourceObjectType;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ServiceOfferingJoinDaoImpl extends GenericDaoBase<ServiceOfferingJoinVO, Long> implements ServiceOfferingJoinDao {
@@ -62,6 +61,8 @@ public class ServiceOfferingJoinDaoImpl extends GenericDaoBase<ServiceOfferingJo
         offeringResponse.setBytesWriteRate(offering.getBytesWriteRate());
         offeringResponse.setIopsReadRate(offering.getIopsReadRate());
         offeringResponse.setIopsWriteRate(offering.getIopsWriteRate());
+        offeringResponse.setIopsTotalRate(offering.getIopsTotalRate());
+        offeringResponse.setIopsRatePerGb(offering.getIopsRatePerGb());
         offeringResponse.setDetails(ApiDBUtils.getResourceDetails(offering.getId(), ResourceObjectType.ServiceOffering));
         offeringResponse.setObjectName("serviceoffering");
         offeringResponse.setIscutomized(offering.isDynamic());

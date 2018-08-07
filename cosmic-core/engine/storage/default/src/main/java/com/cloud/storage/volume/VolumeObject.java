@@ -36,12 +36,11 @@ import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.storage.encoding.EncodingType;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Date;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class VolumeObject implements VolumeInfo {
     private static final Logger s_logger = LoggerFactory.getLogger(VolumeObject.class);
@@ -186,23 +185,7 @@ public class VolumeObject implements VolumeInfo {
                     volumeDao.update(vol.getId(), vol);
                 }
             } else {
-                // image store or imageCache store
-                if (answer instanceof DownloadAnswer) {
-                    final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    volStore.setInstallPath(dwdAnswer.getInstallPath());
-                    volStore.setChecksum(dwdAnswer.getCheckSum());
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                } else if (answer instanceof CopyCmdAnswer) {
-                    final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
-                    volStore.setInstallPath(newVol.getPath());
-                    if (newVol.getSize() != null) {
-                        volStore.setSize(newVol.getSize());
-                    }
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                }
+                processDownloadAnswer(answer);
             }
         } catch (final RuntimeException ex) {
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed) {
@@ -260,7 +243,8 @@ public class VolumeObject implements VolumeInfo {
     public Long getIopsReadRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {
-            return diskOfferingVO.getIopsReadRate();
+            Long iopsReadRate = diskOfferingVO.getIopsReadRate();
+            return getIopsRate(iopsReadRate);
         }
         return null;
     }
@@ -269,9 +253,47 @@ public class VolumeObject implements VolumeInfo {
     public Long getIopsWriteRate() {
         final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
         if (diskOfferingVO != null) {
-            return diskOfferingVO.getIopsWriteRate();
+            Long iopsWriteRate = diskOfferingVO.getIopsWriteRate();
+            return getIopsRate(iopsWriteRate);
         }
         return null;
+    }
+
+    @Override
+    public Long getIopsTotalRate() {
+        final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            Long iopsTotalRate = diskOfferingVO.getIopsTotalRate();
+            return getIopsRate(iopsTotalRate);
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean getIopsRatePerGb() {
+        final DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            Boolean iopsRatePerGb = diskOfferingVO.getIopsRatePerGb();
+            return iopsRatePerGb;
+        }
+        return null;
+    }
+
+    /**
+     * Calculates the IOPS per GB if iops_rate_per_gb flag is set. If disk is smaller than a GB then
+     * return iopsRate as minimum.
+     *
+     * @param iopsRate IOPS to use for calculation
+     * @return IOPS calculated per GB
+     */
+    private Long getIopsRate(Long iopsRate) {
+        if (getIopsRatePerGb()) {
+            long diskSize = getSize() >> 30;
+            if (iopsRate != null && iopsRate > 0 && diskSize > 0) {
+                return iopsRate * diskSize;
+            }
+        }
+        return iopsRate;
     }
 
     @Override
@@ -312,7 +334,7 @@ public class VolumeObject implements VolumeInfo {
             }
             to = new VolumeObjectTO(this.getUuid(), this.getVolumeType(), dataStoreTO, this.getName(), this.getSize(), this.getPath(), this.getVolumeId(), this
                     .getAttachedVmName(), this.getAccountId(), this.getChainInfo(), this.getFormat(), this.getProvisioningType(), this.getId(), this.getDeviceId(), this.getBytesReadRate(), this
-                    .getBytesWriteRate(), this.getIopsReadRate(), this.getIopsWriteRate(), this.getCacheMode(), this.getHypervisorType());
+                    .getBytesWriteRate(), this.getIopsReadRate(), this.getIopsWriteRate(), this.getIopsTotalRate(), this.getIopsRatePerGb(), this.getCacheMode(), this.getHypervisorType());
         }
         return to;
     }
@@ -447,23 +469,7 @@ public class VolumeObject implements VolumeInfo {
                     volumeDao.update(vol.getId(), vol);
                 }
             } else {
-                // image store or imageCache store
-                if (answer instanceof DownloadAnswer) {
-                    final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    volStore.setInstallPath(dwdAnswer.getInstallPath());
-                    volStore.setChecksum(dwdAnswer.getCheckSum());
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                } else if (answer instanceof CopyCmdAnswer) {
-                    final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
-                    final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
-                    final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
-                    volStore.setInstallPath(newVol.getPath());
-                    if (newVol.getSize() != null) {
-                        volStore.setSize(newVol.getSize());
-                    }
-                    volumeStoreDao.update(volStore.getId(), volStore);
-                }
+                processDownloadAnswer(answer);
             }
         } catch (final RuntimeException ex) {
             if (event == ObjectInDataStoreStateMachine.Event.OperationFailed) {
@@ -476,6 +482,26 @@ public class VolumeObject implements VolumeInfo {
 
     public long getVolumeId() {
         return volumeVO.getId();
+    }
+
+    private void processDownloadAnswer(Answer answer) {
+        // image store or imageCache store
+        if (answer instanceof DownloadAnswer) {
+            final DownloadAnswer dwdAnswer = (DownloadAnswer) answer;
+            final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
+            volStore.setInstallPath(dwdAnswer.getInstallPath());
+            volStore.setChecksum(dwdAnswer.getCheckSum());
+            volumeStoreDao.update(volStore.getId(), volStore);
+        } else if (answer instanceof CopyCmdAnswer) {
+            final CopyCmdAnswer cpyAnswer = (CopyCmdAnswer) answer;
+            final VolumeDataStoreVO volStore = volumeStoreDao.findByStoreVolume(dataStore.getId(), getId());
+            final VolumeObjectTO newVol = (VolumeObjectTO) cpyAnswer.getNewData();
+            volStore.setInstallPath(newVol.getPath());
+            if (newVol.getSize() != null) {
+                volStore.setSize(newVol.getSize());
+            }
+            volumeStoreDao.update(volStore.getId(), volStore);
+        }
     }
 
     @Override

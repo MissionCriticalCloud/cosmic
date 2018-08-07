@@ -164,6 +164,8 @@ import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -182,9 +184,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConfigurationManagerImpl extends ManagerBase implements ConfigurationManager, ConfigurationService, Configurable {
     public static final Logger s_logger = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
@@ -789,20 +788,24 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             }
         }
 
+        final Boolean iopsRatePerGb = cmd.getIopsRatePerGb() != null ? cmd.getIopsRatePerGb() : false;
+
         return createServiceOffering(userId, cmd.getIsSystem(), vmType, cmd.getServiceOfferingName(), cpuNumber, memory, cmd.getDisplayText(),
                 cmd.getProvisioningType(), localStorageRequired, offerHA, limitCpuUse, volatileVm, cmd.getTags(), cmd.getDomainId(), cmd.getHostTag(),
                 cmd.getNetworkRate(), cmd.getDeploymentPlanner(), cmd.getDetails(), cmd.isCustomizedIops(), cmd.getMinIops(), cmd.getMaxIops(),
-                cmd.getBytesReadRate(), cmd.getBytesWriteRate(), cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getHypervisorSnapshotReserve());
+                cmd.getBytesReadRate(), cmd.getBytesWriteRate(), cmd.getIopsReadRate(), cmd.getIopsWriteRate(), cmd.getIopsTotalRate(), iopsRatePerGb,
+                cmd.getHypervisorSnapshotReserve());
     }
 
     protected ServiceOfferingVO createServiceOffering(final long userId, final boolean isSystem, final VirtualMachineType vmType,
-                                                      final String name, final Integer cpu, final Integer ramSize, final String displayText, final String
-                                                              provisioningType, final boolean localStorageRequired,
-                                                      final boolean offerHA, final boolean limitResourceUse, final boolean volatileVm, String tags, final Long domainId, final
-                                                      String hostTag,
-                                                      final Integer networkRate, final String deploymentPlanner, final Map<String, String> details, final Boolean
-                                                              isCustomizedIops, Long minIops, Long maxIops,
-                                                      Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate, final Integer hypervisorSnapshotReserve) {
+                                                      final String name, final Integer cpu, final Integer ramSize, final String displayText,
+                                                      final String provisioningType, final boolean localStorageRequired, final boolean offerHA,
+                                                      final boolean limitResourceUse, final boolean volatileVm, String tags, final Long domainId,
+                                                      final String hostTag, final Integer networkRate, final String deploymentPlanner,
+                                                      final Map<String, String> details, final Boolean isCustomizedIops,
+                                                      Long minIops, Long maxIops, Long bytesReadRate, Long bytesWriteRate,
+                                                      Long iopsReadRate, Long iopsWriteRate, Long iopsTotalRate, final boolean iopsRatePerGb,
+                                                      final Integer hypervisorSnapshotReserve) {
 
         // Check if user exists in the system
         final User user = _userDao.findById(userId);
@@ -879,6 +882,15 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         }
         if (iopsWriteRate != null && iopsWriteRate > 0) {
             offering.setIopsWriteRate(iopsWriteRate);
+        }
+        if (iopsTotalRate != null && iopsTotalRate > 0) {
+            if (iopsWriteRate != null && iopsWriteRate > 0 || iopsReadRate != null && iopsReadRate > 0) {
+                throw new InvalidParameterValueException("Total IOPS rate cannot be used together with IOPS read rate or IOPS write rate");
+            }
+            offering.setIopsTotalRate(iopsTotalRate);
+        }
+        if (iopsRatePerGb) {
+            offering.setIopsRatePerGb(iopsRatePerGb);
         }
 
         if (hypervisorSnapshotReserve != null && hypervisorSnapshotReserve < 0) {
@@ -1186,12 +1198,15 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         final Long bytesWriteRate = cmd.getBytesWriteRate();
         final Long iopsReadRate = cmd.getIopsReadRate();
         final Long iopsWriteRate = cmd.getIopsWriteRate();
+        final Long iopsTotalRate = cmd.getIopsTotalRate();
+        final Boolean iopsRatePerGb = cmd.getIopsRatePerGb() != null ? cmd.getIopsRatePerGb() : false;
         final Integer hypervisorSnapshotReserve = cmd.getHypervisorSnapshotReserve();
 
         final Long userId = CallContext.current().getCallingUserId();
         return createDiskOffering(userId, domainId, name, description, provisioningType, numGibibytes, tags, isCustomized,
                 localStorageRequired, isDisplayOfferingEnabled, isCustomizedIops, minIops,
-                maxIops, bytesReadRate, bytesWriteRate, iopsReadRate, iopsWriteRate, hypervisorSnapshotReserve);
+                maxIops, bytesReadRate, bytesWriteRate, iopsReadRate, iopsWriteRate, iopsTotalRate, iopsRatePerGb,
+                hypervisorSnapshotReserve);
     }
 
     @Override
@@ -4700,7 +4715,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
     protected DiskOfferingVO createDiskOffering(final Long userId, final Long domainId, final String name, final String description, final String provisioningType,
                                                 final Long numGibibytes, String tags, boolean isCustomized, final boolean localStorageRequired,
                                                 final boolean isDisplayOfferingEnabled, final Boolean isCustomizedIops, Long minIops, Long maxIops,
-                                                Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate,
+                                                Long bytesReadRate, Long bytesWriteRate, Long iopsReadRate, Long iopsWriteRate, Long iopsTotalRate, boolean iopsRatePerGb,
                                                 final Integer hypervisorSnapshotReserve) {
         long diskSize = 0;// special case for custom disk offerings
         if (numGibibytes != null && numGibibytes <= 0) {
@@ -4788,6 +4803,13 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         if (iopsWriteRate != null && iopsWriteRate > 0) {
             newDiskOffering.setIopsWriteRate(iopsWriteRate);
         }
+        if (iopsTotalRate != null && iopsTotalRate > 0) {
+            if (iopsWriteRate != null && iopsWriteRate > 0 || iopsReadRate != null && iopsReadRate > 0) {
+                throw new InvalidParameterValueException("Total IOPS rate cannot be used together with IOPS read rate or IOPS write rate");
+            }
+            newDiskOffering.setIopsTotalRate(iopsTotalRate);
+        }
+        newDiskOffering.setIopsRatePerGb(iopsRatePerGb);
 
         if (hypervisorSnapshotReserve != null && hypervisorSnapshotReserve < 0) {
             throw new InvalidParameterValueException("If provided, Hypervisor Snapshot Reserve must be greater than or equal to 0.");

@@ -13,7 +13,6 @@ import com.cloud.legacymodel.storage.DiskProfile;
 import com.cloud.legacymodel.to.StorageFilerTO;
 import com.cloud.legacymodel.to.VolumeTO;
 import com.cloud.model.enumeration.StoragePoolType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +61,7 @@ public final class LibvirtCreateCommandWrapper extends LibvirtCommandWrapper<Cre
             volume.setBytesWriteRate(dskch.getBytesWriteRate());
             volume.setIopsReadRate(dskch.getIopsReadRate());
             volume.setIopsWriteRate(dskch.getIopsWriteRate());
+            volume.setIopsTotalRate(dskch.getIopsTotalRate());
             volume.setCacheMode(dskch.getCacheMode());
             return new CreateAnswer(command, volume);
         } catch (final CloudRuntimeException e) {

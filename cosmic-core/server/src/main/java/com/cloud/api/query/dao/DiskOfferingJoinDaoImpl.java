@@ -8,12 +8,11 @@ import com.cloud.utils.db.Attribute;
 import com.cloud.utils.db.GenericDaoBase;
 import com.cloud.utils.db.SearchBuilder;
 import com.cloud.utils.db.SearchCriteria;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class DiskOfferingJoinDaoImpl extends GenericDaoBase<DiskOfferingJoinVO, Long> implements DiskOfferingJoinDao {
@@ -59,6 +58,8 @@ public class DiskOfferingJoinDaoImpl extends GenericDaoBase<DiskOfferingJoinVO, 
         diskOfferingResponse.setBytesWriteRate(offering.getBytesWriteRate());
         diskOfferingResponse.setIopsReadRate(offering.getIopsReadRate());
         diskOfferingResponse.setIopsWriteRate(offering.getIopsWriteRate());
+        diskOfferingResponse.setIopsTotalRate(offering.getIopsTotalRate());
+        diskOfferingResponse.setIopsRatePerGb(offering.getIopsRatePerGb());
         diskOfferingResponse.setCacheMode(offering.getCacheMode());
         diskOfferingResponse.setObjectName("diskoffering");
 

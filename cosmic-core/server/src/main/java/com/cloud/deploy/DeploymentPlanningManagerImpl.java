@@ -94,11 +94,14 @@ import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -107,9 +110,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeSet;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DeploymentPlanningManagerImpl extends ManagerBase implements DeploymentPlanningManager, Manager, Listener,
         StateListener<State, VirtualMachine.Event, VirtualMachine> {
@@ -730,6 +730,9 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                 final List<StoragePool> volumePoolList = suitableVolumeStoragePools.get(vol);
                 hostCanAccessPool = false;
                 for (final StoragePool potentialSPool : volumePoolList) {
+                    if (!_storageMgr.storagePoolHasEnoughIops(Collections.singletonList(vol), potentialSPool)) {
+                        continue;
+                    }
                     if (hostCanAccessSPool(potentialHost, potentialSPool)) {
                         hostCanAccessPool = true;
                         if (multipleVolume && !readyAndReusedVolumes.contains(vol)) {
@@ -1121,7 +1124,7 @@ public class DeploymentPlanningManagerImpl extends ManagerBase implements Deploy
                 if (saveReservation) {
                     final VMReservationVO vmReservation =
                             new VMReservationVO(vm.getId(), plannedDestination.getZone().getId(), plannedDestination.getPod().getId(), plannedDestination.getCluster()
-                                                                                                                                                         .getId(),
+                                    .getId(),
                                     plannedDestination.getHost().getId());
                     if (planner != null) {
                         vmReservation.setDeploymentPlanner(planner.getName());

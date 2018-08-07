@@ -29,6 +29,10 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
     Long iopsReadRate;
     @Column(name = "iops_write_rate")
     Long iopsWriteRate;
+    @Column(name = "iops_total_rate")
+    Long iopsTotalRate;
+    @Column(name = "iops_rate_per_gb")
+    Boolean iopsRatePerGb = false;
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private long id;
@@ -120,6 +124,14 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
 
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 
     public void setId(final long id) {
@@ -366,6 +378,14 @@ public class ServiceOfferingJoinVO extends BaseViewVO implements InternalIdentit
 
     public Long getIopsWriteRate() {
         return iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
     }
 
     public boolean isDynamic() {

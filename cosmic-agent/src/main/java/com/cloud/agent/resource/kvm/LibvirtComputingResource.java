@@ -1,22 +1,5 @@
 package com.cloud.agent.resource.kvm;
 
-import static com.cloud.agent.resource.kvm.LibvirtComputingResource.BridgeType.OPENVSWITCH;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.FORMAT_NETWORK_SPEED;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PATH_PATCH_DIR;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PATH_SCRIPTS_NETWORK_DOMR;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_CREATE_TEMPLATE;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_KVM_HEART_BEAT;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_LOCAL_GATEWAY;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_MANAGE_SNAPSHOT;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_DHCP_HOST;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_VM;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_PING_TEST;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_ROUTER_PROXY;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
-import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_VERSIONS;
-
-import static java.util.UUID.randomUUID;
-
 import com.cloud.agent.resource.AgentResource;
 import com.cloud.agent.resource.AgentResourceBase;
 import com.cloud.agent.resource.kvm.event.LifecycleListener;
@@ -92,7 +75,6 @@ import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
@@ -116,6 +98,27 @@ import com.cloud.utils.script.Script;
 import com.cloud.utils.ssh.SshHelper;
 import com.cloud.utils.storage.JavaStorageLayer;
 import com.cloud.utils.storage.StorageLayer;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.libvirt.Connect;
+import org.libvirt.Domain;
+import org.libvirt.DomainBlockStats;
+import org.libvirt.DomainInfo;
+import org.libvirt.DomainInfo.DomainState;
+import org.libvirt.DomainInterfaceStats;
+import org.libvirt.DomainSnapshot;
+import org.libvirt.Library;
+import org.libvirt.LibvirtException;
+import org.libvirt.NodeInfo;
+import org.libvirt.flags.DomainDeviceModifyFlags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.ejb.Local;
 import javax.naming.ConfigurationException;
@@ -147,27 +150,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.libvirt.Connect;
-import org.libvirt.Domain;
-import org.libvirt.DomainBlockStats;
-import org.libvirt.DomainInfo;
-import org.libvirt.DomainInfo.DomainState;
-import org.libvirt.DomainInterfaceStats;
-import org.libvirt.DomainSnapshot;
-import org.libvirt.Library;
-import org.libvirt.LibvirtException;
-import org.libvirt.NodeInfo;
-import org.libvirt.flags.DomainDeviceModifyFlags;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResource.BridgeType.OPENVSWITCH;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.FORMAT_NETWORK_SPEED;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PATH_PATCH_DIR;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PATH_SCRIPTS_NETWORK_DOMR;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_CREATE_TEMPLATE;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_KVM_HEART_BEAT;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_LOCAL_GATEWAY;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_MANAGE_SNAPSHOT;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_DHCP_HOST;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_OVS_PVLAN_VM;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_PING_TEST;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_ROUTER_PROXY;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_SEND_CONFIG_PROPERTIES;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.SCRIPT_VERSIONS;
+import static java.util.UUID.randomUUID;
 
 /**
  * LibvirtComputingResource execute requests on the computing/routing host using the libvirt API
@@ -1675,6 +1672,9 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                 }
                 if (volumeObjectTo.getIopsWriteRate() != null && volumeObjectTo.getIopsWriteRate() > 0) {
                     disk.setIopsWriteRate(volumeObjectTo.getIopsWriteRate());
+                }
+                if (volumeObjectTo.getIopsTotalRate() != null && volumeObjectTo.getIopsTotalRate() > 0) {
+                    disk.setIopsTotalRate(volumeObjectTo.getIopsTotalRate());
                 }
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));

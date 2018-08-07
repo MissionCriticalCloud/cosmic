@@ -149,6 +149,9 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -172,10 +175,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 @Component
 public class StorageManagerImpl extends ManagerBase implements StorageManager, ClusterManagerListener, Configurable {
@@ -979,22 +978,17 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             return true;
         }
 
-        final StoragePoolVO storagePoolVo = this._storagePoolDao.findById(pool.getId());
-        final long currentIops = this._capacityMgr.getUsedIops(storagePoolVo);
+        final Double overProvFactor = CapacityManager.StorageIopsOverprovisioningFactor.valueIn(pool.getId());
+        final Long storagePoolTotalIops = pool.getCapacityIops() * overProvFactor.longValue();
 
-        long requestedIops = 0;
-
-        for (final Volume requestedVolume : requestedVolumes) {
-            final Long minIops = requestedVolume.getMinIops();
-
-            if (minIops != null && minIops > 0) {
-                requestedIops += minIops;
-            }
+        if (!checkUsedIops(pool)) {
+            String msg = String.format("Insufficient IOPS [%f * %d = %d] available on pool: %s",
+                    overProvFactor, pool.getCapacityIops(),
+                    storagePoolTotalIops, _storagePoolDao.findById(pool.getId()).getName());
+            s_logger.debug(msg);
+            return false;
         }
-
-        final long futureIops = currentIops + requestedIops;
-
-        return futureIops <= pool.getCapacityIops();
+        return true;
     }
 
     @Override
@@ -1105,6 +1099,41 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         return false;
     }
 
+    private boolean checkUsedIops(final StoragePool pool) {
+        final double overProvisioning = CapacityManager.StorageIopsOverprovisioningFactor.valueIn(pool.getDataCenterId());
+        final double totalAvailableIops = pool.getCapacityIops() * overProvisioning;
+        final List<VMInstanceVO> vmInstanceVOList = listByStoragePool(pool.getId());
+        long usedIops = 0;
+        for (VMInstanceVO vmInstance : vmInstanceVOList) {
+            if (vmInstance.getState() != State.Running) {
+                continue;
+            }
+            List<VolumeVO> volumeDao = _volumeDao.findByInstance(vmInstance.getId());
+            for (VolumeVO volume : volumeDao) {
+                long multiplier = 1;
+                DiskOfferingVO diskOfferingVO = _diskOfferingDao.findById(volume.diskOfferingId);
+                Long readIops = diskOfferingVO.getIopsReadRate();
+                Long writeIops = diskOfferingVO.getIopsWriteRate();
+                Long totalIops = diskOfferingVO.getIopsTotalRate();
+                Boolean iopsRatePerGb = diskOfferingVO.getIopsRatePerGb();
+                if (iopsRatePerGb != null && iopsRatePerGb) {
+                    multiplier = volume.getSize() >> 30;
+                }
+                if (totalIops != null && totalIops > 0) {
+                    usedIops += (totalIops * multiplier);
+                } else {
+                    if (readIops != null && readIops > 0) {
+                        usedIops += (readIops * multiplier);
+                    }
+                    if (writeIops != null && writeIops > 0) {
+                        usedIops += (writeIops * multiplier);
+                    }
+                }
+            }
+        }
+        return usedIops <= totalAvailableIops;
+    }
+    
     private DiskOfferingVO getDiskOfferingVO(final Volume volume) {
         final Long diskOfferingId = volume.getDiskOfferingId();
 

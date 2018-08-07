@@ -69,6 +69,14 @@ public interface DiskOffering extends Identity, InternalIdentity {
 
     void setIopsWriteRate(Long iopsWriteRate);
 
+    Long getIopsTotalRate();
+
+    void setIopsTotalRate(Long iopsTotalRate);
+
+    Boolean getIopsRatePerGb();
+
+    void setIopsRatePerGb(Boolean iopsRatePerGb);
+    
     Integer getHypervisorSnapshotReserve();
 
     void setHypervisorSnapshotReserve(Integer hypervisorSnapshotReserve);

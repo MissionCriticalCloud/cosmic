@@ -1,5 +1,9 @@
 package com.cloud.agent.resource.kvm.storage;
 
+import com.ceph.rados.IoCTX;
+import com.ceph.rados.Rados;
+import com.ceph.rbd.Rbd;
+import com.ceph.rbd.RbdImage;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtConnection;
 import com.cloud.agent.resource.kvm.storage.utils.QemuImg;
@@ -45,6 +49,16 @@ import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.JavaStorageLayer;
 import com.cloud.utils.storage.StorageLayer;
+import org.apache.commons.io.FileUtils;
+import org.libvirt.Connect;
+import org.libvirt.Domain;
+import org.libvirt.DomainInfo;
+import org.libvirt.DomainInfo.DomainState;
+import org.libvirt.DomainSnapshot;
+import org.libvirt.LibvirtException;
+import org.libvirt.flags.DomainDeviceModifyFlags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -58,22 +72,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-
-import com.ceph.rados.IoCTX;
-import com.ceph.rados.Rados;
-import com.ceph.rbd.Rbd;
-import com.ceph.rbd.RbdImage;
-import org.apache.commons.io.FileUtils;
-import org.libvirt.Connect;
-import org.libvirt.Domain;
-import org.libvirt.DomainInfo;
-import org.libvirt.DomainInfo.DomainState;
-import org.libvirt.DomainSnapshot;
-import org.libvirt.LibvirtException;
-import org.libvirt.flags.DomainDeviceModifyFlags;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class KvmStorageProcessor implements StorageProcessor {
 
@@ -826,7 +826,7 @@ public class KvmStorageProcessor implements StorageProcessor {
 
             final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
-            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
+            attachOrDetachDisk(conn, true, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial, vol);
 
             return new AttachAnswer(disk);
         } catch (final LibvirtException e) {
@@ -871,7 +871,7 @@ public class KvmStorageProcessor implements StorageProcessor {
             final KvmPhysicalDisk phyDisk = this.storagePoolMgr.getPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(),
                     vol.getPath());
 
-            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial);
+            attachOrDetachDisk(conn, false, vmName, phyDisk, disk.getDiskSeq().intValue(), disk.getDiskController(), disk.getDiskFormat(), serial, vol);
 
             this.storagePoolMgr.disconnectPhysicalDisk(primaryStore.getPoolType(), primaryStore.getUuid(), vol.getPath());
 
@@ -1095,7 +1095,7 @@ public class KvmStorageProcessor implements StorageProcessor {
     }
 
     private synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId, final DiskControllerType
-            diskControllerType, final ImageFormat diskFormat, final String serial) throws LibvirtException, InternalErrorException {
+            diskControllerType, final ImageFormat diskFormat, final String serial, final VolumeObjectTO volumeObjectTO) throws LibvirtException, InternalErrorException {
         final List<LibvirtDiskDef> disks;
         Domain dm = null;
         LibvirtDiskDef diskdef = null;
@@ -1126,6 +1126,15 @@ public class KvmStorageProcessor implements StorageProcessor {
                 }
                 diskdef.setSerial(serial);
                 diskdef.setDeviceId(devId);
+                Optional.ofNullable(volumeObjectTO.getBytesReadRate()).filter(bps -> bps > 0).ifPresent(diskdef::setBytesReadRate);
+                Optional.ofNullable(volumeObjectTO.getBytesWriteRate()).filter(bps -> bps > 0).ifPresent(diskdef::setBytesWriteRate);
+                if (volumeObjectTO.getIopsTotalRate() == null) {
+                    Optional.ofNullable(volumeObjectTO.getIopsReadRate()).filter(iops -> iops > 0).ifPresent(diskdef::setIopsReadRate);
+                    Optional.ofNullable(volumeObjectTO.getIopsWriteRate()).filter(iops -> iops > 0).ifPresent(diskdef::setIopsWriteRate);
+                } else {
+                    Optional.ofNullable(volumeObjectTO.getIopsTotalRate()).filter(iops -> iops > 0).ifPresent(diskdef::setIopsTotalRate);
+                }
+
                 if (attachingPool.getType() == StoragePoolType.RBD) {
                     diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(), attachingPool.getSourcePort(), attachingPool.getAuthUserName(), attachingPool.getUuid(),
                             devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, ImageFormat.RAW);
