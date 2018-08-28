@@ -1,4 +1,5 @@
 package com.cloud.agent.resource.consoleproxy;
+import com.cloud.utils.security.SSLUtils;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -71,6 +72,8 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
                     final SSLParameters sslparams = c.getDefaultSSLParameters();
 
                     params.setSSLParameters(sslparams);
+                    params.setProtocols(SSLUtils.getRecommendedProtocols());
+                    params.setCipherSuites(SSLUtils.getRecommendedCiphers());
                     // statement above could throw IAE if any params invalid.
                     // eg. if app has a UI and parameters supplied by a user.
                 }
@@ -89,6 +92,8 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
         try {
             final SSLServerSocketFactory ssf = this.sslContext.getServerSocketFactory();
             final SSLServerSocket srvSock = (SSLServerSocket) ssf.createServerSocket(port);
+            srvSock.setEnabledProtocols(SSLUtils.getRecommendedProtocols());
+            srvSock.setEnabledCipherSuites(SSLUtils.getRecommendedCiphers());
 
             s_logger.info("create SSL server socket on port: " + port);
             return srvSock;
