@@ -81,6 +81,10 @@ public class ConsoleProxyHttpHandlerHelper {
                 if (param.getPassword() != null) {
                     map.put("password", param.getPassword());
                 }
+                if (param.getTokenCreationTimestamp() != null) {
+                    s_logger.error("decode getTokenCreationTimestamp: " + param.getTokenCreationTimestamp().toString());
+                    map.put("tokenCreationTimestamp", param.getTokenCreationTimestamp().toString());
+                }
             } else {
                 s_logger.error("Unable to decode token");
             }

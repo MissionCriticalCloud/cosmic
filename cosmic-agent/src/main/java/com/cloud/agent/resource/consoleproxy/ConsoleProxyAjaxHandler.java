@@ -66,6 +66,32 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
         final String vm_locale = queryMap.get("locale");
         final String username = queryMap.get("username");
         final String password = queryMap.get("password");
+        final String tokenCreationTimestampString = queryMap.get("tokenCreationTimestamp");
+
+        // Assume expiry when no timestamp is found
+        if (tokenCreationTimestampString == null) {
+            s_logger.warn("tokenCreationTimestampString is null: session expired");
+            sendResponse(t, "text/html", "Expired ajax client session id");
+            return;
+        }
+
+        // Check timestamp
+        try {
+            final Long currentTimestamp = System.currentTimeMillis() / 1000;
+            final long tokenCreationTimestamp = Long.parseLong(tokenCreationTimestampString);
+
+            if ((currentTimestamp - tokenCreationTimestamp) > 3600) {
+                s_logger.warn("tokenCreationTimestamp " + tokenCreationTimestamp + " - currentTimestamp " + currentTimestamp + " > 3600 seconds: session expired");
+                sendResponse(t, "text/html", "Expired ajax client session id");
+                return;
+            }
+            s_logger.debug("tokenCreationTimestamp " + tokenCreationTimestamp + " - currentTimestamp " + currentTimestamp + " <= 3600 seconds: session still valid");
+
+        } catch (final NumberFormatException e) {
+            s_logger.warn("Exception " + e + " when checking timestamp: session expired");
+            sendResponse(t, "text/html", "Expired ajax client session id");
+            return;
+        }
 
         if (tag == null) {
             tag = "";
@@ -118,6 +144,7 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
             param.setLocale(vm_locale);
             param.setUsername(username);
             param.setPassword(password);
+            param.setTokenCreationTimestamp(Long.parseLong(tokenCreationTimestampString));
 
             viewer = ConsoleProxy.getAjaxVncViewer(param, ajaxSessionIdStr);
         } catch (final Exception e) {

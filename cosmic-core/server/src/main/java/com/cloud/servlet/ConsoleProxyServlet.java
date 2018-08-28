@@ -416,6 +416,8 @@ public class ConsoleProxyServlet extends HttpServlet {
         param.setClientHostPassword(sid);
         param.setClientTag(tag);
         param.setTicket(ticket);
+        param.setTokenCreationTimestamp(System.currentTimeMillis() / 1000);
+
         if (portInfo.second() == -9) {
             param.setUsername(_ms.findDetail(hostVo.getId(), "username").getValue());
             param.setPassword(_ms.findDetail(hostVo.getId(), "password").getValue());
@@ -461,6 +463,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         param.setClientHostPassword(sid);
         param.setClientTag(tag);
         param.setTicket(ticket);
+        param.setTokenCreationTimestamp(System.currentTimeMillis() / 1000);
 
         if (details != null) {
             param.setLocale(details.getValue());
