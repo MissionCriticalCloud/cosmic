@@ -2430,19 +2430,11 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         if (cmd.getPrivateKey() != null) {
             _ksMgr.saveCertificate(ConsoleProxyManager.CERTIFICATE_NAME, certificate, key, cmd.getDomainSuffix());
 
-            // Reboot ssvm here since private key is present - meaning server cert being passed
-            final List<SecondaryStorageVmVO> alreadyRunning = _secStorageVmDao.getSecStorageVmListInStates(null, State.Running, State.Migrating, State.Starting);
-            for (final SecondaryStorageVmVO ssVmVm : alreadyRunning) {
-                _secStorageVmMgr.rebootSecStorageVm(ssVmVm.getId());
-            }
         } else {
             _ksMgr.saveCertificate(cmd.getAlias(), certificate, cmd.getCertIndex(), cmd.getDomainSuffix());
         }
 
-        _consoleProxyMgr.setManagementState(ConsoleProxyManagementState.ResetSuspending);
-        return "Certificate has been successfully updated, if its the server certificate we would reboot all " +
-                "running console proxy VMs and secondary storage VMs to propagate the new certificate, " +
-                "please give a few minutes for console access and storage services service to be up and working again";
+        return "Certificate has been successfully updated, please recreate the system VMs";
     }
 
     @Override
