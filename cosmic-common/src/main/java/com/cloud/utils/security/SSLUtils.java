@@ -31,10 +31,22 @@ public class SSLUtils {
     }
 
     public static SSLContext getSSLContext() throws NoSuchAlgorithmException {
-        return SSLContext.getInstance("TLSv1");
+        return SSLContext.getInstance("TLSv1.2");
     }
 
     public static SSLContext getSSLContext(final String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
-        return SSLContext.getInstance("TLSv1", provider);
+        return SSLContext.getInstance("TLSv1.2", provider);
     }
+
+    public static String[] getRecommendedProtocols() {
+        return new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" };
+    }
+
+    public static String[] getRecommendedCiphers() {
+        return new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
+                "TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+                "TLS_DHE_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA", "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
+                "TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_RSA_WITH_AES_256_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384" };
+
+        }
 }
