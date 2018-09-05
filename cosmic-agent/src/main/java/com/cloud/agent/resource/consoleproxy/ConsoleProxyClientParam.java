@@ -19,6 +19,8 @@ public class ConsoleProxyClientParam {
     private String username;
     private String password;
 
+    private Long tokenCreationTimestamp;
+
     public ConsoleProxyClientParam() {
         this.clientHostPort = 0;
     }
@@ -117,5 +119,16 @@ public class ConsoleProxyClientParam {
 
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public Long getTokenCreationTimestamp() {
+        if (this.tokenCreationTimestamp != null) {
+            return this.tokenCreationTimestamp;
+        }
+        return 0L;
+    }
+
+    public void setTokenCreationTimestamp(final long tokenCreationTimestamp) {
+        this.tokenCreationTimestamp = tokenCreationTimestamp;
     }
 }
