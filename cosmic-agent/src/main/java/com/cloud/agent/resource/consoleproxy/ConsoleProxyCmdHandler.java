@@ -33,6 +33,7 @@ public class ConsoleProxyCmdHandler implements HttpHandler {
 
             final Headers hds = t.getResponseHeaders();
             hds.set("Content-Type", "text/plain");
+            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             t.sendResponseHeaders(200, 0);
             final OutputStreamWriter os = new OutputStreamWriter(t.getResponseBody(), "UTF-8");
             statsCollector.getStatsReport(os);
