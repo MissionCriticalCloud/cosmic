@@ -107,6 +107,7 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
             final Headers hds = t.getResponseHeaders();
             hds.set("Content-Type", contentType);
             hds.set("Last-Modified", new Date(lastModified).toGMTString());
+            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             t.sendResponseHeaders(200, length);
             responseFileContent(t, f);
 

@@ -113,6 +113,7 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
             hds.set("Content-Type", "image/jpeg");
             hds.set("Cache-Control", "no-cache");
             hds.set("Cache-Control", "no-store");
+            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             t.sendResponseHeaders(200, bs.length);
             final OutputStream os = t.getResponseBody();
             os.write(bs);
@@ -124,6 +125,7 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
             if (img != null) {
                 final Headers hds = t.getResponseHeaders();
                 hds.set("Content-Type", "image/jpeg");
+                hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
                 t.sendResponseHeaders(200, img.length);
 
                 final OutputStream os = t.getResponseBody();
