@@ -33,6 +33,8 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
             }
         } catch (final IllegalArgumentException e) {
             s_logger.warn("Exception, ", e);
+            final Headers hds = t.getResponseHeaders();
+            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             t.sendResponseHeaders(400, -1);     // bad request
         } finally {
             t.close();
@@ -138,6 +140,8 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
                 if (s_logger.isInfoEnabled()) {
                     s_logger.info("Image has already been swept out, key: " + key);
                 }
+                final Headers hds = t.getResponseHeaders();
+                hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
                 t.sendResponseHeaders(404, -1);
             }
         }
