@@ -59,6 +59,8 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
         } catch (final IllegalArgumentException e) {
             final String response = "Bad query string";
             s_logger.error(response + ", request URI : " + t.getRequestURI());
+            final Headers hds = t.getResponseHeaders();
+            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             t.sendResponseHeaders(200, response.length());
             final OutputStream os = t.getResponseBody();
             os.write(response.getBytes());

@@ -40,6 +40,8 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
             }
         } catch (final IllegalArgumentException e) {
             s_logger.warn("Exception, ", e);
+            final Headers hds = t.getResponseHeaders();
+            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
             t.sendResponseHeaders(400, -1);     // bad request
         } finally {
             t.close();
@@ -386,6 +388,8 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
 
     private void handleClientKickoff(final HttpExchange t, final ConsoleProxyClient viewer) throws IOException {
         final String response = viewer.onAjaxClientKickoff();
+        final Headers hds = t.getResponseHeaders();
+        hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
         t.sendResponseHeaders(200, response.length());
         final OutputStream os = t.getResponseBody();
         try {
