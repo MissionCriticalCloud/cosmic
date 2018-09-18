@@ -391,16 +391,18 @@ public class LibvirtVmDef {
             private String track;
             private boolean noKvmClock;
             private boolean present;
+            private boolean trackGuest;
 
             public Timer() {
             }
 
-            private Timer(final String name, final String tickPolicy, final boolean present) {
+            private Timer(final String name, final String tickPolicy, final boolean present, final boolean trackGuest) {
                 this.name = name;
                 this.tickPolicy = tickPolicy;
                 this.track = track;
                 this.noKvmClock = noKvmClock;
                 this.present = present;
+                this.trackGuest = trackGuest;
             }
 
             @Override
@@ -418,6 +420,10 @@ public class LibvirtVmDef {
                             timerBuilder.append("tickpolicy='");
                             timerBuilder.append(this.tickPolicy);
                             timerBuilder.append("' ");
+                            if (this.trackGuest) {
+                                timerBuilder.append("track='guest'");
+                                timerBuilder.append(" ");
+                            }
                         }
 
                         timerBuilder.append(">\n");
@@ -437,12 +443,12 @@ public class LibvirtVmDef {
             this.offset = offset;
         }
 
-        public void addTimer(final String timerName, final String tickPolicy, final boolean present) {
-            timers.add(new Timer(timerName, tickPolicy, present));
+        public void addTimer(final String timerName, final String tickPolicy, final boolean present, final boolean trackGuest) {
+            timers.add(new Timer(timerName, tickPolicy, present, trackGuest));
         }
 
         public void addTimer(final String timerName, final String tickPolicy) {
-            timers.add(new Timer(timerName, tickPolicy, true));
+            timers.add(new Timer(timerName, tickPolicy, true, false));
         }
 
         public enum ClockOffset {
