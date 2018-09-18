@@ -1370,18 +1370,22 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         final ClockDef clock = new ClockDef();
         Boolean kvmClockEnabled = !isKvmClockDisabled();
         Boolean hypervClockEnabled = false;
+        Boolean trackGuest = false;
         if (vmTo.getOptimiseFor() == OptimiseFor.Windows) {
             clock.setClockOffset(ClockDef.ClockOffset.LOCALTIME);
             kvmClockEnabled = false;
             hypervClockEnabled = true;
+            trackGuest = true;
         }
-        clock.addTimer("kvmclock", null, kvmClockEnabled);
-        clock.addTimer("hypervclock", null, hypervClockEnabled);
+        clock.addTimer("kvmclock", null, kvmClockEnabled, false);
+        clock.addTimer("hypervclock", null, hypervClockEnabled, false);
 
         // Recommended default clock/timer settings - https://bugzilla.redhat.com/show_bug.cgi?id=1053847
-        clock.addTimer("rtc", "catchup");
-        clock.addTimer("pit", "delay");
-        clock.addTimer("hpet", null, false);
+        // Important note for track="guest" in Windows VMs:
+        // https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/Virtualization_Deployment_and_Administration_Guide/sect-Virtualization-Tips_and_tricks-Libvirt_Managed_Timers.html
+        clock.addTimer("rtc", "catchup", true, trackGuest);
+        clock.addTimer("pit", "delay", true, false);
+        clock.addTimer("hpet", null, false, false);
         vm.addComponent(clock);
 
         final DevicesDef devices = new DevicesDef();
