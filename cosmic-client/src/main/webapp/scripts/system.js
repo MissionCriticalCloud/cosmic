@@ -1,7 +1,8 @@
 (function ($, cloudStack) {
 
     var zoneObjs, podObjs, clusterObjs, domainObjs, networkOfferingObjs, physicalNetworkObjs;
-    var selectedClusterObj, selectedZoneObj, selectedPublicNetworkObj, selectedManagementNetworkObj, selectedPhysicalNetworkObj, selectedGuestNetworkObj;
+    var selectedClusterObj, selectedZoneObj, selectedPublicNetworkObj, selectedManagementNetworkObj,
+        selectedPhysicalNetworkObj, selectedGuestNetworkObj;
     var nspMap = {};
     //from listNetworkServiceProviders API
     var nspHardcodingArray = []; //for service providers listView (hardcoding, not from listNetworkServiceProviders API)
@@ -1484,16 +1485,18 @@
 
                                         //need to make 2 listNetworks API call to get all guest networks from one physical network in Advanced zone
                                         var items = [];
-                                        //"listNetworks&projectid=-1": list guest networks under all projects (no matter who the owner is)
-                                        $.ajax({
-                                            url: createURL("listNetworks&projectid=-1&trafficType=Guest&zoneId=" + selectedZoneObj.id + "&physicalnetworkid=" + selectedPhysicalNetworkObj.id + "&page=" + args.page + "&pagesize=" + pageSize + array1.join("")),
-                                            dataType: "json",
-                                            async: false,
-                                            success: function (json) {
-                                                if (json.listnetworksresponse.network != null && json.listnetworksresponse.network.length > 0)
-                                                    items = json.listnetworksresponse.network;
-                                            }
-                                        });
+                                        if (isAdmin()) {
+                                            //"listNetworks&projectid=-1": list guest networks under all projects (no matter who the owner is)
+                                            $.ajax({
+                                                url: createURL("listNetworks&projectid=-1&trafficType=Guest&zoneId=" + selectedZoneObj.id + "&physicalnetworkid=" + selectedPhysicalNetworkObj.id + "&page=" + args.page + "&pagesize=" + pageSize + array1.join("")),
+                                                dataType: "json",
+                                                async: false,
+                                                success: function (json) {
+                                                    if (json.listnetworksresponse.network != null && json.listnetworksresponse.network.length > 0)
+                                                        items = json.listnetworksresponse.network;
+                                                }
+                                            });
+                                        }
 
                                         var networkCollectionMap = {};
                                         $(items).each(function () {
@@ -2331,7 +2334,7 @@
                                                  * because in project view, all API calls are appended with projectid=[projectID].
                                                  * Therefore, we only call the second listRouters API(with projectid=-1) in non-project view.
                                                  */
-                                                if (cloudStack.context && cloudStack.context.projects == null) { //non-project view
+                                                if (cloudStack.context && cloudStack.context.projects == null && isAdmin()) { //non-project view
                                                     $.ajax({
                                                         url: createURL("listRouters&zoneid=" + selectedZoneObj.id + "&listAll=true&page=" + args.page + "&pagesize=" + pageSize + array1.join("") + "&projectid=-1"),
                                                         data: data2,
@@ -2923,7 +2926,7 @@
                                                  * because in project view, all API calls are appended with projectid=[projectID].
                                                  * Therefore, we only call the second listRouters API(with projectid=-1) in non-project view.
                                                  */
-                                                if (cloudStack.context && cloudStack.context.projects == null) { //non-project view
+                                                if (cloudStack.context && cloudStack.context.projects == null && isAdmin()) { //non-project view
                                                     $.ajax({
                                                         url: createURL("listRouters&zoneid=" + selectedZoneObj.id + "&listAll=true&page=" + args.page + "&pagesize=" + pageSize + array1.join("") + "&projectid=-1"),
                                                         dataType: 'json',
@@ -4746,7 +4749,7 @@
                                                     array.push("&listAll=true");
                                                     break;
                                                 default:
-                                                    array.push("&listAll=true&scope="+args.filterBy.kind);
+                                                    array.push("&listAll=true&scope=" + args.filterBy.kind);
                                                     break;
                                             }
                                         }
@@ -4959,7 +4962,7 @@
                                                                  * because in project view, all API calls are appended with projectid=[projectID].
                                                                  * Therefore, we only call the second listRouters API(with projectid=-1) in non-project view.
                                                                  */
-                                                                if (cloudStack.context && cloudStack.context.projects == null) { //non-project view
+                                                                if (cloudStack.context && cloudStack.context.projects == null && isAdmin()) { //non-project view
                                                                     $.ajax({
                                                                         url: createURL("listRouters&listAll=true&page=" + args.page + "&pagesize=" + pageSize + "&projectid=-1"),
                                                                         async: false,
@@ -5308,7 +5311,7 @@
                                          * because in project view, all API calls are appended with projectid=[projectID].
                                          * Therefore, we only call the second listRouters API(with projectid=-1) in non-project view.
                                          */
-                                        if (cloudStack.context && cloudStack.context.projects == null) { //non-project view
+                                        if (cloudStack.context && cloudStack.context.projects == null && isAdmin()) { //non-project view
                                             /*
                                              * account parameter(account+domainid) and project parameter(projectid) are not allowed to be passed together to listXXXXXXX API.
                                              * So, remove account parameter(account+domainid) from data2
