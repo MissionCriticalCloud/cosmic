@@ -5,16 +5,20 @@ import com.cloud.host.dao.HostDao;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.CopyCommand;
 import com.cloud.legacymodel.communication.command.StorageSubSystemCommand;
+import com.cloud.legacymodel.storage.VirtualMachineTemplate;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.DataObjectType;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.storage.GuestOSHypervisorVO;
 import com.cloud.storage.GuestOSVO;
+import com.cloud.storage.VMTemplateVO;
 import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.GuestOSHypervisorDao;
+import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.vm.VirtualMachineProfile;
 
 import javax.inject.Inject;
@@ -27,6 +31,8 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
     GuestOSHypervisorDao _guestOsHypervisorDao;
     @Inject
     HostDao _hostDao;
+    @Inject
+    VMTemplateDao _vmTemplateDao;
 
     protected KVMGuru() {
         super();
@@ -77,7 +83,15 @@ public class KVMGuru extends HypervisorGuruBase implements HypervisorGuru {
         // Determine the VM's OS description
         final GuestOSVO guestOS = _guestOsDao.findByIdIncludingRemoved(vm.getVirtualMachine().getGuestOSId());
         to.setOs(guestOS.getDisplayName());
-        to.setCpuflags(vm.getVirtualMachine().getCpuFlags());
+        // Set on template level
+        final VMTemplateVO vmTemplate = _vmTemplateDao.findById(vm.getTemplateId());
+        if (vmTemplate != null && vmTemplate.getCpuFlags() != null) {
+            to.setCpuflags(vmTemplate.getCpuFlags());
+        }
+        // Override on VM level
+        if (vm.getVirtualMachine() != null && vm.getVirtualMachine().getCpuFlags() != null) {
+            to.setCpuflags(vm.getVirtualMachine().getCpuFlags());
+        }
         to.setManufacturer(vm.getVirtualMachine().getManufacturerString());
 
         final HostVO host = _hostDao.findById(vm.getVirtualMachine().getHostId());
