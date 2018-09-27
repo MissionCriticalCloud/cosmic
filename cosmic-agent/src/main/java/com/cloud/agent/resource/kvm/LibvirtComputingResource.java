@@ -96,6 +96,7 @@ import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.RngBackendModel;
@@ -1366,6 +1367,19 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         if (vmTo.getType() == VirtualMachineType.User) {
             cmd.setFeatures(getCpuFeatures());
         }
+
+        // Windows performs better without the hypervisor flag
+        // But only when maintenance policy is live migrate
+        if (OptimiseFor.Windows.equals(vmTo.getOptimiseFor()) && MaintenancePolicy.LiveMigrate.equals(vmTo.getMaintenancePolicy())) {
+            String extended_cpu_flags = vmTo.getCpuflags();
+            if (extended_cpu_flags == null) {
+                extended_cpu_flags = "-hypervisor";
+            } else {
+                extended_cpu_flags +=  " -hypervisor";
+            }
+            cmd.setCpuflags(extended_cpu_flags);
+        }
+
         // multi cores per socket, for larger core configs
         if (vcpus % 6 == 0) {
             final int sockets = vcpus / 6;
