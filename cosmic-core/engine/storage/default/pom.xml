@@ -5,41 +5,41 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.1.11</version>
+        <version>6.1.12-SNAPSHOT</version>
         <relativePath>../../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.1.11</version>
+            <version>6.1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-api</artifactId>
-            <version>6.1.11</version>
+            <version>6.1.12-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>6.1.11</version>
+            <version>6.1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
-            <version>6.1.11</version>
+            <version>6.1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-api</artifactId>
-            <version>6.1.11</version>
+            <version>6.1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>6.1.11</version>
+            <version>6.1.12-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
