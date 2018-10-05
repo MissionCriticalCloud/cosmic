@@ -838,6 +838,10 @@ public class LibvirtVmDef {
 
             if (this.features != null || this.cpuflags != null) {
                 for (final String feature : featureMap.keySet()) {
+                    // Ignore empty flags
+                    if ("".equals(feature)) {
+                        continue;
+                    }
                     if (featureMap.get(feature)) {
                         modeBuilder.append("<feature policy='require' name='" + feature + "'/>");
                     } else {
