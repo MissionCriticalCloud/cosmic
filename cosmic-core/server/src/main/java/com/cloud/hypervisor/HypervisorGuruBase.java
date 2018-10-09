@@ -96,7 +96,10 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
 
             if (TrafficType.Guest.equals(nicProfile.getTrafficType())) {
                 final NetworkVO network = _networkDao.findById(nicProfile.getNetworkId());
-                vpcList.add(network.getVpcId());
+                final Long vpcId = network.getVpcId();
+                if (vpcId != null) {
+                    vpcList.add(network.getVpcId());
+                }
             }
         }
 
@@ -159,11 +162,14 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
 
         for (final Long vpcId : vpcList) {
             final VpcVO vpc = _vpcDao.findById(vpcId);
-            vpcNameList.add(vpc.getName());
-
+            if (vpc != null) {
+                vpcNameList.add(vpc.getName());
+            }
             final List<? extends ResourceTag> tags = ApiDBUtils.listByResourceTypeAndId(ResourceTag.ResourceObjectType.Vpc, vpcId);
             for (final ResourceTag tag : tags) {
-                resourceTags.put("vpc_" + tag.getKey(), tag.getValue());
+                if (tag != null) {
+                    resourceTags.put("vpc_" + tag.getKey(), tag.getValue());
+                }
             }
         }
 
