@@ -840,7 +840,7 @@
                                                     var filteredofferings = $.grep(offerings, function (offering) {
                                                         return offering.state == 'Enabled';
                                                     });
-                                                    $(filteredofferings).each(function (offering) {
+                                                    filteredofferings.forEach(function (offering) {
                                                         items.push({
                                                             id: offering.id,
                                                             description: offering.displaytext
@@ -852,7 +852,7 @@
                                             //include currently selected vpc offering to dropdown
                                             items.push({
                                                 id: args.context.vpc[0].vpcofferingid,
-                                                description: args.context.vpc[0].vpcoffering + " (Current offering)"
+                                                description: args.context.vpc[0].vpcofferingdisplaytext + " (Current offering)"
                                             });
 
                                             args.response.success({
