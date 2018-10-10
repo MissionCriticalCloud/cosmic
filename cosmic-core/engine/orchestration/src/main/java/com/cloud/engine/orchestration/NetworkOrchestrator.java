@@ -1268,7 +1268,16 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             final Integer networkRate = _networkModel.getNetworkRate(network.getId(), vm.getId());
 
             final NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
-            final NicProfile profile = new NicProfile(nic, network, network.getBroadcastUri(), nic.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
+
+            // Get Broadcast URI from the NIC
+            URI broadcastUri = nic.getBroadcastUri();
+
+            // Except for Guest networks
+            if (TrafficType.Guest.equals(network.getTrafficType())) {
+                broadcastUri = network.getBroadcastUri();
+            }
+
+            final NicProfile profile = new NicProfile(nic, network, broadcastUri, nic.getIsolationUri(), networkRate, _networkModel.getNetworkTag(vm.getHypervisorType(), network));
             if (guru instanceof NetworkMigrationResponder) {
                 if (!((NetworkMigrationResponder) guru).prepareMigration(profile, network, vm, dest, context)) {
                     s_logger.error("NetworkGuru " + guru + " prepareForMigration failed."); // XXX: Transaction error
