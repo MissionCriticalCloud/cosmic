@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '6.1.12'
+VERSION = '6.1.13'
 
 setup(
     name='Marvin',
