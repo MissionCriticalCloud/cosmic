@@ -1306,6 +1306,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
             metadata.getNodes().put("cosmicXmlGeneratedDateTime", getCurrentLocalDateTimeStamp());
             metadata.getNodes().put("cosmicXmlGeneratedEpoch", getCurrentEpoch());
             metadata.getNodes().put("cosmicVmHostname", metadataTo.getHostname());
+            metadata.getNodes().put("cosmicOptimiseFor", vmTo.getOptimiseFor().toString());
 
             final List<String> vpcNameList = metadataTo.getVpcNameList();
             if (vpcNameList != null) {
