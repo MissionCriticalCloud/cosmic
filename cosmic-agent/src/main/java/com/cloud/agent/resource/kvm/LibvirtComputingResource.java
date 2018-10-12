@@ -1314,13 +1314,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                 }
             }
 
-            final Map<String, String> vmDetails = metadataTo.getResourceDetails();
-            if (vmDetails != null) {
-                for (Map.Entry<String, String> vmDetail : vmDetails.entrySet()) {
-                    metadata.getNodes().put("cosmicDetail_" + vmDetail.getKey(), vmDetail.getValue());
-                }
-            }
-
             final Map<String, String> vmTags = metadataTo.getResourceTags();
             if (vmTags != null) {
                 for (Map.Entry<String, String> vmTag : vmTags.entrySet()) {
