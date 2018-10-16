@@ -6,19 +6,19 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic</artifactId>
-        <version>6.1.14-SNAPSHOT</version>
+        <version>6.1.14</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-common</artifactId>
-            <version>6.1.14-SNAPSHOT</version>
+            <version>6.1.14</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-model</artifactId>
-            <version>6.1.14-SNAPSHOT</version>
+            <version>6.1.14</version>
         </dependency>
 
         <dependency>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-security</artifactId>
-            <version>6.1.14-SNAPSHOT</version>
+            <version>6.1.14</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
