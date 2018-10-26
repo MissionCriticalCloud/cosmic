@@ -36,11 +36,12 @@ import com.cloud.utils.fsm.StateMachine2Transitions;
 import com.cloud.utils.storage.encoding.EncodingType;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VolumeObject implements VolumeInfo {
     private static final Logger s_logger = LoggerFactory.getLogger(VolumeObject.class);
@@ -333,8 +334,10 @@ public class VolumeObject implements VolumeInfo {
                 dataStoreTO = this.getDataStore().getTO();
             }
             to = new VolumeObjectTO(this.getUuid(), this.getVolumeType(), dataStoreTO, this.getName(), this.getSize(), this.getPath(), this.getVolumeId(), this
-                    .getAttachedVmName(), this.getAccountId(), this.getChainInfo(), this.getFormat(), this.getProvisioningType(), this.getId(), this.getDeviceId(), this.getBytesReadRate(), this
-                    .getBytesWriteRate(), this.getIopsReadRate(), this.getIopsWriteRate(), this.getIopsTotalRate(), this.getIopsRatePerGb(), this.getCacheMode(), this.getHypervisorType());
+                    .getAttachedVmName(), this.getAccountId(), this.getChainInfo(), this.getFormat(), this.getProvisioningType(), this.getId(), this.getDeviceId(),
+                    this.getBytesReadRate(), this
+                    .getBytesWriteRate(), this.getIopsReadRate(), this.getIopsWriteRate(), this.getIopsTotalRate(), this.getIopsRatePerGb(), this.getCacheMode(),
+                    this.getHypervisorType());
         }
         return to;
     }

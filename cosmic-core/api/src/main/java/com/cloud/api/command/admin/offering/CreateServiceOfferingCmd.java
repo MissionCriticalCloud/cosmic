@@ -12,15 +12,17 @@ import com.cloud.api.response.ServiceOfferingResponse;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.offering.ServiceOffering;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-@APICommand(name = "createServiceOffering", group = APICommandGroup.ServiceOfferingService, description = "Creates a service offering.", responseObject = ServiceOfferingResponse.class,
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@APICommand(name = "createServiceOffering", group = APICommandGroup.ServiceOfferingService, description = "Creates a service offering.", responseObject =
+        ServiceOfferingResponse.class,
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class CreateServiceOfferingCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(CreateServiceOfferingCmd.class.getName());

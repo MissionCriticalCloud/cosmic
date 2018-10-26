@@ -64,8 +64,6 @@ import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.UserVmDetailsDao;
 import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -75,6 +73,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CapacityManagerImpl extends ManagerBase implements CapacityManager, StateListener<State, VirtualMachine.Event, VirtualMachine>, Listener, ResourceListener,
         Configurable {
@@ -260,7 +261,8 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     final long reservedMem = capacityMemory.getReservedCapacity();
                     final long actualTotalCpu = capacityCpu.getTotalCapacity();
                     final float cpuOvercommitRatio = Float.parseFloat(CapacityManagerImpl.this._clusterDetailsDao.findDetail(clusterIdFinal, "cpuOvercommitRatio").getValue());
-                    final float memoryOvercommitRatio = Float.parseFloat(CapacityManagerImpl.this._clusterDetailsDao.findDetail(clusterIdFinal, "memoryOvercommitRatio").getValue());
+                    final float memoryOvercommitRatio =
+                            Float.parseFloat(CapacityManagerImpl.this._clusterDetailsDao.findDetail(clusterIdFinal, "memoryOvercommitRatio").getValue());
                     final int vmCPU = svo.getCpu();
                     final long vmMem = svo.getRamSize() * 1024L * 1024L;
                     final long actualTotalMem = capacityMemory.getTotalCapacity();
@@ -673,7 +675,8 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     CapacityManagerImpl.this._capacityDao.persist(capacity);
 
                     capacity =
-                            new CapacityVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId(), usedCpuFinal, host.getCpus().longValue(), Capacity.CAPACITY_TYPE_CPU);
+                            new CapacityVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId(), usedCpuFinal, host.getCpus()
+                                                                                                                                         .longValue(), Capacity.CAPACITY_TYPE_CPU);
                     capacity.setReservedCapacity(reservedCpuFinal);
                     capacity.setCapacityState(capacityState);
                     CapacityManagerImpl.this._capacityDao.persist(capacity);

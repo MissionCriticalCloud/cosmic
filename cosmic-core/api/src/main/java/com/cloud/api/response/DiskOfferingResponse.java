@@ -5,9 +5,10 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.storage.DiskOffering;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = DiskOffering.class)
 public class DiskOfferingResponse extends BaseResponse {

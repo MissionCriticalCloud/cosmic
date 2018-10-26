@@ -1,9 +1,5 @@
 package com.cloud.agent.resource.kvm.storage;
 
-import com.ceph.rados.IoCTX;
-import com.ceph.rados.Rados;
-import com.ceph.rbd.Rbd;
-import com.ceph.rbd.RbdImage;
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.agent.resource.kvm.LibvirtConnection;
 import com.cloud.agent.resource.kvm.storage.utils.QemuImg;
@@ -49,16 +45,6 @@ import com.cloud.model.enumeration.StoragePoolType;
 import com.cloud.utils.script.Script;
 import com.cloud.utils.storage.JavaStorageLayer;
 import com.cloud.utils.storage.StorageLayer;
-import org.apache.commons.io.FileUtils;
-import org.libvirt.Connect;
-import org.libvirt.Domain;
-import org.libvirt.DomainInfo;
-import org.libvirt.DomainInfo.DomainState;
-import org.libvirt.DomainSnapshot;
-import org.libvirt.LibvirtException;
-import org.libvirt.flags.DomainDeviceModifyFlags;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
@@ -74,6 +60,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.ceph.rados.IoCTX;
+import com.ceph.rados.Rados;
+import com.ceph.rbd.Rbd;
+import com.ceph.rbd.RbdImage;
+import org.apache.commons.io.FileUtils;
+import org.libvirt.Connect;
+import org.libvirt.Domain;
+import org.libvirt.DomainInfo;
+import org.libvirt.DomainInfo.DomainState;
+import org.libvirt.DomainSnapshot;
+import org.libvirt.LibvirtException;
+import org.libvirt.flags.DomainDeviceModifyFlags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KvmStorageProcessor implements StorageProcessor {
 
@@ -1094,8 +1095,9 @@ public class KvmStorageProcessor implements StorageProcessor {
         return new SnapshotAndCopyAnswer();
     }
 
-    private synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId, final DiskControllerType
-            diskControllerType, final ImageFormat diskFormat, final String serial, final VolumeObjectTO volumeObjectTO) throws LibvirtException, InternalErrorException {
+    private synchronized String attachOrDetachDisk(final Connect conn, final boolean attach, final String vmName, final KvmPhysicalDisk attachingDisk, final int devId,
+                                                   final DiskControllerType
+                                                           diskControllerType, final ImageFormat diskFormat, final String serial, final VolumeObjectTO volumeObjectTO) throws LibvirtException, InternalErrorException {
         final List<LibvirtDiskDef> disks;
         Domain dm = null;
         LibvirtDiskDef diskdef = null;
@@ -1136,13 +1138,16 @@ public class KvmStorageProcessor implements StorageProcessor {
                 }
 
                 if (attachingPool.getType() == StoragePoolType.RBD) {
-                    diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(), attachingPool.getSourcePort(), attachingPool.getAuthUserName(), attachingPool.getUuid(),
+                    diskdef.defNetworkBasedDisk(attachingDisk.getPath(), attachingPool.getSourceHost(), attachingPool.getSourcePort(), attachingPool.getAuthUserName(),
+                            attachingPool
+                                    .getUuid(),
                             devId, diskControllerType, LibvirtDiskDef.DiskProtocol.RBD, ImageFormat.RAW);
                 } else if (attachingPool.getType() == StoragePoolType.Gluster) {
                     final String mountpoint = attachingPool.getLocalPath();
                     final String path = attachingDisk.getPath();
                     final String glusterVolume = attachingPool.getSourceDir().replace("/", "");
-                    diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(), attachingPool.getSourcePort(), null, null, devId, diskControllerType,
+                    diskdef.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), attachingPool.getSourceHost(), attachingPool.getSourcePort(), null, null, devId,
+                            diskControllerType,
                             LibvirtDiskDef.DiskProtocol.GLUSTER, ImageFormat.QCOW2);
                 } else if (attachingPool.getType() == StoragePoolType.NetworkFilesystem) {
                     diskdef.defFileBasedDisk(attachingDisk.getPath(), devId, diskControllerType, diskFormat);

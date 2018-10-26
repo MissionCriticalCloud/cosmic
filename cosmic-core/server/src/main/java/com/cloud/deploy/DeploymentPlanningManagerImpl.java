@@ -94,8 +94,6 @@ import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachineProfile;
 import com.cloud.vm.dao.UserVmDao;
 import com.cloud.vm.dao.VMInstanceDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
@@ -110,6 +108,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeploymentPlanningManagerImpl extends ManagerBase implements DeploymentPlanningManager, Manager, Listener,
         StateListener<State, VirtualMachine.Event, VirtualMachine> {

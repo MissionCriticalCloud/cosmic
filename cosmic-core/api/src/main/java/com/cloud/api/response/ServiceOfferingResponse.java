@@ -5,10 +5,11 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.serializer.Param;
-import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 import java.util.Map;
+
+import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = ServiceOffering.class)
 public class ServiceOfferingResponse extends BaseResponse {
