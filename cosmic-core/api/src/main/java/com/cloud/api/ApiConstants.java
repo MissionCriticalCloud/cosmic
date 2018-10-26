@@ -117,6 +117,8 @@ public class ApiConstants {
     public static final String INTERVAL_TYPE = "intervaltype";
     public static final String IOPS_READ_RATE = "iopsreadrate";
     public static final String IOPS_WRITE_RATE = "iopswriterate";
+    public static final String IOPS_TOTAL_RATE = "iopstotalrate";
+    public static final String IOPS_RATE_PER_GB = "iopsratepergb";
     public static final String IP_ADDRESS = "ipaddress";
     public static final String IP6_ADDRESS = "ip6address";
     public static final String IP_ADDRESS_ID = "ipaddressid";

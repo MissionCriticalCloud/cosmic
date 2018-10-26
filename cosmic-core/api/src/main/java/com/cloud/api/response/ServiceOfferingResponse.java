@@ -121,6 +121,14 @@ public class ServiceOfferingResponse extends BaseResponse {
     @Param(description = "io requests write rate of the service offering")
     private Long iopsWriteRate;
 
+    @SerializedName("diskIopsTotalRate")
+    @Param(description = "io requests total rate of the service offering")
+    private Long iopsTotalRate;
+
+    @SerializedName("diskIopsRatePerGb")
+    @Param(description = "io requests per GB")
+    private Boolean iopsRatePerGb;
+
     @SerializedName(ApiConstants.DEPLOYMENT_PLANNER)
     @Param(description = "deployment strategy used to deploy VM.")
     private String deploymentPlanner;
@@ -346,5 +354,21 @@ public class ServiceOfferingResponse extends BaseResponse {
 
     public void setIscutomized(final boolean iscutomized) {
         isCustomized = iscutomized;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 }

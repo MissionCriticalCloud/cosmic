@@ -20,6 +20,7 @@ public class VolumeTO implements InternalIdentity {
     private Long bytesWriteRate;
     private Long iopsReadRate;
     private Long iopsWriteRate;
+    private Long iopsTotalRate;
     private String cacheMode;
     private Long chainSize;
 
@@ -146,6 +147,14 @@ public class VolumeTO implements InternalIdentity {
 
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
     }
 
     public String getCacheMode() {

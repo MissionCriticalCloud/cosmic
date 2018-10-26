@@ -24,6 +24,7 @@ public class DiskProfile {
     private Long bytesWriteRate;
     private Long iopsReadRate;
     private Long iopsWriteRate;
+    private long iopsTotalRate;
     private String cacheMode;
 
     private HypervisorType hyperType;
@@ -193,6 +194,14 @@ public class DiskProfile {
 
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
     }
 
     public String getCacheMode() {

@@ -27,6 +27,8 @@ public class VolumeObjectTO implements DataTO {
     private Long bytesWriteRate;
     private Long iopsReadRate;
     private Long iopsWriteRate;
+    private Long iopsTotalRate;
+    private Boolean iopsRatePerGb;
     private DiskCacheMode cacheMode;
     private HypervisorType hypervisorType;
 
@@ -34,9 +36,11 @@ public class VolumeObjectTO implements DataTO {
 
     }
 
-    public VolumeObjectTO(final String uuid, final VolumeType volumeType, final DataStoreTO dataStore, final String name, final Long size, final String path, final Long volumeId, final String
-            vmName, final long accountId, final String chainInfo, final ImageFormat format, final StorageProvisioningType provisioningType, final long id, final Long deviceId, final Long
-                                  bytesReadRate, final Long bytesWriteRate, final Long iopsReadRate, final Long iopsWriteRate, final DiskCacheMode cacheMode, final HypervisorType hypervisorType) {
+    public VolumeObjectTO(final String uuid, final VolumeType volumeType, final DataStoreTO dataStore, final String name, final Long size, final String path, final Long volumeId,
+                          final String vmName, final long accountId, final String chainInfo, final ImageFormat format, final StorageProvisioningType provisioningType,
+                          final long id, final Long deviceId, final Long bytesReadRate, final Long bytesWriteRate,
+                          final Long iopsReadRate, final Long iopsWriteRate, final Long iopsTotalRate, final Boolean iopsRatePerGb,
+                          final DiskCacheMode cacheMode, final HypervisorType hypervisorType) {
         this.uuid = uuid;
         this.volumeType = volumeType;
         this.dataStore = dataStore;
@@ -55,6 +59,8 @@ public class VolumeObjectTO implements DataTO {
         this.bytesWriteRate = bytesWriteRate;
         this.iopsReadRate = iopsReadRate;
         this.iopsWriteRate = iopsWriteRate;
+        this.iopsTotalRate = iopsTotalRate;
+        this.iopsRatePerGb = iopsRatePerGb;
         this.cacheMode = cacheMode;
         this.hypervisorType = hypervisorType;
     }
@@ -211,6 +217,22 @@ public class VolumeObjectTO implements DataTO {
 
     public void setIopsWriteRate(final Long iopsWriteRate) {
         this.iopsWriteRate = iopsWriteRate;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 
     public Long getDeviceId() {

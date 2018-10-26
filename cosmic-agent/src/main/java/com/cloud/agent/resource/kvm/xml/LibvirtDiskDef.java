@@ -21,6 +21,7 @@ public class LibvirtDiskDef {
     private Long bytesWriteRate;
     private Long iopsReadRate;
     private Long iopsWriteRate;
+    private Long iopsTotalRate;
     private DiskCacheMode diskCacheMode;
     private String serial;
     private boolean qemuDriver = true;
@@ -218,6 +219,10 @@ public class LibvirtDiskDef {
         this.iopsWriteRate = iopsWriteRate;
     }
 
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
     public DiskCacheMode getCacheMode() {
         return this.diskCacheMode;
     }
@@ -398,8 +403,9 @@ public class LibvirtDiskDef {
         }
 
         if (this.deviceType != DeviceType.CDROM
-                && (this.bytesReadRate != null && this.bytesReadRate > 0 || this.bytesWriteRate != null && this.bytesWriteRate > 0
-                || this.iopsReadRate != null && this.iopsReadRate > 0 || this.iopsWriteRate != null && this.iopsWriteRate > 0)) {
+                && ((this.bytesReadRate != null && this.bytesReadRate > 0 || this.bytesWriteRate != null && this.bytesWriteRate > 0
+                || this.iopsReadRate != null && this.iopsReadRate > 0 || this.iopsWriteRate != null && this.iopsWriteRate > 0)
+                || (this.iopsTotalRate != null && this.iopsTotalRate > 0))) {
             diskBuilder.append("<iotune>\n");
             if (this.bytesReadRate != null && this.bytesReadRate > 0) {
                 diskBuilder.append("<read_bytes_sec>" + this.bytesReadRate + "</read_bytes_sec>\n");
@@ -412,6 +418,9 @@ public class LibvirtDiskDef {
             }
             if (this.iopsWriteRate != null && this.iopsWriteRate > 0) {
                 diskBuilder.append("<write_iops_sec>" + this.iopsWriteRate + "</write_iops_sec>\n");
+            }
+            if (this.iopsTotalRate != null && this.iopsTotalRate > 0) {
+                diskBuilder.append("<total_iops_sec>" + this.iopsTotalRate + "</total_iops_sec>\n");
             }
             diskBuilder.append("</iotune>\n");
         }

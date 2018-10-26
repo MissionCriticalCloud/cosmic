@@ -59,6 +59,8 @@ public class DiskOfferingJoinDaoImpl extends GenericDaoBase<DiskOfferingJoinVO, 
         diskOfferingResponse.setBytesWriteRate(offering.getBytesWriteRate());
         diskOfferingResponse.setIopsReadRate(offering.getIopsReadRate());
         diskOfferingResponse.setIopsWriteRate(offering.getIopsWriteRate());
+        diskOfferingResponse.setIopsTotalRate(offering.getIopsTotalRate());
+        diskOfferingResponse.setIopsRatePerGb(offering.getIopsRatePerGb());
         diskOfferingResponse.setCacheMode(offering.getCacheMode());
         diskOfferingResponse.setObjectName("diskoffering");
 

@@ -92,7 +92,6 @@ import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DiskControllerType;
-import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
@@ -1282,7 +1281,6 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     public Long getCurrentEpoch() {
         ZonedDateTime zdtNow = ZonedDateTime.now(ZoneOffset.UTC);
         return zdtNow.with(LocalTime.MIDNIGHT).toInstant().toEpochMilli();
-
     }
 
     public LibvirtVmDef createVmFromSpec(final VirtualMachineTO vmTo) {
@@ -1369,7 +1367,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
             if (extended_cpu_flags == null) {
                 extended_cpu_flags = "-hypervisor";
             } else {
-                extended_cpu_flags +=  " -hypervisor";
+                extended_cpu_flags += " -hypervisor";
             }
             cmd.setCpuflags(extended_cpu_flags);
         }
@@ -1434,7 +1432,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
 
         // Recommended default clock/timer settings - https://bugzilla.redhat.com/show_bug.cgi?id=1053847
         // Important note for track="guest" in Windows VMs:
-        // https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/Virtualization_Deployment_and_Administration_Guide/sect-Virtualization-Tips_and_tricks-Libvirt_Managed_Timers.html
+        // https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0
+        // .1/html/Virtualization_Deployment_and_Administration_Guide/sect-Virtualization-Tips_and_tricks-Libvirt_Managed_Timers.html
         clock.addTimer("rtc", "catchup", true, trackGuest);
         clock.addTimer("pit", "delay", true, false);
         clock.addTimer("hpet", null, false, false);
@@ -1645,8 +1644,9 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     final String mountpoint = pool.getLocalPath();
                     final String path = physicalDisk.getPath();
                     final String glusterVolume = pool.getSourceDir().replace("/", "");
-                    disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(), pool.getSourcePort(), null, null, devId, volume.getDiskController(), DiskProtocol
-                            .GLUSTER, ImageFormat.QCOW2);
+                    disk.defNetworkBasedDisk(glusterVolume + path.replace(mountpoint, ""), pool.getSourceHost(), pool.getSourcePort(), null, null, devId,
+                            volume.getDiskController(), DiskProtocol
+                                    .GLUSTER, ImageFormat.QCOW2);
                 } else if (pool.getType() == StoragePoolType.CLVM || pool.getType() == StoragePoolType.LVM) {
                     disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
                 } else if (pool.getType() == StoragePoolType.NetworkFilesystem) {
@@ -1669,6 +1669,9 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                 }
                 if (volumeObjectTo.getIopsWriteRate() != null && volumeObjectTo.getIopsWriteRate() > 0) {
                     disk.setIopsWriteRate(volumeObjectTo.getIopsWriteRate());
+                }
+                if (volumeObjectTo.getIopsTotalRate() != null && volumeObjectTo.getIopsTotalRate() > 0) {
+                    disk.setIopsTotalRate(volumeObjectTo.getIopsTotalRate());
                 }
                 if (volumeObjectTo.getCacheMode() != null) {
                     disk.setCacheMode(LibvirtDiskDef.DiskCacheMode.valueOf(volumeObjectTo.getCacheMode().toString().toUpperCase()));
@@ -1755,7 +1758,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
             if (localstorage.getType() == StoragePoolType.LVM) {
                 try {
                     logger.debug("Found local LVM storage pool: " + localstorage.getPath() + ", with uuid: " + localstorage.getUuid() + ", in the agent configuration");
-                    final KvmStoragePool localStoragePool = this.storagePoolMgr.createStoragePool(localstorage.getUuid(), "localhost", -1, localstorage.getPath(), "", StoragePoolType.LVM);
+                    final KvmStoragePool localStoragePool =
+                            this.storagePoolMgr.createStoragePool(localstorage.getUuid(), "localhost", -1, localstorage.getPath(), "", StoragePoolType.LVM);
 
                     final StoragePoolInfo storagePoolInfo = new StoragePoolInfo();
                     storagePoolInfo.setUuid(localstorage.getUuid());

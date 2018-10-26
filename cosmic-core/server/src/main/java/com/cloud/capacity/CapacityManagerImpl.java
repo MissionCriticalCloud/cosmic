@@ -261,7 +261,8 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     final long reservedMem = capacityMemory.getReservedCapacity();
                     final long actualTotalCpu = capacityCpu.getTotalCapacity();
                     final float cpuOvercommitRatio = Float.parseFloat(CapacityManagerImpl.this._clusterDetailsDao.findDetail(clusterIdFinal, "cpuOvercommitRatio").getValue());
-                    final float memoryOvercommitRatio = Float.parseFloat(CapacityManagerImpl.this._clusterDetailsDao.findDetail(clusterIdFinal, "memoryOvercommitRatio").getValue());
+                    final float memoryOvercommitRatio =
+                            Float.parseFloat(CapacityManagerImpl.this._clusterDetailsDao.findDetail(clusterIdFinal, "memoryOvercommitRatio").getValue());
                     final int vmCPU = svo.getCpu();
                     final long vmMem = svo.getRamSize() * 1024L * 1024L;
                     final long actualTotalMem = capacityMemory.getTotalCapacity();
@@ -674,7 +675,8 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
                     CapacityManagerImpl.this._capacityDao.persist(capacity);
 
                     capacity =
-                            new CapacityVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId(), usedCpuFinal, host.getCpus().longValue(), Capacity.CAPACITY_TYPE_CPU);
+                            new CapacityVO(host.getId(), host.getDataCenterId(), host.getPodId(), host.getClusterId(), usedCpuFinal, host.getCpus()
+                                                                                                                                         .longValue(), Capacity.CAPACITY_TYPE_CPU);
                     capacity.setReservedCapacity(reservedCpuFinal);
                     capacity.setCapacityState(capacityState);
                     CapacityManagerImpl.this._capacityDao.persist(capacity);
@@ -926,6 +928,6 @@ public class CapacityManagerImpl extends ManagerBase implements CapacityManager,
     @Override
     public ConfigKey<?>[] getConfigKeys() {
         return new ConfigKey<?>[]{CpuOverprovisioningFactor, MemOverprovisioningFactor, StorageCapacityDisableThreshold, StorageOverprovisioningFactor,
-                StorageAllocatedCapacityDisableThreshold};
+                StorageIopsOverprovisioningFactor, StorageAllocatedCapacityDisableThreshold};
     }
 }

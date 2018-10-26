@@ -116,6 +116,12 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
     @SerializedName("diskIopsWriteRate")
     @Param(description = "io requests write rate of the disk volume")
     private Long iopsWriteRate;
+    @SerializedName("diskIopsTotalRate")
+    @Param(description = "io requests total rate of the disk volume")
+    private Long iopsTotalRate;
+    @SerializedName("diskIopsRatePerGb")
+    @Param(description = "io requests per GB")
+    private Boolean iopsRatePerGb;
     @SerializedName(ApiConstants.HYPERVISOR)
     @Param(description = "Hypervisor the volume belongs to")
     private String hypervisor;
@@ -466,5 +472,21 @@ public class VolumeResponse extends BaseResponse implements ControlledViewEntity
 
     public void setDiskFormat(final ImageFormat diskFormat) {
         this.diskFormat = diskFormat;
+    }
+
+    public Long getIopsTotalRate() {
+        return iopsTotalRate;
+    }
+
+    public void setIopsTotalRate(Long iopsTotalRate) {
+        this.iopsTotalRate = iopsTotalRate;
+    }
+
+    public Boolean getIopsRatePerGb() {
+        return iopsRatePerGb;
+    }
+
+    public void setIopsRatePerGb(Boolean iopsRatePerGb) {
+        this.iopsRatePerGb = iopsRatePerGb;
     }
 }

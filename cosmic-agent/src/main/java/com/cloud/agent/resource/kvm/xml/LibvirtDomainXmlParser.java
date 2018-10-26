@@ -128,6 +128,11 @@ public class LibvirtDomainXmlParser {
                         final Long iopsWriteRate = Long.parseLong(iopsWriteRateStr);
                         def.setIopsWriteRate(iopsWriteRate);
                     }
+                    final String iopsTotalRateStr = getTagValue("total_iops_sec", (Element) iotune.item(0));
+                    if (iopsTotalRateStr != null) {
+                        final Long iopsTotalRate = Long.parseLong(iopsTotalRateStr);
+                        def.setIopsTotalRate(iopsTotalRate);
+                    }
                 }
 
                 this.diskDefs.add(def);

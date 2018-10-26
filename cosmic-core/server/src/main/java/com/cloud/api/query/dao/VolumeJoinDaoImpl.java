@@ -86,6 +86,8 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
 
         volResponse.setMinIops(volume.getMinIops());
         volResponse.setMaxIops(volume.getMaxIops());
+        volResponse.setIopsTotalRate(volume.getIopsTotalRate());
+        volResponse.setIopsRatePerGb(volume.getIopsRatePerGb());
 
         volResponse.setCreated(volume.getCreated());
         volResponse.setState(volume.getState().toString());
