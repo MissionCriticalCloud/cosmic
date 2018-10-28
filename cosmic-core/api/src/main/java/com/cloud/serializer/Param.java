@@ -23,4 +23,6 @@ public @interface Param {
     RoleType[] authorized() default {};
 
     boolean isSensitive() default false;
+
+    String SerializedName() default "";
 }

@@ -12,6 +12,12 @@ import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = VirtualMachine.class)
 public class SystemVmResponse extends BaseResponse {
+    @Param(description = "The UUID of the latest async job acting on this object", SerializedName = ApiConstants.JOB_ID)
+    private String dummy_jobId;
+
+    @Param(description = "The current status of the latest async job acting on this object, should be 0 for PENDING", SerializedName = ApiConstants.JOB_STATUS)
+    private Integer dummy_jobStatus;
+
     @SerializedName("id")
     @Param(description = "the ID of the system VM")
     private String id;

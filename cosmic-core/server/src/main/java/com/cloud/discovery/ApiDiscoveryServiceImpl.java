@@ -93,7 +93,9 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
             final Field[] responseFields = apiCmdAnnotation.responseObject().getDeclaredFields();
             for (final Field responseField : responseFields) {
                 final ApiResponseResponse responseResponse = getFieldResponseMap(responseField);
-                response.addApiResponse(responseResponse);
+                if (response.getName() != null) {
+                    response.addApiResponse(responseResponse);
+                }
             }
 
             response.setObjectName("api");
@@ -130,8 +132,8 @@ public class ApiDiscoveryServiceImpl extends ComponentLifecycleBase implements A
         final ApiResponseResponse responseResponse = new ApiResponseResponse();
         final SerializedName serializedName = responseField.getAnnotation(SerializedName.class);
         final Param param = responseField.getAnnotation(Param.class);
-        if (serializedName != null && param != null) {
-            responseResponse.setName(serializedName.value());
+        if (serializedName != null && param != null || param != null && !param.SerializedName().isEmpty()) {
+            responseResponse.setName(serializedName != null ? serializedName.value() : param.SerializedName());
             responseResponse.setDescription(param.description());
             responseResponse.setType(responseField.getType().getSimpleName().toLowerCase());
             //If response is not of primitive type - we have a nested entity

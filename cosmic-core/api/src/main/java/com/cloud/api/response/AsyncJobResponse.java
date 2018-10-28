@@ -13,6 +13,8 @@ import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = JobInfo.class)
 public class AsyncJobResponse extends BaseResponse {
+    @Param(description = "The current status of the latest async job acting on this object, should be 0 for PENDING", SerializedName = ApiConstants.JOB_STATUS)
+    private Integer dummy_jobStatus;
 
     @SerializedName("accountid")
     @Param(description = "the account that executed the async command")
