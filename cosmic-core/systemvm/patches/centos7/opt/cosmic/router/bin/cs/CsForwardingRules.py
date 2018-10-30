@@ -57,7 +57,12 @@ class CsForwardingRules(object):
         self.config.fw.append(["nat", "", fw_output_rule])
 
     def processStaticNatRule(self, rule):
-        device = self.config.get_public_interface_name()
+        try:
+            device = self.config.get_public_interface_name()
+        except:
+            # Ignore for now, after network_overview is processed it will work
+            return
+
         if device is None:
             raise Exception("Ip address %s has no device in the ips databag" % rule["public_ip"])
 
