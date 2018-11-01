@@ -1,6 +1,7 @@
 package com.cloud.network;
 
 import com.cloud.acl.SecurityChecker.AccessType;
+import com.cloud.agent.manager.Commands;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.command.admin.network.DedicateGuestVlanRangeCmd;
 import com.cloud.api.command.admin.network.ListDedicatedGuestVlanRangesCmd;
@@ -28,6 +29,7 @@ import com.cloud.event.ActionEvent;
 import com.cloud.event.EventTypes;
 import com.cloud.framework.config.dao.ConfigurationDao;
 import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
+import com.cloud.legacymodel.communication.command.UpdateNetworkOverviewCommand;
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.dc.DataCenter;
 import com.cloud.legacymodel.dc.Vlan.VlanType;
@@ -50,6 +52,7 @@ import com.cloud.legacymodel.network.Nic;
 import com.cloud.legacymodel.network.vpc.NetworkACL;
 import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.legacymodel.to.NetworkOverviewTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
@@ -85,6 +88,8 @@ import com.cloud.network.element.VirtualRouterElement;
 import com.cloud.network.element.VpcVirtualRouterElement;
 import com.cloud.network.guru.NetworkGuru;
 import com.cloud.network.lb.LoadBalancingRulesService;
+import com.cloud.network.router.CommandSetupHelper;
+import com.cloud.network.router.NetworkHelper;
 import com.cloud.network.rules.FirewallRuleVO;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.network.rules.dao.PortForwardingRulesDao;
@@ -127,6 +132,7 @@ import com.cloud.utils.db.TransactionLegacy;
 import com.cloud.utils.db.TransactionStatus;
 import com.cloud.utils.exception.ExceptionUtil;
 import com.cloud.utils.net.NetUtils;
+import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.NicSecondaryIp;
 import com.cloud.vm.NicVO;
 import com.cloud.vm.ReservationContext;
@@ -134,6 +140,7 @@ import com.cloud.vm.ReservationContextImpl;
 import com.cloud.vm.SecondaryStorageVmVO;
 import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
+import com.cloud.vm.dao.DomainRouterDao;
 import com.cloud.vm.dao.NicDao;
 import com.cloud.vm.dao.NicSecondaryIpDao;
 import com.cloud.vm.dao.NicSecondaryIpVO;
@@ -163,6 +170,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * NetworkServiceImpl implements NetworkService.
@@ -290,10 +298,15 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @Inject
     private
     ZoneRepository zoneRepository;
-
+    @Inject
+    protected CommandSetupHelper _commandSetupHelper;
     private int _cidrLimit;
     private boolean _allowSubdomainNetworkAccess;
-
+    @Inject
+    @Qualifier("networkHelper")
+    protected NetworkHelper _networkGeneralHelper;
+    @Inject
+    DomainRouterDao _routerDao;
     private List<NetworkGuru> _networkGurus;
 
     private Map<String, String> _configs;
@@ -1530,11 +1543,14 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             network.setDns2(dns2);
         }
 
+        Boolean sendNetworkOverview = false;
         if (dhcpTftpServer != null) {
+            sendNetworkOverview = true;
             network.setDhcpTftpServer(dhcpTftpServer);
         }
 
         if (dhcpBootfileName != null) {
+            sendNetworkOverview = true;
             network.setDhcpBootfileName(dhcpBootfileName);
         }
 
@@ -1786,6 +1802,29 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             }
         }
 
+        if (sendNetworkOverview) {
+            final List<DomainRouterVO> routers = _routerDao.listByVpcId(network.getVpcId());
+            for (final DomainRouterVO router : routers) {
+                final NetworkOverviewTO networkOverview = _commandSetupHelper.createNetworkOverviewFromRouter(
+                        router,
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        null,
+                        null
+                );
+
+                try {
+                    s_logger.warn("Updating network_overview of network " + network + " on router " + router);
+                    final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
+                    updateNetworkOverviewCommand.setPlugNics(true);
+                    final Commands cmds = new Commands(updateNetworkOverviewCommand);
+                    _networkGeneralHelper.sendCommandsToRouter(router, cmds);
+                } catch (final Exception ex) {
+                    s_logger.warn("Failed to update network_overview of network " + network + " on router " + router + " due to ", ex);
+                }
+            }
+        }
         return getNetwork(network.getId());
     }
 
