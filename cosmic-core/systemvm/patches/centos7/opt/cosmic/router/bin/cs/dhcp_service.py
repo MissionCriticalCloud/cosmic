@@ -70,7 +70,9 @@ class DhcpService:
             gateway=ip['gateway'],
             netmask=network.netmask,
             dns_servers=dns_servers,
-            domain_name=interface['metadata']['domain_name']
+            domain_name=interface['metadata']['domain_name'],
+            dhcp_bootfile_name=interface['metadata']['dhcp_bootfile_name'] if 'dhcp_bootfile_name' in interface['metadata'] else None,
+            dhcp_tftp_server=interface['metadata']['dhcp_tftp_server'] if 'dhcp_tftp_server' in interface['metadata'] else None
         )
 
         filename = '{}.conf'.format(interface_name)
