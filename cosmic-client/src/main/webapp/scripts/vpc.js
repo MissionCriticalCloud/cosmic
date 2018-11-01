@@ -2402,6 +2402,18 @@
                             if (args.data.ipexclusionlist != null && args.data.ipexclusionlist != args.context.networks[0].ipexclusionlist)
                                 array1.push("&ipexclusionlist=" + todb(args.data.ipexclusionlist));
 
+                            if (args.data.dhcptftpserver != null && args.data.dhcptftpserver != args.context.networks[0].dhcptftpserver) {
+                                array1.push("&dhcptftpserver=" + todb(args.data.dhcptftpserver));
+                            } else {
+                                array1.push("&dhcptftpserver=");
+                            }
+
+                            if (args.data.dhcpbootfilename != null && args.data.dhcpbootfilename != args.context.networks[0].dhcpbootfilename) {
+                                array1.push("&dhcpbootfilename=" + todb(args.data.dhcpbootfilename));
+                            } else  {
+                                array1.push("&dhcpbootfilename=");
+                            }
+
                             //args.data.networkofferingid is null when networkofferingid field is hidden
                             if (args.data.networkofferingid != null && args.data.networkofferingid != args.context.networks[0].networkofferingid) {
                                 array1.push("&networkofferingid=" + todb(args.data.networkofferingid));
@@ -2832,6 +2844,17 @@
                                     });
                                 }
                             },
+
+                            dhcptftpserver: {
+                                label: 'label.DHCP.TFTP.Server',
+                                isEditable: true
+                            },
+
+                            dhcpbootfilename: {
+                                label: 'label.DHCP.Boot.FileName',
+                                isEditable: true
+                            },
+
                             id: {
                                 label: 'label.id'
                             }

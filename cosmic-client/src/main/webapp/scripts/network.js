@@ -1478,6 +1478,7 @@
                                     networkdomaintext: {
                                         label: 'label.network.domain.text'
                                     },
+
                                     networkdomain: {
                                         label: 'label.network.domain',
                                         isEditable: true
@@ -1486,8 +1487,19 @@
                                     domain: {
                                         label: 'label.domain'
                                     },
+
                                     account: {
                                         label: 'label.account'
+                                    },
+
+                                    dhcptftpserver: {
+                                        label: 'label.DHCP.TFTP.Server',
+                                        isEditable: true
+                                    },
+
+                                    dhcpbootfilename: {
+                                        label: 'label.DHCP.Boot.FileName',
+                                        isEditable: true
                                     }
                                 }],
 
@@ -2037,6 +2049,18 @@
                                     if (args.data.ipexclusionlist != null && args.data.ipexclusionlist != args.context.networks[0].ipexclusionlist) {
                                         $.extend(data, {
                                             ipexclusionlist: args.data.ipexclusionlist
+                                        });
+                                    }
+
+                                    if (args.data.dhcptftpserver != null && args.data.dhcptftpserver != args.context.networks[0].dhcptftpserver) {
+                                        $.extend(data, {
+                                            dhcptftpserver: args.data.dhcptftpserver
+                                        });
+                                    }
+
+                                    if (args.data.dhcpbootfilename != null && args.data.dhcpbootfilename != args.context.networks[0].dhcpbootfilename) {
+                                        $.extend(data, {
+                                            dhcpbootfilename: args.data.dhcpbootfilename
                                         });
                                     }
 
