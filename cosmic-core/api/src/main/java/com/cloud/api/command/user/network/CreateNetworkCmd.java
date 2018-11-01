@@ -145,6 +145,12 @@ public class CreateNetworkCmd extends BaseCmd {
     @Parameter(name = ApiConstants.IP_EXCLUSION_LIST, type = CommandType.STRING, description = "IP exclusion list for private networks")
     private String ipExclusionList;
 
+    @Parameter(name = ApiConstants.DHCP_TFTP_SERVER, type = CommandType.STRING, description = "DHCP option 66: tftp-server")
+    private String dhcpTftpServer;
+
+    @Parameter(name = ApiConstants.DHCP_BOOTFILE_NAME, type = CommandType.STRING, description = "DHCP option 67: bootfile-name")
+    private String dhcpBootfileName;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -214,6 +220,14 @@ public class CreateNetworkCmd extends BaseCmd {
 
     public Boolean getDisplayNetwork() {
         return displayNetwork;
+    }
+
+    public String getDhcpTftpServer() {
+        return dhcpTftpServer;
+    }
+
+    public String getDhcpBootfileName() {
+        return dhcpBootfileName;
     }
 
     public Long getZoneId() {

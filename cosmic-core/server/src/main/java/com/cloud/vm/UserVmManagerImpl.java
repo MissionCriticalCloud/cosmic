@@ -3177,7 +3177,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                                 + " as a part of deployVM process");
                         Network newNetwork = _networkMgr.createGuestNetwork(requiredOfferings.get(0).getId(), newAccount.getAccountName() + "-network",
                                 newAccount.getAccountName() + "-network", null, null, null, null, newAccount, null, physicalNetwork, zone.getId(), ACLType.Account, null, null,
-                                null, null, true, null, null, null, null);
+                                null, null, true, null, null, null, null, null, null);
                         // if the network offering has persistent set to true, implement the network
                         if (requiredOfferings.get(0).getIsPersistent()) {
                             final DeployDestination dest = new DeployDestination(zone, null, null, null);

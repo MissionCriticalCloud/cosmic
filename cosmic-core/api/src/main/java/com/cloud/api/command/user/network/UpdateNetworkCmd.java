@@ -76,6 +76,12 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.IP_EXCLUSION_LIST, type = CommandType.STRING, description = "IP exclusion list for private networks")
     private String ipExclusionList;
 
+    @Parameter(name = ApiConstants.DHCP_TFTP_SERVER, type = CommandType.STRING, description = "DHCP option 66: tftp-server")
+    private String dhcpTftpServer;
+
+    @Parameter(name = ApiConstants.DHCP_BOOTFILE_NAME, type = CommandType.STRING, description = "DHCP option 67: bootfile-name")
+    private String dhcpBootfileName;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -91,7 +97,8 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
 
         final Network result =
                 _networkService.updateGuestNetwork(getId(), getNetworkName(), getDisplayText(), callerAccount, callerUser, getNetworkDomain(), getNetworkOfferingId(),
-                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2(), getIpExclusionList());
+                        getChangeCidr(), getGuestVmCidr(), getDisplayNetwork(), getCustomId(), getDns1(), getDns2(), getIpExclusionList(), getDhcpTftpServer(),
+                        getDhcpBootfileName());
 
         if (result != null) {
             final NetworkResponse response = _responseGenerator.createNetworkResponse(ResponseView.Restricted, result);
@@ -135,6 +142,14 @@ public class UpdateNetworkCmd extends BaseAsyncCustomIdCmd {
             return ipExclusionList;
         }
         return ipExclusionList.replaceAll("\\s", "");
+    }
+
+    public String getDhcpTftpServer() {
+        return dhcpTftpServer;
+    }
+
+    public String getDhcpBootfileName() {
+        return dhcpBootfileName;
     }
 
     public Boolean getChangeCidr() {

@@ -621,6 +621,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         final String dns1 = cmd.getDns1();
         final String dns2 = cmd.getDns2();
         final String ipExclusionList = cmd.getIpExclusionList();
+        final String getDhcpTftpServer = cmd.getDhcpTftpServer();
+        final String getDhcpBootfileName = cmd.getDhcpBootfileName();
 
         // Validate network offering
         final NetworkOfferingVO ntwkOff = _networkOfferingDao.findById(networkOfferingId);
@@ -888,7 +890,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
-                createVlan, dns1, dns2, ipExclusionList);
+                createVlan, dns1, dns2, ipExclusionList, getDhcpTftpServer, getDhcpBootfileName);
 
         // if the network offering has persistent set to true, implement the network
         if (ntwkOff.getIsPersistent()) {
@@ -1472,7 +1474,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_UPDATE, eventDescription = "updating network", async = true)
     public Network updateGuestNetwork(final long networkId, final String name, final String displayText, final Account callerAccount, final User callerUser,
                                       final String domainSuffix, final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork,
-                                      final String customId, final String dns1, final String dns2, final String ipExclusionList) {
+                                      final String customId, final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer,
+                                      final String dhcpBootfileName) {
 
         // verify input parameters
         final NetworkVO network = _networksDao.findById(networkId);
@@ -1525,6 +1528,14 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
 
         if (dns2 != null) {
             network.setDns2(dns2);
+        }
+
+        if (dhcpTftpServer != null) {
+            network.setDhcpTftpServer(dhcpTftpServer);
+        }
+
+        if (dhcpBootfileName != null) {
+            network.setDhcpBootfileName(dhcpBootfileName);
         }
 
         if (ipExclusionList != null) {
@@ -2926,7 +2937,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                         //create Guest network
                         privateNetwork = _networkMgr.createGuestNetwork(ntwkOffFinal.getId(), networkName, displayText, gateway, cidr, uriString, null, owner, null, pNtwk,
                                 pNtwk.getDataCenterId(), ACLType.Account, null, vpcId, null, null, true, null,
-                                dc.getDns1(), dc.getDns2(), null);
+                                dc.getDns1(), dc.getDns2(), null, null, null);
                         if (privateNetwork != null) {
                             s_logger.debug("Successfully created guest network " + privateNetwork);
                         } else {
@@ -3562,7 +3573,8 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                                   final Long domainId, final boolean isDomainSpecific, final Boolean subdomainAccessFinal, final Long vpcId, final String startIPv6,
                                   final String endIPv6, final String ip6Gateway, final String ip6Cidr, final Boolean displayNetwork, final Long aclId, final String isolatedPvlan,
                                   final NetworkOfferingVO ntwkOff, final PhysicalNetwork pNtwk, final ACLType aclType, final Account ownerFinal, final String cidr,
-                                  final boolean createVlan, final String dns1, final String dns2, final String ipExclusionList) throws InsufficientCapacityException,
+                                  final boolean createVlan, final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer,
+                                  final String dhcpBootfileName) throws InsufficientCapacityException,
             ResourceAllocationException {
         try {
             final Network network = Transaction.execute(new TransactionCallbackWithException<Network, Exception>() {
@@ -3608,14 +3620,14 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                             }
                         }
                         network = _vpcMgr.createVpcGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
-                                aclType, subdomainAccess, vpcId, aclId, caller, displayNetwork, dns1, dns2, ipExclusionList);
+                                aclType, subdomainAccess, vpcId, aclId, caller, displayNetwork, dns1, dns2, ipExclusionList, dhcpTftpServer, dhcpBootfileName);
                     } else {
                         if (_configMgr.isOfferingForVpc(ntwkOff)) {
                             throw new InvalidParameterValueException("Network offering can be used for VPC networks only");
                         }
 
                         network = _networkMgr.createGuestNetwork(networkOfferingId, name, displayText, gateway, cidr, vlanId, networkDomain, owner, sharedDomainId, pNtwk, zoneId,
-                                aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan, dns1, dns2, ipExclusionList);
+                                aclType, subdomainAccess, vpcId, ip6Gateway, ip6Cidr, displayNetwork, isolatedPvlan, dns1, dns2, ipExclusionList, dhcpTftpServer, dhcpBootfileName);
                     }
 
                     if (_accountMgr.isRootAdmin(caller.getId()) && createVlan && network != null) {

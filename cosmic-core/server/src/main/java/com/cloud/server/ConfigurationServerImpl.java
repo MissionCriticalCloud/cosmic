@@ -438,7 +438,7 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                         final NetworkVO network =
                                 new NetworkVO(id, trafficType, mode, broadcastDomainType, networkOfferingId, domainId, accountId, related, null, null, networkDomain,
                                         GuestType.Shared, zoneId, null, null, specifyIpRanges, null, offering.getRedundantRouter(),
-                                        zone.getDns1(), zone.getDns2(), null);
+                                        zone.getDns1(), zone.getDns2(), null, null, null);
                         network.setGuruName(guruNames.get(network.getTrafficType()));
                         network.setState(State.Implemented);
                         _networkDao.persist(network, false, getServicesAndProvidersForNetwork(networkOfferingId));

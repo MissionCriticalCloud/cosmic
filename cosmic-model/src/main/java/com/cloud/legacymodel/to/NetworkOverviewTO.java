@@ -126,6 +126,8 @@ public class NetworkOverviewTO {
             private String domainName;
             private String dns1;
             private String dns2;
+            private String dhcpTftpServer;
+            private String dhcpBootfileName;
 
             public MetadataTO() {
             }
@@ -159,6 +161,14 @@ public class NetworkOverviewTO {
                 if (network.getDns2() != null && !network.getDns2().equals("")) {
                     dns2 = network.getDns2();
                 }
+
+                if (network.getDhcpTftpServer() != null) {
+                    dhcpTftpServer = network.getDhcpTftpServer();
+                }
+
+                if (network.getDhcpBootfileName() != null) {
+                    dhcpBootfileName = network.getDhcpBootfileName();
+                }
             }
 
             public String getType() {
@@ -191,6 +201,22 @@ public class NetworkOverviewTO {
 
             public void setDns2(final String dns2) {
                 this.dns2 = dns2;
+            }
+
+            public String getDhcpTftpServer() {
+                return dhcpTftpServer;
+            }
+
+            public void setDhcpTftpServer(final String dhcpTftpServer) {
+                this.dhcpTftpServer = dhcpTftpServer;
+            }
+
+            public String getDhcpBootfileName() {
+                return dhcpBootfileName;
+            }
+
+            public void setDhcpBootfileName(final String dhcpBootfileName) {
+                this.dhcpBootfileName = dhcpBootfileName;
             }
 
             @Override

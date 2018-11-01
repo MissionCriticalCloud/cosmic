@@ -73,7 +73,7 @@ public interface NetworkOrchestrationService {
 
     List<? extends Network> setupNetwork(Account owner, NetworkOffering offering, Network predefined, DeploymentPlan plan, String name, String displayText,
                                          boolean errorIfAlreadySetup, Long domainId, ACLType aclType, Boolean subdomainAccess, Long vpcId, Long relatedNetworkId,
-                                         Boolean isDisplayNetworkEnabled, String dns1, String dns2, final String ipExclusionList)
+                                         Boolean isDisplayNetworkEnabled, String dns1, String dns2, String ipExclusionList, String dhcpTftpServer, String dhcpBootfileName)
             throws ConcurrentOperationException;
 
     Network setupSyncNetwork(Account owner, DeploymentPlan plan, boolean isVpcRouter, Vpc vpc, Network isolatedNetwork);
@@ -138,7 +138,8 @@ public interface NetworkOrchestrationService {
     Network createGuestNetwork(long networkOfferingId, String name, String displayText, String gateway, String cidr,
                                String vlanId, String networkDomain, Account owner, Long domainId, PhysicalNetwork physicalNetwork,
                                long zoneId, ACLType aclType, Boolean subdomainAccess, Long vpcId, String ip6Gateway, String ip6Cidr,
-                               Boolean displayNetworkEnabled, String isolatedPvlan, String dns1, String dns2, final String ipExclusionList)
+                               Boolean displayNetworkEnabled, String isolatedPvlan, String dns1, String dns2, String ipExclusionList,
+                               String dhcpTftpServer, String dhcpBootfileName)
             throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException;
 
     UserDataServiceProvider getPasswordResetProvider(Network network);

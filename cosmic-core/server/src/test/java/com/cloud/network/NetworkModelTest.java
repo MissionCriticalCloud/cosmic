@@ -69,7 +69,7 @@ public class NetworkModelTest {
     public void testGetExcludedIpsInNetwork() {
         Network network = new NetworkVO(1L, null, null, null, 1L, 1L, 1L, 1L,
                 null, null, null, null, 1L, null, null,
-                false, null, false, null, null, "10.0.0.1-10.0.0.3,10.0.1.5");
+                false, null, false, null, null, "10.0.0.1-10.0.0.3,10.0.1.5", "boot.cloud9.example.org", "/boot/me.bin");
         List<String> res = modelImpl.getExcludedIpsInNetwork(network);
         org.junit.Assert.assertTrue(!res.isEmpty());
         org.junit.Assert.assertTrue(res.contains("10.0.0.2"));
@@ -80,7 +80,7 @@ public class NetworkModelTest {
     public void testGetAvailableIps() {
         Network network = new NetworkVO(1L, null, null, null, 1L, 1L, 1L, 1L,
                 null, null, null, null, 1L, null, null,
-                false, null, false, null, null, "10.0.0.1-10.0.0.3,10.0.0.5");
+                false, null, false, null, null, "10.0.0.1-10.0.0.3,10.0.0.5", "boot.cloud9.example.org", "/boot/me.bin");
         ((NetworkVO) network).setCidr("10.0.0.0/29");
 
         final NicDao nicDao = mock(NicDao.class);
@@ -102,7 +102,7 @@ public class NetworkModelTest {
 
         network = new NetworkVO(1L, null, null, null, 1L, 1L, 1L, 1L,
                 null, null, null, null, 1L, null, null,
-                false, null, false, null, null, null);
+                false, null, false, null, null, null, null, null);
         ((NetworkVO) network).setCidr("10.0.0.0/29");
         possibleAddresses = modelImpl.getAvailableIps(network, "10.0.0.6");
         org.junit.Assert.assertEquals(possibleAddresses.size(), 6);
