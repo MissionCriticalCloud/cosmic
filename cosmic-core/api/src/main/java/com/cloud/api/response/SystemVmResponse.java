@@ -12,6 +12,14 @@ import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = VirtualMachine.class)
 public class SystemVmResponse extends BaseResponse {
+    @SerializedName(ApiConstants.JOB_ID)
+    @Param(description = "the job ID associated with the system VM. This is only displayed if the router listed is part of a currently running asynchronous job.")
+    private String jobId;
+
+    @SerializedName(ApiConstants.JOB_STATUS)
+    @Param(description = "the job status associated with the system VM.  This is only displayed if the router listed is part of a currently running asynchronous job.")
+    private Integer jobStatus;
+
     @SerializedName("id")
     @Param(description = "the ID of the system VM")
     private String id;
@@ -327,5 +335,25 @@ public class SystemVmResponse extends BaseResponse {
 
     public void setLinkLocalNetmask(final String linkLocalNetmask) {
         this.linkLocalNetmask = linkLocalNetmask;
+    }
+
+    @Override
+    public String getJobId() {
+        return jobId;
+    }
+
+    @Override
+    public void setJobId(final String jobId) {
+        this.jobId = jobId;
+    }
+
+    @Override
+    public Integer getJobStatus() {
+        return jobStatus;
+    }
+
+    @Override
+    public void setJobStatus(final Integer jobStatus) {
+        this.jobStatus = jobStatus;
     }
 }
