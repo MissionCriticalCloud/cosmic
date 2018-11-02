@@ -322,6 +322,13 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
     }
 
     @Override
+    public VMInstanceVO findVMByInstanceNameIncludingRemoved(final String name) {
+        final SearchCriteria<VMInstanceVO> sc = _instanceNameSearch.create();
+        sc.setParameters("instanceName", name);
+        return findOneIncludingRemovedBy(sc);
+    }
+
+    @Override
     public VMInstanceVO findVMByHostName(final String hostName) {
         final SearchCriteria<VMInstanceVO> sc = _hostNameSearch.create();
         sc.setParameters("hostName", hostName);
@@ -609,7 +616,7 @@ public class VMInstanceDaoImpl extends GenericDaoBase<VMInstanceVO, Long> implem
             @Override
             public Boolean doInTransaction(final TransactionStatus status) {
                 boolean needToUpdate = false;
-                final VMInstanceVO instance = findById(instanceId);
+                final VMInstanceVO instance = findByIdIncludingRemoved(instanceId);
                 if (instance != null) {
                     final Long savedPowerHostId = instance.getPowerHostId();
                     if (instance.getPowerState() != powerState || savedPowerHostId == null

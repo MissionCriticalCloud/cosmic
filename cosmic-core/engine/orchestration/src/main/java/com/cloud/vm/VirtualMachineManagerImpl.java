@@ -1110,6 +1110,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 handlePowerOnReportWithNoPendingJobsOnVM(vm);
             } else if (vm.getPowerState() == PowerState.PowerPaused) {
                 handlePowerPausedReportWithNoPendingJobsOnVM(vm);
+            } else if (vm.getPowerState() == PowerState.PowerOnUnexpected) {
+                s_logger.info("VM " + vm.getInstanceName() + " is in PowerOn state while this was unexpected!");
             } else {
                 handlePowerOffReportWithNoPendingJobsOnVM(vm);
             }
@@ -1509,7 +1511,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     case PowerPaused:
                         handlePowerPausedReportWithNoPendingJobsOnVM(vm);
                         break;
-
+                    case PowerOnUnexpected:
+                        s_logger.info("VM " + vm.getInstanceName() + " is in PowerOn state while this was unexpected!!");
+                        break;
                     case PowerOff:
                     case PowerReportMissing:
                         handlePowerOffReportWithNoPendingJobsOnVM(vm);
