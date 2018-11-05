@@ -1218,25 +1218,41 @@
                                         });
                                     }
 
-                                    var oldcidr;
-                                    $.ajax({
-                                        url: createURL("listNetworks&id=" + args.context.vpcTiers[0].id + "&listAll=true"),
-                                        dataType: "json",
-                                        async: false,
-                                        success: function (json) {
-                                            oldcidr = json.listnetworksresponse.network[0].cidr;
-
-                                        }
-                                    });
-
-
-                                    if (args.data.cidr != "" && args.data.cidr != oldcidr) {
+                                    if (args.data.dhcptftpserver != null && args.data.dhcptftpserver != args.context.vpcTiers[0].dhcptftpserver) {
                                         $.extend(data, {
-                                            guestvmcidr: args.data.cidr
+                                            dhcptftpserver: args.data.dhcptftpserver
                                         });
                                     }
-                                },
-                            },
+
+                                    if (args.data.dhcpbootfilename != null && args.data.dhcpbootfilename != args.context.vpcTiers[0].dhcpbootfilename) {
+                                        $.extend(data, {
+                                            dhcpbootfilename: args.data.dhcpbootfilename
+                                        });
+                                    }
+
+                                    var oldcidr;
+                                    $.ajax({
+                                        url: createURL("updateNetwork&id=" + args.context.vpcTiers[0].id),
+                                        dataType: "json",
+                                        async: true,
+                                        data: data,
+                                        success: function (json) {
+                                            var jid = json.updatenetworkresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        var item = json.queryasyncjobresultresponse.jobresult.network;
+                                                        return {
+                                                            data: item
+                                                        };
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
                         },
 
                         tabFilter: function (args) {
