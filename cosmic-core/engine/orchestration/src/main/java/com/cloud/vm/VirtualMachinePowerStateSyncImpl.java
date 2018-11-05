@@ -66,12 +66,23 @@ public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStat
         }
 
         for (final Map.Entry<String, HostVmStateReportEntry> entry : states.entrySet()) {
-            final VMInstanceVO vm = findVM(entry.getKey());
+            // Active VM
+            VMInstanceVO vm = findVM(entry.getKey());
             if (vm != null) {
+                s_logger.debug("VM found running as expected: " + entry.getKey() + ", host: " + entry.getValue().getHost());
                 map.put(vm.getId(), entry.getValue().getState());
-            } else {
-                s_logger.info("Unable to find matched VM in Cosmic DB. name: " + entry.getKey() + ", host: " + entry.getValue().getHost());
+                continue;
             }
+
+            // VM that was supposed to be gone
+            vm = findRemovedVM(entry.getKey());
+            if (vm != null) {
+                map.put(vm.getId(), VirtualMachine.PowerState.PowerOnUnexpected);
+                s_logger.debug("VM found running while it should be gone: " + entry.getKey() + ", host: " + entry.getValue().getHost());
+                continue;
+            }
+
+            s_logger.debug("VM found running that is unknown to us: " + entry.getKey() + ", host: " + entry.getValue().getHost() + ". Ignoring.");
         }
 
         return map;
@@ -176,5 +187,8 @@ public class VirtualMachinePowerStateSyncImpl implements VirtualMachinePowerStat
 
     private VMInstanceVO findVM(final String vmName) {
         return _instanceDao.findVMByInstanceName(vmName);
+    }
+    private VMInstanceVO findRemovedVM(final String vmName) {
+        return _instanceDao.findVMByInstanceNameIncludingRemoved(vmName);
     }
 }

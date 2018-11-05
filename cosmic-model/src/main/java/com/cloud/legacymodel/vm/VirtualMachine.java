@@ -130,6 +130,7 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
     enum PowerState {
         PowerUnknown,
         PowerOn,
+        PowerOnUnexpected,
         PowerOff,
         PowerPaused,
         PowerReportMissing
