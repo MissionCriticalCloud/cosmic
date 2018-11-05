@@ -21,12 +21,14 @@ public class ApiResponseGsonHelper {
         s_gBuilder.setVersion(1.3);
         s_gBuilder.registerTypeAdapter(ResponseObject.class, new ResponseObjectTypeAdapter());
         s_gBuilder.registerTypeAdapter(String.class, new EncodedStringTypeAdapter());
+        s_gBuilder.setExclusionStrategies(new SuperclassExclusionStrategy());
         s_gBuilder.setExclusionStrategies(new ApiResponseExclusionStrategy());
 
         s_gLogBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         s_gLogBuilder.setVersion(1.3);
         s_gLogBuilder.registerTypeAdapter(ResponseObject.class, new ResponseObjectTypeAdapter());
         s_gLogBuilder.registerTypeAdapter(String.class, new EncodedStringTypeAdapter());
+        s_gLogBuilder.setExclusionStrategies(new SuperclassExclusionStrategy());
         s_gLogBuilder.setExclusionStrategies(new LogExclusionStrategy());
     }
 
