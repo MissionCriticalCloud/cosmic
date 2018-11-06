@@ -42,6 +42,20 @@
                     });
                     data['new-network-ip'] = $form.find('.new-network .select.advanced .specify-ip input[type=text]').val();
 
+                    // Pass network MACs
+                    data['my-network-macs'] = [];
+                    $form.find('.my-networks .select .specify-mac input[type=text]').each(function () {
+                        var $input = $(this);
+
+                        if (!$input.closest('.select').find('input[type=checkbox]').is(':checked')) return true;
+
+                        data['my-network-macs'].push(
+                            $input.closest('.select').hasClass('advanced') ?
+                                $input.val() : null
+                        );
+                    });
+                    data['new-network-mac'] = $form.find('.new-network .select.advanced .specify-mac input[type=text]').val();
+
                     // Handle multi-disk service offerings
                     if ($form.find('.multi-disk-select-container').size()) {
                         data['disk-offerings-multi'] = [];
@@ -987,16 +1001,26 @@
                                         var $select = $(this);
                                         var $advancedLink = $('<div>').addClass('advanced-options hide-if-unselected');
                                         var $specifyIpField = $('<div>').addClass('specify-ip hide-if-unselected').append(
-                                            $('<label>').html(_l('label.ip.address')),
-                                            $('<input>').attr({type: 'text'})
+                                            $('<div>').addClass('table-view').append(
+                                                $('<label>').html(_l('label.ip.address')),
+                                                $('<input>').attr({type: 'text'})
+                                            )
+                                        );
+                                        var $specifyMacField = $('<div>').addClass('specify-mac hide-if-unselected').append(
+                                            $('<div>').addClass('table-view').append(
+                                                $('<label>').html(_l('label.macaddress')),
+                                                $('<input>').attr({type: 'text'})
+                                            )
                                         );
 
                                         // Cleanup
                                         if ($select.closest('.new-network').size()) {
                                             $select.find('.advanced-options, .specify-ip').remove();
+                                            $select.find('.advanced-options, .specify-mac').remove();
                                         }
 
                                         $select.append($advancedLink, $specifyIpField);
+                                        $select.append($advancedLink, $specifyMacField);
                                         $advancedLink.click(function () {
                                             $select.toggleClass('advanced');
                                         });
@@ -1004,7 +1028,7 @@
 
                                     // Show non-VPC networks by default
                                     filterNetworkList(-1);
-                                    
+
                                     originalValues(formData);
                                     checkShowAddNetwork($newNetwork);
                                 }

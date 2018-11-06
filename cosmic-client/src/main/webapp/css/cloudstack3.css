@@ -489,6 +489,10 @@ body.login {
     width: 100%;
 }
 
+div.table-view {
+    display: inline-block;
+}
+
 div.list-view table tbody td span {
     display: block;
     float: left;
@@ -3948,6 +3952,13 @@ Dialogs*/
     border-top: 1px solid #DFDFDF;
 }
 
+.ui-dialog .ui-widget-content .nothing-to-select .specify-mac {
+    margin-top: 28px;
+    padding-top: 21px;
+    font-size: 12px;
+    border-top: 1px solid #DFDFDF;
+}
+
 .ui-dialog-buttonset {
     width: 285px;
     margin: 0;
@@ -6284,8 +6295,8 @@ label.error {
 }
 
 .multi-wizard.instance-wizard .custom-disk-size .select-container {
-    height: 213px;
-    margin: -7px 6px 0 8px;
+    height: 260px;
+    margin: 0px 6px 0 8px;
     /*+border-radius:6px;*/
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
@@ -6580,7 +6591,7 @@ label.error {
 }
 
 .multi-wizard.instance-wizard .select-network .select.advanced .secondary-input {
-    height: 73px;
+    height: 97px;
 }
 
 .multi-wizard.instance-wizard .select-network .select .secondary-input input {
@@ -6608,7 +6619,7 @@ label.error {
 }
 
 .multi-wizard.instance-wizard .select-network .select-container .select.advanced {
-    height: 74px;
+    height: 94px;
 }
 
 .multi-wizard.instance-wizard .select-network .select .advanced-options {
@@ -6639,6 +6650,23 @@ label.error {
 }
 
 .multi-wizard.instance-wizard .select-network .select.advanced .specify-ip input {
+    margin: 0px 0 0 15px;
+    width: 138px;
+}
+
+.multi-wizard.instance-wizard .select-network .select .specify-mac {
+    display: none;
+    position: absolute;
+    top: 65px;
+    left: -14px;
+    width: 100%;
+}
+
+.multi-wizard.instance-wizard .select-network .select.advanced .specify-mac {
+    display: block;
+}
+
+.multi-wizard.instance-wizard .select-network .select.advanced .specify-mac input {
     margin: 0px 0 0 15px;
     width: 138px;
 }
@@ -6695,6 +6723,11 @@ label.error {
 }
 
 .multi-wizard.instance-wizard .select-network .select.new-network .select.advanced .specify-ip {
+    top: 74px;
+    left: 29px;
+}
+
+.multi-wizard.instance-wizard .select-network .select.new-network .select.advanced .specify-mac {
     top: 74px;
     left: 29px;
 }

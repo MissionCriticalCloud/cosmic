@@ -1,12 +1,13 @@
-(function(cloudStack, $) {
-    cloudStack.uiCustom.migrate = function(args) {
+(function (cloudStack, $) {
+    cloudStack.uiCustom.migrate = function (args) {
         var listView = args.listView;
         var action = args.action;
+        var checknull = args.checknull;
 
-        return function(args) {
+        return function (args) {
             var context = args.context;
 
-            var hostList = function(args) {
+            var hostList = function (args) {
                 var $listView;
 
                 var hosts = $.extend(true, {}, args.listView, {
@@ -19,7 +20,7 @@
                         label: _l(args.listView.label),
                         type: 'radio',
                         action: {
-                            uiCustom: function(args) {
+                            uiCustom: function (args) {
                                 var $item = args.$item;
                                 var $input = $item.find('td.actions input:visible');
 
@@ -55,11 +56,11 @@
                 buttons: [{
                     text: _l('label.ok'),
                     'class': 'ok migrateok',
-                    click: function() {
+                    click: function () {
                         var complete = args.complete;
                         var selectedHostObj = $dataList.find('tr.multi-edit-selected').data('json-obj');
-                        if(selectedHostObj != undefined) {
-                            $dataList.fadeOut(function() {
+                        if (selectedHostObj != undefined || !$dataList.checknull) {
+                            $dataList.fadeOut(function () {
                                 action({
                                     context: $.extend(true, {}, context, {
                                         selectedHost: [
@@ -67,13 +68,13 @@
                                         ]
                                     }),
                                     response: {
-                                        success: function(args) {
+                                        success: function (args) {
                                             complete({
                                                 _custom: args._custom,
                                                 $item: $('<div>'),
                                             });
                                         },
-                                        error: function(args) {
+                                        error: function (args) {
                                             cloudStack.dialog.notice({
                                                 message: args
                                             });
@@ -82,11 +83,10 @@
                                 });
                             });
 
-                            $('div.overlay').fadeOut(function() {
+                            $('div.overlay').fadeOut(function () {
                                 $('div.overlay').remove();
                             });
-                        }
-                        else {
+                        } else if ($dataList.checknull) {
                             cloudStack.dialog.notice({
                                 message: _l('message.migrate.instance.select.host')
                             });
@@ -95,17 +95,23 @@
                 }, {
                     text: _l('label.cancel'),
                     'class': 'cancel migratecancel',
-                    click: function() {
-                        $dataList.fadeOut(function() {
+                    click: function () {
+                        $dataList.fadeOut(function () {
                             $dataList.remove();
                         });
-                        $('div.overlay').fadeOut(function() {
+                        $('div.overlay').fadeOut(function () {
                             $('div.overlay').remove();
                             $(':ui-dialog').dialog('destroy');
                         });
                     }
                 }]
             }).parent('.ui-dialog').overlay();
+
+            if (checknull !== undefined && typeof checknull === typeof true) {
+                $dataList.checknull = checknull;
+            } else {
+                $dataList.checknull = true;
+            }
         };
     };
 }(cloudStack, jQuery));

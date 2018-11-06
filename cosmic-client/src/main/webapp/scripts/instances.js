@@ -483,94 +483,117 @@
                         }
                     },
                     startByAdmin: {
-                        label: 'label.action.start.instance',
-                        createForm: {
-                            title: 'label.action.start.instance',
-                            desc: 'message.action.start.instance',
-                            fields: {
-                                hostId: {
-                                    label: 'label.host',
-                                    isHidden: function (args) {
-                                        if (isAdmin())
-                                            return false;
-                                        else
-                                            return true;
-                                    },
-                                    select: function (args) {
-                                        if (isAdmin()) {
-                                            $.ajax({
-                                                url: createURL("listHosts&state=Up&type=Routing&zoneid=" + args.context.instances[0].zoneid),
-                                                dataType: "json",
-                                                async: true,
-                                                success: function (json) {
-                                                    if (json.listhostsresponse.host != undefined) {
-                                                        hostObjs = json.listhostsresponse.host;
-                                                        hostObjs.sort(function (a, b) {
-                                                            return a.name.localeCompare(b.name);
-                                                        });
-                                                        var items = [{
-                                                            id: -1,
-                                                            description: 'Default'
-                                                        }];
-                                                        $(hostObjs).each(function () {
-                                                            items.push({
-                                                                id: this.id,
-                                                                description: this.name
+                        action: {
+                            custom: cloudStack.uiCustom.migrate({
+                                checknull: false,
+                                listView: {
+                                    label: 'label.action.start.instance',
+                                    listView: {
+                                        id: 'availableHosts',
+                                        fields: {
+                                            description: {
+                                                label: 'label.name'
+                                            },
+                                            dedicated: {
+                                                label: 'label.dedicated'
+                                            },
+                                            cpuallocated: {
+                                                label: 'label.cpu.allocated'
+                                            },
+                                            memoryavailable: {
+                                                label: 'label.memory.available'
+                                            }
+                                        },
+                                        dataProvider: function (args) {
+                                            var data = {
+                                                page: args.page,
+                                                pagesize: pageSize
+                                            };
+                                            if (args.filterBy.search.value) {
+                                                data.keyword = args.filterBy.search.value;
+                                            }
+
+                                            if (isAdmin()) {
+                                                $.ajax({
+                                                    url: createURL("listHosts&state=Up&type=Routing&zoneid=" + args.context.instances[0].zoneid),
+                                                    data: data,
+                                                    dataType: "json",
+                                                    async: true,
+                                                    success: function (json) {
+                                                        if (json.listhostsresponse.host !== undefined) {
+                                                            hostObjs = json.listhostsresponse.host;
+                                                            hostObjs.sort(function (a, b) {
+                                                                return a.name.localeCompare(b.name);
                                                             });
-                                                        });
-                                                        args.response.success({
-                                                            data: items
-                                                        });
-                                                    } else {
-                                                        cloudStack.dialog.notice({
-                                                            message: _l('No Hosts are avaialble')
-                                                        });
+                                                            var items = [];
+                                                            $(hostObjs).each(function () {
+                                                                var dedicated = (this.dedicated ? "Yes, to " + this.domainname : _l('label.no'));
+
+                                                                items.push({
+                                                                    id: this.id,
+                                                                    description: this.name,
+                                                                    dedicated: dedicated,
+                                                                    cpuallocated: Math.ceil(parseInt(this.cpuallocated)) + "%",
+                                                                    memoryavailable: (parseFloat(this.memorytotal - this.memoryallocated) / (1024.0 * 1024.0 * 1024.0)).toFixed(2) + ' GB'
+                                                                });
+                                                            });
+                                                            args.response.success({
+                                                                data: items
+                                                            });
+                                                        } else {
+                                                            args.response.success({
+                                                                data: []
+                                                            });
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                args.response.success({
+                                                    data: null
+                                                });
+                                            }
+                                        }
+                                    }
+                                },
+                                action: function (args) {
+                                    var selectedHostObj;
+                                    var data = {
+                                        id: args.context.instances[0].id
+                                    };
+
+
+                                    if (args.context.selectedHost != null && args.context.selectedHost.length > 0) {
+                                        selectedHostObj = args.context.selectedHost[0];
+                                        $.extend(data, {
+                                            hostid: selectedHostObj.id
+                                        });
+                                    }
+
+                                    $.ajax({
+                                        url: createURL("startVirtualMachine"),
+                                        data: data,
+                                        dataType: "json",
+                                        async: true,
+                                        success: function (json) {
+                                            var jid = json.startvirtualmachineresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        return json.queryasyncjobresultresponse.jobresult.virtualmachine;
+                                                    },
+                                                    getActionFilter: function () {
+                                                        return vmActionfilter;
                                                     }
                                                 }
                                             });
-                                        } else {
-                                            args.response.success({
-                                                data: null
-                                            });
                                         }
-                                    }
+                                    })
+
                                 }
-                            }
-                        },
-                        action: function (args) {
-                            var data = {
-                                id: args.context.instances[0].id
-                            }
-                            if (args.$form.find('.form-item[rel=hostId]').css("display") != "none" && args.data.hostId != -1) {
-                                $.extend(data, {
-                                    hostid: args.data.hostId
-                                });
-                            }
-                            $.ajax({
-                                url: createURL("startVirtualMachine"),
-                                data: data,
-                                dataType: "json",
-                                async: true,
-                                success: function (json) {
-                                    var jid = json.startvirtualmachineresponse.jobid;
-                                    args.response.success({
-                                        _custom: {
-                                            jobId: jid,
-                                            getUpdatedItem: function (json) {
-                                                return json.queryasyncjobresultresponse.jobresult.virtualmachine;
-                                            },
-                                            getActionFilter: function () {
-                                                return vmActionfilter;
-                                            }
-                                        }
-                                    });
-                                }
-                            });
+                            })
                         },
                         messages: {
-                            confirm: function (args) {
-                                return 'message.action.start.instance';
-                            },
                             notification: function (args) {
                                 return 'label.action.start.instance';
                             },
@@ -2045,13 +2068,20 @@
                                 isEditable: true
                             },
                             name: {
-                                label: 'label.host.name'
+                                label: 'label.host.name',
+                                isCopyPaste: true
                             },
                             instancename: {
-                                label: 'label.instance.name'
+                                label: 'label.instance.name',
+                                isCopyPaste: true
                             },
                             id: {
-                                label: 'label.id'
+                                label: 'label.id',
+                                isCopyPaste: true
+                            },
+                            hostname: {
+                                label: 'label.host',
+                                isCopyPaste: true
                             },
                             state: {
                                 label: 'label.state',
@@ -2164,9 +2194,6 @@
                             zonename: {
                                 label: 'label.zone.name',
                                 isEditable: false
-                            },
-                            hostname: {
-                                label: 'label.host'
                             },
                             keypair: {
                                 label: 'label.ssh.key.pair'
