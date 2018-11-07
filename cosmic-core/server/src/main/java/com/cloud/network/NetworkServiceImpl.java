@@ -1489,6 +1489,7 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
                                       final String domainSuffix, final Long networkOfferingId, final Boolean changeCidr, final String guestVmCidr, final Boolean displayNetwork,
                                       final String customId, final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer,
                                       final String dhcpBootfileName) {
+        Boolean sendNetworkOverview = false;
 
         // verify input parameters
         final NetworkVO network = _networksDao.findById(networkId);
@@ -1536,14 +1537,15 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
         }
 
         if (dns1 != null) {
+            sendNetworkOverview = true;
             network.setDns1(dns1);
         }
 
         if (dns2 != null) {
+            sendNetworkOverview = true;
             network.setDns2(dns2);
         }
 
-        Boolean sendNetworkOverview = false;
         if (dhcpTftpServer != null) {
             sendNetworkOverview = true;
             network.setDhcpTftpServer(dhcpTftpServer);
