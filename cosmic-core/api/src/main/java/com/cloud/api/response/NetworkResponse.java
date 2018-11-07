@@ -220,6 +220,14 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
     @Param(description = "If a network is enabled for 'streched l2 subnet' then represents zones on which network currently spans", since = "4.4")
     private Set<String> networkSpannedZones;
 
+    @SerializedName(ApiConstants.DHCP_TFTP_SERVER)
+    @Param(description = "DHCP option 66: tftp-server")
+    private String dhcpTftpServer;
+
+    @SerializedName(ApiConstants.DHCP_BOOTFILE_NAME)
+    @Param(description = "DHCP option 67: bootfile-name")
+    private String dhcpBootfileName;
+
     public Boolean getDisplayNetwork() {
         return displayNetwork;
     }
@@ -435,5 +443,13 @@ public class NetworkResponse extends BaseResponse implements ControlledEntityRes
 
     public void setAclName(final String aclName) {
         this.aclName = aclName;
+    }
+
+    public void setDhcpTftpServer(final String dhcpTftpServer) {
+        this.dhcpTftpServer = dhcpTftpServer;
+    }
+
+    public void setDhcpBootfileName(final String dhcpBootfileName) {
+        this.dhcpBootfileName = dhcpBootfileName;
     }
 }

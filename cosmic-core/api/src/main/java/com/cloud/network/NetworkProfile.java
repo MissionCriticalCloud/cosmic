@@ -43,6 +43,8 @@ public class NetworkProfile implements Network {
     private TrafficType trafficType;
     private Long physicalNetworkId;
     private Long networkAclId;
+    private String dhcpTftpServer;
+    private String dhcpBootfileName;
 
     public NetworkProfile(final Network network) {
         id = network.getId();
@@ -284,5 +286,23 @@ public class NetworkProfile implements Network {
     @Override
     public Class<?> getEntityType() {
         return Network.class;
+    }
+
+    @Override
+    public String getDhcpTftpServer() {
+        return dhcpTftpServer;
+    }
+
+    public void setDhcpTftpServer(final String dhcpTftpServer) {
+        this.dhcpTftpServer = dhcpTftpServer;
+    }
+
+    @Override
+    public String getDhcpBootfileName() {
+        return dhcpBootfileName;
+    }
+
+    public void setDhcpBootfileName(final String dhcpBootfileName) {
+        this.dhcpBootfileName = dhcpBootfileName;
     }
 }

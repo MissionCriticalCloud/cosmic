@@ -1218,25 +1218,41 @@
                                         });
                                     }
 
-                                    var oldcidr;
-                                    $.ajax({
-                                        url: createURL("listNetworks&id=" + args.context.vpcTiers[0].id + "&listAll=true"),
-                                        dataType: "json",
-                                        async: false,
-                                        success: function (json) {
-                                            oldcidr = json.listnetworksresponse.network[0].cidr;
-
-                                        }
-                                    });
-
-
-                                    if (args.data.cidr != "" && args.data.cidr != oldcidr) {
+                                    if (args.data.dhcptftpserver != null && args.data.dhcptftpserver != args.context.vpcTiers[0].dhcptftpserver) {
                                         $.extend(data, {
-                                            guestvmcidr: args.data.cidr
+                                            dhcptftpserver: args.data.dhcptftpserver
                                         });
                                     }
-                                },
-                            },
+
+                                    if (args.data.dhcpbootfilename != null && args.data.dhcpbootfilename != args.context.vpcTiers[0].dhcpbootfilename) {
+                                        $.extend(data, {
+                                            dhcpbootfilename: args.data.dhcpbootfilename
+                                        });
+                                    }
+
+                                    var oldcidr;
+                                    $.ajax({
+                                        url: createURL("updateNetwork&id=" + args.context.vpcTiers[0].id),
+                                        dataType: "json",
+                                        async: true,
+                                        data: data,
+                                        success: function (json) {
+                                            var jid = json.updatenetworkresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function (json) {
+                                                        var item = json.queryasyncjobresultresponse.jobresult.network;
+                                                        return {
+                                                            data: item
+                                                        };
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
                         },
 
                         tabFilter: function (args) {
@@ -1478,6 +1494,7 @@
                                     networkdomaintext: {
                                         label: 'label.network.domain.text'
                                     },
+
                                     networkdomain: {
                                         label: 'label.network.domain',
                                         isEditable: true
@@ -1486,8 +1503,19 @@
                                     domain: {
                                         label: 'label.domain'
                                     },
+
                                     account: {
                                         label: 'label.account'
+                                    },
+
+                                    dhcptftpserver: {
+                                        label: 'label.DHCP.TFTP.Server',
+                                        isEditable: true
+                                    },
+
+                                    dhcpbootfilename: {
+                                        label: 'label.DHCP.Boot.FileName',
+                                        isEditable: true
                                     }
                                 }],
 
@@ -2037,6 +2065,18 @@
                                     if (args.data.ipexclusionlist != null && args.data.ipexclusionlist != args.context.networks[0].ipexclusionlist) {
                                         $.extend(data, {
                                             ipexclusionlist: args.data.ipexclusionlist
+                                        });
+                                    }
+
+                                    if (args.data.dhcptftpserver != null && args.data.dhcptftpserver != args.context.networks[0].dhcptftpserver) {
+                                        $.extend(data, {
+                                            dhcptftpserver: args.data.dhcptftpserver
+                                        });
+                                    }
+
+                                    if (args.data.dhcpbootfilename != null && args.data.dhcpbootfilename != args.context.networks[0].dhcpbootfilename) {
+                                        $.extend(data, {
+                                            dhcpbootfilename: args.data.dhcpbootfilename
                                         });
                                     }
 

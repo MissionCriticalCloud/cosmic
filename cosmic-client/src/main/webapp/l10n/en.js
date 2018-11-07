@@ -33,6 +33,8 @@ var dictionary = {
     "label.CIDR.of.destination.network": "CIDR of destination network",
     "label.CPU.cap": "CPU Cap",
     "label.DHCP.server.type": "DHCP Server Type",
+    "label.DHCP.TFTP.Server": "DHCP TFTP Server",
+    "label.DHCP.Boot.FileName": "DHCP Bootfile Name",
     "label.DNS.domain.for.guest.networks": "DNS domain for Guest Networks",
     "label.ESP.encryption": "ESP Encryption",
     "label.ESP.hash": "ESP Hash",

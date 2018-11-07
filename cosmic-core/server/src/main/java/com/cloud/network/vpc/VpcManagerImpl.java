@@ -2632,7 +2632,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     public Network createVpcGuestNetwork(final long ntwkOffId, final String name, final String displayText, final String gateway, final String cidr, final String vlanId,
                                          String networkDomain, final Account owner, final Long domainId, final PhysicalNetwork pNtwk, final long zoneId, final ACLType aclType,
                                          final Boolean subdomainAccess, final long vpcId, final Long aclId, final Account caller, final Boolean isDisplayNetworkEnabled,
-                                         final String dns1, final String dns2, final String ipExclusionList)
+                                         final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer, final String dhcpBootfileName)
             throws ConcurrentOperationException, InsufficientCapacityException,
             ResourceAllocationException {
 
@@ -2655,7 +2655,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         // 2) Create network
         final Network guestNetwork = _ntwkMgr.createGuestNetwork(ntwkOffId, name, displayText, gateway, cidr, vlanId,
                 networkDomain, owner, domainId, pNtwk, zoneId, aclType, subdomainAccess, vpcId, null, null,
-                isDisplayNetworkEnabled, null, dns1, dns2, ipExclusionList);
+                isDisplayNetworkEnabled, null, dns1, dns2, ipExclusionList, dhcpTftpServer, dhcpBootfileName);
 
         if (guestNetwork != null) {
             guestNetwork.setNetworkACLId(aclId);

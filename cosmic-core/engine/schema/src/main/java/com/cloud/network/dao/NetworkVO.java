@@ -113,12 +113,14 @@ public class NetworkVO implements Network {
     String ip6Cidr;
     @Column(name = "network_acl_id")
     Long networkACLId;
-
     @Column(name = "streched_l2")
     boolean strechedL2Network = false;
-
     @Column(name = "ip_exclusion_list")
     String ipExclusionList;
+    @Column(name = "dhcp_tftp_server")
+    String dhcpTftpServer;
+    @Column(name = "dhcp_bootfile_name")
+    String dhcpBootfileName;
 
     public NetworkVO() {
         uuid = UUID.randomUUID().toString();
@@ -126,9 +128,10 @@ public class NetworkVO implements Network {
 
     public NetworkVO(final long id, final Network that, final long offeringId, final String guruName, final long domainId, final long accountId, final long related,
                      final String name, final String displayText, final String networkDomain, final GuestType guestType, final long dcId, final Long physicalNetworkId,
-                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant, final String dns1, final String dns2, final String ipExclusionList) {
+                     final ACLType aclType, final boolean specifyIpRanges, final Long vpcId, final boolean isRedundant, final String dns1, final String dns2,
+                     final String ipExclusionList, final String dhcpTftpServer, final String dhcpBootfileName) {
         this(id, that.getTrafficType(), that.getMode(), that.getBroadcastDomainType(), offeringId, domainId, accountId, related, name, displayText, networkDomain, guestType,
-                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant, dns1, dns2, ipExclusionList);
+                dcId, physicalNetworkId, aclType, specifyIpRanges, vpcId, isRedundant, dns1, dns2, ipExclusionList, dhcpTftpServer, dhcpBootfileName);
         gateway = that.getGateway();
         cidr = that.getCidr();
         networkCidr = that.getNetworkCidr();
@@ -165,7 +168,7 @@ public class NetworkVO implements Network {
     public NetworkVO(final long id, final TrafficType trafficType, final DHCPMode mode, final BroadcastDomainType broadcastDomainType, final long networkOfferingId,
                      final long domainId, final long accountId, final long related, final String name, final String displayText, final String networkDomain,
                      final GuestType guestType, final long dcId, final Long physicalNetworkId, final ACLType aclType, final boolean specifyIpRanges, final Long vpcId,
-                     final boolean isRedundant, final String dns1, final String dns2, final String ipExclusionList) {
+                     final boolean isRedundant, final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer, final String dhcpBootfileName) {
         this(trafficType, mode, broadcastDomainType, networkOfferingId, State.Allocated, dcId, physicalNetworkId, isRedundant);
         this.domainId = domainId;
         this.accountId = accountId;
@@ -182,6 +185,8 @@ public class NetworkVO implements Network {
         this.dns1 = dns1;
         this.dns2 = dns2;
         this.ipExclusionList = ipExclusionList;
+        this.dhcpTftpServer = dhcpTftpServer;
+        this.dhcpBootfileName = dhcpBootfileName;
     }
 
     /**
@@ -573,5 +578,21 @@ public class NetworkVO implements Network {
 
     public String getIpExclusionList() {
         return ipExclusionList;
+    }
+
+    public String getDhcpTftpServer() {
+        return dhcpTftpServer;
+    }
+
+    public void setDhcpTftpServer(final String dhcpTftpServer) {
+        this.dhcpTftpServer = dhcpTftpServer;
+    }
+
+    public String getDhcpBootfileName() {
+        return dhcpBootfileName;
+    }
+
+    public void setDhcpBootfileName(final String dhcpBootfileName) {
+        this.dhcpBootfileName = dhcpBootfileName;
     }
 }

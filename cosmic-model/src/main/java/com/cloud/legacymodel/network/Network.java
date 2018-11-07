@@ -67,6 +67,10 @@ public interface Network extends ControlledEntity, StateObject<Network.State>, I
 
     String getDisplayText();
 
+    String getDhcpTftpServer();
+
+    String getDhcpBootfileName();
+
     String getReservationId();
 
     String getNetworkDomain();

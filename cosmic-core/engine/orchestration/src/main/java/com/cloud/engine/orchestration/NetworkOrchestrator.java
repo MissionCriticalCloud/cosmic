@@ -393,7 +393,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             throws ConcurrentOperationException {
         return setupNetwork(
                 owner, offering, null, plan, name, displayText, false, null, null, null, null, null,
-                true, null, null, null
+                true, null, null, null, null, null
         );
     }
 
@@ -402,7 +402,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     public List<? extends Network> setupNetwork(final Account owner, final NetworkOffering offering, final Network predefined, final DeploymentPlan plan, final String name,
                                                 final String displayText, final boolean errorIfAlreadySetup, final Long domainId, final ACLType aclType,
                                                 final Boolean subdomainAccess, final Long vpcId, final Long relatedNetworkId, final Boolean isDisplayNetworkEnabled,
-                                                final String dns1, final String dns2, final String ipExclusionList)
+                                                final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer, final String dhcpBootfileName)
             throws ConcurrentOperationException {
         final Account locked = _accountDao.acquireInLockTable(owner.getId());
         if (locked == null) {
@@ -470,7 +470,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     public void doInTransactionWithoutResult(final TransactionStatus status) {
                         final NetworkVO vo = new NetworkVO(id, network, offering.getId(), guru.getName(), owner.getDomainId(), owner.getId(), relatedFinal, name, displayText,
                                 predefined != null ? predefined.getNetworkDomain() : null, offering.getGuestType(), plan.getDataCenterId(), plan.getPhysicalNetworkId(), aclType,
-                                offering.getSpecifyIpRanges(), vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList);
+                                offering.getSpecifyIpRanges(), vpcId, offering.getRedundantRouter(), dns1, dns2, ipExclusionList, dhcpTftpServer, dhcpBootfileName);
                         vo.setDisplayNetwork(isDisplayNetworkEnabled == null ? true : isDisplayNetworkEnabled);
                         vo.setStrechedL2Network(offering.getSupportsStrechedL2());
                         networks.add(_networksDao.persist(vo, vo.getGuestType() == GuestType.Isolated,
@@ -523,6 +523,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     false,
                     null,
                     null,
+                    null,
+                    null,
                     null
             ).get(0);
         }
@@ -542,6 +544,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                 null,
                 isolatedNetwork.getId(),
                 false,
+                null,
+                null,
                 null,
                 null,
                 null
@@ -1681,9 +1685,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
     public Network createGuestNetwork(final long networkOfferingId, final String name, final String displayText, final String gateway, final String cidr, String vlanId,
                                       String networkDomain, final Account owner, final Long domainId, final PhysicalNetwork pNtwk, final long zoneId, final ACLType aclType,
                                       Boolean subdomainAccess, final Long vpcId, final String ip6Gateway, final String ip6Cidr, final Boolean isDisplayNetworkEnabled,
-                                      final String isolatedPvlan, final String dns1, final String dns2, final String ipExclusionList) throws ConcurrentOperationException,
-            InsufficientCapacityException,
-            ResourceAllocationException {
+                                      final String isolatedPvlan, final String dns1, final String dns2, final String ipExclusionList, final String dhcpTftpServer,
+                                      final String dhcpBootfileName) throws ConcurrentOperationException, InsufficientCapacityException, ResourceAllocationException {
         final NetworkOfferingVO ntwkOff = _networkOfferingDao.findById(networkOfferingId);
         // this method supports only guest network creation
         if (ntwkOff.getTrafficType() != TrafficType.Guest) {
@@ -1912,6 +1915,14 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
                     userNetwork.setIpExclusionList(ipExclusionList);
                 }
 
+                if (dhcpTftpServer != null) {
+                    userNetwork.setDhcpTftpServer(dhcpTftpServer);
+                }
+
+                if (dhcpBootfileName != null) {
+                    userNetwork.setDhcpBootfileName(dhcpBootfileName);
+                }
+
                 if (ip6Cidr != null && ip6Gateway != null) {
                     userNetwork.setIp6Cidr(ip6Cidr);
                     userNetwork.setIp6Gateway(ip6Gateway);
@@ -1937,7 +1948,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
                 final List<? extends Network> networks = setupNetwork(
                         owner, ntwkOff, userNetwork, plan, name, displayText, true, domainId, aclType, subdomainAccessFinal, vpcId, null,
-                        isDisplayNetworkEnabled, dns1, dns2, ipExclusionList
+                        isDisplayNetworkEnabled, dns1, dns2, ipExclusionList, dhcpTftpServer, dhcpBootfileName
                 );
 
                 Network network = null;
@@ -2203,6 +2214,8 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         final NetworkProfile profile = new NetworkProfile(network);
         profile.setDns1(network.getDns1());
         profile.setDns2(network.getDns2());
+        profile.setDhcpTftpServer(network.getDhcpTftpServer());
+        profile.setDhcpBootfileName(network.getDhcpBootfileName());
         guru.updateNetworkProfile(profile);
 
         return profile;

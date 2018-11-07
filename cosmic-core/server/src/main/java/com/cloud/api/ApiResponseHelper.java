@@ -1827,6 +1827,8 @@ public class ApiResponseHelper implements ResponseGenerator {
 
         response.setDns1(profile.getDns1());
         response.setDns2(profile.getDns2());
+        response.setDhcpTftpServer(profile.getDhcpTftpServer());
+        response.setDhcpBootfileName(profile.getDhcpBootfileName());
         // populate capability
         final Map<Service, Map<Capability, String>> serviceCapabilitiesMap = ApiDBUtils.getNetworkCapabilities(network.getId(), network.getDataCenterId());
         final List<ServiceResponse> serviceResponses = new ArrayList<>();
