@@ -243,6 +243,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -801,6 +803,9 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         final Pair<UserVmVO, Map<VirtualMachineProfile.Param, Object>> vmParamPair = new Pair(vm, params);
         if (vm != null && vm.isUpdateParameters()) {
+            // Set date and version we start this VM
+            vm.setLastStartDateTime(getCurrentLocalDateTimeStamp());
+            vm.setLastStartVersion(UserVmManagerImpl.class.getPackage().getImplementationVersion());
             // this value is not being sent to the backend; need only for api
             // display purposes
             if (template.getEnablePassword()) {
@@ -809,11 +814,15 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 if (vm.getDetail("password") != null) {
                     _vmDetailsDao.remove(_vmDetailsDao.findDetail(vm.getId(), "password").getId());
                 }
-                _vmDao.update(vm.getId(), vm);
             }
+            _vmDao.update(vm.getId(), vm);
         }
 
         return vmParamPair;
+    }
+
+    private String getCurrentLocalDateTimeStamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     @Override
@@ -4284,6 +4293,10 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 final GuestOSVO guestOS = _guestOSDao.findById(guestOSId);
                 final long guestOSCategoryId = guestOS.getCategoryId();
                 final GuestOSCategoryVO guestOSCategory = _guestOSCategoryDao.findById(guestOSCategoryId);
+
+                // Set date and version we start this VM
+                vm.setLastStartDateTime(getCurrentLocalDateTimeStamp());
+                vm.setLastStartVersion(UserVmManagerImpl.class.getPackage().getImplementationVersion());
 
                 _vmDao.persist(vm);
                 for (final String key : customParameters.keySet()) {

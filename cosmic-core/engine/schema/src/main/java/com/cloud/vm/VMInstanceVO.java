@@ -166,6 +166,10 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     protected MaintenancePolicy maintenancePolicy;
     @Column(name = "boot_menu_timeout", updatable = true, nullable = true)
     protected Long bootMenuTimeout;
+    @Column(name = "last_start_datetime", updatable = true, nullable = false)
+    protected String lastStartDateTime;
+    @Column(name = "last_start_version", updatable = true, nullable = false)
+    protected String lastStartVersion;
 
     public VMInstanceVO(final long id, final long serviceOfferingId, final String name, final String instanceName, final VirtualMachineType type, final Long vmTemplateId,
                         final HypervisorType hypervisorType, final long guestOSId, final long domainId, final long accountId, final long userId, final boolean haEnabled,
@@ -607,5 +611,21 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
 
     public void setBootMenuTimeout(final Long bootMenuTimeout) {
         this.bootMenuTimeout = bootMenuTimeout;
+    }
+
+    public String getLastStartDateTime() {
+        return lastStartDateTime;
+    }
+
+    public void setLastStartDateTime(final String lastStartDateTime) {
+        this.lastStartDateTime = lastStartDateTime;
+    }
+
+    public String getLastStartVersion() {
+        return lastStartVersion;
+    }
+
+    public void setLastStartVersion(final String lastStartVersion) {
+        this.lastStartVersion = lastStartVersion;
     }
 }

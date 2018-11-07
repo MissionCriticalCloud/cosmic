@@ -103,9 +103,18 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
 
         userVmResponse.setCreated(userVm.getCreated());
         userVmResponse.setDisplayVm(userVm.isDisplayVm());
-        userVmResponse.setMaintenancePolicy(userVm.getMaintenancePolicy());
-        userVmResponse.setBootMenuTimeout(userVm.getBootMenuTimeout());
-
+        if (userVm.getMaintenancePolicy() != null) {
+            userVmResponse.setMaintenancePolicy(userVm.getMaintenancePolicy());
+        }
+        if (userVm.getBootMenuTimeout() != null) {
+            userVmResponse.setBootMenuTimeout(userVm.getBootMenuTimeout());
+        }
+        if (userVm.getLastStartDateTime() != null) {
+            userVmResponse.setLastStartDateTime(userVm.getLastStartDateTime());
+        }
+        if (userVm.getLastStartVersion() != null) {
+            userVmResponse.setLastStartVersion(userVm.getLastStartVersion());
+        }
         if (userVm.getState() != null) {
             userVmResponse.setState(userVm.getState().toString());
         }

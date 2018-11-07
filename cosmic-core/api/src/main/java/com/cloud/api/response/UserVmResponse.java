@@ -224,6 +224,14 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @Param(description = "Timeout of the boot menu (in ms)")
     private Long bootMenuTimeout;
 
+    @SerializedName(ApiConstants.LAST_START_DATE)
+    @Param(description = "Timestamp of last start of VM")
+    private String lastStartDateTime;
+
+    @SerializedName(ApiConstants.LAST_START_VERSION)
+    @Param(description = "What Cosmic version did the VM start with")
+    private String lastStartVersion;
+
     public UserVmResponse() {
         nics = new LinkedHashSet<>();
         tags = new LinkedHashSet<>();
@@ -763,5 +771,21 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setBootMenuTimeout(final Long bootMenuTimeout) {
         this.bootMenuTimeout = bootMenuTimeout;
+    }
+
+    public String getLastStartDateTime() {
+        return lastStartDateTime;
+    }
+
+    public void setLastStartDateTime(final String lastStartDateTime) {
+        this.lastStartDateTime = lastStartDateTime;
+    }
+
+    public String getLastStartVersion() {
+        return lastStartVersion;
+    }
+
+    public void setLastStartVersion(final String lastStartVersion) {
+        this.lastStartVersion = lastStartVersion;
     }
 }

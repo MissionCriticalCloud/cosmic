@@ -143,6 +143,8 @@ public class ApiConstants {
     public static final String JOB_STATUS = "jobstatus";
     public static final String LDAP_ENABLED = "ldapenabled";
     public static final String LASTNAME = "lastname";
+    public static final String LAST_START_DATE = "laststartdate";
+    public static final String LAST_START_VERSION = "laststartversion";
     public static final String LEVEL = "level";
     public static final String LENGTH = "length";
     public static final String LIMIT_CPU_USE = "limitcpuuse";
