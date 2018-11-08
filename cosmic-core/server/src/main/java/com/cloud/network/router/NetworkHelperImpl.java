@@ -73,6 +73,8 @@ import com.cloud.vm.dao.NicDao;
 import javax.annotation.PostConstruct;
 import javax.ejb.Local;
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -292,6 +294,12 @@ public class NetworkHelperImpl implements NetworkHelper {
             router.setStopPending(false);
             router = _routerDao.persist(router);
         }
+
+        // Set date and version we start this VM
+        router.setLastStartDateTime(getCurrentLocalDateTimeStamp());
+        router.setLastStartVersion(NetworkHelperImpl.class.getPackage().getImplementationVersion());
+        router = _routerDao.persist(router);
+
         // We don't want the failure of VPN Connection affect the status of
         // router, so we try to make connection
         // only after router start successfully
@@ -300,6 +308,10 @@ public class NetworkHelperImpl implements NetworkHelper {
             _s2sVpnMgr.reconnectDisconnectedVpnByVpc(vpcId);
         }
         return _routerDao.findById(router.getId());
+    }
+
+    private String getCurrentLocalDateTimeStamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     protected DomainRouterVO waitRouter(final DomainRouterVO router) {
