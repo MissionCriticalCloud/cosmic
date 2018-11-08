@@ -6,20 +6,19 @@ import com.cloud.agent.resource.kvm.storage.KvmStoragePool;
 import com.cloud.agent.resource.kvm.storage.KvmStoragePoolManager;
 import com.cloud.agent.resource.kvm.storage.utils.LVM;
 import com.cloud.agent.resource.kvm.storage.utils.LVMException;
-import com.cloud.agent.resource.kvm.storage.utils.QemuImg;
-import com.cloud.agent.resource.kvm.storage.utils.QemuImgException;
-import com.cloud.agent.resource.kvm.storage.utils.QemuImgFile;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.ResizeVolumeAnswer;
 import com.cloud.legacymodel.communication.command.ResizeVolumeCommand;
 import com.cloud.legacymodel.to.StorageFilerTO;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.model.enumeration.PhysicalDiskFormat;
 import com.cloud.model.enumeration.StoragePoolType;
 
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
+import org.libvirt.StorageVol;
 import org.libvirt.flags.DomainBlockResizeFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,13 +79,18 @@ public final class LibvirtResizeVolumeCommandWrapper extends LibvirtCommandWrapp
             }
 
             try {
-                if (vmInstanceName == null) {
-                    final QemuImg qemuImg = new QemuImg(command.getWait());
-                    qemuImg.resize(new QemuImgFile(vol.getPath(), vol.getFormat()), newSize);
-                } else {
+                final LibvirtUtilitiesHelper libvirtUtilitiesHelper = libvirtComputingResource.getLibvirtUtilitiesHelper();
+                final Connect connection = libvirtUtilitiesHelper.getConnection();
+                final StorageVol storageVol = connection.storageVolLookupByPath(vol.getPath());
+                final VirtualMachine.PowerState state = libvirtComputingResource.getVmState(libvirtUtilitiesHelper.getConnection(), vmInstanceName);
+
+                if (state == VirtualMachine.PowerState.PowerOn) {
                     libvirtBlockResize(libvirtComputingResource, newSize, vmInstanceName, vol);
+                } else {
+                    final int flags = shrinkOk ? StorageVol.ResizeFlags.SHRINK : 0;
+                    storageVol.resize(newSize, flags);
                 }
-            } catch (final LibvirtException | QemuImgException e) {
+            } catch (final LibvirtException e) {
                 return new ResizeVolumeAnswer(command, false, e.toString());
             }
         }
