@@ -4,6 +4,7 @@ import com.cloud.legacymodel.vm.BootloaderType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
+import java.util.Date;
 
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,8 @@ public class VirtualMachineTO {
     private OptimiseFor optimiseFor;
     private MaintenancePolicy maintenancePolicy;
     private Long bootMenuTimeout;
+    private String lastStartDateTime;
+    private String lastStartVersion;
 
     public VirtualMachineTO(final long id, final String instanceName, final VirtualMachineType type, final int cpus, final long minRam, final long maxRam,
                             final BootloaderType bootloader, final String os, final boolean enableHA, final boolean limitCpuUse, final String vncPassword) {
@@ -327,5 +330,21 @@ public class VirtualMachineTO {
 
     public void setBootMenuTimeout(final Long bootMenuTimeout) {
         this.bootMenuTimeout = bootMenuTimeout;
+    }
+
+    public String getLastStartDateTime() {
+        return lastStartDateTime;
+    }
+
+    public void setLastStartDateTime(final String lastStartDateTime) {
+        this.lastStartDateTime = lastStartDateTime;
+    }
+
+    public String getLastStartVersion() {
+        return lastStartVersion;
+    }
+
+    public void setLastStartVersion(final String lastStartVersion) {
+        this.lastStartVersion = lastStartVersion;
     }
 }

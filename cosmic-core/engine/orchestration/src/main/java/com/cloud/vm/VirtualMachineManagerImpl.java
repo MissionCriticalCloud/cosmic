@@ -183,6 +183,8 @@ import java.net.URI;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -411,6 +413,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         if (plan.getPodId() != null) {
             vm.setPodIdToDeployIn(plan.getPodId());
         }
+
+        // Set date and version we start this VM
+        vm.setLastStartDateTime(getCurrentLocalDateTimeStamp());
+        vm.setLastStartVersion(VirtualMachineManagerImpl.class.getPackage().getImplementationVersion());
+
         assert plan.getClusterId() == null && plan.getPoolId() == null : "We currently don't support cluster and pool preset yet";
         final VMInstanceVO vmFinal = _vmDao.persist(vm);
 
@@ -453,6 +460,10 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         });
 
         s_logger.debug("Allocation completed for VM: " + vmFinal);
+    }
+
+    private String getCurrentLocalDateTimeStamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
     @Override
