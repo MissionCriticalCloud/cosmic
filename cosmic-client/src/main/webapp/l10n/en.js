@@ -857,6 +857,8 @@ var dictionary = {
     "label.last.disconnected": "Last Disconnected",
     "label.last.name": "Last Name",
     "label.lastname.lower": "lastname",
+    "label.laststartdate": "Last start date",
+    "label.laststartversion": "Last start version",
     "label.latest.events": "Latest events",
     "label.launch": "Launch",
     "label.launch.vm": "Launch VM",

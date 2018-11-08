@@ -2214,6 +2214,12 @@
                             created: {
                                 label: 'label.created',
                                 converter: cloudStack.converters.toLocalDate
+                            },
+                            laststartdate: {
+                                label: 'label.laststartdate'
+                            },
+                            laststartversion: {
+                                label: 'label.laststartversion'
                             }
                         }],
 

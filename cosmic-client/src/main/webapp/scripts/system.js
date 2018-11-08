@@ -5832,6 +5832,12 @@
                                                 },
                                                 vpcid: {
                                                     label: 'label.vpc.id'
+                                                },
+                                                laststartdate: {
+                                                    label: 'label.laststartdate'
+                                                },
+                                                laststartversion: {
+                                                    label: 'label.laststartversion'
                                                 }
                                             }],
                                         dataProvider: function (args) {
