@@ -199,6 +199,14 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
     @Param(description = "true if the router template requires upgrader")
     private boolean requiresUpgrade;
 
+    @SerializedName(ApiConstants.LAST_START_DATE)
+    @Param(description = "Timestamp of last start of router")
+    private String lastStartDateTime;
+
+    @SerializedName(ApiConstants.LAST_START_VERSION)
+    @Param(description = "What Cosmic version did the router start with")
+    private String lastStartVersion;
+
     public DomainRouterResponse() {
         nics = new LinkedHashSet<>();
     }
@@ -427,5 +435,21 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
 
     public void setRequiresUpgrade(final boolean requiresUpgrade) {
         this.requiresUpgrade = requiresUpgrade;
+    }
+
+    public String getLastStartDateTime() {
+        return lastStartDateTime;
+    }
+
+    public void setLastStartDateTime(final String lastStartDateTime) {
+        this.lastStartDateTime = lastStartDateTime;
+    }
+
+    public String getLastStartVersion() {
+        return lastStartVersion;
+    }
+
+    public void setLastStartVersion(final String lastStartVersion) {
+        this.lastStartVersion = lastStartVersion;
     }
 }

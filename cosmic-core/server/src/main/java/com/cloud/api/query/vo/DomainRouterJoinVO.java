@@ -167,6 +167,10 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     @Column(name = "role")
     @Enumerated(value = EnumType.STRING)
     private VirtualRouter.Role role;
+    @Column(name = "last_start_datetime")
+    protected String lastStartDateTime;
+    @Column(name = "last_start_version")
+    protected String lastStartVersion;
 
     public DomainRouterJoinVO() {
     }
@@ -709,6 +713,14 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
 
     public VirtualRouter.Role getRole() {
         return role;
+    }
+
+    public String getLastStartDateTime() {
+        return lastStartDateTime;
+    }
+
+    public String getLastStartVersion() {
+        return lastStartVersion;
     }
 
     @Override
