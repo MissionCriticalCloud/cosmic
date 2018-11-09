@@ -889,6 +889,7 @@ var dictionary = {
     "label.local.storage.enabled.system.vms": "Enable local storage for System VMs",
     "label.login": "Login",
     "label.logout": "Logout",
+    "label.logs": "Logs",
     "label.lun": "LUN",
     "label.macaddress": "MAC Address",
     "label.maintenance.policy": "Maintenance Policy",

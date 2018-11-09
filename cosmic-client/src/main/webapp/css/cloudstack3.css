@@ -1312,6 +1312,18 @@ div.panel div.list-view div.fixed-header {
     left: 22px !important;
 }
 
+.detail-view div#details-tab-events div.fixed-header {
+    left: 22px !important;
+    top: 6px !important;
+}
+
+.detail-view div#details-tab-events div.events {
+    width: 100%;
+    border: 0px;
+    margin: 0px 0px 0px 10px !important;
+    height: 670px !important;
+}
+
 .detail-view div.list-view div.fixed-header table {
     width: 100% !important;
 }

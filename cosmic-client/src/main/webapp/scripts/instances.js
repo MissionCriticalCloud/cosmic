@@ -2749,6 +2749,61 @@
                                 }
                             });
                         }
+                    },
+                    /**
+                     * Events tab
+                     */
+                    events: {
+                        id: 'events',
+                        title: 'label.menu.events',
+                        listView: {
+                            section: 'events',
+                            id: 'events',
+                            hideToolbar: true,
+                            hideSearchBar: true,
+                            disableInfiniteScrolling: true,
+                            fields: {
+                                created: {
+                                    label: 'label.date',
+                                    converter: cloudStack.converters.toLocalDate
+                                },
+                                level: {
+                                    label: 'label.level'
+                                },
+                                type: {
+                                    label: 'label.type',
+                                    truncate: true
+                                },
+                                account: {
+                                    label: 'label.account'
+                                },
+                                description: {
+                                    label: 'label.description'
+                                }
+                            },
+                            dataProvider: function (args) {
+                                $.ajax({
+                                    url: createURL("listEvents&keyword=" + args.context.instances[0].instancename.split('-')[2]),
+                                    dataType: "json",
+                                    async: true,
+                                    success: function (json) {
+                                        var jsonObj = json.listeventsresponse.event;
+                                        if (jsonObj !== undefined) {
+                                            jsonObj.sort(function (a, b) {
+                                                return b.created.localeCompare(a.created);
+                                            });
+                                            args.response.success({
+                                                data: jsonObj
+                                            });
+                                        } else {
+                                            args.response.success({
+                                                data: []
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
                     }
                 }
             }
