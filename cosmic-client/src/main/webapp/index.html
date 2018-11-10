@@ -325,7 +325,7 @@
 
                 <!-- Step 6: Network -->
                 <div class="step network always-load" wizard-step-id="network">
-                    <!-- 5a: Network description -->
+                    <!-- 6a: Network description -->
                     <div class="wizard-step-conditional nothing-to-select">
                         <p id="from_instance_page_1">
                             <translate key="message.zone.no.network.selection"/>
@@ -339,12 +339,19 @@
                                 <span><translate key="label.ip.address"/></span>
                                 (<span><translate key="label.optional"/></span>):
                             </label>
-                            <input type="text" name="vpc-specify-ip"/>
+                            <input type="text" name="vpc-specify-ip"/><br/>
+                        </div>
+                        <div class="specify-mac">
+                            <label>
+                                <span><translate key="label.macaddress"/></span>
+                                (<span><translate key="label.optional"/></span>):
+                            </label>
+                            <input type="text" name="vpc-specify-mac"/>
                         </div>
                         </p>
                     </div>
 
-                    <!-- 5b: Select network -->
+                    <!-- 6b: Select network -->
                     <div class="wizard-step-conditional select-network">
                         <div class="content">
                             <div class="main-desc">

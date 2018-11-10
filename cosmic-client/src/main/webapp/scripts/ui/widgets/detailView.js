@@ -71,8 +71,8 @@
             // Handle pre-action (occurs before any other behavior happens)
             if (preAction) {
                 if (!preAction({
-                        context: context
-                    })) return false;
+                    context: context
+                })) return false;
             }
 
             var updateTabContent = function (newData) {
@@ -1082,6 +1082,7 @@
                         var selection = window.getSelection();
                         selection.removeAllRanges();
                         selection.addRange(range);
+                        document.execCommand('copy');
                     });
                 }
 
@@ -1188,8 +1189,8 @@
                         var viewAllItem = this;
 
                         if (viewAllItem.preFilter && !viewAllItem.preFilter({
-                                context: context
-                            })) {
+                            context: context
+                        })) {
                             return true;
                         }
 

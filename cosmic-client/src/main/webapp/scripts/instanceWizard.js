@@ -768,10 +768,20 @@
                                         ip: args.data['new-network-ip']
                                     });
                                 }
+                                if (args.data['new-network-mac'] != null && args.data['new-network-mac'].length > 0) {
+                                    $.extend(ipToNetwork, {
+                                        mac: args.data['new-network-mac']
+                                    });
+                                }
                             } else {
                                 if (args.data["my-network-ips"][i] != null && args.data["my-network-ips"][i].length > 0) {
                                     $.extend(ipToNetwork, {
                                         ip: args.data["my-network-ips"][i]
+                                    });
+                                }
+                                if (args.data["my-network-macs"][i] != null && args.data["my-network-macs"][i].length > 0) {
+                                    $.extend(ipToNetwork, {
+                                        mac: args.data["my-network-macs"][i]
                                     });
                                 }
                             }
@@ -788,6 +798,12 @@
                                     ip: args.data["my-network-ips"][i]
                                 });
                             }
+                            if (args.data["my-network-macs"][i] != null && args.data["my-network-macs"][i].length > 0) {
+                                $.extend(ipToNetwork, {
+                                    mac: args.data["my-network-macs"][i]
+                                });
+                            }
+
                             array3.push(ipToNetwork);
                         }
                     }
@@ -797,9 +813,13 @@
 
                 for (var k = 0; k < array3.length; k++) {
                     deployVmData["iptonetworklist[" + k + "].networkid"] = array3[k].networkid;
-                    if (array3[k].ip != undefined && array3[k].ip.length > 0) {
+                    if (array3[k].ip !== undefined && array3[k].ip.length > 0) {
                         deployVmData["iptonetworklist[" + k + "].ip"] = array3[k].ip;
                     }
+                    if (array3[k].mac !== undefined && array3[k].mac.length > 0) {
+                        deployVmData["iptonetworklist[" + k + "].mac"] = array3[k].mac;
+                    }
+
                 }
 
             } else if (step6ContainerType == 'nothing-to-select') {
@@ -807,6 +827,9 @@
                     deployVmData["iptonetworklist[0].networkid"] = args.context.networks[0].id;
                     if (args.data["vpc-specify-ip"] != undefined && args.data["vpc-specify-ip"].length > 0) {
                         deployVmData["iptonetworklist[0].ip"] = args.data["vpc-specify-ip"];
+                    }
+                    if (args.data["vpc-specify-mac"] != undefined && args.data["vpc-specify-mac"].length > 0) {
+                        deployVmData["iptonetworklist[0].mac"] = args.data["vpc-specify-mac"];
                     }
 
                     $.extend(deployVmData, {

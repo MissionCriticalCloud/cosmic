@@ -4651,6 +4651,10 @@
                                             url: createURL('listClusters'),
                                             data: data,
                                             success: function (json) {
+                                                json.listclustersresponse.cluster.sort(function (a, b) {
+                                                    return a.name.localeCompare(b.name);
+                                                });
+
                                                 args.response.success({
                                                     data: json.listclustersresponse.cluster
                                                 });
@@ -4700,6 +4704,10 @@
                                             url: createURL('listHosts'),
                                             data: data,
                                             success: function (json) {
+                                                json.listhostsresponse.host.sort(function (a, b) {
+                                                    return a.name.localeCompare(b.name);
+                                                });
+
                                                 args.response.success({
                                                     data: json.listhostsresponse.host
                                                 });
@@ -5824,6 +5832,12 @@
                                                 },
                                                 vpcid: {
                                                     label: 'label.vpc.id'
+                                                },
+                                                laststartdate: {
+                                                    label: 'label.laststartdate'
+                                                },
+                                                laststartversion: {
+                                                    label: 'label.laststartversion'
                                                 }
                                             }],
                                         dataProvider: function (args) {
@@ -7951,6 +7965,10 @@
                                     addExtraPropertiesToClusterObject(this);
                                 });
 
+                                items.sort(function (a, b) {
+                                    return a.name.localeCompare(b.name);
+                                });
+
                                 args.response.success({
                                     actionFilter: clusterActionfilter,
                                     data: items
@@ -8745,6 +8763,11 @@
                             async: true,
                             success: function (json) {
                                 var items = json.listhostsresponse.host;
+
+                                items.sort(function (a, b) {
+                                    return a.name.localeCompare(b.name);
+                                });
+
                                 args.response.success({
                                     actionFilter: hostActionfilter,
                                     data: items

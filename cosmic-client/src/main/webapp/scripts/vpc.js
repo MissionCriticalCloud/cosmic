@@ -2395,6 +2395,12 @@
                             array1.push("&name=" + todb(args.data.name));
                             array1.push("&displaytext=" + todb(args.data.displaytext));
 
+                            if (args.data.dns1 !== null || args.data.dns1 !== "")
+                                array1.push("&dns1=" + todb(args.data.dns1));
+
+                            if (args.data.dns2 !== null || args.data.dns2 !== "")
+                                array1.push("&dns2=" + todb(args.data.dns2));
+
                             //args.data.networkdomain is null when networkdomain field is hidden
                             if (args.data.networkdomain != null && args.data.networkdomain != args.context.networks[0].networkdomain)
                                 array1.push("&networkdomain=" + todb(args.data.networkdomain));
@@ -2749,6 +2755,14 @@
                             },
                             cidr: {
                                 label: 'label.cidr'
+                            },
+                            dns1: {
+                                label: 'label.dns.1',
+                                isEditable: true
+                            },
+                            dns2: {
+                                label: 'label.dns.2',
+                                isEditable: true
                             },
                             ipexclusionlist: {
                                 label: 'label.ipexclusionlist',
@@ -3268,6 +3282,12 @@
                                     required: true
                                 }
                             },
+                            dns1: {
+                                label: 'label.dns.1'
+                            },
+                            dns2: {
+                                label: 'label.dns.2'
+                            },
                             ipexclusionlist: {
                                 label: 'label.ipexclusionlist',
                                 docID: 'helpTierIpExclusionList',
@@ -3365,6 +3385,18 @@
                                 zoneId: args.context.vpc[0].zoneid
                             });
 
+
+                        if (args.data.dns1 !== '') {
+                            $.extend(dataObj, {
+                                dns1: args.data.dns1
+                            });
+                        }
+
+                        if (args.data.dns2 !== '') {
+                            $.extend(dataObj, {
+                                dns2: args.data.dns2
+                            });
+                        }
 
                         if (args.data.aclid != '')
                             $.extend(dataObj, {

@@ -1473,6 +1473,14 @@
                                         label: 'label.network.cidr'
                                     },
 
+                                    dns1: {
+                                        label: 'label.dns.1'
+                                    },
+
+                                    dns2: {
+                                        label: 'label.dns.2'
+                                    },
+
                                     ipexclusionlist: {
                                         label: 'label.ipexclusionlist',
                                         isEditable: true
@@ -2485,6 +2493,14 @@
 
                                     networkcidr: {
                                         label: 'label.network.cidr'
+                                    },
+
+                                    dns1: {
+                                        label: 'label.dns.1'
+                                    },
+
+                                    dns2: {
+                                        label: 'label.dns.2'
                                     },
 
                                     ipexclusionlist: {
