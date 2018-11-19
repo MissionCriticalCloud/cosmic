@@ -4,6 +4,7 @@ import socket
 import subprocess
 
 from jinja2 import Environment, FileSystemLoader
+from netaddr import IPNetwork, IPAddress
 
 import utils
 
@@ -33,7 +34,6 @@ class Keepalived:
         self.init_config()
         self.write_global_defs()
         self.parse_vrrp_interface_instances()
-        self.parse_vrrp_routes_instance()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
@@ -89,45 +89,40 @@ class Keepalived:
                 virtual_router_id=interface_id,
                 advert_int=self.config.get_advert_int(),
                 virtual_ipaddress=[],
-                virtual_ipaddress_excluded=ipv4addresses
+                virtual_ipaddress_excluded=ipv4addresses,
+                network=interface
             )
-
-    def parse_vrrp_routes_instance(self):
-        sync_interface_name = self.config.get_sync_interface_name()
-
-        virtualroutes = []
-
-        # Set the default route here until we handle it from the management server
-        if 'source_nat' in self.config.dbag_network_overview['services'] and \
-                self.config.dbag_network_overview['services']['source_nat']:
-            virtualroutes.append(
-                'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
-            )
-
-        for route in self.config.dbag_network_overview['routes']:
-            virtualroutes.append('%s via %s metric %s' % (route['cidr'], route['next_hop'], route['metric']))
-
-        self.write_vrrp_instance(
-            name='routes',
-            state='BACKUP',
-            interface=sync_interface_name,
-            virtual_router_id=self.routes_vrrp_id,
-            advert_int=self.config.get_advert_int(),
-            virtual_ipaddress=[],
-            virtual_routes=virtualroutes
-        )
 
     def write_vrrp_instance(
             self,
             name,
             state,
             interface,
+            network,
             virtual_router_id,
             advert_int,
             virtual_ipaddress=None,
-            virtual_ipaddress_excluded=None,
-            virtual_routes=None
+            virtual_ipaddress_excluded=None
     ):
+
+        virtual_routes = []
+        # Generate virtual routes
+        if len(network) > 0 and 'type' in network['metadata'] and network['metadata']['type'] in ("guesttier", "private", "public"):
+            for route in self.config.dbag_network_overview['routes']:
+                if IPAddress(route['next_hop']) in IPNetwork(network['ipv4_addresses'][0]['cidr']):
+                    logging.debug("Adding route to %s for %s because part of cidr %s" % (route['next_hop'], interface, network['ipv4_addresses'][0]['cidr']))
+                    virtual_routes.append('%s via %s metric %s' % (route['cidr'], route['next_hop'], route['metric']))
+                else:
+                    logging.debug("Skipping route %s for %s because not part of cidr %s" % (route['next_hop'], interface, network['ipv4_addresses'][0]['cidr']))
+            # Set the default route here until we handle it from the management server
+            if network['metadata']['type'] == 'public' and 'source_nat' in self.config.dbag_network_overview['services'] and \
+                    self.config.dbag_network_overview['services']['source_nat']:
+                virtual_routes.append(
+                    'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
+                )
+        else:
+            logging.debug("Skipping because network is empty. Network: %s" % network)
+
         content = self.jinja_env.get_template('keepalived_vrrp_instance.conf').render(
             name=name,
             state=state,
