@@ -894,7 +894,7 @@
             var userdata = args.data.userdata;
             if (userdata != null && userdata.length > 0) {
                 $.extend(deployVmData, {
-                    userdata: todb(btoa(userdata))
+                    userdata: btoa(userdata)
                 });
             }
 
@@ -905,6 +905,7 @@
 
             $.ajax({
                 url: createURL('deployVirtualMachine'),
+                method: "POST",
                 data: deployVmData,
                 success: function (json) {
                     var jid = json.deployvirtualmachineresponse.jobid;

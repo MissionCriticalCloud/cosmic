@@ -25,10 +25,12 @@ import com.cloud.uservm.UserVm;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.net.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Updates properties of a virtual machine. The VM has to be stopped and restarted for the " +
+@APICommand(name = "updateVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Updates properties of a virtual machine. The VM has to be stopped and " +
+        "restarted for the " +
         "new properties to take effect. UpdateVirtualMachine does not first check whether the VM is stopped. " +
         "Therefore, stop the VM manually before issuing this call.", responseObject = UserVmResponse.class, responseView = ResponseView.Restricted, entityType = {VirtualMachine
         .class},
@@ -76,11 +78,13 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     private String name;
     @Parameter(name = ApiConstants.INSTANCE_NAME, type = CommandType.STRING, description = "instance name of the user vm", since = "4.4", authorized = {RoleType.Admin})
     private String instanceName;
-    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical " +
+            "Cloud'")
     private String manufacturerString;
     @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
     private String optimiseFor;
-    @Parameter(name = ApiConstants.RESTART_REQUIRED, type = CommandType.BOOLEAN, description = "true if VM needs to a stop/start to receive updated VM specs on the hypervisor", authorized = {RoleType.Admin})
+    @Parameter(name = ApiConstants.RESTART_REQUIRED, type = CommandType.BOOLEAN, description = "true if VM needs to a stop/start to receive updated VM specs on the hypervisor",
+            authorized = {RoleType.Admin})
     protected Boolean requiresRestart;
     @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
     private String maintenancePolicy;
@@ -197,6 +201,9 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
 
     public OptimiseFor getOptimiseFor() {
         if (optimiseFor != null) {
+            if (getHttpMethod() == HTTPMethod.POST) {
+                optimiseFor = new String(Base64.decodeBase64(this.optimiseFor));
+            }
             return OptimiseFor.valueOf(optimiseFor);
         } else {
             return OptimiseFor.Generic;
