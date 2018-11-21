@@ -64,7 +64,9 @@ public class DomainRouterJoinDaoImpl extends GenericDaoBase<DomainRouterJoinVO, 
         if (router.getLastStartVersion() != null) {
             routerResponse.setLastStartVersion(router.getLastStartVersion());
         }
-
+        if (router.getRouterUnicastId() != null) {
+            routerResponse.setRouterUnicastId(router.getRouterUnicastId());
+        }
         if (router.getTemplateVersion() != null) {
             final String routerVersion = Version.trimRouterVersion(router.getTemplateVersion());
             routerResponse.setVersion(routerVersion);

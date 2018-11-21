@@ -171,6 +171,8 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     protected String lastStartDateTime;
     @Column(name = "last_start_version")
     protected String lastStartVersion;
+    @Column(name = "router_unicast_id")
+    protected Long routerUnicastId;
 
     public DomainRouterJoinVO() {
     }
@@ -722,7 +724,9 @@ public class DomainRouterJoinVO extends BaseViewVO implements ControlledViewEnti
     public String getLastStartVersion() {
         return lastStartVersion;
     }
-
+    public Long getRouterUnicastId() {
+        return routerUnicastId;
+    }
     @Override
     public Class<?> getEntityType() {
         return VirtualMachine.class;

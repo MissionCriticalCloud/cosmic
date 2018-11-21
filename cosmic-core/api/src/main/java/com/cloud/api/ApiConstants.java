@@ -6,6 +6,8 @@ public class ApiConstants {
     public static final String ACCOUNT_TYPE = "accounttype";
     public static final String ACCOUNT_ID = "accountid";
     public static final String ACCOUNT_NAME = "accountname";
+    public static final String ADVERT_INTERVAL = "advertinterval";
+    public static final String ADVERT_METHOD = "advertmethod";
     public static final String ALGORITHM = "algorithm";
     public static final String ALLOCATED_ONLY = "allocatedonly";
     public static final String API_KEY = "apikey";
@@ -211,6 +213,7 @@ public class ApiConstants {
     public static final String RESPONSE = "response";
     public static final String REVERTABLE = "revertable";
     public static final String REGISTERED = "registered";
+    public static final String ROUTER_UNICAST_ID = "routerunicastid";
     public static final String QUERY_FILTER = "queryfilter";
     public static final String SCHEDULE = "schedule";
     public static final String SCOPE = "scope";

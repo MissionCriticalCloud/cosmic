@@ -31,7 +31,9 @@ class Firewall:
         for interface in self.config.dbag_network_overview['interfaces']:
             device = utils.get_interface_name_from_mac_address(interface['mac_address'])
 
-            if interface['metadata']['type'] in ['sync', 'other']:
+            if interface['metadata']['type'] == 'sync':
+                self.add_sync_vpc_rules(device)
+            elif interface['metadata']['type'] == 'other':
                 pass
             elif interface['metadata']['type'] == 'public':
                 self.add_public_vpc_rules(device)
@@ -73,10 +75,11 @@ class Firewall:
         self.fw.append(["filter", "", "-A INPUT -i lo -j ACCEPT"])
         self.fw.append(["filter", "", "-A INPUT -p icmp -j ACCEPT"])
 
-        self.fw.append(["filter", "", "-A INPUT -d 224.0.0.18/32 -j ACCEPT"])
-        self.fw.append(["filter", "", "-A INPUT -d 224.0.0.22/32 -j ACCEPT"])
-        self.fw.append(["filter", "", "-A INPUT -d 224.0.0.252/32 -j ACCEPT"])
-        self.fw.append(["filter", "", "-A INPUT -d 225.0.0.50/32 -j ACCEPT"])
+        if self.config.get_advert_method() == "MULTICAST":
+            self.fw.append(["filter", "", "-A INPUT -d 224.0.0.18/32 -j ACCEPT"])
+            self.fw.append(["filter", "", "-A INPUT -d 224.0.0.22/32 -j ACCEPT"])
+            self.fw.append(["filter", "", "-A INPUT -d 224.0.0.252/32 -j ACCEPT"])
+            self.fw.append(["filter", "", "-A INPUT -d 225.0.0.50/32 -j ACCEPT"])
 
         self.fw.append(["filter", "",
                         "-A INPUT -i eth0 -p tcp -m tcp -s 169.254.0.1/32 --dport 3922 -m "
@@ -130,6 +133,13 @@ class Firewall:
         self.fw.append(["", "front", "-A INPUT -i %s -d %s -p tcp -m tcp -m state --state NEW --dport 443 -j ACCEPT" % (
             device, cidr
         )])
+
+    def add_sync_vpc_rules(self, device):
+        logging.info("Configuring Sync VPC rules")
+
+        if self.config.get_advert_method() == "UNICAST":
+            self.fw.append(["filter", "", "-A INPUT -i %s -p vrrp -j ACCEPT" % device])
+            self.fw.append(["filter", "", "-A OUTPUT -o %s -p vrrp -j ACCEPT" % device])
 
     def add_public_vpc_rules(self, device):
         logging.info("Configuring Public VPC rules")

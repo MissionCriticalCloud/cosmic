@@ -207,6 +207,10 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
     @Param(description = "What Cosmic version did the router start with")
     private String lastStartVersion;
 
+    @SerializedName(ApiConstants.ROUTER_UNICAST_ID)
+    @Param(description = "Unicast router ID")
+    private Long routerUnicastId;
+
     public DomainRouterResponse() {
         nics = new LinkedHashSet<>();
     }
@@ -451,5 +455,13 @@ public class DomainRouterResponse extends BaseResponse implements ControlledView
 
     public void setLastStartVersion(final String lastStartVersion) {
         this.lastStartVersion = lastStartVersion;
+    }
+
+    public Long getRouterUnicastId() {
+        return routerUnicastId;
+    }
+
+    public void setRouterUnicastId(final Long routerUnicastId) {
+        this.routerUnicastId = routerUnicastId;
     }
 }

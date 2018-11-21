@@ -21,6 +21,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.model.enumeration.AdvertMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -89,6 +90,14 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
             description = "Comma separated list of IP addresses to configure as syslog servers on the VPC to forward IP tables logging")
     private String syslogServerList;
 
+    @Parameter(name = ApiConstants.ADVERT_INTERVAL, type = CommandType.LONG,
+            description = "VRRP advertisement interval. Defaults to 1.'")
+    private Long advertInterval;
+
+    @Parameter(name = ApiConstants.ADVERT_METHOD, type = CommandType.STRING,
+            description = "VRRP advertisement method to use: unicast / multicast. Defaults to multicast'")
+    private String advertMethod;
+
     // ///////////////////////////////////////////////////
     // ///////////////// Accessors ///////////////////////
     // ///////////////////////////////////////////////////
@@ -103,8 +112,8 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
 
     @Override
     public void create() throws ResourceAllocationException {
-        final Vpc vpc = _vpcService.createVpc(getZoneId(), getVpcOffering(), getEntityOwnerId(), getVpcName(), getDisplayText(), getCidr(), getNetworkDomain(), getDisplayVpc(), getSourceNatList(),
-                getSyslogServerList());
+        final Vpc vpc = _vpcService.createVpc(getZoneId(), getVpcOffering(), getEntityOwnerId(), getVpcName(), getDisplayText(), getCidr(), getNetworkDomain(), getDisplayVpc(),
+                getSourceNatList(), getSyslogServerList(), getAdvertInterval(), getAdvertMethod());
         if (vpc != null) {
             setEntityId(vpc.getId());
             setEntityUuid(vpc.getUuid());
@@ -216,4 +225,15 @@ public class CreateVPCCmd extends BaseAsyncCreateCmd {
     public String getEventDescription() {
         return "creating VPC. Id: " + getEntityId();
     }
-}
+
+    public Long getAdvertInterval() {
+        return advertInterval;
+    }
+
+    public AdvertMethod getAdvertMethod() {
+        if (advertMethod != null) {
+            return AdvertMethod.valueOf(advertMethod.toUpperCase());
+        } else {
+            return null;
+        }
+    }}

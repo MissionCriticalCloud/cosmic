@@ -5,6 +5,7 @@ import com.cloud.api.ApiConstants;
 import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.model.enumeration.AdvertMethod;
 import com.cloud.serializer.Param;
 
 import java.util.Date;
@@ -114,6 +115,14 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     @Param(description = "Comma separated list of IP addresses to configure as syslog servers on the VPC to forward IP tables logging", since = "5.3")
     private String syslogServerList;
 
+    @SerializedName(ApiConstants.ADVERT_METHOD)
+    @Param(description = "VRRP advertisement method to use: unicast / multicast. Defaults to multicast'", since = "6.1")
+    private AdvertMethod advertMethod;
+
+    @SerializedName(ApiConstants.ADVERT_INTERVAL)
+    @Param(description = "VRRP advertisement interval. Defaults to 1.", since = "6.1")
+    private long advertInterval;
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -221,5 +230,13 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
 
     public void setSyslogServerList(final String syslogServerList) {
         this.syslogServerList = syslogServerList;
+    }
+
+    public void setAdvertMethod(final AdvertMethod advertMethod) {
+        this.advertMethod = advertMethod;
+    }
+
+    public void setAdvertInterval(final long advertInterval) {
+        this.advertInterval = advertInterval;
     }
 }

@@ -35,6 +35,19 @@ class Config:
             return self.dbag_cmdline['config']['advert_int']
         return 1
 
+    def get_advert_method(self):
+        if 'advert_method' in self.dbag_cmdline['config']:
+            return self.dbag_cmdline['config']['advert_method']
+        return "multicast"
+
+    def get_unicast_subnet(self):
+        if 'unicast_subnet' in self.dbag_cmdline['config']:
+            return self.dbag_cmdline['config']['unicast_subnet']
+        return "100.100.0.0/24"
+
+    def get_unicast_id(self):
+        return self.dbag_cmdline['config']['unicast_id']
+
     def set_ingress_rules(self, key, ingress_rules):
         self.ingress_rules[key] = ingress_rules
 

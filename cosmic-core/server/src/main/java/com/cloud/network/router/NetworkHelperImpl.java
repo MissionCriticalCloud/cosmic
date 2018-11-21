@@ -458,6 +458,11 @@ public class NetworkHelperImpl implements NetworkHelper {
             routerOffering = _serviceOfferingDao.findById(routerDeploymentDefinition.getSecondaryServiceOfferingId());
         }
 
+        Long routerUnicastId = 1L;
+        if (isRedundant && routers != null && routers.size() == 1 && routers.get(0).getRouterUnicastId() == 1L) {
+            routerUnicastId = 2L;
+        }
+
         _serviceOfferingDao.loadDetails(routerOffering);
         final String serviceofferingHypervisor = routerOffering.getDetail("hypervisor");
         if (serviceofferingHypervisor != null && !serviceofferingHypervisor.isEmpty()) {
@@ -512,7 +517,7 @@ public class NetworkHelperImpl implements NetworkHelper {
                 router = new DomainRouterVO(id, routerOffering.getId(), routerDeploymentDefinition.getVirtualProvider().getId(), VirtualMachineName.getRouterName(id,
                         s_vmInstanceName), template.getId(), template.getHypervisorType(), template.getGuestOSId(), owner.getDomainId(), owner.getId(),
                         userId, routerDeploymentDefinition.isRedundant(), RedundantState.UNKNOWN, offerHA, false, vpcId,
-                        template.getOptimiseFor(), template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false, template.getMaintenancePolicy());
+                        template.getOptimiseFor(), template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false, template.getMaintenancePolicy(), routerUnicastId);
 
                 router.setDynamicallyScalable(template.isDynamicallyScalable());
                 router.setRole(Role.VIRTUAL_ROUTER);

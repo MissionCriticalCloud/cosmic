@@ -87,7 +87,13 @@ NETMASK="%s"
     def setup_sync_nic(self):
 
         sync_device = self.find_nic("sync")
-        sync_ip_address = self.link_local_ip.replace("169.254", "100.100")
+        print("Setting up router for %s VRRP" % self.cmdline["advert_method"])
+        if self.cmdline["advert_method"] == "UNICAST":
+            sync_ip_address = self.cmdline["unicast_subnet"].replace("0/24", self.cmdline["unicast_id"])
+        else:
+            sync_ip_address = self.link_local_ip.replace("169.254", "100.100")
+
+        print("Sync ip is %s" % sync_ip_address)
 
         if not sync_device:
             return False
