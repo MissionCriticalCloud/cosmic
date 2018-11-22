@@ -635,6 +635,7 @@ var dictionary = {
     "label.duration.in.sec": "Duration (in sec)",
     "label.dynamically.scalable": "Dynamically Scalable",
     "label.edit": "Edit",
+    "label.edit.acl.list": "Edit ACL list",
     "label.edit.acl.rule": "Edit ACL rule",
     "label.edit.affinity.group": "Edit Anti-Affinity Group",
     "label.edit.lb.rule": "Edit LB rule",

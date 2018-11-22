@@ -689,7 +689,7 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_NETWORK_ACL_UPDATE, eventDescription = "updating network acl", async = true)
-    public NetworkACL updateNetworkACL(final Long id, final String customId, final Boolean forDisplay) {
+    public NetworkACL updateNetworkACL(final Long id, final String customId, final Boolean forDisplay, final String description, final String name) {
         final NetworkACLVO acl = _networkACLDao.findById(id);
         final Vpc vpc = _entityMgr.findById(Vpc.class, acl.getVpcId());
         final Account caller = CallContext.current().getCallingAccount();
@@ -701,6 +701,14 @@ public class NetworkACLServiceImpl extends ManagerBase implements NetworkACLServ
 
         if (forDisplay != null) {
             acl.setDisplay(forDisplay);
+        }
+
+        if (description != null) {
+            acl.setDescription(description);
+        }
+
+        if (name != null) {
+            acl.setName(name);
         }
 
         _networkACLDao.update(id, acl);
