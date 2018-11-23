@@ -1,11 +1,11 @@
-package com.cloud.consoleproxy.vnc;
+package com.cloud.agent.resource.consoleproxy.vnc;
 
-import com.cloud.consoleproxy.vnc.packet.client.ClientPacket;
-import com.cloud.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
-import com.cloud.consoleproxy.vnc.packet.client.KeyboardEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.MouseEventPacket;
-import com.cloud.consoleproxy.vnc.packet.client.SetEncodingsPacket;
-import com.cloud.consoleproxy.vnc.packet.client.SetPixelFormatPacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.client.ClientPacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.client.FramebufferUpdateRequestPacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.client.KeyboardEventPacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.client.MouseEventPacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.client.SetEncodingsPacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.client.SetPixelFormatPacket;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;

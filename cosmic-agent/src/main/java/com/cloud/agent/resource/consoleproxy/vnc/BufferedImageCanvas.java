@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.vnc;
+package com.cloud.agent.resource.consoleproxy.vnc;
 
 import com.cloud.consoleproxy.util.ImageHelper;
 import com.cloud.consoleproxy.util.TileInfo;

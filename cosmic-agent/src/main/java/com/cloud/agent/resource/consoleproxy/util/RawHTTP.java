@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.util;
+package com.cloud.agent.resource.consoleproxy.util;
 
 import com.cloud.utils.security.SSLUtils;
 import com.cloud.utils.security.SecureSSLSocketFactory;

@@ -1,8 +1,8 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.consoleproxy.vnc.FrameBufferCanvas;
-import com.cloud.consoleproxy.vnc.RfbConstants;
-import com.cloud.consoleproxy.vnc.VncClient;
+import com.cloud.agent.resource.consoleproxy.vnc.FrameBufferCanvas;
+import com.cloud.agent.resource.consoleproxy.vnc.RfbConstants;
+import com.cloud.agent.resource.consoleproxy.vnc.VncClient;
 
 import java.io.IOException;
 import java.net.URI;

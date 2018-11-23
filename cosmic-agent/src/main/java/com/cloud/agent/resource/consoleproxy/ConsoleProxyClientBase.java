@@ -1,8 +1,8 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.consoleproxy.util.TileInfo;
-import com.cloud.consoleproxy.util.TileTracker;
-import com.cloud.consoleproxy.vnc.FrameBufferCanvas;
+import com.cloud.agent.resource.consoleproxy.util.TileInfo;
+import com.cloud.agent.resource.consoleproxy.util.TileTracker;
+import com.cloud.agent.resource.consoleproxy.vnc.FrameBufferCanvas;
 
 import java.awt.Image;
 import java.awt.Rectangle;

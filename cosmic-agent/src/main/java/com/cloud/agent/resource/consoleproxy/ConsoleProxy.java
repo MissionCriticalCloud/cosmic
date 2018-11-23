@@ -251,6 +251,7 @@ public class ConsoleProxy {
             server.createContext("/resource/", new ConsoleProxyResourceHandler());
             server.createContext("/ajax", new ConsoleProxyAjaxHandler());
             server.createContext("/ajaximg", new ConsoleProxyAjaxImageHandler());
+            server.createContext("/novnc", new ConsoleProxyNoVncHandler());
             server.setExecutor(new ThreadExecutor()); // creates a default executor
             server.start();
         } catch (final Exception e) {
@@ -429,6 +430,17 @@ public class ConsoleProxy {
         }
 
         return authResult;
+    }
+
+    public static void removeViewer(final ConsoleProxyClientParam param) {
+        final String clientKey = param.getClientMapKey();
+        ConsoleProxyClient viewer = null;
+        synchronized (connectionMap) {
+            viewer = connectionMap.get(clientKey);
+        }
+        if (viewer != null) {
+            removeViewer(viewer);
+        }
     }
 
     public static void removeViewer(final ConsoleProxyClient viewer) {

@@ -1,8 +1,8 @@
-package com.cloud.consoleproxy.vnc;
+package com.cloud.agent.resource.consoleproxy.vnc;
 
 import com.cloud.agent.resource.consoleproxy.ConsoleProxyClientListener;
-import com.cloud.consoleproxy.vnc.packet.server.FramebufferUpdatePacket;
-import com.cloud.consoleproxy.vnc.packet.server.ServerCutText;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.server.FramebufferUpdatePacket;
+import com.cloud.agent.resource.consoleproxy.vnc.packet.server.ServerCutText;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;

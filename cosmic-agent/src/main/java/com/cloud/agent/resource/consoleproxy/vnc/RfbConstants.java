@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.vnc;
+package com.cloud.agent.resource.consoleproxy.vnc;
 
 import java.nio.charset.Charset;
 
@@ -7,6 +7,7 @@ public interface RfbConstants {
     public static final String RFB_PROTOCOL_VERSION_MAJOR = "RFB 003.";
     // public static final String VNC_PROTOCOL_VERSION_MINOR = "003";
     public static final String VNC_PROTOCOL_VERSION_MINOR = "003";
+    public static final String RFB_WEBSOCKETS = RFB_PROTOCOL_VERSION_MAJOR + "008";
     public static final String RFB_PROTOCOL_VERSION = RFB_PROTOCOL_VERSION_MAJOR + VNC_PROTOCOL_VERSION_MINOR;
 
     /**

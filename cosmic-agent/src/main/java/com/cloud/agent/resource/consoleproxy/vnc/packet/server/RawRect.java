@@ -1,6 +1,6 @@
-package com.cloud.consoleproxy.vnc.packet.server;
+package com.cloud.agent.resource.consoleproxy.vnc.packet.server;
 
-import com.cloud.consoleproxy.vnc.VncScreenDescription;
+import com.cloud.agent.resource.consoleproxy.vnc.VncScreenDescription;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

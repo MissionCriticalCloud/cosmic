@@ -48,7 +48,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * Thumbnail access : /console?cmd=thumbnail&vm=xxx&w=xxx&h=xxx
- * Console access : /conosole?cmd=access&vm=xxx
+ * Console access : /console?cmd=access&vm=xxx
  * Authentication : /console?cmd=auth&vm=xxx&sid=xxx
  */
 @Component("consoleServlet")
@@ -245,10 +245,12 @@ public class ConsoleProxyServlet extends HttpServlet {
             return;
         }
 
+        boolean websocketConsole = Boolean.parseBoolean(req.getParameter("websocketconsole"));
+
         if (cmd.equalsIgnoreCase("thumbnail")) {
             handleThumbnailRequest(req, resp, vmId);
         } else if (cmd.equalsIgnoreCase("access")) {
-            handleAccessRequest(req, resp, vmId);
+            handleAccessRequest(req, resp, vmId, websocketConsole);
         } else {
             handleAuthRequest(req, resp, vmId);
         }
@@ -311,7 +313,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         }
     }
 
-    private void handleAccessRequest(final HttpServletRequest req, final HttpServletResponse resp, final long vmId) {
+    private void handleAccessRequest(final HttpServletRequest req, final HttpServletResponse resp, final long vmId, boolean webSocketRequest) {
         final VirtualMachine vm = _vmMgr.findById(vmId);
         if (vm == null) {
             s_logger.warn("VM " + vmId + " does not exist, sending blank response for console access request");
@@ -348,7 +350,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         }
 
         final StringBuffer sb = new StringBuffer();
-        sb.append("<html><title>").append(escapeHTML(vmName)).append("</title><frameset><frame src=\"").append(composeConsoleAccessUrl(rootUrl, vm, host));
+        sb.append("<html><title>").append(escapeHTML(vmName)).append("</title><frameset><frame src=\"").append(composeConsoleAccessUrl(rootUrl, vm, host, webSocketRequest));
         sb.append("\"></frame></frameset></html>");
         s_logger.debug("the console url is :: " + sb.toString());
         sendResponse(resp, sb.toString());
@@ -439,7 +441,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         return sb.toString();
     }
 
-    private String composeConsoleAccessUrl(final String rootUrl, final VirtualMachine vm, final HostVO hostVo) {
+    private String composeConsoleAccessUrl(final String rootUrl, final VirtualMachine vm, final HostVO hostVo, boolean webSocketRequest) {
         final StringBuffer sb = new StringBuffer(rootUrl);
         final String host = hostVo.getPrivateIpAddress();
 
@@ -481,7 +483,11 @@ public class ConsoleProxyServlet extends HttpServlet {
             param.setClientTunnelSession(parsedHostInfo.third());
         }
 
-        sb.append("/ajax?token=" + encryptor.encryptObject(ConsoleProxyClientParam.class, param));
+        if (webSocketRequest) {
+            sb.append("/novnc?token=" + encryptor.encryptObject(ConsoleProxyClientParam.class, param));
+        } else {
+            sb.append("/ajax?token=" + encryptor.encryptObject(ConsoleProxyClientParam.class, param));
+        }
 
         // for console access, we need guest OS type to help implement keyboard
         final long guestOs = vm.getGuestOSId();
