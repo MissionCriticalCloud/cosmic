@@ -1,16 +1,16 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleProxyNoVncHandler implements HttpHandler {
     private static final Logger s_logger = LoggerFactory.getLogger(ConsoleProxyNoVncHandler.class);
@@ -74,7 +74,7 @@ public class ConsoleProxyNoVncHandler implements HttpHandler {
     private String getFile(String fileName) throws IOException {
         final File file = new File(fileName);
         if (file.exists()) {
-            final byte[] buffer = new byte[(int)file.length()];
+            final byte[] buffer = new byte[(int) file.length()];
             final FileInputStream fis = new FileInputStream(file);
             fis.read(buffer);
             return new String(buffer);
