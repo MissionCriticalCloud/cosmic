@@ -17,7 +17,8 @@ import com.cloud.legacymodel.user.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "updateNetworkACLList", group = APICommandGroup.NetworkACLService, description = "Updates network ACL list", responseObject = SuccessResponse.class, since = "4.4",
+@APICommand(name = "updateNetworkACLList", group = APICommandGroup.NetworkACLService, description = "Updates network ACL list", responseObject = SuccessResponse.class, since =
+        "4.4",
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = false)
 public class UpdateNetworkACLListCmd extends BaseAsyncCustomIdCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(UpdateNetworkACLListCmd.class.getName());
@@ -33,6 +34,12 @@ public class UpdateNetworkACLListCmd extends BaseAsyncCustomIdCmd {
     @Parameter(name = ApiConstants.FOR_DISPLAY, type = CommandType.BOOLEAN, description = "an optional field, whether to the display the list to the end user or not", since = "4" +
             ".4", authorized = {RoleType.Admin})
     private Boolean display;
+
+    @Parameter(name = ApiConstants.DESCRIPTION, type = CommandType.STRING, description = "description for ACL")
+    private String description;
+
+    @Parameter(name = ApiConstants.NAME, type = CommandType.STRING, description = "name for ACL")
+    private String name;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -54,7 +61,7 @@ public class UpdateNetworkACLListCmd extends BaseAsyncCustomIdCmd {
 
     @Override
     public void execute() throws ResourceUnavailableException {
-        final NetworkACL acl = _networkACLService.updateNetworkACL(id, this.getCustomId(), getDisplay());
+        final NetworkACL acl = _networkACLService.updateNetworkACL(id, this.getCustomId(), getDisplay(), description, name);
         final NetworkACLResponse aclResponse = _responseGenerator.createNetworkACLResponse(acl);
         setResponseObject(aclResponse);
         aclResponse.setResponseName(getCommandName());

@@ -76,4 +76,12 @@ public class NetworkACLVO implements NetworkACL {
     public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
 }

@@ -684,6 +684,36 @@
                     detailView: {
                         isMaximized: true,
                         actions: {
+                            edit: {
+                                label: 'label.edit.acl.list',
+                                messages: {
+                                    notification: function (args) {
+                                        return 'label.edit.acl.list'
+                                    }
+                                },
+                                action: function (args) {
+                                    $.ajax({
+                                        url: createURL('updateNetworkACLList&id=' + args.context.aclLists[0].id + "&description=" + args.data.description + "&name=" + args.data.name),
+                                        success: function (json) {
+                                            var jid = json.updatenetworkacllistresponse.jobid;
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: jid,
+                                                    getUpdatedItem: function () {
+                                                        $(window).trigger('cloudStack.fullRefresh');
+                                                    }
+                                                }
+                                            })
+                                        },
+                                        error: function (json) {
+                                            args.response.error(parseXMLHttpResponse(json));
+                                        }
+                                    })
+                                },
+                                notification: {
+                                    poll: pollAsyncJobResult
+                                }
+                            },
                             remove: {
                                 label: 'label.delete.acl.list',
                                 messages: {
@@ -728,7 +758,8 @@
                                         isEditable: true
                                     },
                                     description: {
-                                        label: 'label.description'
+                                        label: 'label.description',
+                                        isEditable: true
                                     },
                                     id: {
                                         label: 'label.id'
@@ -743,6 +774,7 @@
                                                 var allowedActions = [];
                                                 if (items.vpcid != null) {
                                                     allowedActions.push("remove");
+                                                    allowedActions.push("edit");
                                                 }
                                                 return allowedActions;
                                             }
@@ -776,21 +808,6 @@
 
                                                     args.response.success({
                                                         data: items
-                                                        /* {
-                                                         cidrlist: '10.1.1.0/24',
-                                                         protocol: 'TCP',
-                                                         startport: 22, endport: 22,
-                                                         networkid: 0,
-                                                         traffictype: 'Egress'
-                                                         },
-                                                         {
-                                                         cidrlist: '10.2.1.0/24',
-                                                         protocol: 'UDP',
-                                                         startport: 56, endport: 72,
-                                                         networkid: 0,
-                                                         trafficType: 'Ingress'
-                                                         }
-                                                         ]*/
                                                     });
                                                 }
                                             });
@@ -2416,7 +2433,7 @@
 
                             if (args.data.dhcpbootfilename != null && args.data.dhcpbootfilename != args.context.networks[0].dhcpbootfilename) {
                                 array1.push("&dhcpbootfilename=" + todb(args.data.dhcpbootfilename));
-                            } else  {
+                            } else {
                                 array1.push("&dhcpbootfilename=");
                             }
 

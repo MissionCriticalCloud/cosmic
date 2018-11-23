@@ -123,5 +123,5 @@ public interface NetworkACLService {
      */
     boolean replaceNetworkACLonPrivateGw(long aclId, long privateGatewayId) throws ResourceUnavailableException;
 
-    NetworkACL updateNetworkACL(Long id, String customId, Boolean forDisplay);
+    NetworkACL updateNetworkACL(Long id, String customId, Boolean forDisplay, String description, String name);
 }
