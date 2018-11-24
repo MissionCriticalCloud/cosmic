@@ -58,7 +58,12 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        
         <!-- dependencies for starting a post upload server on ssvm -->
         <dependency>
             <groupId>io.netty</groupId>
