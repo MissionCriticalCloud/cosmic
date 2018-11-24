@@ -1,9 +1,9 @@
 package com.cloud.agent.resource.consoleproxy.vnc;
 
 import com.cloud.agent.resource.consoleproxy.ConsoleProxyClientListener;
+import com.cloud.agent.resource.consoleproxy.util.RawHTTP;
 import com.cloud.agent.resource.consoleproxy.vnc.packet.client.KeyboardEventPacket;
 import com.cloud.agent.resource.consoleproxy.vnc.packet.client.MouseEventPacket;
-import com.cloud.consoleproxy.util.RawHTTP;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
