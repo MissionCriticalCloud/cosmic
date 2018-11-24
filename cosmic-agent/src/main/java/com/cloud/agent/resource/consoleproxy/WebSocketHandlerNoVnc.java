@@ -1,14 +1,7 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.consoleproxy.util.RawHTTP;
-import com.cloud.consoleproxy.vnc.RfbConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.socket.BinaryMessage;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.BinaryWebSocketHandler;
+import com.cloud.agent.resource.consoleproxy.util.RawHTTP;
+import com.cloud.agent.resource.consoleproxy.vnc.RfbConstants;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -23,6 +16,14 @@ import java.nio.ByteBuffer;
 import java.security.spec.KeySpec;
 import java.util.Map;
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
     private static final Logger s_logger = LoggerFactory.getLogger(WebSocketHandlerNoVnc.class);
@@ -79,8 +80,9 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
         String console_host_session = queryMap.get("sessionref");
         int port;
 
-        if (host == null || portStr == null || sid == null)
+        if (host == null || portStr == null || sid == null) {
             throw new IllegalArgumentException();
+        }
 
         try {
             port = Integer.parseInt(portStr);
@@ -107,7 +109,9 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
                             "<p>Access is denied for the console session check. Please close the window and retry again</p>", "</div></body></html>"};
 
             StringBuilder sb = new StringBuilder();
-            for (String aContent : content) sb.append(aContent);
+            for (String aContent : content) {
+                sb.append(aContent);
+            }
 
             sendResponseString(session, sb.toString());
         }
@@ -154,7 +158,6 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
             try {
                 vncSocket.setSoTimeout(0);
                 readBytes = is.read(b);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -292,7 +295,6 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
                         + "failed to get close resource for socket: " + e.getLocalizedMessage());
             }
         }
-
     }
 
     @Override
@@ -441,16 +443,16 @@ public class WebSocketHandlerNoVnc extends BinaryWebSocketHandler {
         return response;
     }
 
-//    private void initialize() throws IOException {
-//        s_logger.warn("asking for exclusive access");
-//        os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
-//        os.flush();
-//
-//        //   getting initializer parameter and sending them to server
-//        byte[] b = new byte[1500];
-//        int readBytes = -1;
-//        vncSocket.setSoTimeout(0);
-//        readBytes = is.read(b);
-//        sendResponseBytes(session, b, readBytes);
-//    }
+    //    private void initialize() throws IOException {
+    //        s_logger.warn("asking for exclusive access");
+    //        os.writeByte(RfbConstants.EXCLUSIVE_ACCESS);
+    //        os.flush();
+    //
+    //        //   getting initializer parameter and sending them to server
+    //        byte[] b = new byte[1500];
+    //        int readBytes = -1;
+    //        vncSocket.setSoTimeout(0);
+    //        readBytes = is.read(b);
+    //        sendResponseBytes(session, b, readBytes);
+    //    }
 }
