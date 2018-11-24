@@ -24,7 +24,7 @@
 
     <jpa:repositories base-package="com.cloud.db.repository" />
 
-    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/cosmic" />
+    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/cosmic" expected-type="javax.sql.DataSource" />
 
     <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
 
