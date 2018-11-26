@@ -236,13 +236,9 @@ import com.cloud.vm.dao.VMInstanceDao;
 import com.cloud.vm.snapshot.VMSnapshotManager;
 import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -261,6 +257,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserVmManagerImpl extends ManagerBase implements UserVmManager, VirtualMachineGuru, UserVmService, Configurable {
     private static final ConfigKey<Integer> VmIpFetchWaitInterval = new ConfigKey<>("Advanced", Integer.class, "externaldhcp.vmip.retrieval.interval", "180",
@@ -1059,9 +1059,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         if (userData != null) {
             // check and replace newlines
             userData = userData.replace("\\n", "");
-            try {
-                userData = java.net.URLDecoder.decode(userData, "UTF-8");
-            } catch (final UnsupportedEncodingException e) {
+            if (!Base64.isBase64(userData)) {
                 throw new InvalidParameterValueException("Unsupported encoding");
             }
             validateUserData(userData, httpMethod);
@@ -1407,7 +1405,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
 
             final Network defaultNetwork = _networkDao.findById(defaultNic.getNetworkId());
-            final NicProfile defaultNicProfile = new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
+            final NicProfile defaultNicProfile =
+                    new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
             final VirtualMachineProfile vmProfile = new VirtualMachineProfileImpl(vmInstance);
             vmProfile.setParameter(VirtualMachineProfile.Param.VmPassword, password);
 
@@ -1574,7 +1573,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         final Network defaultNetwork = _networkDao.findById(defaultNic.getNetworkId());
-        final NicProfile defaultNicProfile = new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
+        final NicProfile defaultNicProfile =
+                new NicProfile(defaultNic, defaultNetwork, null, null, null, _networkModel.getNetworkTag(template.getHypervisorType(), defaultNetwork));
 
         final VirtualMachineProfile vmProfile = new VirtualMachineProfileImpl(vmInstance);
 
@@ -3174,8 +3174,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     final List<? extends Network> virtualNetworks = _networkModel.listNetworksForAccount(newAccount.getId(), zone.getId(), GuestType.Isolated);
                     if (virtualNetworks.isEmpty()) {
                         final long physicalNetworkId = _networkModel.findPhysicalNetworkId(zone.getId(), requiredOfferings.get(0).getTags(), requiredOfferings.get(0)
-                                .getTrafficType
-                                        ());
+                                                                                                                                                              .getTrafficType
+                                                                                                                                                                      ());
                         // Validate physical network
                         final PhysicalNetwork physicalNetwork = _physicalNetworkDao.findById(physicalNetworkId);
                         if (physicalNetwork == null) {
@@ -3876,10 +3876,14 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     }
 
     @DB
-    private UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String displayName, final Account owner,
-                                        final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final String group, final HTTPMethod httpmethod, final String userData,
-                                        final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps, final IpAddresses defaultIps,
-                                        final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters, final String customId,
+    private UserVm createVirtualMachine(final Zone zone, final ServiceOffering serviceOffering, final VirtualMachineTemplate tmplt, String hostName, final String displayName,
+                                        final Account owner,
+                                        final Long diskOfferingId, final Long diskSize, final List<NetworkVO> networkList, final String group, final HTTPMethod httpmethod,
+                                        final String userData,
+                                        final String sshKeyPair, final HypervisorType hypervisor, final Account caller, final Map<Long, IpAddresses> requestedIps,
+                                        final IpAddresses defaultIps,
+                                        final Boolean isDisplayVm, final String keyboard, final List<Long> affinityGroupIdList, final Map<String, String> customParameters,
+                                        final String customId,
                                         final DiskControllerType diskControllerType, final Long bootMenuTimeout, MaintenancePolicy maintenancePolicy, OptimiseFor optimiseFor,
                                         String manufacturerString)
             throws InsufficientCapacityException, ResourceUnavailableException, ConcurrentOperationException, StorageUnavailableException, ResourceAllocationException {
@@ -4044,17 +4048,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         // Check templates permissions
         _accountMgr.checkAccess(owner, AccessType.UseEntry, false, template);
 
-        // Decode userData
-        String decodedUserData = null;
-        try {
-            if (userData != null) {
-                decodedUserData = java.net.URLDecoder.decode(userData, "UTF-8");
-            }
-        } catch (final UnsupportedEncodingException e) {
-            throw new InvalidParameterValueException("Unsupported encoding");
-        }
         // check if the user data is correct
-        validateUserData(decodedUserData, httpmethod);
+        validateUserData(userData, httpmethod);
 
         // Find an SSH public key corresponding to the key pair name, if one is
         // given
@@ -4198,7 +4193,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             }
         }
 
-        final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, decodedUserData, caller, isDisplayVm, keyboard, accountId, userId,
+        final UserVmVO vm = commitUserVm(zone, template, hostName, displayName, owner, diskOfferingId, diskSize, userData, caller, isDisplayVm, keyboard, accountId, userId,
                 offering, isIso, sshPublicKey, networkNicMap, id, instanceName, uuidName, hypervisorType, customParameters, diskControllerType, manufacturerString, optimiseFor,
                 macLarning, cpuFlags, maintenancePolicy, bootMenuTimeout);
 
