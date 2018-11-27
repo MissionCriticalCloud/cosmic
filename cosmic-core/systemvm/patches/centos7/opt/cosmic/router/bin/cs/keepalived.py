@@ -34,6 +34,7 @@ class Keepalived:
         self.init_config()
         self.write_global_defs()
         self.parse_vrrp_interface_instances()
+        self.parse_vrrp_routes_instance()
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
@@ -94,6 +95,7 @@ class Keepalived:
                 virtual_ipaddress_excluded=ipv4addresses,
                 network=interface,
                 advert_method=self.config.get_advert_method(),
+                virtual_routes=[],
                 unicast_src=unicast_src,
                 unicast_peer=unicast_peer
             )
@@ -112,6 +114,34 @@ class Keepalived:
         ))
         return unicast_src, unicast_peer
 
+    # The reason we write the default route to its own keepalived config file
+    # is so that the group always has 2: public and the routes one.
+    # Else if won't execute the scripts on state change.
+    def parse_vrrp_routes_instance(self):
+        sync_interface_name = self.config.get_sync_interface_name()
+        virtual_routes = []
+        # Set the default route here until we handle it from the management server
+        if 'source_nat' in self.config.dbag_network_overview['services'] and \
+                self.config.dbag_network_overview['services']['source_nat']:
+            virtual_routes.append(
+                'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
+            )
+
+        unicast_src, unicast_peer = self.get_unicast_ips()
+        self.write_vrrp_instance(
+            name='routes',
+            state='BACKUP',
+            interface=sync_interface_name,
+            network={},
+            virtual_router_id=self.routes_vrrp_id,
+            advert_int=self.config.get_advert_int(),
+            advert_method=self.config.get_advert_method(),
+            virtual_routes=virtual_routes,
+            unicast_src=unicast_src,
+            unicast_peer=unicast_peer,
+            virtual_ipaddress=[]
+        )
+
     def write_vrrp_instance(
             self,
             name,
@@ -123,11 +153,11 @@ class Keepalived:
             advert_method,
             unicast_src,
             unicast_peer,
+            virtual_routes=[],
             virtual_ipaddress=None,
             virtual_ipaddress_excluded=None
     ):
 
-        virtual_routes = []
         # Generate virtual routes
         if len(network) > 0 and 'type' in network['metadata'] and network['metadata']['type'] in ("guesttier", "private", "public"):
             for route in self.config.dbag_network_overview['routes']:
@@ -136,7 +166,7 @@ class Keepalived:
                     virtual_routes.append('%s via %s metric %s' % (route['cidr'], route['next_hop'], route['metric']))
                 else:
                     logging.debug("Skipping route %s for %s because not part of cidr %s" % (route['next_hop'], interface, network['ipv4_addresses'][0]['cidr']))
-            # Set the default route here until we handle it from the management server
+            # Set the default route here too so it is linked to the public interface
             if network['metadata']['type'] == 'public' and 'source_nat' in self.config.dbag_network_overview['services'] and \
                     self.config.dbag_network_overview['services']['source_nat']:
                 virtual_routes.append(
