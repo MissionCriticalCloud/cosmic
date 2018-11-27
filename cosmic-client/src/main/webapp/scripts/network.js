@@ -498,6 +498,41 @@
                                         docID: 'helpVPCSyslogServerList',
                                         label: 'label.vpc.syslogserverlist'
                                     },
+                                    advertmethod: {
+                                        label: 'label.vpc.advertmethod',
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "UNICAST",
+                                                description: "Unicast"
+                                            },{
+                                                id: "MULTICAST",
+                                                description: "Multicast"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+                                    advertinterval: {
+                                        label: 'label.vpc.advertinterval',
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "1",
+                                                description: "1"
+                                            },{
+                                                id: "2",
+                                                description: "2"
+                                            },{
+                                                id: "3",
+                                                description: "3"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
                                     networkdomain: {
                                         docID: 'helpVPCDomain',
                                         label: 'label.DNS.domain.for.guest.networks'
@@ -551,6 +586,16 @@
                                 if (args.data.syslogserverlist != null && args.data.syslogserverlist.length > 0)
                                     $.extend(dataObj, {
                                         syslogserverlist: args.data.syslogserverlist
+                                    });
+
+                                if (args.data.advertmethod != null && args.data.advertmethod.length > 0)
+                                    $.extend(dataObj, {
+                                        advertmethod: args.data.advertmethod
+                                    });
+
+                                if (args.data.advertinterval != null && args.data.advertinterval.length > 0)
+                                    $.extend(dataObj, {
+                                        advertinterval: args.data.advertinterval
                                     });
 
                                 if (args.data.networkdomain != null && args.data.networkdomain.length > 0)
@@ -618,13 +663,23 @@
                                 action: function (args) {
                                     // should we update the vpc offering
 
-                                    if (args.data.vpcofferingid != null && args.data.vpcofferingid != args.context.vpc[0].vpcofferingid) {
+                                    if ((args.data.vpcofferingid != null && args.data.vpcofferingid != args.context.vpc[0].vpcofferingid)
+                                        || (args.data.advertmethod !== null && args.data.advertmethod.length > 0 && args.context.vpc[0].advertmethod !== args.data.advertmethod)
+                                        || (args.data.advertinterval != null && args.data.advertinterval.length > 0 && args.context.vpc[0].advertinterval !== args.data.advertinterval)) {
+
+                                        var message = 'message.confirm.change.vpcoffering';
+
                                         var dataObj = {
                                             id: args.context.vpc[0].id,
                                             name: args.data.name,
-                                            displaytext: args.data.displaytext,
-                                            vpcofferingid: args.data.vpcofferingid
+                                            displaytext: args.data.displaytext
                                         };
+
+                                        if (args.data.vpcofferingid !== null && args.data.vpcofferingid !== args.context.vpc[0].vpcofferingid) {
+                                            $.extend(dataObj, {
+                                                vpcofferingid: args.data.vpcofferingid
+                                            });
+                                        }
 
                                         if (args.data.sourcenatlist != null && args.data.sourcenatlist.length > 0)
                                             $.extend(dataObj, {
@@ -636,8 +691,22 @@
                                                 syslogserverlist: args.data.syslogserverlist
                                             });
 
+                                        if (args.data.advertmethod !== null && args.data.advertmethod.length > 0 && args.context.vpc[0].advertmethod !== args.data.advertmethod) {
+                                            $.extend(dataObj, {
+                                                advertmethod: args.data.advertmethod
+                                            });
+                                            message = 'message.confirm.change.vpcoffering.impact';
+                                        }
+
+                                        if (args.data.advertinterval != null && args.data.advertinterval.length > 0 && args.context.vpc[0].advertinterval !== args.data.advertinterval) {
+                                            $.extend(dataObj, {
+                                                advertinterval: args.data.advertinterval
+                                            });
+                                            message = 'message.confirm.change.vpcoffering.impact';
+                                        }
+
                                         cloudStack.dialog.confirm({
-                                            message: 'message.confirm.change.vpcoffering',
+                                            message: message,
                                             action: function () { //"Yes"    button is clicked
                                                 $.ajax({
                                                     url: createURL('updateVPC'),
@@ -877,6 +946,43 @@
                                     syslogserverlist: {
                                         label: 'label.vpc.syslogserverlist',
                                         isEditable: true
+                                    },
+                                    advertmethod: {
+                                        label: 'label.vpc.advertmethod',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "UNICAST",
+                                                description: "Unicast"
+                                            },{
+                                                id: "MULTICAST",
+                                                description: "Multicast"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
+                                    },
+                                    advertinterval: {
+                                        label: 'label.vpc.advertinterval',
+                                        isEditable: true,
+                                        select: function (args) {
+                                            var items = [];
+                                            items.push({
+                                                id: "1",
+                                                description: "1"
+                                            },{
+                                                id: "2",
+                                                description: "2"
+                                            },{
+                                                id: "3",
+                                                description: "3"
+                                            });
+                                            args.response.success({
+                                                data: items
+                                            });
+                                        }
                                     },
                                     networkdomain: {
                                         label: 'label.network.domain'
