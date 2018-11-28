@@ -1247,6 +1247,7 @@ var dictionary = {
     "label.recover.vm": "Recover VM",
     "label.redundant.router": "Runs more than 1 router VM",
     "label.redundant.router.capability": "Can run more than 1 router VM",
+    "label.redundant.router.unicast.id":"Unicast ID",
     "label.redundant.state": "Keepalived state",
     "label.redundant.vpc": "Redundant VPC",
     "label.refresh": "Refresh",

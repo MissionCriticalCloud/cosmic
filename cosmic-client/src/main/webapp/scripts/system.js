@@ -5830,6 +5830,9 @@
                                                 redundantstate: {
                                                     label: 'label.redundant.state'
                                                 },
+                                                routerunicastid: {
+                                                    label: 'label.redundant.router.unicast.id'
+                                                },
                                                 vpcid: {
                                                     label: 'label.vpc.id'
                                                 },
@@ -5877,6 +5880,9 @@
                                             },
                                             ipaddress: {
                                                 label: 'label.ip.address'
+                                            },
+                                            macaddress: {
+                                                label: 'label.macaddress'
                                             },
                                             id: {
                                                 label: 'label.id'
