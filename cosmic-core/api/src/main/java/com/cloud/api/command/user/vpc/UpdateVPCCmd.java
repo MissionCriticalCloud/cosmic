@@ -17,6 +17,7 @@ import com.cloud.api.response.VpcResponse;
 import com.cloud.event.EventTypes;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.model.enumeration.AdvertMethod;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -57,13 +58,23 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
             description = "Comma separated list of IP addresses to configure as syslog servers on the VPC to forward IP tables logging")
     private String syslogServerList;
 
+    @Parameter(name = ApiConstants.ADVERT_INTERVAL, type = CommandType.LONG,
+            description = "VRRP advertisement interval. Defaults to 1.")
+    private Long advertInterval;
+
+    @Parameter(name = ApiConstants.ADVERT_METHOD, type = CommandType.STRING,
+            description = "VRRP advertisement method to use: unicast / multicast. Defaults to multicast'")
+    private String advertMethod;
+
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
 
     @Override
     public void execute() {
-        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId(), getSourceNatList(), getSyslogServerList());
+        final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId(), getSourceNatList(),
+                getSyslogServerList(), getAdvertInterval(), getAdvertMethod());
         if (result != null) {
             final VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
@@ -149,6 +160,18 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
     public void checkUuid() {
         if (getCustomId() != null) {
             _uuidMgr.checkUuid(getCustomId(), Vpc.class);
+        }
+    }
+
+    public Long getAdvertInterval() {
+        return advertInterval;
+    }
+
+    public AdvertMethod getAdvertMethod() {
+        if (advertMethod != null) {
+            return AdvertMethod.valueOf(advertMethod.toUpperCase());
+        } else {
+            return null;
         }
     }
 }

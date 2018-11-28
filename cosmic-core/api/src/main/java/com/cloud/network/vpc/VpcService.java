@@ -8,6 +8,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.NetworkRuleConflictException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
+import com.cloud.model.enumeration.AdvertMethod;
 import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.legacymodel.network.vpc.Vpc;
@@ -33,8 +34,8 @@ public interface VpcService {
      * @return
      * @throws ResourceAllocationException TODO
      */
-    public Vpc createVpc(long zoneId, long vpcOffId, long vpcOwnerId, String vpcName, String displayText, String cidr, String networkDomain, Boolean displayVpc, String sourceNatList, String
-            syslogServerList)
+    public Vpc createVpc(long zoneId, long vpcOffId, long vpcOwnerId, String vpcName, String displayText, String cidr, String networkDomain, Boolean displayVpc,
+                         String sourceNatList, String syslogServerList, Long advertInterval, AdvertMethod advertMethod)
             throws ResourceAllocationException;
 
     /**
@@ -58,7 +59,8 @@ public interface VpcService {
      * @param displayVpc  TODO
      * @return
      */
-    public Vpc updateVpc(long vpcId, String vpcName, String displayText, String customId, Boolean displayVpc, Long vpcOfferingId, String sourceNatList, String syslogServerList);
+    public Vpc updateVpc(long vpcId, String vpcName, String displayText, String customId, Boolean displayVpc, Long vpcOfferingId, String sourceNatList, String syslogServerList,
+                         Long advertInterval, AdvertMethod advertMethod);
 
     /**
      * Lists VPC(s) based on the parameters passed to the method call

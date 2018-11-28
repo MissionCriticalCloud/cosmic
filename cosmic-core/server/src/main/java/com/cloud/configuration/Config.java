@@ -1601,6 +1601,24 @@ public enum Config {
             "seconds between VRRP broadcast. It would 3 times broadcast fail to trigger fail-over mechanism of redundant router",
             null),
 
+    RedundantRouterAdvertMethod(
+            "Advanced",
+            NetworkOrchestrationService.class,
+            String.class,
+            "router.redundant.advert.method",
+            "multicast",
+            "VRRP advertisement method to use: unicast / multicast. Defaults to multicast'",
+            null),
+
+    RedundantRouterUnicastSubnet(
+            "Advanced",
+            NetworkOrchestrationService.class,
+            String.class,
+            "router.redundant.unicast.subnet",
+            "100.100.0.0/24",
+            "Unicast ipv4 /24 subnet to use from CGN. Defaults to 100.100.0.0/24'",
+            null),
+
     RouterAggregationCommandEachTimeout(
             "Advanced",
             NetworkOrchestrationService.class,

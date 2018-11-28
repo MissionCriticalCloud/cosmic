@@ -1,6 +1,7 @@
 package com.cloud.network.vpc;
 
 import com.cloud.legacymodel.network.vpc.Vpc;
+import com.cloud.model.enumeration.AdvertMethod;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -54,6 +55,12 @@ public class VpcVO implements Vpc {
     String sourceNatList;
     @Column(name = "syslog_server_list")
     String syslogServerList;
+    @Column(name = "advert_interval")
+    long advertInterval;
+    @Column(name = "unicast_subnet")
+    String unicastSubnet;
+    @Column(name = "advert_method")
+    AdvertMethod advertMethod;
 
     public VpcVO() {
         uuid = UUID.randomUUID().toString();
@@ -61,7 +68,7 @@ public class VpcVO implements Vpc {
 
     public VpcVO(final long zoneId, final String name, final String displayText, final long accountId, final long domainId,
                  final long vpcOffId, final String cidr, final String networkDomain, final boolean isRedundant, final String sourceNatList,
-                 final String syslogServerList) {
+                 final String syslogServerList, final long advertInterval, final String unicastSubnet, final AdvertMethod advertMethod) {
         this.zoneId = zoneId;
         this.name = name;
         this.displayText = displayText;
@@ -75,6 +82,9 @@ public class VpcVO implements Vpc {
         redundant = isRedundant;
         this.sourceNatList = sourceNatList;
         this.syslogServerList = syslogServerList;
+        this.advertInterval = advertInterval;
+        this.unicastSubnet = unicastSubnet;
+        this.advertMethod = advertMethod;
     }
 
     @Override
@@ -208,5 +218,29 @@ public class VpcVO implements Vpc {
 
     public String getSyslogServerList() {
         return syslogServerList;
+    }
+
+    public long getAdvertInterval() {
+        return advertInterval;
+    }
+
+    public void setAdvertInterval(final long advertInterval) {
+        this.advertInterval = advertInterval;
+    }
+
+    public String getUnicastSubnet() {
+        return unicastSubnet;
+    }
+
+    public void setUnicastSubnet(final String unicastSubnet) {
+        this.unicastSubnet = unicastSubnet;
+    }
+
+    public AdvertMethod getAdvertMethod() {
+        return advertMethod;
+    }
+
+    public void setAdvertMethod(final AdvertMethod advertMethod) {
+        this.advertMethod = advertMethod;
     }
 }

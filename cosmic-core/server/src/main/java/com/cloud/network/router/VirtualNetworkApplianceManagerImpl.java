@@ -87,6 +87,7 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.AdvertMethod;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.NetworkType;
 import com.cloud.model.enumeration.StorageProvisioningType;
@@ -901,6 +902,9 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
 
         // 1) Set router details
         final DomainRouterVO router = _routerDao.findById(profile.getVirtualMachine().getId());
+        final Vpc vpc = _vpcDao.findById(router.getVpcId());
+        final List<DomainRouterVO> routerList = _routerDao.listByVpcId(router.getVpcId());
+
         final Map<String, String> details = _vmDetailsDao.listDetailsKeyPairs(router.getId());
         router.setDetails(details);
 
@@ -1026,54 +1030,76 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
         final long networkId = nic.getNetworkId();
         _networkDao.findById(networkId);
 
-        final int advertInt = NumbersUtil.parseInt(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
-        buf.append(" advert_int=").append(advertInt);
+        final List<DomainRouterVO> routers;
 
-        final boolean isRedundant = router.getIsRedundantRouter();
-        if (isRedundant) {
-            buf.append(" redundant_router=1");
+        final Long vpcId = router.getVpcId();
+        if (vpcId != null) {
+            final Vpc vpc = _vpcDao.findById(vpcId);
+            routers = _routerDao.listByVpcId(vpcId);
 
-            final Long vpcId = router.getVpcId();
-            final List<DomainRouterVO> routers;
-            if (vpcId != null) {
-                routers = _routerDao.listByVpcId(vpcId);
-                // For a redundant VPC router, both shall have the same router id. It will be used by the VRRP virtural_router_id attribute.
-                // So we use the VPC id to avoid group problems.
-                buf.append(" router_id=").append(vpcId);
-
-                // Will build the routers password based on the VPC ID and UUID.
-                final Vpc vpc = _vpcDao.findById(vpcId);
-
-                try {
-                    final MessageDigest digest = MessageDigest.getInstance("SHA-512");
-                    final byte[] rawDigest = vpc.getUuid().getBytes(Charset.defaultCharset());
-                    digest.update(rawDigest);
-
-                    final BigInteger password = new BigInteger(1, digest.digest());
-                    buf.append(" router_password=").append(password);
-                } catch (final NoSuchAlgorithmException e) {
-                    s_logger.error("Failed to pssword! Will use the plan B instead.");
-                    buf.append(" router_password=").append(vpc.getUuid());
-                }
-            } else {
-                routers = _routerDao.listByNetworkAndRole(nic.getNetworkId(), Role.VIRTUAL_ROUTER);
+            if (vpc.isRedundant()) {
+                buf.append(" redundant_router=1");
             }
 
-            String redundantState = RedundantState.BACKUP.toString();
-            router.setRedundantState(RedundantState.BACKUP);
-            if (routers.size() == 0) {
+            long advertInt = vpc.getAdvertInterval();
+            if (advertInt <= 0) {
+                advertInt = NumbersUtil.parseLong(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
+            }
+            buf.append(" advert_int=").append(advertInt);
+
+            String unicastSubnet = vpc.getUnicastSubnet();
+            if (unicastSubnet == null || unicastSubnet.isEmpty() || !NetUtils.isValidIp4Cidr(unicastSubnet)) {
+                unicastSubnet = _configDao.getValue(Config.RedundantRouterUnicastSubnet.key());
+                if (unicastSubnet == null || unicastSubnet.isEmpty() || !NetUtils.isValidIp4Cidr(unicastSubnet)) {
+                    unicastSubnet = "100.100.0.0/24";
+                }
+            }
+            buf.append(" unicast_subnet=").append(unicastSubnet);
+
+            AdvertMethod advertMethod = vpc.getAdvertMethod();
+            if (advertMethod == null) {
+                try {
+                    String advertMethodConfigValue = _configDao.getValue(Config.RedundantRouterAdvertMethod.key());
+                    advertMethod = AdvertMethod.valueOf(advertMethodConfigValue);
+                } catch (final IllegalArgumentException ex) {
+                    advertMethod = AdvertMethod.MULTICAST;
+                }
+            }
+            buf.append(" advert_method=").append(advertMethod);
+
+            buf.append(" router_id=").append(vpcId);
+            buf.append(" unicast_id=").append(router.getRouterUnicastId());
+
+            try {
+                final MessageDigest digest = MessageDigest.getInstance("SHA-512");
+                final byte[] rawDigest = vpc.getUuid().getBytes(Charset.defaultCharset());
+                digest.update(rawDigest);
+
+                final BigInteger password = new BigInteger(1, digest.digest());
+                buf.append(" router_password=").append(password);
+            } catch (final NoSuchAlgorithmException e) {
+                s_logger.error("Failed to pssword! Will use the plan B instead.");
+                buf.append(" router_password=").append(vpc.getUuid());
+            }
+        } else {
+            routers = _routerDao.listByNetworkAndRole(nic.getNetworkId(), Role.VIRTUAL_ROUTER);
+        }
+
+        String redundantState = RedundantState.BACKUP.toString();
+        router.setRedundantState(RedundantState.BACKUP);
+        if (routers.size() == 0) {
+            redundantState = RedundantState.MASTER.toString();
+            router.setRedundantState(RedundantState.MASTER);
+        } else {
+            final DomainRouterVO router0 = routers.get(0);
+            if (router.getId() == router0.getId()) {
                 redundantState = RedundantState.MASTER.toString();
                 router.setRedundantState(RedundantState.MASTER);
-            } else {
-                final DomainRouterVO router0 = routers.get(0);
-                if (router.getId() == router0.getId()) {
-                    redundantState = RedundantState.MASTER.toString();
-                    router.setRedundantState(RedundantState.MASTER);
-                }
             }
-
-            buf.append(" redundant_state=").append(redundantState);
         }
+
+        // @TODO Remove this
+        buf.append(" redundant_state=").append(redundantState);
 
         return buf;
     }
@@ -1094,9 +1120,6 @@ public class VirtualNetworkApplianceManagerImpl extends ManagerBase implements V
             final String brd = NetUtils.long2Ip(NetUtils.ip2Long(guestNic.getIPv4Address()) | ~NetUtils.ip2Long(guestNic.getIPv4Netmask()));
             buf.append(" guestbrd=").append(brd);
             buf.append(" guestcidrsize=").append(NetUtils.getCidrSize(guestNic.getIPv4Netmask()));
-
-            final int advertInt = NumbersUtil.parseInt(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
-            buf.append(" advert_int=").append(advertInt);
         }
 
         // setup network domain

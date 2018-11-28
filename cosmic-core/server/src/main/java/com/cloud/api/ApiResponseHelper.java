@@ -2284,6 +2284,8 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setRedundantRouter(vpc.isRedundant());
         response.setSourceNatList(vpc.getSourceNatList());
         response.setSyslogServerList(vpc.getSyslogServerList());
+        response.setAdvertInterval(vpc.getAdvertInterval());
+        response.setAdvertMethod(vpc.getAdvertMethod());
 
         final Map<Service, Set<Provider>> serviceProviderMap = ApiDBUtils.listVpcOffServices(vpc.getVpcOfferingId());
         final List<ServiceResponse> serviceResponses = getServiceResponses(serviceProviderMap);

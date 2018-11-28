@@ -3,6 +3,7 @@ package com.cloud.legacymodel.network.vpc;
 import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
+import com.cloud.model.enumeration.AdvertMethod;
 
 public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
 
@@ -50,6 +51,21 @@ public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
      * @return VPC syslog server list
      */
     String getSyslogServerList();
+
+    /**
+     * @return VRRP advert_interval
+     */
+    long getAdvertInterval();
+
+    /**
+     * @return VRRP unicast subnet
+     */
+    String getUnicastSubnet();
+
+    /**
+     * @return VRRP advert method
+     */
+    AdvertMethod getAdvertMethod();
 
     /**
      * @return true if restart is required for the VPC; false otherwise

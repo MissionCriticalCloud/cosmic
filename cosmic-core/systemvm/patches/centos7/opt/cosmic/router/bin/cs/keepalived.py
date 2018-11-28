@@ -82,6 +82,8 @@ class Keepalived:
             for i in interface['ipv4_addresses']:
                 ipv4addresses.append('%s dev %s' % (i['cidr'], interface_name))
 
+            unicast_src, unicast_peer = self.get_unicast_ips()
+
             self.write_vrrp_instance(
                 name=name,
                 state='BACKUP',
@@ -89,8 +91,28 @@ class Keepalived:
                 virtual_router_id=interface_id,
                 advert_int=self.config.get_advert_int(),
                 virtual_ipaddress=[],
-                virtual_ipaddress_excluded=ipv4addresses
+                virtual_ipaddress_excluded=ipv4addresses,
+                advert_method=self.config.get_advert_method(),
+                unicast_src=unicast_src,
+                unicast_peer=unicast_peer
             )
+
+    def get_unicast_ips(self):
+        unicast_subnet = self.config.get_unicast_subnet()
+        unicast_id = self.config.get_unicast_id()
+        unicast_src = unicast_subnet.replace("0/24", unicast_id)
+
+        # We work with .1 and .2 within the subnet
+        if int(unicast_id) == 1:
+            unicast_peer = unicast_subnet.replace("0/24", str(int(unicast_id) + 1))
+        else:
+            unicast_peer = unicast_subnet.replace("0/24", str(int(unicast_id) - 1))
+
+        logging.debug("Got unicast_id %s, returned unicast_src %s and unicast_peer %s" % (
+            unicast_id, unicast_src, unicast_peer
+        ))
+
+        return unicast_src, unicast_peer
 
     def parse_vrrp_routes_instance(self):
         sync_interface_name = self.config.get_sync_interface_name()
@@ -107,6 +129,8 @@ class Keepalived:
         for route in self.config.dbag_network_overview['routes']:
             virtualroutes.append('%s via %s metric %s' % (route['cidr'], route['next_hop'], route['metric']))
 
+        unicast_src, unicast_peer = self.get_unicast_ips()
+
         self.write_vrrp_instance(
             name='routes',
             state='BACKUP',
@@ -114,7 +138,10 @@ class Keepalived:
             virtual_router_id=self.routes_vrrp_id,
             advert_int=self.config.get_advert_int(),
             virtual_ipaddress=[],
-            virtual_routes=virtualroutes
+            virtual_routes=virtualroutes,
+            advert_method=self.config.get_advert_method(),
+            unicast_src=unicast_src,
+            unicast_peer=unicast_peer
         )
 
     def write_vrrp_instance(
@@ -124,6 +151,9 @@ class Keepalived:
             interface,
             virtual_router_id,
             advert_int,
+            advert_method,
+            unicast_src,
+            unicast_peer,
             virtual_ipaddress=None,
             virtual_ipaddress_excluded=None,
             virtual_routes=None
@@ -136,7 +166,10 @@ class Keepalived:
             advert_int=advert_int,
             virtual_ipaddress=virtual_ipaddress,
             virtual_ipaddress_excluded=virtual_ipaddress_excluded,
-            virtual_routes=virtual_routes
+            virtual_routes=virtual_routes,
+            advert_method=advert_method,
+            unicast_src=unicast_src,
+            unicast_peer=unicast_peer
         )
 
         self.vrrp_instances.append(name)

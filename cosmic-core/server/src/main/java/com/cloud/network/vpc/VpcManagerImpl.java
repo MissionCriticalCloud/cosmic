@@ -52,6 +52,7 @@ import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.common.managed.context.ManagedContextRunnable;
+import com.cloud.model.enumeration.AdvertMethod;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.IpAddress;
@@ -763,8 +764,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_CREATE, eventDescription = "creating vpc", create = true)
     public Vpc createVpc(final long zoneId, final long vpcOffId, final long vpcOwnerId, final String vpcName,
-                         final String displayText, final String cidr, String networkDomain,
-                         final Boolean displayVpc, final String sourceNatList, final String syslogServerList) throws ResourceAllocationException {
+                         final String displayText, final String cidr, String networkDomain, final Boolean displayVpc, final String sourceNatList, final String syslogServerList,
+                         Long advertInterval, AdvertMethod advertMethod) throws ResourceAllocationException {
         final Account caller = CallContext.current().getCallingAccount();
         final Account owner = _accountMgr.getAccount(vpcOwnerId);
 
@@ -813,8 +814,26 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             }
         }
 
-        final VpcVO vpc = new VpcVO(zoneId, vpcName, displayText, owner.getId(), owner.getDomainId(), vpcOffId, cidr,
-                networkDomain, vpcOff.getRedundantRouter(), sourceNatList, syslogServerList);
+        String unicastSubnet = _configDao.getValue(Config.RedundantRouterUnicastSubnet.key());
+        if (unicastSubnet == null || unicastSubnet.isEmpty() || !NetUtils.isValidIp4Cidr(unicastSubnet)) {
+            unicastSubnet = "100.100.0.0/24";
+        }
+
+        if (advertMethod == null) {
+            try {
+                String advertMethodConfigValue = _configDao.getValue(Config.RedundantRouterAdvertMethod.key());
+                advertMethod = AdvertMethod.valueOf(advertMethodConfigValue);
+            } catch (final IllegalArgumentException ex) {
+                advertMethod = AdvertMethod.MULTICAST;
+            }
+        }
+
+        if (advertInterval == null) {
+            advertInterval = NumbersUtil.parseLong(_configDao.getValue(Config.RedundantRouterVrrpInterval.key()), 1);
+        }
+
+        final VpcVO vpc = new VpcVO(zoneId, vpcName, displayText, owner.getId(), owner.getDomainId(), vpcOffId, cidr, networkDomain, vpcOff.getRedundantRouter(),
+                sourceNatList, syslogServerList, advertInterval, unicastSubnet, advertMethod);
 
         return createVpc(displayVpc, vpc);
     }
@@ -929,7 +948,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_UPDATE, eventDescription = "updating vpc")
     public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final
-    String sourceNatList, final String syslogServerList) {
+    String sourceNatList, final String syslogServerList, Long advertInterval, AdvertMethod advertMethod) {
         CallContext.current().setEventDetails(" Id: " + vpcId);
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -962,6 +981,16 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         if (syslogServerList != null) {
             vpc.setSyslogServerList(syslogServerList);
+        }
+
+        if (advertInterval != null) {
+            vpc.setAdvertInterval(advertInterval);
+            restartWithCleanupRequired = true;
+        }
+
+        if (advertMethod != null) {
+            vpc.setAdvertMethod(advertMethod);
+            restartWithCleanupRequired = true;
         }
 
         if (vpcOfferingId != null) {
@@ -1020,7 +1049,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         final User callerUser = _accountMgr.getActiveUser(CallContext.current().getCallingUserId());
         final ReservationContext context = new ReservationContextImpl(null, null, callerUser, callerAccount);
 
-        if (!vpc.isRedundant()) {
+        if (vpcOfferingId != null && !vpc.isRedundant()) {
             final List<DomainRouterVO> routers = _routerDao.listByVpcId(vpc.getId());
             for (final DomainRouterVO router : routers) {
                 // Delete any non-MASTER router since we are supposed to run a single setup according to the new VPC offering

@@ -49,10 +49,13 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
     @Column(name = "vpc_id")
     private Long vpcId;
 
+    @Column(name = "router_unicast_id")
+    private Long routerUnicastId;
+
     public DomainRouterVO(final long id, final long serviceOfferingId, final long elementId, final String name, final long templateId, final HypervisorType hypervisorType,
                           final long guestOSId, final long domainId, final long accountId, final long userId, final boolean isRedundantRouter, final RedundantState redundantState,
                           final boolean haEnabled, final boolean stopPending, final Long vpcId, final OptimiseFor optimiseFor, final String manufacturerString,
-                          final String cpuFlags, final Boolean macLearning, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy) {
+                          final String cpuFlags, final Boolean macLearning, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy, final Long routerUnicastId) {
         super(id, serviceOfferingId, name, name, VirtualMachineType.DomainRouter, templateId, hypervisorType, guestOSId, domainId, accountId, userId, haEnabled);
         this.elementId = elementId;
         this.isRedundantRouter = isRedundantRouter;
@@ -65,6 +68,7 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
         this.macLearning = macLearning;
         this.requiresRestart = requiresRestart;
         this.maintenancePolicy = maintenancePolicy;
+        this.routerUnicastId = routerUnicastId;
     }
 
     protected DomainRouterVO() {
@@ -167,5 +171,13 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
 
     public void setScriptsVersion(final String scriptsVersion) {
         this.scriptsVersion = scriptsVersion;
+    }
+
+    public Long getRouterUnicastId() {
+        return routerUnicastId;
+    }
+
+    public void setRouterUnicastId(final Long routerUnicastId) {
+        this.routerUnicastId = routerUnicastId;
     }
 }
