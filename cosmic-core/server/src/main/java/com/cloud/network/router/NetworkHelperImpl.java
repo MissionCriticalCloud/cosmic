@@ -459,7 +459,7 @@ public class NetworkHelperImpl implements NetworkHelper {
         }
 
         Long routerUnicastId = 1L;
-        if (isRedundant && routers != null && routers.size() == 1 && routers.get(0).getRouterUnicastId() == 1L) {
+        if (isRedundant && routers != null && routers.size() == 1 && routers.get(0).getRouterUnicastId() != null && routers.get(0).getRouterUnicastId() == 1L) {
             routerUnicastId = 2L;
         }
 
