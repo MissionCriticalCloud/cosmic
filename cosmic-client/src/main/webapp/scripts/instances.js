@@ -1403,8 +1403,7 @@
                                         items.push({
                                             id: "Generic",
                                             description: "Generic VM"
-                                        });
-                                        items.push({
+                                        },{
                                             id: "Windows",
                                             description: "Windows VM"
                                         });

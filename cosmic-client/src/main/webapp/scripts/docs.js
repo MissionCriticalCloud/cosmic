@@ -962,6 +962,14 @@ cloudStack.docs = {
         desc: 'Comma separated list of IP addresses that will be configured as remote syslog servers to forward IP tables logging.',
         externalLink: ''
     },
+    helpVPCAdvertInterval: {
+        desc: 'VRRP advertisement interval. Defaults to 1.',
+        externalLink: ''
+    },
+    helpVPCAdvertMethod: {
+        desc: 'VRRP advertisement method to use: UNICAST / MULTICAST.',
+        externalLink: ''
+    },
     helpVPCDomain: {
         desc: 'If you want to assign a special domain name to this VPC\'s guest VM network, specify the DNS suffix',
         externalLink: ''

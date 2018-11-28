@@ -3,7 +3,7 @@
 CONNTRACKD_BIN=/usr/sbin/conntrackd
 CONNTRACKD_LOCK=/var/lock/conntrack.lock
 CONNTRACKD_CONFIG=/etc/conntrackd/conntrackd.conf
-KEEPALIVED_STATE=/tmp/keepalived_state
+KEEPALIVED_STATE=/opt/cosmic/router/keepalived_state
 
 case "$1" in
   primary)
