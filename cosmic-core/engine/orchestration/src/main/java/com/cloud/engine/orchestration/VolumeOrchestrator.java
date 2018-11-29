@@ -870,7 +870,11 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
                 throw new CloudRuntimeException("Failed to find the destination storage pool " + storagePool.getId());
             }
 
-            volumeMap.put(this.volFactory.getVolume(volume.getId()), (DataStore) destPool);
+            if (storagePool.isClusterWide()) {
+                volumeMap.put(this.volFactory.getVolume(volume.getId()), (DataStore) destPool);
+            } else {
+                s_logger.debug("Skipping volume " + volume + " due to non-ZoneWide scope");
+            }
         }
 
         final AsyncCallFuture<CommandResult> future = this.volService.migrateVolumes(volumeMap, vmTo, srcHost, destHost);

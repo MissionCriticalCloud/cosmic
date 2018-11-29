@@ -235,7 +235,17 @@ public class StoragePoolVO implements StoragePool {
 
     @Override
     public boolean isShared() {
-        return scope == ScopeType.HOST ? false : true;
+        return scope != ScopeType.HOST ;
+    }
+
+    @Override
+    public boolean isZoneWide() {
+        return scope == ScopeType.ZONE;
+    }
+
+    @Override
+    public boolean isClusterWide() {
+        return scope == ScopeType.CLUSTER;
     }
 
     @Override

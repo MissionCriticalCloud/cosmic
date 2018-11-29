@@ -36,6 +36,10 @@ public interface StoragePool extends Identity, InternalIdentity {
 
     boolean isShared();
 
+    boolean isZoneWide();
+
+    boolean isClusterWide();
+
     boolean isLocal();
 
     StoragePoolStatus getStatus();

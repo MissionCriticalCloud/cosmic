@@ -252,7 +252,17 @@ public class PrimaryDataStoreImpl implements PrimaryDataStore {
 
     @Override
     public boolean isShared() {
-        return pdsv.getScope() == ScopeType.HOST ? false : true;
+        return pdsv.getScope() != ScopeType.HOST ;
+    }
+
+    @Override
+    public boolean isZoneWide() {
+        return pdsv.getScope() == ScopeType.ZONE;
+    }
+
+    @Override
+    public boolean isClusterWide() {
+        return pdsv.getScope() == ScopeType.CLUSTER;
     }
 
     @Override
