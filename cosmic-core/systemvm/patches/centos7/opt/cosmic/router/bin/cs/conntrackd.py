@@ -1,5 +1,6 @@
 import logging
 import subprocess
+import utils
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -28,10 +29,15 @@ class Conntrackd:
         for ipv4 in self.config.get_all_ipv4_addresses_on_router():
             address_ignore.append('IPv4_address %s' % ipv4)
 
+        unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
+
         content = self.jinja_env.get_template('conntrackd.conf').render(
             ipv6_multicast_address=self.conntrackd_ipv6_multicast_address,
             sync_interface=self.config.get_sync_interface_name(),
-            address_ignore=address_ignore
+            address_ignore=address_ignore,
+            advert_method=self.config.get_advert_method(),
+            unicast_src=unicast_src,
+            unicast_peer=unicast_peer
         )
 
         logging.debug("Writing keepalived config file %s with content \n%s" % (

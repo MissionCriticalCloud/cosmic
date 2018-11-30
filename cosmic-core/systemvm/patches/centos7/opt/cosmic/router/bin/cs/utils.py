@@ -1,7 +1,6 @@
 import re
 import netifaces
-import os
-import sys
+import logging
 
 tier_interface_name_regex = re.compile('eth*')
 
@@ -28,3 +27,17 @@ def bool_to_yn(value):
     if value:
         return "yes"
     return "no"
+
+def get_unicast_ips(config):
+    unicast_subnet = config.get_unicast_subnet()
+    unicast_id = config.get_unicast_id()
+    unicast_src = unicast_subnet.replace("0/24", unicast_id)
+    # We work with .1 and .2 within the subnet
+    if int(unicast_id) == 1:
+        unicast_peer = unicast_subnet.replace("0/24", str(int(unicast_id) + 1))
+    else:
+        unicast_peer = unicast_subnet.replace("0/24", str(int(unicast_id) - 1))
+    logging.debug("Got unicast_id %s, returned unicast_src %s and unicast_peer %s" % (
+        unicast_id, unicast_src, unicast_peer
+    ))
+    return unicast_src, unicast_peer

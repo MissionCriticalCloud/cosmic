@@ -83,7 +83,7 @@ class Keepalived:
             for i in interface['ipv4_addresses']:
                 ipv4addresses.append('%s dev %s' % (i['cidr'], interface_name))
 
-            unicast_src, unicast_peer = self.get_unicast_ips()
+            unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
 
             self.write_vrrp_instance(
                 name=name,
@@ -100,20 +100,6 @@ class Keepalived:
                 unicast_peer=unicast_peer
             )
 
-    def get_unicast_ips(self):
-        unicast_subnet = self.config.get_unicast_subnet()
-        unicast_id = self.config.get_unicast_id()
-        unicast_src = unicast_subnet.replace("0/24", unicast_id)
-        # We work with .1 and .2 within the subnet
-        if int(unicast_id) == 1:
-            unicast_peer = unicast_subnet.replace("0/24", str(int(unicast_id) + 1))
-        else:
-            unicast_peer = unicast_subnet.replace("0/24", str(int(unicast_id) - 1))
-        logging.debug("Got unicast_id %s, returned unicast_src %s and unicast_peer %s" % (
-            unicast_id, unicast_src, unicast_peer
-        ))
-        return unicast_src, unicast_peer
-
     # The reason we write the default route to its own keepalived config file
     # is so that the group always has 2: public and the routes one.
     # Else if won't execute the scripts on state change.
@@ -127,7 +113,8 @@ class Keepalived:
                 'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
             )
 
-        unicast_src, unicast_peer = self.get_unicast_ips()
+        unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
+
         self.write_vrrp_instance(
             name='routes',
             state='BACKUP',
