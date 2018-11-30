@@ -38,7 +38,7 @@ class Config:
     def get_advert_method(self):
         if 'advert_method' in self.dbag_cmdline['config']:
             return self.dbag_cmdline['config']['advert_method']
-        return "multicast"
+        return "MULTICAST"
 
     def get_unicast_subnet(self):
         if 'unicast_subnet' in self.dbag_cmdline['config']:
