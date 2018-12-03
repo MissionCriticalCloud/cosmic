@@ -140,8 +140,8 @@ class Firewall:
         if self.config.get_advert_method() == "UNICAST":
             self.fw.append(["filter", "", "-A INPUT -i %s -p vrrp -j ACCEPT" % device])
             self.fw.append(["filter", "", "-A OUTPUT -o %s -p vrrp -j ACCEPT" % device])
-            self.fw.append(["filter", "", "-A INPUT -i %s -p 3780 -j ACCEPT" % device])
-            self.fw.append(["filter", "", "-A OUTPUT -o %s -p 3780 -j ACCEPT" % device])
+            self.fw.append(["filter", "", "-A INPUT -i %s -p tcp --dport 3780 -j ACCEPT" % device])
+            self.fw.append(["filter", "", "-A OUTPUT -o %s -p tcp --dport 3780 -j ACCEPT" % device])
 
     def add_public_vpc_rules(self, device):
         logging.info("Configuring Public VPC rules")
