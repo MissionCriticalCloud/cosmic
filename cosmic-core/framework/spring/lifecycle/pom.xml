@@ -5,19 +5,19 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.2.3-SNAPSHOT</version>
+        <version>6.2.3</version>
         <relativePath>../../../</relativePath>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-common</artifactId>
-            <version>6.2.3-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-config</artifactId>
-            <version>6.2.3-SNAPSHOT</version>
+            <version>6.2.3</version>
         </dependency>
     </dependencies>
 </project>
