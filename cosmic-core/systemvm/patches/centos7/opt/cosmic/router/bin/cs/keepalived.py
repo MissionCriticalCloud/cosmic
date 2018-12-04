@@ -83,7 +83,11 @@ class Keepalived:
             for i in interface['ipv4_addresses']:
                 ipv4addresses.append('%s dev %s' % (i['cidr'], interface_name))
 
-            unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
+            if self.config.get_advert_method() == "UNICAST":
+                unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
+            else:
+                unicast_src = None
+                unicast_peer = None
 
             self.write_vrrp_instance(
                 name=name,
@@ -113,8 +117,11 @@ class Keepalived:
                 'default via %s' % self.config.dbag_network_overview['services']['source_nat'][0]['gateway']
             )
 
-        unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
-
+        if self.config.get_advert_method() == "UNICAST":
+            unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
+        else:
+            unicast_src = None
+            unicast_peer = None
         self.write_vrrp_instance(
             name='routes',
             state='BACKUP',
