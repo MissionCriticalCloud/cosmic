@@ -29,11 +29,7 @@ class Conntrackd:
         for ipv4 in self.config.get_all_ipv4_addresses_on_router():
             address_ignore.append('IPv4_address %s' % ipv4)
 
-        if self.config.get_advert_method() == "UNICAST":
-            unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
-        else:
-            unicast_src = None
-            unicast_peer = None
+        unicast_src, unicast_peer = utils.get_unicast_ips(self.config)
 
         content = self.jinja_env.get_template('conntrackd.conf').render(
             ipv6_multicast_address=self.conntrackd_ipv6_multicast_address,
