@@ -100,11 +100,13 @@ class Config:
             if interface['metadata']['type'] == 'public':
                 return utils.get_interface_name_from_mac_address(interface['mac_address'])
 
-    def get_all_ipv4_addresses_on_router(self):
+    def get_to_be_ignored_ipv4_addresses_on_router(self):
         ipv4_addresses = []
 
         for interface in self.dbag_network_overview['interfaces']:
             for ip in interface['ipv4_addresses']:
-                ipv4_addresses.append(ip['cidr'].split('/')[0])
+                if interface['metadata']['type'] in ('other', 'sync'):
+                    ipv4_addresses.append(ip['cidr'].split('/')[0])
+        ipv4_addresses.append(self.get_unicast_subnet())
 
         return ipv4_addresses
