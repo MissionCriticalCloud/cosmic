@@ -1,6 +1,7 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
+import com.cloud.agent.resource.kvm.xml.LibvirtStorageVolumeDef;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateWithStorageAcrossClustersAnswer;
@@ -20,7 +21,9 @@ import java.util.List;
 
 import org.libvirt.Connect;
 import org.libvirt.Domain;
+import org.libvirt.LibvirtException;
 import org.libvirt.StoragePool;
+import org.libvirt.StorageVol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -70,6 +73,19 @@ public final class LibvirtMigrateWithStorageAcrossClustersCommandWrapper extends
                 volumeObjectTO.setId(volumeTO.getId());
                 volumeObjectTO.setPath(volumeTO.getPath());
                 volumes.add(volumeObjectTO);
+
+                StorageVol storageVol = null;
+                try {
+                    storageVol = destinationPool.storageVolLookupByName(volumeTO.getPath());
+                } catch (final LibvirtException e) {
+                    s_logger.debug("Could not find volume " + volumeTO.getPath() + ": " + e.getMessage());
+                }
+                if (storageVol == null) {
+                    LibvirtStorageVolumeDef volumeDef = new LibvirtStorageVolumeDef(volumeTO.getPath(), volumeTO.getSize(),
+                            LibvirtStorageVolumeDef.VolumeFormat.getFormat(volumeTO.getImageFormat().name()), null, null,
+                            volumeTO.getStorageProvisioningType());
+                    destinationPool.storageVolCreateXML(volumeDef.toString(), 0);
+                }
             }
 
             // VIR_MIGRATE_LIVE = 1

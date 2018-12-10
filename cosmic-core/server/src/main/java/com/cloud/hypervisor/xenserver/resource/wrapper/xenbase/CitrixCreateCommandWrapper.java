@@ -55,7 +55,8 @@ public final class CitrixCreateCommandWrapper extends CommandWrapper<CreateComma
             s_logger.debug("Succesfully created VDI for " + command + ".  Uuid = " + vdir.uuid);
 
             final VolumeTO vol =
-                    new VolumeTO(command.getVolumeId(), dskch.getType(), pool.getType(), pool.getUuid(), vdir.nameLabel, pool.getPath(), vdir.uuid, vdir.virtualSize, null);
+                    new VolumeTO(command.getVolumeId(), dskch.getType(), pool.getType(), pool.getUuid(), vdir.nameLabel, pool.getPath(), vdir.uuid, vdir.virtualSize,
+                            null, null, null);
 
             return new CreateAnswer(command, vol);
         } catch (final Exception e) {

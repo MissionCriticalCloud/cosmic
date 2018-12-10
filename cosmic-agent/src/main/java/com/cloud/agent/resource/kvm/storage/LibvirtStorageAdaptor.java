@@ -498,7 +498,8 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     @Override
-    public KvmPhysicalDisk createPhysicalDisk(final String name, final KvmStoragePool pool, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long size) {
+    public KvmPhysicalDisk createPhysicalDisk(final String name, final KvmStoragePool pool, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType,
+                                              final long size) {
 
         this.logger.info("Attempting to create volume " + name + " (" + pool.getType().toString() + ") in pool " + pool.getUuid() + " with size " + size);
 
@@ -557,7 +558,8 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
         return disk;
     }
 
-    private KvmPhysicalDisk createPhysicalDiskByQemuImg(final String name, final KvmStoragePool pool, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long
+    private KvmPhysicalDisk createPhysicalDiskByQemuImg(final String name, final KvmStoragePool pool, final PhysicalDiskFormat format,
+                                                        final StorageProvisioningType provisioningType, final long
             size) {
         final String volPath = pool.getLocalPath() + "/" + name;
         long virtualSize = 0;
@@ -601,7 +603,7 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
         final long volAllocation;
         final long volCapacity;
 
-        final LibvirtStorageVolumeDef volDef = new LibvirtStorageVolumeDef(name, size, libvirtformat, null, null);
+        final LibvirtStorageVolumeDef volDef = new LibvirtStorageVolumeDef(name, size, libvirtformat, null, null, null);
         this.logger.debug(volDef.toString());
         try {
             final StorageVol vol = virtPool.storageVolCreateXML(volDef.toString(), 0);
@@ -763,7 +765,8 @@ public class LibvirtStorageAdaptor implements StorageAdaptor {
     }
 
     @Override
-    public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name, final PhysicalDiskFormat format, final StorageProvisioningType provisioningType, final long
+    public KvmPhysicalDisk createDiskFromTemplate(final KvmPhysicalDisk template, final String name, final PhysicalDiskFormat format,
+                                                  final StorageProvisioningType provisioningType, final long
             size, final KvmStoragePool destPool, final int timeout) {
 
         this.logger.info(
