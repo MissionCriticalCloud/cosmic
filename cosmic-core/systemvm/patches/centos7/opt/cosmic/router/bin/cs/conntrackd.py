@@ -26,7 +26,7 @@ class Conntrackd:
     def write_config_file(self):
         address_ignore = []
 
-        for ipv4 in self.config.get_all_ipv4_addresses_on_router():
+        for ipv4 in self.config.get_to_be_ignored_ipv4_addresses_on_router():
             address_ignore.append('IPv4_address %s' % ipv4)
 
         if self.config.get_advert_method() == "UNICAST":
