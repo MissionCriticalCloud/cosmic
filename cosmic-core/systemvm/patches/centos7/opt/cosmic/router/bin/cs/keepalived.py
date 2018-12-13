@@ -38,6 +38,9 @@ class Keepalived:
         self.write_sync_group()
         self.zap_keepalived_config_directory()
         self.reload_keepalived()
+        # Reload an extra time to make sure all routes are moved from old to new files
+        # This can be removed once all pre-Cosmic 6.2 routers are replaced
+        self.reload_keepalived()
 
     def init_config(self):
         if not os.path.exists(self.keepalived_config_path):
