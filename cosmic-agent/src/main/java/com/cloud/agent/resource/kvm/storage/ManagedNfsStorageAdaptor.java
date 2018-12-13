@@ -201,7 +201,7 @@ public class ManagedNfsStorageAdaptor implements StorageAdaptor {
                 volCapacity = poolinfo.available;
 
                 final LibvirtStorageVolumeDef volDef = new LibvirtStorageVolumeDef(volumeUuid, volCapacity, libvirtformat, null,
-                        null);
+                        null, null);
                 this.logger.debug(volDef.toString());
 
                 vol = virtPool.storageVolCreateXML(volDef.toString(), 0);

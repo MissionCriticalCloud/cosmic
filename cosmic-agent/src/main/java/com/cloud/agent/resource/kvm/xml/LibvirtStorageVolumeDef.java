@@ -1,6 +1,7 @@
 package com.cloud.agent.resource.kvm.xml;
 
 import com.cloud.model.enumeration.PhysicalDiskFormat;
+import com.cloud.model.enumeration.StorageProvisioningType;
 
 import org.apache.commons.lang.NotImplementedException;
 
@@ -10,14 +11,16 @@ public class LibvirtStorageVolumeDef {
     private final VolumeFormat volFormat;
     private final String backingPath;
     private final VolumeFormat backingFormat;
+    private final StorageProvisioningType storageProvisioningType;
 
     public LibvirtStorageVolumeDef(final String volName, final Long size, final VolumeFormat format, final String tmplPath,
-                                   final VolumeFormat tmplFormat) {
+                                   final VolumeFormat tmplFormat, final StorageProvisioningType storageProvisioningType) {
         this.volName = volName;
         this.volSize = size;
         this.volFormat = format;
         this.backingPath = tmplPath;
         this.backingFormat = tmplFormat;
+        this.storageProvisioningType = storageProvisioningType;
     }
 
     public VolumeFormat getFormat() {
@@ -29,10 +32,16 @@ public class LibvirtStorageVolumeDef {
         final StringBuilder storageVolBuilder = new StringBuilder();
         storageVolBuilder.append("<volume>\n");
         storageVolBuilder.append("<name>" + this.volName + "</name>\n");
+        if (storageProvisioningType == StorageProvisioningType.FAT) {
+            storageVolBuilder.append("<allocation>0</allocation>\n");
+        }
         if (this.volSize != null) {
             storageVolBuilder.append("<capacity>" + this.volSize + "</capacity>\n");
         }
         storageVolBuilder.append("<target>\n");
+        if (this.volFormat == VolumeFormat.QCOW2) {
+            storageVolBuilder.append("<compat>1.1</compat>\n");
+        }
         storageVolBuilder.append("<format type='" + this.volFormat + "'/>\n");
         storageVolBuilder.append("<permissions>");
         storageVolBuilder.append("<mode>0744</mode>");

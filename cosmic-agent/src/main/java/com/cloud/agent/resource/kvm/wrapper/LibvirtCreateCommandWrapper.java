@@ -55,8 +55,7 @@ public final class LibvirtCreateCommandWrapper extends LibvirtCommandWrapper<Cre
                 }
             }
             final VolumeTO volume = new VolumeTO(command.getVolumeId(), dskch.getType(), pool.getType(), pool.getUuid(),
-                    pool.getPath(), vol.getName(), vol.getName(), disksize,
-                    null);
+                    pool.getPath(), vol.getName(), vol.getName(), disksize, null, null, null);
 
             volume.setBytesReadRate(dskch.getBytesReadRate());
             volume.setBytesWriteRate(dskch.getBytesWriteRate());

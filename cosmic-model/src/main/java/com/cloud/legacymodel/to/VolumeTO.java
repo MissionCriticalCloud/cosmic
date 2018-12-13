@@ -1,7 +1,9 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.InternalIdentity;
+import com.cloud.model.enumeration.ImageFormat;
 import com.cloud.model.enumeration.StoragePoolType;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VolumeType;
 
 public class VolumeTO implements InternalIdentity {
@@ -23,12 +25,14 @@ public class VolumeTO implements InternalIdentity {
     private Long iopsTotalRate;
     private String cacheMode;
     private Long chainSize;
+    private ImageFormat imageFormat;
+    private StorageProvisioningType storageProvisioningType;
 
     protected VolumeTO() {
     }
 
     public VolumeTO(final long id, final VolumeType type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
-                    final long size, final String chainInfo) {
+                    final long size, final String chainInfo, final ImageFormat imageFormat, final StorageProvisioningType storageProvisioningType) {
         this.id = id;
         this.name = name;
         this.path = path;
@@ -38,11 +42,12 @@ public class VolumeTO implements InternalIdentity {
         this.storagePoolUuid = poolUuid;
         this.mountPoint = mountPoint;
         this.chainInfo = chainInfo;
+        this.imageFormat = imageFormat;
+        this.storageProvisioningType = storageProvisioningType;
     }
 
     public VolumeTO(final long id, final VolumeType type, final StoragePoolType poolType, final String poolUuid, final String name, final String mountPoint, final String path,
-                    final long size, final String chainInfo,
-                    final String guestOsType) {
+                    final long size, final String chainInfo, final String guestOsType, final ImageFormat imageFormat, final StorageProvisioningType storageProvisioningType) {
         this.id = id;
         this.name = name;
         this.path = path;
@@ -53,6 +58,8 @@ public class VolumeTO implements InternalIdentity {
         this.mountPoint = mountPoint;
         this.chainInfo = chainInfo;
         this.guestOsType = guestOsType;
+        this.imageFormat = imageFormat;
+        this.storageProvisioningType = storageProvisioningType;
     }
 
     public long getDeviceId() {
@@ -171,5 +178,21 @@ public class VolumeTO implements InternalIdentity {
 
     public void setChainSize(final Long chainSize) {
         this.chainSize = chainSize;
+    }
+
+    public ImageFormat getImageFormat() {
+        return imageFormat;
+    }
+
+    public void setImageFormat(final ImageFormat imageFormat) {
+        this.imageFormat = imageFormat;
+    }
+
+    public StorageProvisioningType getStorageProvisioningType() {
+        return storageProvisioningType;
+    }
+
+    public void setStorageProvisioningType(final StorageProvisioningType storageProvisioningType) {
+        this.storageProvisioningType = storageProvisioningType;
     }
 }
