@@ -6,7 +6,7 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic-core</artifactId>
-        <version>6.2.5</version>
+        <version>6.2.6-SNAPSHOT</version>
     </parent>
     <properties>
         <client.config.base>${project.build.directory}/dependency</client.config.base>
@@ -16,12 +16,12 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>6.2.5</version>
+            <version>6.2.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-client-ui</artifactId>
-            <version>6.2.5</version>
+            <version>6.2.6-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>
