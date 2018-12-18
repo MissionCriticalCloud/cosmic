@@ -135,6 +135,7 @@ public class AgentShell {
         addNotNull(this.allProperties, "private.network.device", this.agentConfiguration.getNetwork().getDevice().getManagement());
         addNotNull(this.allProperties, "cmds.timeout", this.agentConfiguration.getCmds().getTimeout());
         addNotNull(this.allProperties, "vm.migrate.speed", this.agentConfiguration.getVm().getMigrate().getSpeed());
+        addNotNull(this.allProperties, "vm.migrate.speedacrosscluster", this.agentConfiguration.getVm().getMigrate().getSpeedAcrossCluster());
         addNotNull(this.allProperties, "vm.migrate.downtime", this.agentConfiguration.getVm().getMigrate().getDowntime());
         addNotNull(this.allProperties, "vm.migrate.pauseafter", this.agentConfiguration.getVm().getMigrate().getPauseafter());
         addNotNull(this.allProperties, "vm.memballoon.disable", this.agentConfiguration.getVm().getMemballoon().isDisable());
