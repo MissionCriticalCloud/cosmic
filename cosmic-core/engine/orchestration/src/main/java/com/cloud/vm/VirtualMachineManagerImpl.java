@@ -1962,6 +1962,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     _workDao.updateStep(work, Step.Started);
 
                     startAnswer = cmds.getAnswer(StartAnswer.class);
+
+                    // Set date and version we start this VM
+                    vm.setLastStartDateTime(getCurrentLocalDateTimeStamp());
+                    vm.setLastStartVersion(VirtualMachineManagerImpl.class.getPackage().getImplementationVersion());
+                    _vmDao.persist(vm);
+
                     if (startAnswer != null && startAnswer.getResult()) {
                         handlePath(vmTO.getDisks(), startAnswer.getIqnToPath());
                         final String host_guid = startAnswer.getHost_guid();
