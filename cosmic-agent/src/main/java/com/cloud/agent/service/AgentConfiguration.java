@@ -830,6 +830,7 @@ public class AgentConfiguration {
             @NotNull private Integer downtime = 1000;
             @NotNull private Integer pauseafter = 120000;
             @NotNull private Integer speed = 0;
+            @NotNull private Integer speedAcrossCluster = 0;
 
             public Integer getDowntime() {
                 return downtime;
@@ -853,6 +854,14 @@ public class AgentConfiguration {
 
             public void setSpeed(final Integer speed) {
                 this.speed = speed;
+            }
+
+            public Integer getSpeedAcrossCluster() {
+                return speedAcrossCluster;
+            }
+
+            public void setSpeedAcrossCluster(final Integer speedAcrossCluster) {
+                this.speedAcrossCluster = speedAcrossCluster;
             }
         }
     }

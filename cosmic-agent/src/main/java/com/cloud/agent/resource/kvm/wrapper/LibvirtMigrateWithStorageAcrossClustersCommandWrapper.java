@@ -91,7 +91,7 @@ public final class LibvirtMigrateWithStorageAcrossClustersCommandWrapper extends
             // VIR_MIGRATE_LIVE = 1
             // VIR_MIGRATE_UNDEFINE_SOURCE = 16
             // VIR_MIGRATE_NON_SHARED_DISK = 64
-            domain.migrate(destinationConnection, 1 | 16 | 64, domainXml, vm.getName(), null, 0);
+            domain.migrate(destinationConnection, 1 | 16 | 64, domainXml, vm.getName(), null, libvirtComputingResource.getMigrateSpeedAcrossCluster());
 
             return new MigrateWithStorageAcrossClustersAnswer(command, volumes);
         } catch (final Exception e) {
