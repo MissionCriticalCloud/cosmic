@@ -1705,7 +1705,7 @@
                                         label: 'label.path',
                                         isCopyPaste: true
                                     },
-                                    serviceofferingname: {
+                                    diskofferingname: {
                                         label: 'label.disk.offering'
                                     },
                                     type: {
