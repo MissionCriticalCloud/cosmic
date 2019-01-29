@@ -59,8 +59,8 @@ class Firewall:
 
         # default block VPN ports
         logging.info("VPN_open is %s and public_ip is %s" % (vpn_open, public_ip))
-        if not vpn_open and public_ip is not None:
-            self.block_vpn_rules(public_device, public_ip)
+        if not vpn_open:
+            self.block_vpn_rules(public_device)
 
     def add_default_vpc_rules(self):
         logging.info("Configuring default VPC rules")
@@ -256,7 +256,7 @@ class Firewall:
                                    "-A INPUT -s %s -d %s -j MARK --set-xmark 0x524/0xffffffff" % (
                                        net, site2site['left_subnet'])])
         # Block anything else
-        self.block_vpn_rules(device, site2site['left'])
+        self.block_vpn_rules(device)
 
     def add_remote_access_vpn_rules(self, device, publicip, remote_access):
         logging.info("Configuring RemoteAccess VPN rules")
@@ -283,12 +283,12 @@ class Firewall:
         self.config.fw.append(["", "", "-I INPUT -i ppp+ -m tcp -p tcp --dport 53 -j ACCEPT"])
         self.config.fw.append(["nat", "front", "-A PREROUTING -i ppp+ -m tcp -p tcp --dport 53 -j DNAT --to-destination %s" % local_ip])
 
-    def block_vpn_rules(self, device, publicip):
+    def block_vpn_rules(self, device):
         logging.info("Dropping VPN rules")
 
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 500 -j REJECT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 4500 -j REJECT" % (device, publicip)])
-        self.config.fw.append(["", "", "-A INPUT -i %s --dst %s -p udp -m udp --dport 1701 -j REJECT" % (device, publicip)])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p udp -m udp --dport 500 -j REJECT" % device])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p udp -m udp --dport 4500 -j REJECT" % device])
+        self.config.fw.append(["", "", "-A INPUT -i %s -p udp -m udp --dport 1701 -j REJECT" % device])
         self.config.fw.append(["", "", "-A INPUT -i %s -p ah -j REJECT" % device])
         self.config.fw.append(["", "", "-A INPUT -i %s -p esp -j REJECT" % device])
         self.config.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j REJECT"])
