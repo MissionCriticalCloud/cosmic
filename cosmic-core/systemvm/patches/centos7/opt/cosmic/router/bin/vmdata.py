@@ -92,7 +92,7 @@ def createfile(ip, folder, file, data):
         except OSError as e:
             # error 17 is already exists, we do it this way for concurrency
             if e.errno != 17:
-                print("failed to make directories " + metamanifestdir + " due to :" + e.strerror)
+                print(("failed to make directories " + metamanifestdir + " due to :" + e.strerror))
                 sys.exit(1)
         if os.path.exists(metamanifest):
             fh = open(metamanifest, "r+a")
@@ -122,7 +122,7 @@ def htaccess(ip, folder, file):
     except OSError as e:
         # error 17 is already exists, we do it this way for sake of concurrency
         if e.errno != 17:
-            print("failed to make directories " + htaccessFolder + " due to :" + e.strerror)
+            print(("failed to make directories " + htaccessFolder + " due to :" + e.strerror))
             sys.exit(1)
 
     fh = open(htaccessFile, "w")
@@ -136,7 +136,7 @@ def exflock(file):
     try:
         flock(file, LOCK_EX)
     except IOError as e:
-        print("failed to lock file" + file.name + " due to : " + e.strerror)
+        print(("failed to lock file" + file.name + " due to : " + e.strerror))
         sys.exit(1)
     return True
 
@@ -145,7 +145,7 @@ def unflock(file):
     try:
         flock(file, LOCK_UN)
     except IOError as e:
-        print("failed to unlock file" + file.name + " due to : " + e.strerror)
+        print(("failed to unlock file" + file.name + " due to : " + e.strerror))
         sys.exit(1)
     return True
 

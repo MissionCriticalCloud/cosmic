@@ -4,7 +4,7 @@ import logging
 import os
 import re
 
-import CsHelper
+from . import CsHelper
 
 
 class CsProcess(object):

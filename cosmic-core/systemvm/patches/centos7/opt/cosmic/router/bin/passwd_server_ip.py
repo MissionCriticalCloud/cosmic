@@ -17,8 +17,8 @@ import sys
 import syslog
 import threading
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SocketServer import ThreadingMixIn  # , ForkingMixIn
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn  # , ForkingMixIn
 
 passMap = {}
 secureToken = None

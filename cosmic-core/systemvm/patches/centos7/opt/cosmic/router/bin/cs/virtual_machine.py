@@ -1,7 +1,7 @@
 import logging
 
-from dhcp_vm import DhcpVm
-from metadata_vm import MetadataVm
+from .dhcp_vm import DhcpVm
+from .metadata_vm import MetadataVm
 
 
 class VirtualMachine:

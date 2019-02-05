@@ -6,15 +6,15 @@ import os
 import shutil
 import uuid
 
-import cs_cmdline
-import cs_dhcp
-import cs_firewallrules
-import cs_forwardingrules
-import cs_loadbalancer
-import cs_network_acl
-import cs_public_ip_acl
-import cs_staticroutes
-import cs_virtualrouter
+from . import cs_cmdline
+from . import cs_dhcp
+from . import cs_firewallrules
+from . import cs_forwardingrules
+from . import cs_loadbalancer
+from . import cs_network_acl
+from . import cs_public_ip_acl
+from . import cs_staticroutes
+from . import cs_virtualrouter
 
 
 class DataBag:

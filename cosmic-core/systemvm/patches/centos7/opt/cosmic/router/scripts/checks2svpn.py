@@ -29,7 +29,7 @@ def main():
                     pass
 
                 batchinfo += "%s:%s:%s&" % (vpn['right'], exitcode, exittext)
-    print batchinfo
+    print(batchinfo)
     return 0
 
 

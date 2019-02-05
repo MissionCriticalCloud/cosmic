@@ -1,6 +1,6 @@
 import logging
 import subprocess
-import utils
+from . import utils
 
 from jinja2 import Environment, FileSystemLoader
 

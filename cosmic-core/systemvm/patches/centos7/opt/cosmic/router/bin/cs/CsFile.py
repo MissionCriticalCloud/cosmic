@@ -122,7 +122,7 @@ class CsFile:
         logging.debug("Searching for %s string " % search)
 
         for index, line in enumerate(self.new_config):
-            print(' line = ' + line)
+            print((' line = ' + line))
             if line.lstrip().startswith(ignoreLinesStartWith):
                 continue
             if search in line:

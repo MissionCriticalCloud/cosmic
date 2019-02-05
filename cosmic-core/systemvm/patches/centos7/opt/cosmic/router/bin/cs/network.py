@@ -1,15 +1,15 @@
 import logging
 
-from conntrackd import Conntrackd
-from dhcp_service import DhcpService
-from dhcp_vm import DhcpVm
-from firewall import Firewall
-from keepalived import Keepalived
-from metadata_service import MetadataService
-from metadata_vm import MetadataVm
-from password_service import PasswordService
-from vpn import Vpn
-from rsyslog import Rsyslog
+from .conntrackd import Conntrackd
+from .dhcp_service import DhcpService
+from .dhcp_vm import DhcpVm
+from .firewall import Firewall
+from .keepalived import Keepalived
+from .metadata_service import MetadataService
+from .metadata_vm import MetadataVm
+from .password_service import PasswordService
+from .vpn import Vpn
+from .rsyslog import Rsyslog
 
 
 class Network:

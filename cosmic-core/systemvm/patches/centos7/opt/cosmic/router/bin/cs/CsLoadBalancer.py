@@ -1,8 +1,8 @@
 import logging
 
-import CsHelper
-from CsFile import CsFile
-from CsProcess import CsProcess
+from . import CsHelper
+from .CsFile import CsFile
+from .CsProcess import CsProcess
 
 HAPROXY_CONF_T = "/etc/haproxy/haproxy.cfg.new"
 HAPROXY_CONF_P = "/etc/haproxy/haproxy.cfg"
@@ -14,9 +14,9 @@ class CsLoadBalancer(object):
         self.dbag = self.config.dbag_loadbalancer
 
     def process(self):
-        if "config" not in self.dbag.keys():
+        if "config" not in list(self.dbag.keys()):
             return
-        if 'configuration' not in self.dbag['config'][0].keys():
+        if 'configuration' not in list(self.dbag['config'][0].keys()):
             return
         config = self.dbag['config'][0]['configuration']
         file1 = CsFile(HAPROXY_CONF_T)
@@ -66,7 +66,7 @@ class CsLoadBalancer(object):
             else:
                 for ingress_rule in ingress_rules:
                     ingress_cidrs = ingress_rule['cidr'].split(',')
-                    if 'first_port' in ingress_rule.keys() and 'type' in ingress_rule.keys() and ingress_rule[
+                    if 'first_port' in list(ingress_rule.keys()) and 'type' in list(ingress_rule.keys()) and ingress_rule[
                         'first_port'] == int(dstport) and ingress_rule['type'] == protocol:
                         for ingress_cidr in ingress_cidrs:
                             firewall.append(["filter", "",
@@ -83,7 +83,7 @@ class CsLoadBalancer(object):
             else:
                 for ingress_rule in ingress_rules:
                     ingress_cidrs = ingress_rule['cidr'].split(',')
-                    if 'first_port' in ingress_rule.keys() and ingress_rule['first_port'] == int(port):
+                    if 'first_port' in list(ingress_rule.keys()) and ingress_rule['first_port'] == int(port):
                         for ingress_cidr in ingress_cidrs:
                             firewall.append(["filter", "",
                                              "-A INPUT -i eth2 -s %s -p %s -d %s --dport %s -m state --state NEW -j ACCEPT" % (

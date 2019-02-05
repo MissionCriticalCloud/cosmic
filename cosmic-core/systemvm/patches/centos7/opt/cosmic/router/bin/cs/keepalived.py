@@ -6,7 +6,7 @@ import subprocess
 from jinja2 import Environment, FileSystemLoader
 from netaddr import IPNetwork, IPAddress
 
-import utils
+from . import utils
 
 
 class Keepalived:

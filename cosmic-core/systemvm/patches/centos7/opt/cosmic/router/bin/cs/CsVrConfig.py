@@ -3,7 +3,7 @@
 
 import logging
 
-import CsHelper
+from . import CsHelper
 from cs.CsFile import CsFile
 
 

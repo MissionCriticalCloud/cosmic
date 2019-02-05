@@ -3,7 +3,7 @@ from netaddr import *
 
 def merge(dbag, data):
     # always empty the databag as we will receive all new data
-    for key in dbag.keys():
+    for key in list(dbag.keys()):
         del dbag[key]
 
     for key in data:
@@ -20,7 +20,7 @@ def merge(dbag, data):
                 try:
                     net = IPNetwork(cidr)
                 except:
-                    print('[ERROR] So it seems we have a faulty CIDR in the source NAT list: ' + cidr)
+                    print(('[ERROR] So it seems we have a faulty CIDR in the source NAT list: ' + cidr))
                     exit(1)
 
             dbag[key] = data[key]
@@ -32,7 +32,7 @@ def merge(dbag, data):
                 try:
                     address = IPAddress(ip)
                 except:
-                    print('[ERROR] So it seems we have a faulty IP address in the syslog server list: ' + ip)
+                    print(('[ERROR] So it seems we have a faulty IP address in the syslog server list: ' + ip))
                     exit(1)
 
             dbag[key] = data[key]

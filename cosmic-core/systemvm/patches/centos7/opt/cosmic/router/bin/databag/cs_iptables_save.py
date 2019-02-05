@@ -19,7 +19,7 @@ License:    GNU General Public License version 3 or later
 
 Have Fun!
 """
-from __future__ import print_function
+
 
 try:
     from collections import UserDict
@@ -96,7 +96,7 @@ class Chains(UserDict):
             return
         if "-N" in action:
             new_chain_name = liste.pop(1)
-            existing = self.data.keys()
+            existing = list(self.data.keys())
             if new_chain_name in existing:
                 logging.debug("Chain %s already exists" % new_chain_name)
                 return
@@ -105,7 +105,7 @@ class Chains(UserDict):
             return
         if "-I" in action:  # or "-A" in action:
             chain_name = liste[1]
-            existing = self.data.keys()
+            existing = list(self.data.keys())
             if chain_name not in existing:
                 self.data[chain_name] = []
                 self.poli[chain_name] = "-"
@@ -115,7 +115,7 @@ class Chains(UserDict):
             return
         if "-A" in action:  # or "-I" in action:
             chain_name = liste[1]
-            existing = self.data.keys()
+            existing = list(self.data.keys())
             if chain_name not in existing:
                 self.data[chain_name] = []
                 self.poli[chain_name] = "-"
@@ -175,10 +175,10 @@ class Tables(UserDict):
                 len = self.data[key].length
                 if len > -1:
                     print("*%s" % (self.data[key].name), file=f)
-                    for chain in self.data[key].keys():
+                    for chain in list(self.data[key].keys()):
                         poli = self.data[key].poli[chain]
                         print(":%s %s [0:0]" % (chain, poli), file=f)
-                    for chain in self.data[key].values():
+                    for chain in list(self.data[key].values()):
                         elem = None
                         for elem in chain:
                             print(elem, file=f)

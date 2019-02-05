@@ -1,5 +1,5 @@
-import utils
-from CsDatabag import CsDatabag
+from . import utils
+from .CsDatabag import CsDatabag
 
 
 class Config:

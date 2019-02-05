@@ -2,7 +2,7 @@ import logging
 
 from jinja2 import Environment, FileSystemLoader
 
-import utils
+from . import utils
 
 
 class Firewall:

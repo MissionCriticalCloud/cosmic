@@ -53,15 +53,15 @@ class CsAcl(object):
             icmp_type = ''
             rule = self.rule
             icmp_type = "any"
-            if "icmp_type" in self.rule.keys() and self.rule['icmp_type'] != -1:
+            if "icmp_type" in list(self.rule.keys()) and self.rule['icmp_type'] != -1:
                 icmp_type = self.rule['icmp_type']
-            if "icmp_code" in self.rule.keys() and rule['icmp_code'] != -1:
+            if "icmp_code" in list(self.rule.keys()) and rule['icmp_code'] != -1:
                 icmp_type = "%s/%s" % (self.rule['icmp_type'], self.rule['icmp_code'])
             rnge = ''
-            if "first_port" in self.rule.keys() and \
+            if "first_port" in list(self.rule.keys()) and \
                             self.rule['first_port'] == self.rule['last_port']:
                 rnge = " --dport %s " % self.rule['first_port']
-            if "first_port" in self.rule.keys() and \
+            if "first_port" in list(self.rule.keys()) and \
                             self.rule['first_port'] != self.rule['last_port']:
                 rnge = " --dport %s:%s" % (rule['first_port'], rule['last_port'])
             if self.direction == 'ingress':
@@ -131,12 +131,12 @@ class CsAcl(object):
             self.netmask = obj['nic_netmask']
             self.config = config
             self.cidr = "%s/%s" % (self.ip, self.netmask)
-            if 'public_ip' in obj.keys():
+            if 'public_ip' in list(obj.keys()):
                 self.public_ip = obj['public_ip']
-            if "ingress_rules" in obj.keys():
+            if "ingress_rules" in list(obj.keys()):
                 self.ingress = obj['ingress_rules']
                 config.set_ingress_rules(self.ip, obj['ingress_rules'])
-            if "egress_rules" in obj.keys():
+            if "egress_rules" in list(obj.keys()):
                 self.egress = obj['egress_rules']
             self.fw = config.get_fw()
 
@@ -218,9 +218,9 @@ class CsAcl(object):
                 self.type = rule['type']
                 self.icmp_type = "any"
                 self.protocol = self.type
-                if "icmp_type" in rule.keys() and rule['icmp_type'] != -1:
+                if "icmp_type" in list(rule.keys()) and rule['icmp_type'] != -1:
                     self.icmp_type = rule['icmp_type']
-                if "icmp_code" in rule.keys() and rule['icmp_code'] != -1:
+                if "icmp_code" in list(rule.keys()) and rule['icmp_code'] != -1:
                     self.icmp_type = "%s/%s" % (self.icmp_type, rule['icmp_code'])
                 if self.type == "protocol":
                     if rule['protocol'] == 41:
@@ -228,11 +228,11 @@ class CsAcl(object):
                     self.protocol = rule['protocol']
                 self.action = "DROP"
                 self.dport = ""
-                if 'allowed' in rule.keys() and rule['allowed']:
+                if 'allowed' in list(rule.keys()) and rule['allowed']:
                     self.action = "ACCEPT"
-                if 'first_port' in rule.keys():
+                if 'first_port' in list(rule.keys()):
                     self.dport = "-m %s --dport %s" % (self.protocol, rule['first_port'])
-                if 'last_port' in rule.keys() and self.dport and \
+                if 'last_port' in list(rule.keys()) and self.dport and \
                                 rule['last_port'] != rule['first_port']:
                     self.dport = "%s:%s" % (self.dport, rule['last_port'])
 

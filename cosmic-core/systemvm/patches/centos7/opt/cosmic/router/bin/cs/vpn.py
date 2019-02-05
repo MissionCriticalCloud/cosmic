@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 from jinja2 import Environment, FileSystemLoader
-import utils
+from . import utils
 
 
 class Vpn:
@@ -214,7 +214,7 @@ class Vpn:
         connected_users = self.get_connected_users()
         if connected_users is None:
             return
-        for pid, username in connected_users.iteritems():
+        for pid, username in connected_users.items():
             user_active = False
             for vpn_user in remote_access['vpn_users']:
                 if vpn_user == username:

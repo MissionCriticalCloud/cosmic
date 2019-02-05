@@ -1,9 +1,9 @@
 import logging
 import time
-import urllib
-import urllib2
-import CsHelper
-from CsProcess import CsProcess
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+from . import CsHelper
+from .CsProcess import CsProcess
 
 
 class CsPasswordServiceVMConfig:
@@ -44,9 +44,9 @@ class CsPasswordServiceVMConfig:
                         url = "http://{SERVER_IP}:8080/".format(SERVER_IP=ip)
                         headers = {'DomU_Request': 'save_password'}
                         params = {'ip': vm_ip, 'password': password, 'token': token}
-                        req = urllib2.Request(url, urllib.urlencode(params), headers=headers)
+                        req = urllib.request.Request(url, urllib.parse.urlencode(params), headers=headers)
                         try:
-                            res = urllib2.urlopen(req).read()
+                            res = urllib.request.urlopen(req).read()
                             if res.code == 200:
                                 logging.debug("Update password server result ==> %s" % res)
                                 return res

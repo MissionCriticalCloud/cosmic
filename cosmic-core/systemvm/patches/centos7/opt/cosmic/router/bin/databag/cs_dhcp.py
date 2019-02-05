@@ -19,7 +19,7 @@ def search(dbag, mac_address):
     for o in dbag:
         if o == 'id':
             continue
-        print("%s %s" % (dbag[o]['mac_address'], mac_address))
+        print(("%s %s" % (dbag[o]['mac_address'], mac_address)))
         if dbag[o]['mac_address'] == mac_address:
             hosts.append(o)
     for o in hosts:

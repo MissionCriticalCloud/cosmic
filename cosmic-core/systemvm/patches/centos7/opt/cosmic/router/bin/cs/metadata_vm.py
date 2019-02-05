@@ -53,7 +53,7 @@ class MetadataVm:
         manifest_filename = os.path.join(metadata_dir, "meta-data")
         manifest_file = open(manifest_filename, "w")
 
-        for filename, data in metadata.items():
+        for filename, data in list(metadata.items()):
             manifest_file.write("{}\n".format(filename))
             file = open(os.path.join(metadata_dir, filename), "w")
             if data is not None:
@@ -66,7 +66,7 @@ class MetadataVm:
     def write_vm_user_data(self, ipv4_address, user_data):
         user_data_dir = os.path.join(self.user_data_folder, ipv4_address)
 
-        for filename, data in user_data.items():
+        for filename, data in list(user_data.items()):
             file = open(os.path.join(user_data_dir, filename), "w")
             if data is not None:
                 file.write(base64.b64decode(data))

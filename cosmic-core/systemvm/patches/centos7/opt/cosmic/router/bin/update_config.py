@@ -5,10 +5,10 @@ import logging
 import os.path
 import sys
 
-import configure
-from cs.CsHelper import mkdir
-from cs.CsPasswordService import CsPasswordServiceVMConfig
-from databag.merge import QueueFile
+from . import configure
+from .cs.CsHelper import mkdir
+from .cs.CsPasswordService import CsPasswordServiceVMConfig
+from .databag.merge import QueueFile
 
 OCCURRENCES = 1
 

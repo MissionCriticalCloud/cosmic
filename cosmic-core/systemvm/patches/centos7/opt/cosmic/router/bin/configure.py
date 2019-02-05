@@ -4,15 +4,15 @@ import logging
 import sys
 from collections import OrderedDict
 
-from cs.CsAcl import CsAcl
-from cs.CsForwardingRules import CsForwardingRules
-from cs.CsLoadBalancer import CsLoadBalancer
-from cs.CsNetfilter import CsNetfilters
-from cs.CsVrConfig import CsVrConfig
-from cs.config import Config
-from cs.firewall import Firewall
-from cs.network import Network
-from cs.virtual_machine import VirtualMachine
+from .cs.CsAcl import CsAcl
+from .cs.CsForwardingRules import CsForwardingRules
+from .cs.CsLoadBalancer import CsLoadBalancer
+from .cs.CsNetfilter import CsNetfilters
+from .cs.CsVrConfig import CsVrConfig
+from .cs.config import Config
+from .cs.firewall import Firewall
+from .cs.network import Network
+from .cs.virtual_machine import VirtualMachine
 
 OCCURRENCES = 1
 

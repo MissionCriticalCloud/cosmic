@@ -1,9 +1,9 @@
-from __future__ import print_function
+
 
 import logging
 from subprocess import Popen, PIPE
 
-import CsHelper
+from . import CsHelper
 from databag.cs_iptables_save import Tables
 
 
@@ -14,7 +14,7 @@ class CsChain(object):
         self.count = { }
 
     def add(self, table, chain):
-        if table not in self.chain.keys():
+        if table not in list(self.chain.keys()):
             self.chain.setdefault(table, []).append(chain)
         else:
             self.chain[table].append(chain)
@@ -26,7 +26,7 @@ class CsChain(object):
         self.count[chain] += 1
 
     def get(self, table):
-        if table not in self.chain.keys():
+        if table not in list(self.chain.keys()):
             return { }
         return self.chain[table]
 
@@ -37,7 +37,7 @@ class CsChain(object):
         return self.last_added
 
     def has_chain(self, table, chain):
-        if table not in self.chain.keys():
+        if table not in list(self.chain.keys()):
             return False
         if chain not in self.chain[table]:
             return False
@@ -223,7 +223,7 @@ class CsNetfilter(object):
         self.seen = True
 
     def __convert_to_dict(self, rule):
-        rule = unicode(rule.lstrip())
+        rule = str(rule.lstrip())
         rule = rule.replace('! -', '!_-')
         rule = rule.replace('-p all', '')
         rule = rule.replace('  ', ' ')
@@ -234,8 +234,8 @@ class CsNetfilter(object):
         rule = rule.replace('-m state', '-m2 state')
         rule = rule.replace('ESTABLISHED,RELATED', 'RELATED,ESTABLISHED')
         bits = rule.split(' ')
-        rule = dict(zip(bits[0::2], bits[1::2]))
-        if "-A" in rule.keys():
+        rule = dict(list(zip(bits[0::2], bits[1::2])))
+        if "-A" in list(rule.keys()):
             self.chain = rule["-A"]
         return rule
 
@@ -270,7 +270,7 @@ class CsNetfilter(object):
                  '--to-source', '--to-destination', '--mark']
         str = ''
         for k in order:
-            if k in self.rule.keys():
+            if k in list(self.rule.keys()):
                 printable = k.replace('-m2', '-m')
                 printable = printable.replace('!_-', '! -')
                 if delete:
@@ -287,7 +287,7 @@ class CsNetfilter(object):
             return False
         if rule.get_chain() != self.get_chain():
             return False
-        if len(rule.get_rule().items()) != len(self.get_rule().items()):
+        if len(list(rule.get_rule().items())) != len(list(self.get_rule().items())):
             return False
         common = set(rule.get_rule().items()) & set(self.get_rule().items())
         if len(common) != len(rule.get_rule()):
