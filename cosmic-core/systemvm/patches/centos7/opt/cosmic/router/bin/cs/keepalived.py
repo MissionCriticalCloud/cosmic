@@ -125,11 +125,25 @@ class Keepalived:
         else:
             unicast_src = None
             unicast_peer = None
+        # FIXME: Fix for keepalived version < 1.4, it needs more than one vrrp_instance (https://github.com/acassen/keepalived/issues/594)
+        self.write_vrrp_instance(
+            name='dummy',
+            state='BACKUP',
+            interface=sync_interface_name,
+            network={ },
+            virtual_router_id=int(self.routes_vrrp_id) + 1,
+            advert_int=self.config.get_advert_int(),
+            advert_method=self.config.get_advert_method(),
+            virtual_routes=[],
+            unicast_src=unicast_src,
+            unicast_peer=unicast_peer,
+            virtual_ipaddress=[]
+        )
         self.write_vrrp_instance(
             name='routes',
             state='BACKUP',
             interface=sync_interface_name,
-            network={},
+            network={ },
             virtual_router_id=self.routes_vrrp_id,
             advert_int=self.config.get_advert_int(),
             advert_method=self.config.get_advert_method(),
