@@ -545,6 +545,10 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         return this.libvirtComputingResourceProperties.getVmMigrateSpeedAcrossCluster();
     }
 
+    public int getVmBlockCopySpeed() {
+        return this.libvirtComputingResourceProperties.getVmBlockCopySpeed();
+    }
+
     public String getPingTestPath() {
         return this.pingTestPath;
     }

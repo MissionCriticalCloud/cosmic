@@ -831,6 +831,7 @@ public class AgentConfiguration {
             @NotNull private Integer pauseafter = 120000;
             @NotNull private Integer speed = 0;
             @NotNull private Integer speedAcrossCluster = 0;
+            @NotNull private Integer blockCopySpeed = 0;
 
             public Integer getDowntime() {
                 return downtime;
@@ -862,6 +863,14 @@ public class AgentConfiguration {
 
             public void setSpeedAcrossCluster(final Integer speedAcrossCluster) {
                 this.speedAcrossCluster = speedAcrossCluster;
+            }
+
+            public Integer getBlockCopySpeed() {
+                return blockCopySpeed;
+            }
+
+            public void setBlockCopySpeed(final Integer blockCopySpeed) {
+                this.blockCopySpeed = blockCopySpeed;
             }
         }
     }

@@ -30,6 +30,7 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_PAUSEAFTER;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_SPEED;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_SPEED_ACROSS_CLUSTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_MIGRATE_BLOCK_COPY_SPEED;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_RNG_PATH;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.DEFAULT_VM_VIDEO_RAM;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.FORMAT_PRIVATE_BRIDGE_NAME;
@@ -76,6 +77,7 @@ import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Co
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_SPEED;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_SPEED_ACROSS_CLUSTER;
+import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_MIGRATE_BLOCK_COPY_SPEED;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_RNG_ENABLE;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_RNG_MODEL;
 import static com.cloud.agent.resource.kvm.LibvirtComputingResourceProperties.Constants.PROPERTY_KEY_VM_RNG_PATH;
@@ -158,6 +160,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
     private int vmMigratePauseafter = DEFAULT_VM_MIGRATE_PAUSEAFTER;
     private int vmMigrateSpeed = DEFAULT_VM_MIGRATE_SPEED;
     private int vmMigrateSpeedAcrossCluster = DEFAULT_VM_MIGRATE_SPEED_ACROSS_CLUSTER;
+    private int vmBlockCopySpeed = DEFAULT_VM_MIGRATE_BLOCK_COPY_SPEED;
     private String zone = DEFAULT_ZONE;
 
     private String termPolicyCrashSystem = DEFAULT_TERMPOLICY_CRASH_SYSTEM;
@@ -214,6 +217,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         this.vmMigrateSpeed = parse(properties, PROPERTY_KEY_VM_MIGRATE_SPEED, this.vmMigrateSpeed);
         this.vmMigrateSpeedAcrossCluster = parse(properties, PROPERTY_KEY_VM_MIGRATE_SPEED_ACROSS_CLUSTER, this.vmMigrateSpeedAcrossCluster);
         this.zone = parse(properties, PROPERTY_KEY_ZONE, this.zone);
+        this.vmBlockCopySpeed = parse(properties, PROPERTY_KEY_VM_MIGRATE_BLOCK_COPY_SPEED, this.vmBlockCopySpeed);
 
         this.hypervisorType = parse(properties, PROPERTY_KEY_HYPERVISOR_TYPE, this.hypervisorType, HypervisorType.class);
         this.networkBridgeType = parse(properties, PROPERTY_KEY_NETWORK_BRIDGE_TYPE, this.networkBridgeType, BridgeType.class);
@@ -291,6 +295,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         propertiesMap.put(PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER, this.vmMigratePauseafter);
         propertiesMap.put(PROPERTY_KEY_VM_MIGRATE_SPEED, this.vmMigrateSpeed);
         propertiesMap.put(PROPERTY_KEY_VM_MIGRATE_SPEED_ACROSS_CLUSTER, this.vmMigrateSpeedAcrossCluster);
+        propertiesMap.put(PROPERTY_KEY_VM_MIGRATE_BLOCK_COPY_SPEED, this.vmBlockCopySpeed);
         propertiesMap.put(PROPERTY_KEY_ZONE, this.zone);
         return propertiesMap;
     }
@@ -427,6 +432,10 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         return vmMigrateSpeedAcrossCluster;
     }
 
+    public int getVmBlockCopySpeed() {
+        return vmBlockCopySpeed;
+    }
+
     public List<String> getGuestCpuFeatures() {
         return this.guestCpuFeatures;
     }
@@ -543,7 +552,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final String PROPERTY_KEY_VM_MIGRATE_PAUSEAFTER = "vm.migrate.pauseafter";
         public static final String PROPERTY_KEY_VM_MIGRATE_SPEED = "vm.migrate.speed";
         public static final String PROPERTY_KEY_VM_MIGRATE_SPEED_ACROSS_CLUSTER = "vm.migrate.speedacrosscluster";
-
+        public static final String PROPERTY_KEY_VM_MIGRATE_BLOCK_COPY_SPEED = "vm.migrate.blockcopyspeed";
         public static final String PROPERTY_KEY_TERMPOLICY_CRASH_SYSTEM = "termpolicy.system.oncrash";
         public static final String PROPERTY_KEY_TERMPOLICY_POWEROFF_SYSTEM = "termpolicy.system.onpoweroff";
         public static final String PROPERTY_KEY_TERMPOLICY_REBOOT_SYSTEM = "termpolicy.system.onreboot";
@@ -577,6 +586,7 @@ public class LibvirtComputingResourceProperties implements PropertiesPojo {
         public static final int DEFAULT_VM_MIGRATE_PAUSEAFTER = -1;
         public static final int DEFAULT_VM_MIGRATE_SPEED = -1;
         public static final int DEFAULT_VM_MIGRATE_SPEED_ACROSS_CLUSTER = 0;
+        public static final int DEFAULT_VM_MIGRATE_BLOCK_COPY_SPEED = 0;
 
         public static final String DEFAULT_TERMPOLICY_CRASH_SYSTEM = "restart";
         public static final String DEFAULT_TERMPOLICY_POWEROFF_SYSTEM = "destroy";
