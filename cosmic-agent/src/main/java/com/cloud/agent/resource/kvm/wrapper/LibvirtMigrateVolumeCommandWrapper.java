@@ -92,7 +92,7 @@ public final class LibvirtMigrateVolumeCommandWrapper extends LibvirtCommandWrap
                 disk.setDiskPath(newVolumePath);
 
                 logger.debug("Starting block copy for domain " + dm.getName() + " from " + currentVolumePath + " to " + newVolumePath);
-                dm.blockCopy(currentVolumePath, disk.toString(), new DomainBlockCopyParameters(), 0);
+                dm.blockCopy(currentVolumePath, disk.toString(), new DomainBlockCopyParameters(), libvirtComputingResource.getVmBlockCopySpeed());
             } else {
                 throw new LibvirtException("Couldn't find disk: " + command.getVolumePath() + " on vm: " + dm.getName());
             }
