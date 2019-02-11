@@ -3,7 +3,7 @@
 
     <groupId>cloud.cosmic</groupId>
     <artifactId>cosmic</artifactId>
-    <version>6.2.7-SNAPSHOT</version>
+    <version>6.2.7</version>
     <packaging>pom</packaging>
     <name>Cosmic</name>
     <description>Cosmic is an IaaS (“Infrastructure as a Service”) cloud orchestration platform.</description>
@@ -12,7 +12,7 @@
     <scm>
         <connection>scm:git:git@github.com:MissionCriticalCloud/cosmic.git</connection>
         <developerConnection>scm:git:git@github.com:MissionCriticalCloud/cosmic.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>cosmic-6.2.7</tag>
     </scm>
 
     <distributionManagement>
