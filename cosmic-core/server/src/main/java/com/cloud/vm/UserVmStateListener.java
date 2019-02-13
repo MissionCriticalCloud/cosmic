@@ -93,16 +93,30 @@ public class UserVmStateListener implements StateListener<State, VirtualMachine.
             return; // no provider is configured to provide events bus, so just return
         }
 
-        final String resourceName = getEntityFromClassName(VirtualMachine.class.getName());
-        final com.cloud.framework.events.Event eventMsg =
-                new com.cloud.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
-                        vo.getUuid());
         final Map<String, String> eventDescription = new HashMap<>();
+        final String resourceName = getEntityFromClassName(VirtualMachine.class.getName());
+        String topic = "cosmic";
         eventDescription.put("resource", resourceName);
         eventDescription.put("id", vo.getUuid());
-        eventDescription.put("old-state", oldState.name());
-        eventDescription.put("new-state", newState.name());
         eventDescription.put("status", status);
+        eventDescription.put("event", event);
+        eventDescription.put("vm_name", vo.getHostName());
+
+        // State changed: Publish to DNS topic
+        if (oldState != null && !oldState.equals(newState)) {
+            topic = "cosmic_dns";
+            eventDescription.put("ip_address", vo.getPrivateIpAddress());
+            eventDescription.put("mac_address", vo.getPrivateMacAddress());
+            eventDescription.put("state", newState.name());
+        } else {
+            // State unchanged: publish to default topic
+            eventDescription.put("old-state", oldState.name());
+            eventDescription.put("new-state", newState.name());
+        }
+
+        final com.cloud.framework.events.Event eventMsg =
+                new com.cloud.framework.events.Event(ManagementService.Name, EventCategory.RESOURCE_STATE_CHANGE_EVENT.getName(), event, resourceName,
+                        vo.getUuid(), topic);
 
         final String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
         eventDescription.put("eventDateTime", eventDate);

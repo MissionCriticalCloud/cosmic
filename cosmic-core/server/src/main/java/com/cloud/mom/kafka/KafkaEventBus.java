@@ -7,8 +7,10 @@ import com.cloud.framework.events.EventSubscriber;
 import com.cloud.framework.events.EventTopic;
 import com.cloud.utils.PropertiesUtil;
 import com.cloud.utils.component.ManagerBase;
+import com.cloud.vm.dao.VMInstanceDao;
 
 import javax.ejb.Local;
+import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 import java.io.FileInputStream;
 import java.util.Map;
@@ -24,7 +26,10 @@ import org.slf4j.LoggerFactory;
 @Local(value = EventBus.class)
 public class KafkaEventBus extends ManagerBase implements EventBus {
 
-    private final String _topic = "cosmic";
+    @Inject
+    public VMInstanceDao _vmDao;
+
+    private String defaultTopic = "cosmic";
     private Producer<String,String> _producer;
     private static final Logger s_logger = LoggerFactory.getLogger(KafkaEventBus.class);
     @Override
@@ -64,7 +69,13 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
 
     @Override
     public void publish(Event event) throws EventBusException {
-        ProducerRecord<String, String> record = new ProducerRecord<String,String>(_topic, event.getResourceUUID(), event.getDescription());
+
+        String topic = getDefaultTopic();
+        if (event.getTopic() != null) {
+            topic = event.getTopic();
+        }
+
+        ProducerRecord<String, String> record = new ProducerRecord<String,String>(topic, event.getResourceUUID(), event.getDescription());
         _producer.send(record);
     }
 
@@ -81,5 +92,9 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
     @Override
     public boolean stop() {
         return true;
+    }
+
+    public String getDefaultTopic() {
+        return defaultTopic;
     }
 }
