@@ -138,10 +138,24 @@ class PasswordRequestHandler(BaseHTTPRequestHandler):
                 'serve_password[%s]: non-localhost IP trying to save password: %s' % (listeningAddress, clientAddress))
             self.send_response(403)
             return
-        if 'ip' not in form or 'password' not in form or 'token' not in form or self.headers.get(
-                'DomU_Request') != 'save_password':
+        if 'ip' not in form:
             syslog.syslog(
-                'serve_password[%s]: request trying to save password does not contain both ip and password' % listeningAddress)
+                'serve_password[%s]: request trying to save password does not contain ip' % listeningAddress)
+            self.send_response(403)
+            return
+        if 'password' not in form:
+            syslog.syslog(
+                'serve_password[%s]: request trying to save password does not contain password' % listeningAddress)
+            self.send_response(403)
+            return
+        if 'token' not in form:
+            syslog.syslog(
+                'serve_password[%s]: request trying to save password does not contain token' % listeningAddress)
+            self.send_response(403)
+            return
+        if self.headers.get('DomU_Request') != 'save_password':
+            syslog.syslog(
+                'serve_password[%s]: request trying to save password does not contain correct Header (DomU_Request:save_password)' % listeningAddress)
             self.send_response(403)
             return
         token = form['token'].value
@@ -156,9 +170,13 @@ class PasswordRequestHandler(BaseHTTPRequestHandler):
             syslog.syslog('serve_password[%s]: empty ip/password[%s/%s] received from savepassword' % (
                 listeningAddress, ip, password))
             return
-        syslog.syslog('serve_password[%s]: password saved for VM IP %s' % (listeningAddress, ip))
-        setPassword(ip, password)
-        savePasswordFile()
+        if password != 'saved_password':
+            syslog.syslog('serve_password[%s]: password saved for VM IP %s' % (listeningAddress, ip))
+            setPassword(ip, password)
+            savePasswordFile()
+        else:
+            syslog.syslog('serve_password[%s]: not saving default password for VM IP %s' % (
+                listeningAddress, ip))
         return
 
     def log_message(self, format, *args):

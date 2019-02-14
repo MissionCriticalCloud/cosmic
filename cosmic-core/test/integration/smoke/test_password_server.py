@@ -9,7 +9,8 @@ from marvin.cloudstackAPI import (
     createNetworkACL,
     replaceNetworkACLList,
     restartVPC,
-    restartNetwork
+    restartNetwork,
+    updateTemplate
 )
 from marvin.lib.base import (
     Network,
@@ -49,7 +50,7 @@ class TestPasswordService(cloudstackTestCase):
         cls.services['mode'] = cls.zone.networktype
         cls.template = get_template(
             cls.api_client,
-            cls.zone.id
+            cls.zone.id,
         )
 
         cls.services["virtual_machine"]["zoneid"] = cls.zone.id
@@ -100,6 +101,9 @@ class TestPasswordService(cloudstackTestCase):
 
     # Generic methods
     def perform_password_service_tests(self, vpc_off):
+        self.enable_template_password(
+            template_id=self.template.id,
+            passwordenabled=True)
         self.logger.debug("Creating VPC with offering ID %s" % vpc_off.id)
         vpc_1 = self.createVPC(vpc_off, cidr='10.0.0.0/16')
         self.logger.debug("Creating network inside VPC")
@@ -127,6 +131,9 @@ class TestPasswordService(cloudstackTestCase):
         for router in routers:
             if router.redundantstate == 'MASTER' or len(routers) == 1:
                 self._perform_password_service_test(router, network_1)
+        self.enable_template_password(
+            template_id=self.template.id,
+            passwordenabled=False)
 
     def wait_vm_ready(self, router, vmip):
         self.logger.debug("Check whether VM %s is up" % vmip)
@@ -410,6 +417,16 @@ class TestPasswordService(cloudstackTestCase):
             self.api_client.restartNetwork(cmd)
         except Exception, e:
             self.fail('Unable to restart network with cleanup due to %s ' % e)
+
+    def enable_template_password(self, template_id, passwordenabled=True):
+        try:
+            self.logger.debug("Updating template %s setting passwordenabled to %s" % (template_id, passwordenabled))
+            cmd = updateTemplate.updateTemplateCmd()
+            cmd.id = template_id
+            cmd.passwordenabled = passwordenabled
+            self.api_client.updateTemplate(cmd)
+        except Exception, e:
+            self.fail('Unable to update template due to %s ' % e)
 
     def get_router_state(self, router):
         host = self.get_host_details(router)

@@ -11,10 +11,9 @@ class CsPasswordServiceVMConfig:
 
     def __init__(self, dbag):
         self.dbag = dbag
-        self.process()
 
     def process(self):
-        self.__update(self.dbag['ip_address'], self.dbag['password'])
+        return self.__update(self.dbag['ip_address'], self.dbag['password'])
 
     def __update(self, vm_ip, password):
         token = ""
@@ -46,12 +45,14 @@ class CsPasswordServiceVMConfig:
                         params = {'ip': vm_ip, 'password': password, 'token': token}
                         req = urllib2.Request(url, urllib.urlencode(params), headers=headers)
                         try:
-                            res = urllib2.urlopen(req).read()
-                            if res.code == 200:
-                                logging.debug("Update password server result ==> %s" % res)
-                                return res
+                            res = urllib2.urlopen(req)
+                            if res.getcode() == 200:
+                                logging.debug("Update password server result ==> %s" % res.read())
+                                return 0
                         except Exception as e:
                             logging.debug("Error while querying password server ==> %s" % e.message)
+                            return 1
+
 
                     test_tries += 1
                     logging.debug("Testing password server process round %s/%s" % (test_tries, max_tries))
@@ -59,3 +60,7 @@ class CsPasswordServiceVMConfig:
 
                 logging.debug("Update password server skipped because we didn't find a passwd server process for "
                               "%s (makes sense on backup routers)" % ip)
+                return 1
+
+        # on a non-master router no passwords to set, so we finish with success
+        return 0

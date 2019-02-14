@@ -56,7 +56,10 @@ def process_vmpasswd():
     logging.info("process_vmpassword")
     qf = process(False)
     logging.info("Sending password to password server")
-    CsPasswordServiceVMConfig(qf.getData())
+    returncode = CsPasswordServiceVMConfig(qf.getData()).process()
+    # TODO: use the returncode as exit code, but for now we just log the exit code
+    logging.info("The vmpassword processing ended with exit code %d" % returncode)
+    #sys.exit(returncode)
 
 
 filename = min(glob.iglob(jsonCmdConfigPath + '*'), key=os.path.getctime)
