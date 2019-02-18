@@ -42,7 +42,13 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
             props.load(is);
             is.close();
         } catch (Exception e) {
-            throw new ConfigurationException("Could not read Kafka properties. Please check /cosmic/management/kafka.producer.properties");
+            // Fallback to default properties
+            props.setProperty("bootstrap.servers", "192.168.22.1:9092");
+            props.setProperty("acks", "all");
+            props.setProperty("retries", "1");
+            props.setProperty("topic", "cosmic");
+            props.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+            props.setProperty("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         }
 
         _producer = new KafkaProducer<String,String>(props);
