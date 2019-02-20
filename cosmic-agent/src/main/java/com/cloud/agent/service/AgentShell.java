@@ -155,6 +155,7 @@ public class AgentShell {
 
     private static <K, V> Map<K, V> addNotNull(final Map<K, V> map, final K key, final V value) {
         if (value != null) {
+            logger.debug("Resource: {} = {}", key, value);
             map.put(key, value);
         }
 
