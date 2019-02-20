@@ -488,6 +488,8 @@ public class UserVmData {
         private String type;
         private Boolean isDefault;
         private String macAddress;
+        private String mirrorIpAddress;
+        private Long mirrorKey;
 
         public String getObjectName() {
             return objectName;
@@ -583,6 +585,22 @@ public class UserVmData {
 
         public void setMacAddress(final String macAddress) {
             this.macAddress = macAddress;
+        }
+
+        public String getMirrorIpAddress() {
+            return mirrorIpAddress;
+        }
+
+        public void setMirrorIpAddress(final String mirrorIpAddress) {
+            this.mirrorIpAddress = mirrorIpAddress;
+        }
+
+        public Long getMirrorKey() {
+            return mirrorKey;
+        }
+
+        public void setMirrorKey(final Long mirrorKey) {
+            this.mirrorKey = mirrorKey;
         }
 
         @Override

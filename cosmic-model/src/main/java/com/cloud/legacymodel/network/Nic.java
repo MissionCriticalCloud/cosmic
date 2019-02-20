@@ -62,6 +62,10 @@ public interface Nic extends Identity, InternalIdentity {
 
     URI getBroadcastUri();
 
+    String getMirrorIpAddress();
+
+    Long getMirrorKey();
+
     VirtualMachineType getVmType();
 
     IpAddressFormat getAddressFormat();

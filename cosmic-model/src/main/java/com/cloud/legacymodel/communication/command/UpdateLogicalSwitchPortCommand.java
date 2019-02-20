@@ -6,14 +6,19 @@ public class UpdateLogicalSwitchPortCommand extends Command {
     private final String attachmentUuid;
     private final String ownerName;
     private final String nicName;
+    private final String mirrorIpAddress;
+    private final Long mirrorKey;
+
 
     public UpdateLogicalSwitchPortCommand(final String logicalSwitchPortUuid, final String logicalSwitchUuid, final String attachmentUuid, final String ownerName,
-                                          final String nicName) {
+                                          final String nicName, final String mirrorIpAddress, final Long mirrorKey) {
         this.logicalSwitchUuid = logicalSwitchUuid;
         this.logicalSwitchPortUuid = logicalSwitchPortUuid;
         this.attachmentUuid = attachmentUuid;
         this.ownerName = ownerName;
         this.nicName = nicName;
+        this.mirrorIpAddress = mirrorIpAddress;
+        this.mirrorKey = mirrorKey;
     }
 
     public String getLogicalSwitchUuid() {
@@ -34,6 +39,14 @@ public class UpdateLogicalSwitchPortCommand extends Command {
 
     public String getNicName() {
         return nicName;
+    }
+
+    public String getMirrorIpAddress() {
+        return mirrorIpAddress;
+    }
+
+    public Long getMirrorKey() {
+        return mirrorKey;
     }
 
     @Override

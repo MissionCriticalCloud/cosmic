@@ -205,68 +205,14 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         }
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.nics)) {
-            final long nic_id = userVm.getNicId();
-            if (nic_id > 0) {
-                final NicResponse nicResponse = new NicResponse();
-                nicResponse.setId(userVm.getNicUuid());
-                nicResponse.setIpaddress(userVm.getIpAddress());
-                nicResponse.setGateway(userVm.getGateway());
-                nicResponse.setNetmask(userVm.getNetmask());
-                nicResponse.setNetworkid(userVm.getNetworkUuid());
-                nicResponse.setNetworkName(userVm.getNetworkName());
-                nicResponse.setMacAddress(userVm.getMacAddress());
-                nicResponse.setIp6Address(userVm.getIp6Address());
-                nicResponse.setIp6Gateway(userVm.getIp6Gateway());
-                nicResponse.setIp6Cidr(userVm.getIp6Cidr());
-                if (userVm.getBroadcastUri() != null) {
-                    nicResponse.setBroadcastUri(userVm.getBroadcastUri().toString());
-                }
-                if (userVm.getIsolationUri() != null) {
-                    nicResponse.setIsolationUri(userVm.getIsolationUri().toString());
-                }
-                if (userVm.getTrafficType() != null) {
-                    nicResponse.setTrafficType(userVm.getTrafficType().toString());
-                }
-                if (userVm.getGuestType() != null) {
-                    nicResponse.setType(userVm.getGuestType().toString());
-                }
-                nicResponse.setIsDefault(userVm.isDefaultNic());
-                final List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(userVm.getNicId());
-                if (secondaryIps != null) {
-                    final List<NicSecondaryIpResponse> ipList = new ArrayList<>();
-                    for (final NicSecondaryIpVO ip : secondaryIps) {
-                        final NicSecondaryIpResponse ipRes = new NicSecondaryIpResponse();
-                        ipRes.setId(ip.getUuid());
-                        ipRes.setIpAddr(ip.getIp4Address());
-                        ipList.add(ipRes);
-                    }
-                    nicResponse.setSecondaryIps(ipList);
-                }
-                nicResponse.setObjectName("nic");
-                userVmResponse.addNic(nicResponse);
-            }
+            createUserVmNicResponse(userVm, userVmResponse);
         }
 
         // update tag information
-        final long tag_id = userVm.getTagId();
-        if (tag_id > 0 && !userVmResponse.containTag(tag_id)) {
-            final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
-            if (vtag != null) {
-                userVmResponse.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
-            }
-        }
+        createUserVmTagsResponse(userVmResponse, userVm);
 
         if (details.contains(VMDetails.all) || details.contains(VMDetails.affgrp)) {
-            final Long affinityGroupId = userVm.getAffinityGroupId();
-            if (affinityGroupId != null && affinityGroupId.longValue() != 0) {
-                final AffinityGroupResponse resp = new AffinityGroupResponse();
-                resp.setId(userVm.getAffinityGroupUuid());
-                resp.setName(userVm.getAffinityGroupName());
-                resp.setDescription(userVm.getAffinityGroupDescription());
-                resp.setObjectName("affinitygroup");
-                resp.setAccountName(userVm.getAccountName());
-                userVmResponse.addAffinityGroup(resp);
-            }
+            createUserVmAffinityResponse(userVm, userVmResponse);
         }
 
         // set resource details map
@@ -288,35 +234,53 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         return userVmResponse;
     }
 
-    @Override
-    public UserVmResponse setUserVmResponse(final ResponseView view, final UserVmResponse userVmData, final UserVmJoinVO uvo) {
-        final long nic_id = uvo.getNicId();
+    private void createUserVmAffinityResponse(final UserVmJoinVO userVm, final UserVmResponse userVmResponse) {
+        final Long affinityGroupId = userVm.getAffinityGroupId();
+        if (affinityGroupId != null && affinityGroupId.longValue() != 0) {
+            final AffinityGroupResponse resp = new AffinityGroupResponse();
+            resp.setId(userVm.getAffinityGroupUuid());
+            resp.setName(userVm.getAffinityGroupName());
+            resp.setDescription(userVm.getAffinityGroupDescription());
+            resp.setObjectName("affinitygroup");
+            resp.setAccountName(userVm.getAccountName());
+            userVmResponse.addAffinityGroup(resp);
+        }
+    }
+
+    private void createUserVmNicResponse(final UserVmJoinVO userVm, final UserVmResponse userVmResponse) {
+        final long nic_id = userVm.getNicId();
         if (nic_id > 0) {
             final NicResponse nicResponse = new NicResponse();
-            nicResponse.setId(uvo.getNicUuid());
-            nicResponse.setIpaddress(uvo.getIpAddress());
-            nicResponse.setGateway(uvo.getGateway());
-            nicResponse.setNetmask(uvo.getNetmask());
-            nicResponse.setNetworkid(uvo.getNetworkUuid());
-            nicResponse.setNetworkName(uvo.getNetworkName());
-            nicResponse.setMacAddress(uvo.getMacAddress());
-            nicResponse.setIp6Address(uvo.getIp6Address());
-            nicResponse.setIp6Gateway(uvo.getIp6Gateway());
-            nicResponse.setIp6Cidr(uvo.getIp6Cidr());
-            if (uvo.getBroadcastUri() != null) {
-                nicResponse.setBroadcastUri(uvo.getBroadcastUri().toString());
+            nicResponse.setId(userVm.getNicUuid());
+            nicResponse.setIpaddress(userVm.getIpAddress());
+            nicResponse.setGateway(userVm.getGateway());
+            nicResponse.setNetmask(userVm.getNetmask());
+            nicResponse.setNetworkid(userVm.getNetworkUuid());
+            nicResponse.setNetworkName(userVm.getNetworkName());
+            nicResponse.setMacAddress(userVm.getMacAddress());
+            nicResponse.setIp6Address(userVm.getIp6Address());
+            nicResponse.setIp6Gateway(userVm.getIp6Gateway());
+            nicResponse.setIp6Cidr(userVm.getIp6Cidr());
+            if (userVm.getBroadcastUri() != null) {
+                nicResponse.setBroadcastUri(userVm.getBroadcastUri().toString());
             }
-            if (uvo.getIsolationUri() != null) {
-                nicResponse.setIsolationUri(uvo.getIsolationUri().toString());
+            if (userVm.getIsolationUri() != null) {
+                nicResponse.setIsolationUri(userVm.getIsolationUri().toString());
             }
-            if (uvo.getTrafficType() != null) {
-                nicResponse.setTrafficType(uvo.getTrafficType().toString());
+            if (userVm.getMirrorIpAddress() != null) {
+                nicResponse.setMirrorIpAddress(userVm.getMirrorIpAddress());
             }
-            if (uvo.getGuestType() != null) {
-                nicResponse.setType(uvo.getGuestType().toString());
+            if (userVm.getMirrorKey() != null) {
+                nicResponse.setMirrorKey(userVm.getMirrorKey());
             }
-            nicResponse.setIsDefault(uvo.isDefaultNic());
-            final List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(uvo.getNicId());
+            if (userVm.getTrafficType() != null) {
+                nicResponse.setTrafficType(userVm.getTrafficType().toString());
+            }
+            if (userVm.getGuestType() != null) {
+                nicResponse.setType(userVm.getGuestType().toString());
+            }
+            nicResponse.setIsDefault(userVm.isDefaultNic());
+            final List<NicSecondaryIpVO> secondaryIps = ApiDBUtils.findNicSecondaryIps(userVm.getNicId());
             if (secondaryIps != null) {
                 final List<NicSecondaryIpResponse> ipList = new ArrayList<>();
                 for (final NicSecondaryIpVO ip : secondaryIps) {
@@ -327,11 +291,23 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
                 }
                 nicResponse.setSecondaryIps(ipList);
             }
-
             nicResponse.setObjectName("nic");
-            userVmData.addNic(nicResponse);
+            userVmResponse.addNic(nicResponse);
         }
+    }
 
+    @Override
+    public UserVmResponse setUserVmResponse(final ResponseView view, final UserVmResponse userVmData, final UserVmJoinVO uvo) {
+        createUserVmNicResponse(uvo, userVmData);
+
+        createUserVmTagsResponse(userVmData, uvo);
+
+        createUserVmAffinityResponse(uvo, userVmData);
+
+        return userVmData;
+    }
+
+    private void createUserVmTagsResponse(final UserVmResponse userVmData, final UserVmJoinVO uvo) {
         final long tag_id = uvo.getTagId();
         if (tag_id > 0 && !userVmData.containTag(tag_id)) {
             final ResourceTagJoinVO vtag = ApiDBUtils.findResourceTagViewById(tag_id);
@@ -339,19 +315,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
                 userVmData.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
             }
         }
-
-        final Long affinityGroupId = uvo.getAffinityGroupId();
-        if (affinityGroupId != null && affinityGroupId.longValue() != 0) {
-            final AffinityGroupResponse resp = new AffinityGroupResponse();
-            resp.setId(uvo.getAffinityGroupUuid());
-            resp.setName(uvo.getAffinityGroupName());
-            resp.setDescription(uvo.getAffinityGroupDescription());
-            resp.setObjectName("affinitygroup");
-            resp.setAccountName(uvo.getAccountName());
-            userVmData.addAffinityGroup(resp);
-        }
-
-        return userVmData;
     }
 
     @Override
@@ -391,15 +354,7 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         if (vmIds.length > DETAILS_BATCH_SIZE) {
             while ((curr_index + DETAILS_BATCH_SIZE) <= vmIds.length) {
                 final Long[] ids = new Long[DETAILS_BATCH_SIZE];
-                for (int k = 0, j = curr_index; j < curr_index + DETAILS_BATCH_SIZE; j++, k++) {
-                    ids[k] = vmIds[j];
-                }
-                final SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
-                sc.setParameters("idIN", ids);
-                final List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
-                if (vms != null) {
-                    uvList.addAll(vms);
-                }
+                createUserVmList(DETAILS_BATCH_SIZE, uvList, curr_index, ids, vmIds);
                 curr_index += DETAILS_BATCH_SIZE;
             }
         }
@@ -407,17 +362,21 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             final int batch_size = (vmIds.length - curr_index);
             // set the ids value
             final Long[] ids = new Long[batch_size];
-            for (int k = 0, j = curr_index; j < curr_index + batch_size; j++, k++) {
-                ids[k] = vmIds[j];
-            }
-            final SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
-            sc.setParameters("idIN", ids);
-            final List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
-            if (vms != null) {
-                uvList.addAll(vms);
-            }
+            createUserVmList(batch_size, uvList, curr_index, ids, vmIds);
         }
         return uvList;
+    }
+
+    private void createUserVmList(final int DETAILS_BATCH_SIZE, final List<UserVmJoinVO> uvList, final int curr_index, final Long[] ids, final Long[] vmIds) {
+        for (int k = 0, j = curr_index; j < curr_index + DETAILS_BATCH_SIZE; j++, k++) {
+            ids[k] = vmIds[j];
+        }
+        final SearchCriteria<UserVmJoinVO> sc = VmDetailSearch.create();
+        sc.setParameters("idIN", ids);
+        final List<UserVmJoinVO> vms = searchIncludingRemoved(sc, null, null, false);
+        if (vms != null) {
+            uvList.addAll(vms);
+        }
     }
 
     @Override
