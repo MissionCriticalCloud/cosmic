@@ -2634,6 +2634,12 @@
                             ip6cidr: {
                                 label: 'label.ipv6.CIDR'
                             },
+                            mirroripaddress: {
+                                label: 'label.mirror.ipaddress'
+                            },
+                            mirrorkey: {
+                                label: 'label.mirror.key'
+                            },
 
                             isdefault: {
                                 label: 'label.is.default',
