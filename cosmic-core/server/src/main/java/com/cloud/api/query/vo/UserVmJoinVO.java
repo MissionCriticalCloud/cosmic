@@ -196,6 +196,10 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private URI broadcastUri;
     @Column(name = "isolation_uri")
     private URI isolationUri;
+    @Column(name = "mirror_ip_address")
+    private String mirrorIpAddress;
+    @Column(name = "mirror_key")
+    private Long mirrorKey;
     @Column(name = "network_id")
     private long networkId;
     @Column(name = "network_uuid")
@@ -587,6 +591,14 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setIsolationUri(final URI isolationUri) {
         this.isolationUri = isolationUri;
+    }
+
+    public void setMirrorIpAddress(final String mirror_ip_address) {
+        this.mirrorIpAddress = mirror_ip_address;
+    }
+
+    public void setMirrorKey(final Long mirror_key) {
+        this.mirrorKey = mirror_key;
     }
 
     public void setNetworkId(final long networkId) {
@@ -1015,6 +1027,14 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public URI getIsolationUri() {
         return isolationUri;
+    }
+
+    public String getMirrorIpAddress() {
+        return mirrorIpAddress;
+    }
+
+    public Long getMirrorKey() {
+        return mirrorKey;
     }
 
     public long getNetworkId() {

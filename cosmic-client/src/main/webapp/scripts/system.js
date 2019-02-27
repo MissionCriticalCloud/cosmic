@@ -2713,6 +2713,12 @@
                                                     },
                                                     broadcasturi: {
                                                         label: 'label.broadcast.uri'
+                                                    },
+                                                    mirroripaddress: {
+                                                        label: 'label.mirror.ipaddress'
+                                                    },
+                                                    mirrorkey: {
+                                                        label: 'label.mirror.key'
                                                     }
                                                 }],
                                                 dataProvider: function (args) {
@@ -5895,6 +5901,12 @@
                                             },
                                             broadcasturi: {
                                                 label: 'label.broadcast.uri'
+                                            },
+                                            mirroripaddress: {
+                                                label: 'label.mirror.ipaddress'
+                                            },
+                                            mirrorkey: {
+                                                label: 'label.mirror.key'
                                             }
                                         }],
                                         dataProvider: function (args) {

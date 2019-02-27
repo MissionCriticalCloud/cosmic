@@ -78,6 +78,11 @@ public class NicVO implements Nic {
     String uuid = UUID.randomUUID().toString();
     @Column(name = "secondary_ip")
     boolean secondaryIp;
+    @Column(name = "mirror_ip_address")
+    String mirrorIpAddress;
+    @Column(name = "mirror_key")
+    Long mirrorKey;
+
 
     protected NicVO() {
     }
@@ -299,6 +304,14 @@ public class NicVO implements Nic {
     public void setCreated(final Date created) {
         this.created = created;
     }
+
+    public String getMirrorIpAddress() { return mirrorIpAddress; }
+
+    public void setMirrorIpAddress(final String mirrorIpAddress) { this.mirrorIpAddress = mirrorIpAddress; }
+
+    public Long getMirrorKey() { return mirrorKey; }
+
+    public void setMirrorKey(final Long mirrorKey) { this.mirrorKey = mirrorKey; }
 
     @Override
     public String toString() {

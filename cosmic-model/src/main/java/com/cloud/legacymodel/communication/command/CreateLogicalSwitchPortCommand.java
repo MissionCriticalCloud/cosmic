@@ -6,13 +6,18 @@ public class CreateLogicalSwitchPortCommand extends Command {
     private final String ownerName;
     private final String nicName;
     private final boolean macLearning;
+    private final String mirrorIpAddress;
+    private final Long mirrorKey;
 
-    public CreateLogicalSwitchPortCommand(final String logicalSwitchUuid, final String attachmentUuid, final String ownerName, final String nicName, final boolean macLearning) {
+    public CreateLogicalSwitchPortCommand(final String logicalSwitchUuid, final String attachmentUuid, final String ownerName, final String nicName, final boolean macLearning,
+                                          final String mirrorIpAddress, final Long mirrorKey) {
         this.logicalSwitchUuid = logicalSwitchUuid;
         this.attachmentUuid = attachmentUuid;
         this.ownerName = ownerName;
         this.nicName = nicName;
         this.macLearning = macLearning;
+        this.mirrorIpAddress = mirrorIpAddress;
+        this.mirrorKey = mirrorKey;
     }
 
     public String getLogicalSwitchUuid() {
@@ -29,6 +34,14 @@ public class CreateLogicalSwitchPortCommand extends Command {
 
     public String getNicName() {
         return nicName;
+    }
+
+    public String getMirrorIpAddress() {
+        return mirrorIpAddress;
+    }
+
+    public Long getMirrorKey() {
+        return mirrorKey;
     }
 
     public boolean getMacLearning() {
