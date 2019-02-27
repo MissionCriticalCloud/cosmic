@@ -10,6 +10,7 @@ public class Event {
     String resourceType;
     String resourceUUID;
     String description;
+    String topic;
 
     public Event(final String eventSource, final String eventCategory, final String eventType, final String resourceType, final String resourceUUID) {
         this.eventCategory = eventCategory;
@@ -17,6 +18,16 @@ public class Event {
         this.eventSource = eventSource;
         this.resourceType = resourceType;
         this.resourceUUID = resourceUUID;
+        this.topic = "cosmic";
+    }
+
+    public Event(final String eventSource, final String eventCategory, final String eventType, final String resourceType, final String resourceUUID, final String topic) {
+        this.eventCategory = eventCategory;
+        this.eventType = eventType;
+        this.eventSource = eventSource;
+        this.resourceType = resourceType;
+        this.resourceUUID = resourceUUID;
+        this.topic = topic;
     }
 
     public String getEventCategory() {
@@ -70,5 +81,13 @@ public class Event {
 
     public void setResourceUUID(final String uuid) {
         this.resourceUUID = uuid;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(final String topic) {
+        this.topic = topic;
     }
 }

@@ -68,6 +68,7 @@ import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.user.UserAccount;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.common.managed.context.ManagedContextRunnable;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.user.AccountManager;
 import com.cloud.user.DomainManager;
 import com.cloud.user.UserVO;
