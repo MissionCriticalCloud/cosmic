@@ -321,12 +321,12 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
                 nic.setIPv4Netmask(NetUtils.cidr2Netmask(network.getCidr()));
 
                 if (network.getDns1() != null && network.getDns1().equals("")) {
-                    nic.setIPv4Dns1(zone.getDns1());
+                    nic.setIPv4Dns1(null);
                 } else {
                     nic.setIPv4Dns1(network.getDns1());
                 }
                 if (network.getDns2() != null && network.getDns2().equals("")) {
-                    nic.setIPv4Dns2(zone.getDns2());
+                    nic.setIPv4Dns2(null);
                 } else {
                     nic.setIPv4Dns2(network.getDns2());
                 }
@@ -420,10 +420,10 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     public void updateNetworkProfile(final NetworkProfile networkProfile) {
         final DataCenter dc = _dcDao.findById(networkProfile.getDataCenterId());
         if (networkProfile.getDns1() != null && networkProfile.getDns1().equals("")) {
-            networkProfile.setDns1(dc.getDns1());
+            networkProfile.setDns1(null);
         }
         if (networkProfile.getDns2() != null && networkProfile.getDns2().equals("")) {
-            networkProfile.setDns2(dc.getDns2());
+            networkProfile.setDns2(null);
         }
     }
 
