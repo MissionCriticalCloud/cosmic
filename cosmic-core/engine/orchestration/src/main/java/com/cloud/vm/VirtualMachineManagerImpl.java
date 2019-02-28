@@ -996,6 +996,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     vmInstanceVO.setState(State.Stopped);
                     vmInstanceVO.setHostId(null);
                     _vmDao.persist(vmInstanceVO);
+
+                    // Cleanup network
+                    try {
+                        _networkMgr.release(new VirtualMachineProfileImpl(vmInstanceVO), true);
+                    } catch (final CloudException e) {
+                        s_logger.error("ShutdownEventCommand tried to cleanup networking but failed " + vmInstanceVO.getInstanceName(), e);
+                    }
                 }
                 if (vmInstanceVO.isHaEnabled()) {
                     // Start it once more
