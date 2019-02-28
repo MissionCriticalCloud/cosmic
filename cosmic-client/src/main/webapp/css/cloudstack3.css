@@ -4929,7 +4929,7 @@ textarea {
 
 .dashboard.user .vm-status .content ul li {
     float: left;
-    width: 243px;
+    width: 228px;
     height: 237px;
     border: 1px solid #E6EBEE;
     border-top: 2px solid #D3D9DE;
@@ -4958,7 +4958,7 @@ textarea {
 
 .dashboard.user .vm-status .content ul li .value {
     background: #DFE9CC;
-    width: 229px;
+    width: 214px;
     color: #5D7C98;
     /*+text-shadow:0px 1px 2px #FFFFFF;*/
     -moz-text-shadow: 0px 1px 2px #FFFFFF;
@@ -4985,6 +4985,19 @@ textarea {
 
 .dashboard.user .vm-status .content ul li.total .value {
     background: #DFE4E9;
+}
+
+.dashboard.user .vm-status .content ul li.noncompliant .name {
+    font-size: 20px;
+    /*background-position: -617px -528px;*/
+    background-image: none;
+    padding: 0px 20px;
+}
+
+.dashboard.user .vm-status .content ul li.noncompliant .value {
+    background: #e93a40;
+    margin-top: 20px;
+    color: #ffffff;
 }
 
 /***** Tables / status list*/

@@ -17,17 +17,21 @@ dashboardItemsToDisplay = 3;
                 var dataFns = {
                     instances: function (data) {
                         var totalInstanceCount = 0;
+                        var nonCompliantCount = 0;
                         $.ajax({
                             url: createURL("listVirtualMachines"),
                             data: {
-                                listAll: true,
-                                page: 1,
-                                pageSize: 1
+                                listAll: true
                             },
                             async: false,
                             success: function (json) {
                                 if (json.listvirtualmachinesresponse.count != undefined) {
                                     totalInstanceCount = json.listvirtualmachinesresponse.count;
+                                    json.listvirtualmachinesresponse.virtualmachine.forEach(function (vm) {
+                                        if (vm.laststartversion.includes("Pre")) {
+                                            nonCompliantCount++
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -69,7 +73,8 @@ dashboardItemsToDisplay = 3;
                         dataFns.account($.extend(data, {
                             runningInstances: RunningInstanceCount,
                             stoppedInstances: stoppedInstanceCount,
-                            totalInstances: totalInstanceCount
+                            totalInstances: totalInstanceCount,
+                            nonCompliantInstances: nonCompliantCount
                         }));
                     },
 
