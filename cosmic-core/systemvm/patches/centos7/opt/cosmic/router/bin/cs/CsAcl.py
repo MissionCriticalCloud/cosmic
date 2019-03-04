@@ -59,10 +59,10 @@ class CsAcl(object):
                 icmp_type = "%s/%s" % (self.rule['icmp_type'], self.rule['icmp_code'])
             rnge = ''
             if "first_port" in self.rule.keys() and \
-                            self.rule['first_port'] == self.rule['last_port']:
+                    self.rule['first_port'] == self.rule['last_port']:
                 rnge = " --dport %s " % self.rule['first_port']
             if "first_port" in self.rule.keys() and \
-                            self.rule['first_port'] != self.rule['last_port']:
+                    self.rule['first_port'] != self.rule['last_port']:
                 rnge = " --dport %s:%s" % (rule['first_port'], rule['last_port'])
             if self.direction == 'ingress':
                 if rule['protocol'] == "icmp":
@@ -183,6 +183,8 @@ class CsAcl(object):
                             new_rule['icmp_code'] = rule['icmp_code']
                         if 'icmp_type' in rule:
                             new_rule['icmp_type'] = rule['icmp_type']
+                        if 'protocol' in rule:
+                            new_rule['protocol'] = rule['protocol']
                         rule_list_splitted.append(new_rule)
                 else:
                     rule_list_splitted.append(rule)
@@ -233,7 +235,7 @@ class CsAcl(object):
                 if 'first_port' in rule.keys():
                     self.dport = "-m %s --dport %s" % (self.protocol, rule['first_port'])
                 if 'last_port' in rule.keys() and self.dport and \
-                                rule['last_port'] != rule['first_port']:
+                        rule['last_port'] != rule['first_port']:
                     self.dport = "%s:%s" % (self.dport, rule['last_port'])
 
             def create(self):
