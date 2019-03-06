@@ -102,7 +102,7 @@ Either enable the `beta-nexus` profile on the command line, or make it enabled b
 
 Cosmic is a fork of Apache CloudStack and its API is mostly backwards compatible with CloudStack's API. So, all the documentation can be accessed from http://docs.cloudstack.apache.org.
 
-[API documentation](http://apidoc.cosmiccloud.io/) for Cosmic is on a separate page.
+[API documentation](https://apidoc.mcc.schubergphilis.com/) for Cosmic is on a separate page.
 
 ## Getting Involved
 
@@ -130,7 +130,6 @@ might be exploited, and any additional information that might be useful.
 
 The Cosmic team would like to recognize and thank the contributions of the following entities to the success of this project and resulting system:
 * [Schuberg Philis](https://www.schubergphilis.com): who is responsible for the birth of the Cosmic project (and all other related projects, see [vagrant-cloudstack](https://github.com/MissionCriticalCloud/vagrant-cloudstack) or [bubble-blueprint](https://github.com/MissionCriticalCloud/bubble-blueprint) for some examples) and resulting systems, and is relentlessly supporting all the development costs of Cosmic.
-* [JetBrains](https://www.jetbrains.com): who's motto is "Create anything" and by providing our team with free access to their amazing development environment suite (IntelliJ IDEA - Ultimate edition) allows us to create Cosmic.
 
 ## License
 
