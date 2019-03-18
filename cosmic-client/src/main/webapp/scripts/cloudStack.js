@@ -135,7 +135,7 @@
                         g_allowUserExpungeRecoverVm = json.listcapabilitiesresponse.capability.allowuserexpungerecovervm;
                         g_userProjectsEnabled = json.listcapabilitiesresponse.capability.allowusercreateprojects;
 
-                        g_cloudstackversion = json.listcapabilitiesresponse.capability.cloudstackversion;
+                        g_cosmicversion = json.listcapabilitiesresponse.capability.cosmicversion;
 
                         if (json.listcapabilitiesresponse.capability.apilimitinterval != null && json.listcapabilitiesresponse.capability.apilimitmax != null) {
                             var intervalLimit = ((json.listcapabilitiesresponse.capability.apilimitinterval * 1000) / json.listcapabilitiesresponse.capability.apilimitmax) * 3; //multiply 3 to be on safe side
@@ -266,7 +266,7 @@
                                 g_allowUserExpungeRecoverVm = json.listcapabilitiesresponse.capability.allowuserexpungerecovervm;
                                 g_userProjectsEnabled = json.listcapabilitiesresponse.capability.allowusercreateprojects;
 
-                                g_cloudstackversion = json.listcapabilitiesresponse.capability.cloudstackversion;
+                                g_cosmicversion = json.listcapabilitiesresponse.capability.cosmicversion;
 
                                 if (json.listcapabilitiesresponse.capability.apilimitinterval != null && json.listcapabilitiesresponse.capability.apilimitmax != null) {
                                     var intervalLimit = ((json.listcapabilitiesresponse.capability.apilimitinterval * 1000) / json.listcapabilitiesresponse.capability.apilimitmax) * 3; //multiply 3 to be on safe side
@@ -348,7 +348,7 @@
                 });
             },
 
-            // Show cloudStack main UI widget
+            // Show cosmic main UI widget
             complete: function (args) {
                 var context = {
                     users: [args.user]
