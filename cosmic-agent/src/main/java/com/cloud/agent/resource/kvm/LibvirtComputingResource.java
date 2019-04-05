@@ -1481,7 +1481,7 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
 
         // Always add a virtio scsi controller
         vmTo.getName();
-        final ScsiDef sd = new ScsiDef((short) 0, 0, 0, 9, 0);
+        final ScsiDef sd = new ScsiDef((short) 0, 0, 0, 9, 0, vcpus);
         devices.addDevice(sd);
         logger.debug("Adding SCSI definition for " + vmTo.getName() + ":\n" + sd.toString());
 
