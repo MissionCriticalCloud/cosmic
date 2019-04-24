@@ -1034,6 +1034,9 @@
                                                         async: false,
                                                         success: function (json) {
                                                             var instanceObjs = json.listvirtualmachinesresponse.virtualmachine;
+                                                            instanceObjs.sort(function (a, b) {
+                                                                return a.name.localeCompare(b.name);
+                                                            });
                                                             $(instanceObjs).each(function () {
                                                                 items.push({
                                                                     id: this.id,
