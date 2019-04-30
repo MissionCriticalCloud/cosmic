@@ -4,6 +4,7 @@ import com.cloud.acl.RoleType;
 import com.cloud.context.CallContext;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.serializer.Param;
+import com.cloud.utils.SuperclassExclusionStrategy;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;

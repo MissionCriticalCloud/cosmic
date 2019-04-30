@@ -1,6 +1,7 @@
 package com.cloud.framework.jobs.impl;
 
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
+import com.cloud.utils.SuperclassExclusionStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,6 +41,7 @@ public class JobSerializerHelper {
         s_logger.debug("Job GSON Builder initialized.");
         gsonBuilder.registerTypeAdapter(Class.class, new ClassTypeAdapter());
         gsonBuilder.registerTypeAdapter(Throwable.class, new ThrowableTypeAdapter());
+        gsonBuilder.setExclusionStrategies(new SuperclassExclusionStrategy());
         s_gson = gsonBuilder.create();
     }
 

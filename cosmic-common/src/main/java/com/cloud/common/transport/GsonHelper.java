@@ -4,6 +4,7 @@ import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.to.DataStoreTO;
 import com.cloud.legacymodel.to.DataTO;
+import com.cloud.utils.SuperclassExclusionStrategy;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,6 +19,7 @@ public class GsonHelper {
 
     static {
         final GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setExclusionStrategies(new SuperclassExclusionStrategy());
         s_gson = setDefaultGsonConfig(gsonBuilder);
 
         final GsonBuilder loggerBuilder = new GsonBuilder();

@@ -1,5 +1,7 @@
 package com.cloud.api;
 
+import com.cloud.utils.SuperclassExclusionStrategy;
+
 import java.util.Map;
 
 import com.google.gson.GsonBuilder;
