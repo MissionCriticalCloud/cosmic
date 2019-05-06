@@ -987,6 +987,12 @@ public class LibvirtVmDef {
             scsiBuilder.append(String.format("<controller type='scsi' index='%d' model='virtio-scsi'>\n", this.index));
             scsiBuilder.append(String.format("<address type='pci' domain='0x%04X' bus='0x%02X' slot='0x%02X' function='0x%01X'/>\n",
                     this.domain, this.bus, this.slot, this.function));
+
+            // Limit to max 8 queues
+            if (this.queues > 8) {
+                this.queues = 8;
+            }
+
             if (this.queues > 0) {
                 scsiBuilder.append(String.format("<driver queues='%d'/>\n", this.queues));
             }
