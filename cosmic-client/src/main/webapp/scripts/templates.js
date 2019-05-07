@@ -170,8 +170,7 @@
                                             var apiCmd;
                                             if (args.zone == -1) { //All Zones
                                                 apiCmd = "listHypervisors&zoneid=-1";
-                                            }
-                                            else {
+                                            } else {
                                                 apiCmd = "listHypervisors&zoneid=" + args.zone;
                                             }
 
@@ -319,6 +318,13 @@
                                             });
                                         }
                                     },
+                                    maclearning: {
+                                        label: "label.maclearning",
+                                        isBoolean: true,
+                                        isHidden: function () {
+                                            return !isAdmin();
+                                        }
+                                    },
                                     isExtractable: {
                                         label: "label.extractable",
                                         docID: 'helpRegisterTemplateExtractable',
@@ -379,7 +385,8 @@
                                     osTypeId: args.data.osTypeId,
                                     optimisefor: args.data.optimisefor,
                                     hypervisor: args.data.hypervisor,
-                                    maintenancepolicy: args.data.maintenancepolicy
+                                    maintenancepolicy: args.data.maintenancepolicy,
+                                    maclearning: (args.data.maclearning === "on")
                                 };
 
                                 if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {
@@ -404,6 +411,7 @@
 
                                 $.ajax({
                                     url: createURL('registerTemplate'),
+                                    method: "POST",
                                     data: data,
                                     success: function (json) {
                                         var items = json.registertemplateresponse.template; //items might have more than one array element if it's create templates for all zones.
@@ -449,7 +457,8 @@
                                             passwordEnabled: (args.data.isPasswordEnabled == "on"),
                                             isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                             osTypeId: args.data.osTypeId,
-                                            hypervisor: args.data.hypervisor
+                                            hypervisor: args.data.hypervisor,
+                                            maclearning: (args.data.maclearning === "on")
                                         };
 
                                         if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {
@@ -634,7 +643,13 @@
                                             });
                                         }
                                     },
-
+                                    maclearning: {
+                                        label: "label.maclearning",
+                                        isBoolean: true,
+                                        isHidden: function () {
+                                            return !isAdmin();
+                                        }
+                                    },
                                     isExtractable: {
                                         label: "label.extractable",
                                         docID: 'helpRegisterTemplateExtractable',
@@ -791,10 +806,12 @@
                                         passwordenabled: (args.data.passwordenabled == "on"),
                                         isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                         url: args.data.url,
-                                        maintenancepolicy: args.data.maintenancepolicy
+                                        maintenancepolicy: args.data.maintenancepolicy,
+                                        maclearning: (args.data.maclearning === "on")
                                     };
                                     $.ajax({
                                         url: createURL('updateTemplate'),
+                                        type: "POST",
                                         data: data,
                                         async: false,
                                         success: function (json) {
@@ -1040,6 +1057,14 @@
                                             else
                                                 return cloudStack.converters.convertBytes(args);
                                         }
+                                    },
+                                    maclearning: {
+                                        label: "label.maclearning",
+                                        isBoolean: true,
+                                        isEditable: function () {
+                                            return isAdmin();
+                                        },
+                                        converter: cloudStack.converters.toBooleanText
                                     },
                                     isextractable: {
                                         label: 'label.extractable.lower',
@@ -1496,6 +1521,14 @@
                                                                 return cloudStack.converters.convertBytes(args);
                                                         }
                                                     },
+                                                    maclearning: {
+                                                        label: "label.maclearning",
+                                                        isBoolean: true,
+                                                        isEditable: function () {
+                                                            return isAdmin();
+                                                        },
+                                                        converter: cloudStack.converters.toBooleanText
+                                                    },
                                                     isextractable: {
                                                         label: 'label.extractable.lower',
                                                         isBoolean: true,
@@ -1794,7 +1827,13 @@
                                             });
                                         }
                                     },
-
+                                    maclearning: {
+                                        label: "label.maclearning",
+                                        isBoolean: true,
+                                        isHidden: function () {
+                                            return !isAdmin();
+                                        }
+                                    },
                                     isExtractable: {
                                         label: "label.extractable",
                                         docID: 'helpRegisterISOExtractable',
@@ -1826,7 +1865,8 @@
                                     zoneid: args.data.zone,
                                     optimisefor: args.data.optimisefor,
                                     isextractable: (args.data.isExtractable == "on"),
-                                    bootable: (args.data.isBootable == "on")
+                                    bootable: (args.data.isBootable == "on"),
+                                    maclearning: (args.data.maclearning === "on")
                                 };
 
                                 if (args.$form.find('.form-item[rel=osTypeId]').css("display") != "none") {
@@ -1853,16 +1893,6 @@
                                         args.response.success({
                                             data: items[0]
                                         });
-
-                                        /*
-                                         if(items.length > 1) {
-                                         for(var i=1; i<items.length; i++) {
-                                         var $midmenuItem2 = $("#midmenu_item").clone();
-                                         ISOToMidmenu(items[i], $midmenuItem2);
-                                         bindClickToMidMenu($midmenuItem2, templateToRightPanel, ISOGetMidmenuId);
-                                         $("#midmenu_container").append($midmenuItem2.show());              }
-                                         }
-                                         */
                                     },
                                     error: function (XMLHttpResponse) {
                                         var errorMsg = parseXMLHttpResponse(XMLHttpResponse);
@@ -2018,7 +2048,8 @@
                                         name: args.data.name,
                                         displaytext: args.data.displaytext,
                                         ostypeid: args.data.ostypeid,
-                                        optimisefor: args.data.optimisefor
+                                        optimisefor: args.data.optimisefor,
+                                        maclearning: (args.data.maclearning === "on")
                                     };
                                     $.ajax({
                                         url: createURL('updateIso'),
@@ -2173,6 +2204,14 @@
                                             else
                                                 return cloudStack.converters.convertBytes(args);
                                         }
+                                    },
+                                    maclearning: {
+                                        label: "label.maclearning",
+                                        isBoolean: true,
+                                        isEditable: function () {
+                                            return isAdmin();
+                                        },
+                                        converter: cloudStack.converters.toBooleanText
                                     },
                                     isextractable: {
                                         label: 'label.extractable.lower',
@@ -2491,6 +2530,14 @@
                                                             else
                                                                 return cloudStack.converters.convertBytes(args);
                                                         }
+                                                    },
+                                                    maclearning: {
+                                                        label: "label.maclearning",
+                                                        isBoolean: true,
+                                                        isEditable: function () {
+                                                            return isAdmin();
+                                                        },
+                                                        converter: cloudStack.converters.toBooleanText
                                                     },
                                                     isextractable: {
                                                         label: 'label.extractable.lower',
