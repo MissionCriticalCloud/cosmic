@@ -582,6 +582,13 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             buf.append(" disable_rp_filter=true");
         }
 
+        // Backwards compatibility
+        Boolean setRfc1918Routes = true;
+        final String setRfc1918RoutesStr = this._configDao.getValue("systemvm.setrfc1918routes");
+        if (setRfc1918RoutesStr != null && setRfc1918RoutesStr.equalsIgnoreCase("false")) {
+            setRfc1918Routes = false;
+        }
+
         boolean externalDhcp = false;
         final String externalDhcpStr = this._configDao.getValue("direct.attach.network.externalIpAllocator.enabled");
         if (externalDhcpStr != null && externalDhcpStr.equalsIgnoreCase("true")) {
@@ -623,6 +630,9 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         if (externalDhcp) {
             buf.append(" bootproto=dhcp");
         }
+
+        /* Set RFC1918 routes to MGT nic */
+        buf.append(" setrfc1918routes=").append(setRfc1918Routes.toString().toLowerCase());
 
         final Zone zone = this.zoneRepository.findById(profile.getVirtualMachine().getDataCenterId()).orElse(null);
         buf.append(" internaldns1=").append(zone.getInternalDns1());

@@ -62,7 +62,9 @@ class SecondaryStorageVM:
         setup_html()
         setup_iptable_rules(self.cmdline)
         self.setup_nginx()
-        Utils(self.cmdline).set_rfc1918_routes()
+        if self.cmdline['setrfc1918routes'] == 'true':
+            logging.info("Setting rfc1918 routes")
+            Utils(self.cmdline).set_rfc1918_routes()
 
         os.system("systemctl start cosmic-agent")
 
