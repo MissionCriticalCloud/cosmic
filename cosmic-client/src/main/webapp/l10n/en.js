@@ -897,6 +897,7 @@ var dictionary = {
     "label.logs": "Logs",
     "label.lun": "LUN",
     "label.macaddress": "MAC Address",
+    "label.maclearning": "MAC learning",
     "label.maintenance.policy": "Maintenance Policy",
     "label.make.project.owner": "Make account project owner",
     "label.make.redundant": "Make redundant",

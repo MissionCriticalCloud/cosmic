@@ -107,7 +107,7 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     private String optimiseFor;
     @Parameter(name = ApiConstants.CPU_FLAGS, type = CommandType.STRING, description = "Optionally specify CPU flags to pass to VM")
     private String cpuFlags;
-    @Parameter(name = ApiConstants.MAC_LEARNING, type = CommandType.STRING, description = "Set mag learning boolean, defaults to false")
+    @Parameter(name = ApiConstants.MAC_LEARNING, type = CommandType.BOOLEAN, description = "Set mag learning boolean, defaults to false")
     private Boolean macLearning;
     @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "Maintenance policy for this template, either LiveMigrate or ShutdownAndStart.")
     private String maintenancePolicy;
