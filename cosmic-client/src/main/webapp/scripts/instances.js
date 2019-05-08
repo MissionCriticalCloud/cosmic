@@ -411,9 +411,6 @@
                     path: 'storage.vmsnapshots',
                     label: 'label.snapshots'
                 }, {
-                    path: 'affinityGroups',
-                    label: 'label.affinity.groups'
-                }, {
                     path: '_zone.hosts',
                     label: 'label.host',
                     preFilter: function (args) {
@@ -1403,7 +1400,7 @@
                                         items.push({
                                             id: "Generic",
                                             description: "Generic VM"
-                                        },{
+                                        }, {
                                             id: "Windows",
                                             description: "Windows VM"
                                         });
@@ -2327,7 +2324,7 @@
                                                                     if (networkObj.vpcname != null) {
                                                                         vpcName = " (VPC " + networkObj.vpcname + ")";
                                                                     }
-                                                                    if (typeof(itemsUser) == "undefined") {
+                                                                    if (typeof (itemsUser) == "undefined") {
                                                                         var itemsUser = [];
                                                                     }
                                                                     itemsUser.push({
@@ -2336,7 +2333,7 @@
                                                                     });
                                                                 }
                                                             }
-                                                            if (typeof(itemsUser) != "undefined") {
+                                                            if (typeof (itemsUser) != "undefined") {
                                                                 args.response.success({
                                                                     data: itemsUser
                                                                 });
@@ -2366,7 +2363,7 @@
                                                                 }
 
                                                                 if (!isNetworkExists) {
-                                                                    if (typeof(itemsPub) == "undefined") {
+                                                                    if (typeof (itemsPub) == "undefined") {
                                                                         var itemsPub = [];
                                                                     }
                                                                     itemsPub.push({
@@ -2376,7 +2373,7 @@
                                                                 }
                                                             }
 
-                                                            if (typeof(itemsPub) != "undefined") {
+                                                            if (typeof (itemsPub) != "undefined") {
                                                                 args.response.success({
                                                                     data: itemsPub
                                                                 });
