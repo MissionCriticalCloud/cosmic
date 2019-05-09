@@ -14,7 +14,10 @@ import com.cloud.api.command.user.volume.GetUploadParamsForVolumeCmd;
 import com.cloud.api.command.user.volume.MigrateVolumeCmd;
 import com.cloud.api.command.user.volume.ResizeVolumeCmd;
 import com.cloud.api.command.user.volume.UploadVolumeCmd;
+import com.cloud.api.query.dao.StoragePoolJoinDao;
+import com.cloud.api.query.vo.StoragePoolJoinVO;
 import com.cloud.api.response.GetUploadParamsResponse;
+import com.cloud.capacity.CapacityManager;
 import com.cloud.configuration.Config;
 import com.cloud.configuration.ConfigurationManager;
 import com.cloud.context.CallContext;
@@ -154,6 +157,7 @@ import com.cloud.vm.snapshot.VMSnapshotVO;
 import com.cloud.vm.snapshot.dao.VMSnapshotDao;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -220,6 +224,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     @Inject
     PrimaryDataStoreDao _storagePoolDao;
     @Inject
+    StoragePoolJoinDao _storagePoolJoinDao;
+    @Inject
     DiskOfferingDao _diskOfferingDao;
     @Inject
     AccountDao _accountDao;
@@ -251,6 +257,11 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     VmWorkJobDao _workJobDao;
     @Inject
     ClusterDetailsDao _clusterDetailsDao;
+    @Inject
+    VolumeDao _volumeDao;
+    @Inject
+    CapacityManager _capacityMgr;
+
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     private List<StoragePoolAllocator> _storagePoolAllocators;
     private long _maxVolumeSizeInGb;
@@ -964,8 +975,19 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
     private StoragePoolVO getStoragePoolLeastResourcesUsed(final List<StoragePoolVO> storagePoolVOList) {
         return storagePoolVOList.stream().min((a, b) -> {
-            final Long availablePercentageA = a.getUsedBytes() / a.getCapacityBytes();
-            final Long availablePercentageB = b.getUsedBytes() / b.getCapacityBytes();
+
+            // Get size for all the non-destroyed volumes
+            s_logger.debug("Comparing A:" + a.getName() + " with B:" + b.getName());
+            final Pair<Long, Long> sizesA = this._volumeDao.getNonDestroyedCountAndTotalByPool(a.getId());
+            s_logger.debug("A has " + sizesA.first() + " volumes with size " + sizesA.second());
+            final Pair<Long, Long> sizesB = this._volumeDao.getNonDestroyedCountAndTotalByPool(b.getId());
+            s_logger.debug("B has " + sizesB.first() + " volumes with size " + sizesB.second());
+
+            final Double availablePercentageA = 1 - ((double) sizesA.second() / getTotalOverProvCapacity(a));
+            s_logger.debug("A has " + (availablePercentageA * 100) + " % available");
+
+            final Double availablePercentageB = 1 - ((double) sizesB.second() / getTotalOverProvCapacity(b));
+            s_logger.debug("B has " + (availablePercentageB * 100) + " % available");
 
             return availablePercentageB.compareTo(availablePercentageA);
         }).orElse(null);
@@ -986,7 +1008,31 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     }
 
     private List<StoragePoolVO> checkIfStoragePoolHasSufficientResources(final List<StoragePoolVO> storagePoolVOList, final VolumeInfo volumeInfo) {
-        return storagePoolVOList.stream().filter(storagePoolVO -> (storagePoolVO.getCapacityBytes() - storagePoolVO.getUsedBytes()) > volumeInfo.getSize()).collect(Collectors.toList());
+        return storagePoolVOList.stream().filter(storagePoolVO -> {
+
+            // Get size for all the non-destroyed volumes
+            final Pair<Long, Long> sizes = this._volumeDao.getNonDestroyedCountAndTotalByPool(storagePoolVO.getId());
+            final long totalOverProvCapacity = getTotalOverProvCapacity(storagePoolVO);
+
+            // Capacity left
+            final long capacityLeft = totalOverProvCapacity - sizes.first();
+            s_logger.debug("Storage pool " + storagePoolVO.getName() + " has capacity available of " + capacityLeft + " bytes. Volume is " + volumeInfo.getSize() + " bytes");
+
+            return capacityLeft >= volumeInfo.getSize();
+        }).collect(Collectors.toList());
+    }
+
+    private long getTotalOverProvCapacity(final StoragePoolVO storagePoolVO) {
+        // Join
+        final StoragePoolJoinVO storagePoolJoinVO = _storagePoolJoinDao.findById(storagePoolVO.getId());
+
+        // Available capacity
+        final BigDecimal overProvFactor = new BigDecimal(CapacityManager.StorageOverprovisioningFactor.valueIn(storagePoolVO.getId()));
+
+        final long capacity = overProvFactor.multiply(new BigDecimal(storagePoolJoinVO.getCapacityBytes())).longValue();
+        s_logger.debug("Storage pool " + storagePoolVO.getName() + " has total capacity " + capacity + " bytes (over provision factor used is " + overProvFactor + ")");
+
+        return capacity;
     }
 
     private boolean canVolumeBeAttachedToVirtualMachine(final VolumeInfo volumeInfo, final UserVmVO userVmVO) {
