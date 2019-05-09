@@ -123,7 +123,7 @@
                                         label: 'label.custom',
                                         isBoolean: true,
                                         isChecked: true,
-                                        isReverse: false
+                                        isReverse: true
                                     },
                                     cpuNumber: {
                                         label: 'label.num.cpu.cores',
@@ -465,8 +465,7 @@
 
                                                 if (gpu == '') {
                                                     $(this).closest('form').find('.form-item[rel=\"vgpuType\"]').hide();
-                                                }
-                                                else {
+                                                } else {
                                                     $(this).closest('form').find('.form-item[rel=\"vgpuType\"]').css('display', 'inline-block');
 
                                                     // enable/disable vGPU type options, depending on selected GPU
