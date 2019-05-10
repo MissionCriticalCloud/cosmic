@@ -393,6 +393,13 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             externalDhcp = true;
         }
 
+        // Backwards compatibility
+        Boolean setRfc1918Routes = true;
+        final String setRfc1918RoutesStr = this._configDao.getValue("systemvm.setrfc1918routes");
+        if (setRfc1918RoutesStr != null && setRfc1918RoutesStr.equalsIgnoreCase("false")) {
+            setRfc1918Routes = false;
+        }
+
         if (Boolean.valueOf(this._configDao.getValue("system.vm.random.password"))) {
             buf.append(" vmpassword=").append(this._configDao.getValue("system.vm.password"));
         }
@@ -432,6 +439,9 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         if (externalDhcp) {
             buf.append(" bootproto=dhcp");
         }
+
+        /* Set RFC1918 routes to MGT nic */
+        buf.append(" setrfc1918routes=").append(setRfc1918Routes.toString().toLowerCase());
 
         final DataCenterVO dc = this._dcDao.findById(profile.getVirtualMachine().getDataCenterId());
         buf.append(" internaldns1=").append(dc.getInternalDns1());
