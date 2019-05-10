@@ -264,23 +264,6 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
         value = (String) params.get("proxy_vm");
         this._proxyVmId = NumbersUtil.parseLong(value, 0);
 
-        if (this._localgw != null) {
-            final String mgmtHost = (String) params.get("host");
-            if (this._eth1ip != null) {
-                addRouteToInternalIpOrCidr(this._localgw, this._eth1ip, this._eth1mask, mgmtHost);
-                final String internalDns1 = (String) params.get("internaldns1");
-                if (internalDns1 == null) {
-                    s_logger.warn("No DNS entry found during configuration of NfsSecondaryStorage");
-                } else {
-                    addRouteToInternalIpOrCidr(this._localgw, this._eth1ip, this._eth1mask, internalDns1);
-                }
-                final String internalDns2 = (String) params.get("internaldns2");
-                if (internalDns2 != null) {
-                    addRouteToInternalIpOrCidr(this._localgw, this._eth1ip, this._eth1mask, internalDns2);
-                }
-            }
-        }
-
         this._pubIp = (String) params.get("public.ip");
 
         value = (String) params.get("disable_rp_filter");
@@ -302,45 +285,6 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
 
     @Override
     public void disconnected() {
-    }
-
-    private void addRouteToInternalIpOrCidr(final String localgw, final String eth1ip, final String eth1mask, final String destIpOrCidr) {
-        s_logger.debug("addRouteToInternalIp: localgw=" + localgw + ", eth1ip=" + eth1ip + ", eth1mask=" + eth1mask + ",destIp=" + destIpOrCidr);
-        if (destIpOrCidr == null) {
-            s_logger.debug("addRouteToInternalIp: destIp is null");
-            return;
-        }
-        if (!NetUtils.isValidIp4(destIpOrCidr) && !NetUtils.isValidIp4Cidr(destIpOrCidr)) {
-            s_logger.warn(" destIp is not a valid ip address or cidr destIp=" + destIpOrCidr);
-            return;
-        }
-        boolean inSameSubnet = false;
-        if (NetUtils.isValidIp4(destIpOrCidr)) {
-            if (eth1ip != null && eth1mask != null) {
-                inSameSubnet = NetUtils.sameSubnet(eth1ip, destIpOrCidr, eth1mask);
-            } else {
-                s_logger.warn("addRouteToInternalIp: unable to determine same subnet: _eth1ip=" + eth1ip + ", dest ip=" + destIpOrCidr + ", _eth1mask=" + eth1mask);
-            }
-        } else {
-            inSameSubnet = NetUtils.isNetworkAWithinNetworkB(destIpOrCidr, NetUtils.ipAndNetMaskToCidr(eth1ip, eth1mask));
-        }
-        if (inSameSubnet) {
-            s_logger.debug("addRouteToInternalIp: dest ip " + destIpOrCidr + " is in the same subnet as eth1 ip " + eth1ip);
-            return;
-        }
-        Script command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("ip route delete " + destIpOrCidr);
-        command.execute();
-        command = new Script("/bin/bash", s_logger);
-        command.add("-c");
-        command.add("ip route add " + destIpOrCidr + " via " + localgw);
-        final String result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in configuring route to internal ip err=" + result);
-        } else {
-            s_logger.debug("addRouteToInternalIp: added route to internal ip=" + destIpOrCidr + " via " + localgw);
-        }
     }
 
     private void disableRpFilter() {
