@@ -906,30 +906,16 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
                  */
                 continue;
             }
-            final String tmpresult = allowOutgoingOnPrivate(cidr);
+        }
+
+        if (cmd.getCopyPassword() != null && cmd.getCopyUserName() != null) {
+            final String tmpresult = configureAuth(cmd.getCopyUserName(), cmd.getCopyPassword());
             if (tmpresult != null) {
-                result.append(", ").append(tmpresult);
+                result.append("Failed to configure auth for copy ").append(tmpresult);
                 success = false;
             }
         }
 
-        for (final String cidr : cmd.getAllowedExternalCidrs()) {
-            final String tmpresult = this.setExternalAccess(cidr);
-            if (tmpresult != null) {
-                result.append(", ").append(tmpresult);
-                success = false;
-            }
-        }
-
-        if (success) {
-            if (cmd.getCopyPassword() != null && cmd.getCopyUserName() != null) {
-                final String tmpresult = configureAuth(cmd.getCopyUserName(), cmd.getCopyPassword());
-                if (tmpresult != null) {
-                    result.append("Failed to configure auth for copy ").append(tmpresult);
-                    success = false;
-                }
-            }
-        }
         return new Answer(cmd, success, result.toString());
     }
 
@@ -943,43 +929,6 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             s_logger.warn(errMsg);
             return errMsg;
         }
-        return null;
-    }
-
-    public String allowOutgoingOnPrivate(final String destCidr) {
-        if (!this._inSystemVM) {
-            return null;
-        }
-        final Script command = new Script("/bin/bash", s_logger);
-        final String intf = "eth1";
-        command.add("-c");
-        command.add("iptables -I OUTPUT -o " + intf + " -d " + destCidr
-                + " -p tcp -m state --state NEW -m tcp  -j ACCEPT");
-
-        final String result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in allowing outgoing to " + destCidr + ", err=" + result);
-            return "Error in allowing outgoing to " + destCidr + ", err=" + result;
-        }
-
-        return null;
-    }
-
-    public String setExternalAccess(final String sourceCidr) {
-        if (!this._inSystemVM) {
-            return null;
-        }
-        final Script command = new Script("/bin/bash", s_logger);
-        final String intf = "eth0";
-        command.add("-c");
-        command.add("iptables -I INPUT -i " + intf + " -s " + sourceCidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT");
-
-        final String result = command.execute();
-        if (result != null) {
-            s_logger.warn("Error in allowing external firewall to " + sourceCidr + ", err=" + result);
-            return "Error in allowing external to " + sourceCidr + ", err=" + result;
-        }
-
         return null;
     }
 
