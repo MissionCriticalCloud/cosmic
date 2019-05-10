@@ -1394,7 +1394,7 @@ AjaxViewer.prototype = {
         if (e.shiftLeft)
             modifiers |= AjaxViewer.LEFT_SHIFT_MASK;
 
-        if (e.metaKey)
+        if (e.metaKey && !e.ctrlKey)
             modifiers |= AjaxViewer.META_KEY_MASK;
 
         return modifiers;
