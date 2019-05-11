@@ -1,10 +1,10 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.model.enumeration.BootOrder;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
-import java.util.Date;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +44,7 @@ public class VirtualMachineTO {
     private OptimiseFor optimiseFor;
     private MaintenancePolicy maintenancePolicy;
     private Long bootMenuTimeout;
+    private List<BootOrder> bootOrder;
     private String lastStartDateTime;
     private String lastStartVersion;
 
@@ -330,6 +331,14 @@ public class VirtualMachineTO {
 
     public void setBootMenuTimeout(final Long bootMenuTimeout) {
         this.bootMenuTimeout = bootMenuTimeout;
+    }
+
+    public List<BootOrder> getBootOrder() {
+        return bootOrder;
+    }
+
+    public void setBootOrder(final List<BootOrder> bootOrder) {
+        this.bootOrder = bootOrder;
     }
 
     public String getLastStartDateTime() {

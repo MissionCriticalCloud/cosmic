@@ -277,6 +277,8 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     private MaintenancePolicy maintenancePolicy;
     @Column(name = "boot_menu_timeout")
     private Long bootMenuTimeout;
+    @Column(name = "boot_order")
+    private String bootOrder;
     @Column(name = "last_start_datetime")
     protected String lastStartDateTime;
     @Column(name = "last_start_version")
@@ -1240,6 +1242,10 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public Long getBootMenuTimeout() {
         return bootMenuTimeout;
+    }
+
+    public String getBootOrder() {
+        return bootOrder;
     }
 
     public String getLastStartDateTime() {

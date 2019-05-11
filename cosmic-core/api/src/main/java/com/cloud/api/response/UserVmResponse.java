@@ -224,6 +224,10 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @Param(description = "Timeout of the boot menu (in ms)")
     private Long bootMenuTimeout;
 
+    @SerializedName(ApiConstants.BOOT_ORDER)
+    @Param(description = "Boot order priority")
+    private String bootOrder;
+
     @SerializedName(ApiConstants.LAST_START_DATE)
     @Param(description = "Timestamp of last start of VM")
     private String lastStartDateTime;
@@ -771,6 +775,14 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
 
     public void setBootMenuTimeout(final Long bootMenuTimeout) {
         this.bootMenuTimeout = bootMenuTimeout;
+    }
+
+    public String getBootOrder() {
+        return bootOrder;
+    }
+
+    public void setBootOrder(final String bootOrder) {
+        this.bootOrder = bootOrder;
     }
 
     public String getLastStartDateTime() {

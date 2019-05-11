@@ -35,8 +35,9 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
     public UserVmVO(final long id, final String instanceName, final String displayName, final long templateId, final HypervisorType hypervisorType, final long guestOsId,
                     final boolean haEnabled, final boolean limitCpuUse, final long domainId, final long accountId, final long userId, final long serviceOfferingId,
                     final String userData, final String name, final Long diskOfferingId, final String manufacturerString, final OptimiseFor optimiseFor,
-                    final Boolean macLearning, final String cpuFlags, final MaintenancePolicy maintenancePolicy, final Long bootMenuTimeout) {
-        super(id, serviceOfferingId, name, instanceName, VirtualMachineType.User, templateId, hypervisorType, guestOsId, domainId, accountId, userId, haEnabled, limitCpuUse, diskOfferingId);
+                    final Boolean macLearning, final String cpuFlags, final MaintenancePolicy maintenancePolicy, final Long bootMenuTimeout, final String bootOrder) {
+        super(id, serviceOfferingId, name, instanceName, VirtualMachineType.User, templateId, hypervisorType, guestOsId, domainId, accountId, userId, haEnabled, limitCpuUse,
+                diskOfferingId);
         this.userData = userData;
         this.displayName = displayName;
         this.details = new HashMap<>();
@@ -47,6 +48,7 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
         this.maintenancePolicy = maintenancePolicy;
         this.requiresRestart = Boolean.FALSE;
         this.bootMenuTimeout = bootMenuTimeout;
+        this.bootOrder = bootOrder;
     }
 
     protected UserVmVO() {

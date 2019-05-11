@@ -25,7 +25,6 @@ import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.legacymodel.configuration.Resource;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
-import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
@@ -34,6 +33,7 @@ import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
+import com.cloud.model.enumeration.StorageProvisioningType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.storage.dao.VolumeDao;
@@ -144,7 +144,9 @@ public class VolumeApiServiceImplTest {
                     null, "root", VolumeType.ROOT, DiskControllerType.SCSI);
             when(_svc._volsDao.findById(1L)).thenReturn(volumeOfRunningVm);
 
-            final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L);
+            final UserVmVO runningVm = new UserVmVO(1L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,
+                    false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer",
+                    OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L, "cdrom,hd,network");
             runningVm.setState(State.Running);
             runningVm.setDataCenterId(1L);
             when(_svc._userVmDao.findById(1L)).thenReturn(runningVm);
@@ -155,7 +157,10 @@ public class VolumeApiServiceImplTest {
             volumeOfStoppedVm.setPoolId(1L);
             when(_svc._volsDao.findById(2L)).thenReturn(volumeOfStoppedVm);
 
-            final UserVmVO stoppedVm = new UserVmVO(2L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false,false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L);
+            final UserVmVO stoppedVm =
+                    new UserVmVO(2L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false, false,
+                            1L, 1L, 1, 1L, null, "vm", null, "Manufacturer",
+                            OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L, "cdrom,hd,network");
             stoppedVm.setState(State.Stopped);
             stoppedVm.setDataCenterId(1L);
             when(_svc._userVmDao.findById(2L)).thenReturn(stoppedVm);
@@ -206,7 +211,10 @@ public class VolumeApiServiceImplTest {
             when(_svc._volsDao.findById(7L)).thenReturn(managedVolume1);
 
             // vm having root volume
-            final UserVmVO vmHavingRootVolume = new UserVmVO(4L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false, false, 1L, 1L, 1, 1L, null, "vm", null, "Manufacturer", OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L);
+            final UserVmVO vmHavingRootVolume =
+                    new UserVmVO(4L, "vm", "vm", 1, HypervisorType.XenServer, 1L, false, false,
+                            1L, 1L, 1, 1L, null, "vm", null, "Manufacturer",
+                            OptimiseFor.Generic, false, "", MaintenancePolicy.LiveMigrate, 0L, "cdrom,hd,network");
             vmHavingRootVolume.setState(State.Stopped);
             vmHavingRootVolume.setDataCenterId(1L);
             when(_svc._userVmDao.findById(4L)).thenReturn(vmHavingRootVolume);
@@ -360,8 +368,11 @@ public class VolumeApiServiceImplTest {
     //The resource limit check for primary storage should not be skipped for Volume in 'Uploaded' state.
     @Test
     public void testResourceLimitCheckForUploadedVolume() throws NoSuchFieldException, IllegalAccessException, ResourceAllocationException {
-        doThrow(new ResourceAllocationException("primary storage resource limit check failed", Resource.ResourceType.primary_storage)).when(_svc._resourceLimitMgr).checkResourceLimit(any(AccountVO
-                .class), any(Resource.ResourceType.class), any(Long.class));
+        doThrow(new ResourceAllocationException("primary storage resource limit check failed", Resource.ResourceType.primary_storage)).when(_svc._resourceLimitMgr)
+                                                                                                                                      .checkResourceLimit(any(AccountVO
+                                                                                                                                                      .class),
+                                                                                                                                              any(Resource.ResourceType.class),
+                                                                                                                                              any(Long.class));
         final UserVmVO vm = Mockito.mock(UserVmVO.class);
         final VolumeInfo volumeToAttach = Mockito.mock(VolumeInfo.class);
         when(volumeToAttach.getId()).thenReturn(9L);

@@ -56,8 +56,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "deployVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Creates and automatically starts a virtual machine based on a service offering, disk " +
-        "offering, and template.",
+@APICommand(name = "deployVirtualMachine", group = APICommandGroup.VirtualMachineService, description = "Creates and automatically starts a virtual machine based on a service " +
+        "offering, disk offering, and template.",
         responseObject = UserVmResponse.class, responseView = ResponseView.Restricted, entityType = {VirtualMachine.class},
         requestHasSensitiveInfo = false, responseHasSensitiveInfo = true)
 public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
@@ -197,7 +197,12 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     @Parameter(name = ApiConstants.BOOT_MENU_TIMEOUT, type = CommandType.LONG, description = "Timeout (in ms) to for the boot menu")
     private Long bootMenuTimeout;
 
-    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical Cloud'")
+    @Parameter(name = ApiConstants.BOOT_ORDER, type = CommandType.STRING, description = "Comma seperated list from which device to boot from first, can one of 'hd','cdrom'," +
+            "'network'")
+    private String bootOrder;
+
+    @Parameter(name = ApiConstants.MANUFACTURER_STRING, type = CommandType.STRING, description = "Manufacturer String to put in hardware info, defaults to 'Mission Critical " +
+            "Cloud'")
     private String manufacturerString;
 
     @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
@@ -205,7 +210,6 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
 
     @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "either 'LiveMigrate' or 'ShutdownAndStart' when performing hypervisor maintenance")
     private String maintenancePolicy;
-
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -439,6 +443,10 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
         return 0L;
     }
 
+    public String getBootOrder() {
+        return bootOrder;
+    }
+
     @Override
     public String getEventType() {
         return EventTypes.EVENT_VM_CREATE;
@@ -613,7 +621,7 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
             final IpAddresses addrs = new IpAddresses(ipAddress, ip6Address, getMacAddress());
             final UserVm vm = _userVmService.createAdvancedVirtualMachine(zone, serviceOffering, template, getNetworkIds(), owner, name, displayName, diskOfferingId, size, group,
                     getHypervisor(), getHttpMethod(), userData, sshKeyPairName, getIpToNetworkMap(), addrs, displayVm, keyboard, getAffinityGroupIdList(), getDetails(),
-                    getCustomId(), getDiskController(), getBootMenuTimeout(), getMaintenancePolicy(), getOptimiseFor(), getManufacturerString());
+                    getCustomId(), getDiskController(), getBootMenuTimeout(), getMaintenancePolicy(), getOptimiseFor(), getManufacturerString(), getBootOrder());
 
             if (vm != null) {
                 setEntityId(vm.getId());

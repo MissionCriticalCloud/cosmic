@@ -90,6 +90,7 @@ import com.cloud.legacymodel.utils.Ternary;
 import com.cloud.legacymodel.vm.HostVmStateReportEntry;
 import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.legacymodel.vm.VmStatsEntry;
+import com.cloud.model.enumeration.BootOrder;
 import com.cloud.model.enumeration.BroadcastDomainType;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HostType;
@@ -1342,8 +1343,14 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
         guest.setUuid(uuid);
         guest.setManufacturer(vmTo.getManufacturer());
         guest.setBootMenuTimeout(vmTo.getBootMenuTimeout());
-        guest.setBootOrder(GuestDef.BootOrder.CDROM);
-        guest.setBootOrder(GuestDef.BootOrder.HARDISK);
+        if (vmTo.getBootOrder() != null) {
+            for (BootOrder device : vmTo.getBootOrder()) {
+                guest.setBootOrder(device);
+            }
+        } else {
+            guest.setBootOrder(BootOrder.CDROM);
+            guest.setBootOrder(BootOrder.HARDDISK);
+        }
 
         vm.addComponent(guest);
 

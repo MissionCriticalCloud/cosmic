@@ -13,8 +13,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 public interface UserVmDao extends GenericDao<UserVmVO, Long> {
     List<UserVmVO> listByAccountId(long id);
 
@@ -40,8 +38,8 @@ public interface UserVmDao extends GenericDao<UserVmVO, Long> {
      */
     void updateVM(long id, String displayName, boolean enable, Long osTypeId, String userData, boolean displayVm, boolean isDynamicallyScalable, String customId,
                   String hostName, String instanceName, String manufacturerString, OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy,
-                  Long bootMenuTimeout
-                  );
+                  Long bootMenuTimeout, String bootOrder
+    );
 
     List<UserVmVO> findDestroyedVms(Date date);
 

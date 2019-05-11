@@ -216,7 +216,9 @@ public class AffinityGroupServiceImplTest {
     @Test(expected = InvalidParameterValueException.class)
     public void updateAffinityGroupVMRunning() throws ResourceInUseException {
         when(_acctMgr.finalizeOwner((Account) anyObject(), anyString(), anyLong(), anyLong())).thenReturn(acct);
-        final UserVmVO vm = new UserVmVO(10L, "test", "test", 101L, HypervisorType.Any, 21L, false, false, DOMAIN_ID, 200L, 1, 5L, "", "test", 1L, "Manufacturer", OptimiseFor.Generic,false, "", MaintenancePolicy.LiveMigrate, 0L);
+        final UserVmVO vm = new UserVmVO(10L, "test", "test", 101L, HypervisorType.Any, 21L, false, false,
+                DOMAIN_ID, 200L, 1, 5L, "", "test", 1L, "Manufacturer", OptimiseFor.Generic,
+                false, "", MaintenancePolicy.LiveMigrate, 0L, "cdrom,hd,network");
         vm.setState(VirtualMachine.State.Running);
         when(_vmDao.findById(10L)).thenReturn(vm);
 
