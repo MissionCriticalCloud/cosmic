@@ -682,9 +682,9 @@
 
             //step 5: select an affinity group
             var checkedAffinityGroupIdArray;
-            if (typeof(args.data["affinity-groups"]) == "object" && args.data["affinity-groups"].length != null) { //args.data["affinity-groups"] is an array of string, e.g. ["2375f8cc-8a73-4b8d-9b26-50885a25ffe0", "27c60d2a-de7f-4bb7-96e5-a602cec681df","c6301d77-99b5-4e8a-85e2-3ea2ab31c342"],
+            if (typeof (args.data["affinity-groups"]) == "object" && args.data["affinity-groups"].length != null) { //args.data["affinity-groups"] is an array of string, e.g. ["2375f8cc-8a73-4b8d-9b26-50885a25ffe0", "27c60d2a-de7f-4bb7-96e5-a602cec681df","c6301d77-99b5-4e8a-85e2-3ea2ab31c342"],
                 checkedAffinityGroupIdArray = args.data["affinity-groups"];
-            } else if (typeof(args.data["affinity-groups"]) == "string" && args.data["affinity-groups"].length > 0) { //args.data["affinity-groups"] is a string, e.g. "2375f8cc-8a73-4b8d-9b26-50885a25ffe0"
+            } else if (typeof (args.data["affinity-groups"]) == "string" && args.data["affinity-groups"].length > 0) { //args.data["affinity-groups"] is a string, e.g. "2375f8cc-8a73-4b8d-9b26-50885a25ffe0"
                 checkedAffinityGroupIdArray = [];
                 checkedAffinityGroupIdArray.push(args.data["affinity-groups"]);
             } else { // typeof(args.data["affinity-groups"]) == null
@@ -704,9 +704,9 @@
                 var defaultNetworkId = args.data.defaultNetwork; //args.data.defaultNetwork might be equal to string "new-network" or a network ID
 
                 var checkedNetworkIdArray;
-                if (typeof(args.data["my-networks"]) == "object" && args.data["my-networks"].length != null) { //args.data["my-networks"] is an array of string, e.g. ["203", "202"],
+                if (typeof (args.data["my-networks"]) == "object" && args.data["my-networks"].length != null) { //args.data["my-networks"] is an array of string, e.g. ["203", "202"],
                     checkedNetworkIdArray = args.data["my-networks"];
-                } else if (typeof(args.data["my-networks"]) == "string" && args.data["my-networks"].length > 0) { //args.data["my-networks"] is a string, e.g. "202"
+                } else if (typeof (args.data["my-networks"]) == "string" && args.data["my-networks"].length > 0) { //args.data["my-networks"] is a string, e.g. "202"
                     checkedNetworkIdArray = [];
                     checkedNetworkIdArray.push(args.data["my-networks"]);
                 } else { // typeof(args.data["my-networks"]) == null
@@ -889,6 +889,13 @@
                 $.extend(deployVmData, {
                     optimisefor: optimisefor
                 });
+            }
+
+            var startvm = args.data.startvm;
+            if (startvm != null && startvm.length > 0) {
+                $.extend(deployVmData, {
+                    startvm: startvm
+                })
             }
 
             var userdata = args.data.userdata;
