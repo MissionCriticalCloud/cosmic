@@ -90,6 +90,9 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     private String maintenancePolicy;
     @Parameter(name = ApiConstants.BOOT_MENU_TIMEOUT, type = CommandType.LONG, description = "Timeout (in ms) to for the boot menu")
     private Long bootMenuTimeout;
+    @Parameter(name = ApiConstants.BOOT_ORDER, type = CommandType.STRING, description = "Comma seperated list from which device to boot from first, can one of 'hd','cdrom'," +
+            "'network'")
+    private String bootOrder;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -216,5 +219,9 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
 
     public Long getBootMenuTimeout() {
         return bootMenuTimeout;
+    }
+
+    public String getBootOrder() {
+        return bootOrder;
     }
 }

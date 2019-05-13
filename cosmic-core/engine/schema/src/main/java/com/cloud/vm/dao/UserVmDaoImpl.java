@@ -48,7 +48,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             + "vm_template.id, vm_template.name, vm_template.display_text, iso.id, iso.name, "
             + "vm_template.enable_password, service_offering.id, disk_offering.name, storage_pool.id, storage_pool.pool_type, "
             + "service_offering.cpu, service_offering.ram_size, volumes.id, volumes.device_id, volumes.volume_type,"
-            + "nics.id, nics.ip4_address, nics.default_nic, nics.gateway, nics.network_id, nics.netmask, nics.mac_address, nics.broadcast_uri, nics.isolation_uri, nics.mirror_ip_address, nics.mirror_key, "
+            + "nics.id, nics.ip4_address, nics.default_nic, nics.gateway, nics.network_id, nics.netmask, nics.mac_address, nics.broadcast_uri, nics.isolation_uri, nics" +
+            ".mirror_ip_address, nics.mirror_key, "
             + "networks.traffic_type, networks.guest_type, user_ip_address.id, user_ip_address.public_ip_address from vm_instance "
             + "left join account on vm_instance.account_id=account.id  " + "left join domain on vm_instance.domain_id=domain.id "
             + "left join instance_group_vm_map on vm_instance.id=instance_group_vm_map.instance_id "
@@ -57,7 +58,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
             + "left join user_vm on vm_instance.id=user_vm.id " + "left join vm_template iso on iso.id=user_vm.iso_id "
             + "left join service_offering on vm_instance.service_offering_id=service_offering.id "
             + "left join disk_offering  on vm_instance.service_offering_id=disk_offering.id " + "left join volumes on vm_instance.id=volumes.instance_id "
-            + "left join storage_pool on volumes.pool_id=storage_pool.id " + "left join nics on vm_instance.id=nics.instance_id " + "left join networks on nics.network_id=networks.id " + "left join" +
+            + "left join storage_pool on volumes.pool_id=storage_pool.id " + "left join nics on vm_instance.id=nics.instance_id " + "left join networks on nics" +
+            ".network_id=networks.id " + "left join" +
             " user_ip_address on user_ip_address.vm_id=vm_instance.id " + "where vm_instance.id in (";
     private static final String VMS_DETAIL_BY_NAME = "select vm_instance.instance_name, vm_instance.vm_type, vm_instance.id , user_vm_details.value, user_vm_details.name from " +
             "vm_instance "
@@ -240,7 +242,8 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     @Override
     public void updateVM(final long id, final String displayName, final boolean enable, final Long osTypeId, final String userData, final boolean displayVm,
                          final boolean isDynamicallyScalable, final String customId, final String hostName, final String instanceName, final String manufacturerString,
-                         final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy, final Long bootMenuTimeout) {
+                         final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy, final Long bootMenuTimeout,
+                         final String bootOrder) {
 
         final UserVmVO vo = createForUpdate();
         vo.setDisplayName(displayName);
@@ -263,6 +266,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         }
         if (bootMenuTimeout != null) {
             vo.setBootMenuTimeout(bootMenuTimeout);
+        }
+        if (bootOrder != null) {
+            vo.setBootOrder(bootOrder);
         }
         if (hostName != null) {
             vo.setHostName(hostName);

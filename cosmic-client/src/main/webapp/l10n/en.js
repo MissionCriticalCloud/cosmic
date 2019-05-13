@@ -29,6 +29,7 @@ var dictionary = {
     "inline": "Inline",
     "instances.actions.reboot.label": "Reboot instance",
     "label.boot.menu.timeout": "Boot menu timeout (ms)",
+    "label.boot.order": "Boot order",
     "label.CIDR.list": "CIDR list",
     "label.CIDR.of.destination.network": "CIDR of destination network",
     "label.CPU.cap": "CPU Cap",

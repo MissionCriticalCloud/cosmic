@@ -21,7 +21,6 @@ import java.util.Map;
 
 /**
  *
- *
  */
 public interface UserVmManager extends UserVmService {
     String EnableDynamicallyScaleVmCK = "enable.dynamic.scale.vm";
@@ -81,6 +80,6 @@ public interface UserVmManager extends UserVmService {
 
     UserVm updateVirtualMachine(long id, String displayName, String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                 Boolean isDynamicallyScalable, HTTPMethod httpMethod, String customId, String hostName, String instanceName, String manufacturerString,
-                                OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy, Long bootMenuTimeout
+                                OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy, Long bootMenuTimeout, String bootOrder
     ) throws ResourceUnavailableException, InsufficientCapacityException;
 }

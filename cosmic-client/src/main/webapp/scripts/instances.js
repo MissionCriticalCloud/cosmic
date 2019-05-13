@@ -1065,7 +1065,8 @@
                                 group: args.data.group,
                                 isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                 optimisefor: args.data.optimisefor,
-                                bootmenutimeout: args.data.bootmenutimeout
+                                bootmenutimeout: args.data.bootmenutimeout,
+                                bootorder: args.data.bootorder
                             };
                             if (args.data.displayname != args.context.instances[0].displayname) {
                                 $.extend(data, {
@@ -2143,6 +2144,32 @@
                             bootmenutimeout: {
                                 label: 'label.boot.menu.timeout',
                                 isEditable: true
+                            },
+                            bootorder: {
+                                label: 'label.boot.order',
+                                isEditable: true,
+                                select: function (args) {
+                                    var items = [];
+                                    items.push({
+                                        id: "cdrom,hd",
+                                        description: "CDROM, Harddisk"
+                                    }, {
+                                        id: "network,hd",
+                                        description: "Network, Harddisk"
+                                    }, {
+                                        id: "cdrom,hd,network",
+                                        description: "CDROM, Harddisk, Network"
+                                    });
+                                    args.response.success({
+                                        data: items
+                                    })
+                                },
+                                converter: function (args) {
+                                    if (args == null)
+                                        return "CDROM, Harddisk";
+                                    else
+                                        return args;
+                                }
                             },
                             rootdevicecontroller: {
                                 label: 'label.root.disk.controller'

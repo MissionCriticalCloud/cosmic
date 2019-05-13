@@ -78,7 +78,8 @@ public interface UserVmService {
      */
     UserVm resetVMSSHKey(ResetVMSSHKeyCmd cmd) throws ResourceUnavailableException, InsufficientCapacityException;
 
-    UserVm startVirtualMachine(StartVMCmd cmd) throws ExecutionException, ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException, ResourceAllocationException;
+    UserVm startVirtualMachine(StartVMCmd cmd) throws ExecutionException, ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException,
+            ResourceAllocationException;
 
     UserVm rebootVirtualMachine(RebootVMCmd cmd) throws InsufficientCapacityException, ResourceUnavailableException;
 
@@ -160,9 +161,9 @@ public interface UserVmService {
      */
     UserVm createAdvancedVirtualMachine(Zone zone, ServiceOffering serviceOffering, VirtualMachineTemplate template, List<Long> networkIdList, Account owner,
                                         String hostName, String displayName, Long diskOfferingId, Long diskSize, String group, HypervisorType hypervisor, HTTPMethod httpmethod,
-                                        String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps, Boolean displayVm, String keyboard, List<Long>
-                                        affinityGroupIdList, Map<String, String> customParameters, String customId, DiskControllerType diskControllerType, Long bootMenuTimeout,
-                                        MaintenancePolicy maintenancePolicy, OptimiseFor optimiseFor, String manufacturerString)
+                                        String userData, String sshKeyPair, Map<Long, IpAddresses> requestedIps, IpAddresses defaultIps, Boolean displayVm, String keyboard,
+                                        List<Long> affinityGroupIdList, Map<String, String> customParameters, String customId, DiskControllerType diskControllerType,
+                                        Long bootMenuTimeout, MaintenancePolicy maintenancePolicy, OptimiseFor optimiseFor, String manufacturerString, String bootOrder)
             throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException, ResourceAllocationException;
 
     /**
@@ -220,7 +221,8 @@ public interface UserVmService {
      * @throws ResourceUnavailableException     if the destination host to migrate the VM is not currently available.
      * @throws VirtualMachineMigrationException if the VM to be migrated is not in Running state
      */
-    VirtualMachine migrateVirtualMachineWithVolume(Long vmId, Host destinationHost, Map<String, String> volumeToPool) throws ResourceUnavailableException, ConcurrentOperationException,
+    VirtualMachine migrateVirtualMachineWithVolume(Long vmId, Host destinationHost, Map<String, String> volumeToPool) throws ResourceUnavailableException,
+            ConcurrentOperationException,
             ManagementServerException, VirtualMachineMigrationException;
 
     UserVm moveVMToUser(AssignVMCmd moveUserVMCmd) throws ResourceAllocationException, ConcurrentOperationException, ResourceUnavailableException, InsufficientCapacityException;

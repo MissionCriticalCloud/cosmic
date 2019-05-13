@@ -641,7 +641,7 @@ public class UserVmManagerTest {
         final Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
 
         final UserVmVO vm = new UserVmVO(10L, "test", "test", 1L, HypervisorType.Any, 1L, false, false, 1L, 1L, 1, 5L, "test", "test", 1L, "Manufacturer", OptimiseFor.Generic,
-                false, "", MaintenancePolicy.LiveMigrate, 0L);
+                false, "", MaintenancePolicy.LiveMigrate, 0L, "cdrom,hd,network");
         vm.setState(VirtualMachine.State.Stopped);
         when(_vmDao.findById(anyLong())).thenReturn(vm);
 

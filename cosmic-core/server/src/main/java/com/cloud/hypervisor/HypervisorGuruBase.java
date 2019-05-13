@@ -11,6 +11,7 @@ import com.cloud.legacymodel.to.NicTO;
 import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.BootOrder;
 import com.cloud.model.enumeration.TrafficType;
 import com.cloud.model.enumeration.VirtualMachineType;
 import com.cloud.network.dao.NetworkDao;
@@ -19,7 +20,6 @@ import com.cloud.network.vpc.VpcVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.ServiceOffering;
 import com.cloud.resource.ResourceManager;
-import com.cloud.server.ConfigurationServer;
 import com.cloud.server.ResourceTag;
 import com.cloud.service.ServiceOfferingDetailsVO;
 import com.cloud.service.dao.ServiceOfferingDao;
@@ -39,6 +39,7 @@ import com.cloud.vm.dao.VMInstanceDao;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,18 @@ public abstract class HypervisorGuruBase extends AdapterBase implements Hypervis
         to.setConfigDriveLabel(vmProfile.getConfigDriveLabel());
         to.setConfigDriveIsoRootFolder(vmProfile.getConfigDriveIsoRootFolder());
         to.setConfigDriveIsoFile(vmProfile.getConfigDriveIsoFile());
+
+        LinkedHashSet<BootOrder> order = new LinkedHashSet<>();
+        if (vmInstance.getBootOrder() != null) {
+            for (final String dev : vmInstance.getBootOrder().split(",")) {
+                order.add(BootOrder.stringToEnum(dev));
+            }
+        } else {
+            // If bootorder column in DB is empty do default behaviour
+            order.add(BootOrder.CDROM);
+            order.add(BootOrder.HARDDISK);
+        }
+        to.setBootOrder(new ArrayList<>(order));
 
         final MetadataTO metadataTO = new MetadataTO();
 

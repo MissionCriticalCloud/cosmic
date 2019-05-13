@@ -109,6 +109,9 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
         if (userVm.getBootMenuTimeout() != null) {
             userVmResponse.setBootMenuTimeout(userVm.getBootMenuTimeout());
         }
+        if (userVm.getBootOrder() != null) {
+            userVmResponse.setBootOrder(userVm.getBootOrder());
+        }
         if (userVm.getLastStartDateTime() != null) {
             userVmResponse.setLastStartDateTime(userVm.getLastStartDateTime());
         }

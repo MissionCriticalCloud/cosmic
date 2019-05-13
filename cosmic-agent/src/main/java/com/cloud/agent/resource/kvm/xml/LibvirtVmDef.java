@@ -1,5 +1,6 @@
 package com.cloud.agent.resource.kvm.xml;
 
+import com.cloud.model.enumeration.BootOrder;
 import com.cloud.model.enumeration.GuestNetType;
 import com.cloud.model.enumeration.NicModel;
 import com.cloud.model.enumeration.RngBackendModel;
@@ -171,7 +172,7 @@ public class LibvirtVmDef {
                 guestDef.append(">hvm</type>\n");
                 if (!this.bootDevs.isEmpty()) {
                     for (final BootOrder bo : this.bootDevs) {
-                        guestDef.append("<boot dev='" + bo + "'/>\n");
+                        guestDef.append("<boot dev='" + bo.getValue() + "'/>\n");
                     }
                 }
                 guestDef.append("<smbios mode='sysinfo'/>\n");
@@ -186,20 +187,6 @@ public class LibvirtVmDef {
                 return guestDef.toString();
             } else {
                 return null;
-            }
-        }
-
-        public enum BootOrder {
-            HARDISK("hd"), CDROM("cdrom"), FLOPPY("fd"), NETWORK("network");
-            String order;
-
-            BootOrder(final String order) {
-                this.order = order;
-            }
-
-            @Override
-            public String toString() {
-                return this.order;
             }
         }
     }
