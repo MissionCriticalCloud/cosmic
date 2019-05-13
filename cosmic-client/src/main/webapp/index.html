@@ -619,21 +619,6 @@
                                 </div>
                             </div>
 
-                            <!-- Primary network -->
-                            <div class="select">
-                                <div class="name">
-                                    <span><translate key="label.network"/></span>
-                                </div>
-                                <div class="value">
-                                    <span wizard-field="default-network" conditional-field="select-network"></span>
-                                </div>
-                                <div class="edit">
-                                    <a href="6">
-                                        <translate key="label.edit"/>
-                                    </a>
-                                </div>
-                            </div>
-
                             <!-- SSH Key Pairs -->
                             <div class="select">
                                 <div class="name">
@@ -650,7 +635,7 @@
                             </div>
 
                             <!-- Optimise for -->
-                            <div class="select">
+                            <div class="select odd">
                                 <div class="name">
                                     <span><translate key="label.optimisefor"/></span>
                                 </div>
@@ -658,6 +643,34 @@
                                     <select name="optimisefor" id="optimise-for">
                                         <option value="">Default</option>
                                     </select>
+                                </div>
+                            </div>
+
+                            <!-- Auto start instance -->
+                            <div class="select">
+                                <div class="name">
+                                    <span><translate key="label.action.start.instance"/></span>
+                                </div>
+                                <div class="value">
+                                    <select name="startvm" id="startvm">
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Primary network -->
+                            <div class="select odd">
+                                <div class="name">
+                                    <span><translate key="label.network"/></span>
+                                </div>
+                                <div class="value">
+                                    <span wizard-field="default-network" conditional-field="select-network"></span>
+                                </div>
+                                <div class="edit">
+                                    <a href="6">
+                                        <translate key="label.edit"/>
+                                    </a>
                                 </div>
                             </div>
 
