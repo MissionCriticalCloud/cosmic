@@ -2265,7 +2265,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             if (network == null) {
                 throw new InvalidParameterValueException("Unable to find network by id " + networkIdList.get(0));
             }
-            if (GuestType.Private.equals(network.getGuestType())) {
+            if (GuestType.Private.equals(network.getGuestType()) && !_accountMgr.isRootAdmin(caller.getId())) {
                 throw new InvalidParameterValueException("Deploying VMs in a network of type " + GuestType.Private + " is not possible.");
             }
             if (network.getVpcId() != null) {
