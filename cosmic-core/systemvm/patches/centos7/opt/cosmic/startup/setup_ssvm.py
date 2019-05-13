@@ -30,16 +30,12 @@ COMMIT
 -A INPUT -p icmp --icmp-type 13 -j DROP
 -A INPUT -p icmp -j ACCEPT
 -A INPUT -i %s -p tcp -m state --state NEW -s 169.254.0.1/32 --dport 3922 -j ACCEPT
--A OUTPUT -o %s -p tcp -m state --state NEW -m tcp --dport 80 -j REJECT
--A OUTPUT -o %s -p tcp -m state --state NEW -m tcp --dport 443 -j REJECT
 COMMIT
 """ % (
         cmdline['controlnic'],
         cmdline['mgtnic'],
         cmdline['publicnic'],
         cmdline['controlnic'],
-        cmdline['mgtnic'],
-        cmdline['mgtnic']
     )
 
     with open("/tmp/iptables-secstorage", "w") as f:
