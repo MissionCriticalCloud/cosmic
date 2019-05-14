@@ -166,6 +166,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -855,7 +856,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         final List<StoragePoolVO> storagePoolsInScopeWithVirtualMachine = findAllStoragePoolsInScopeWithVirtualMachine(virtualMachine);
 
-        final List<StoragePoolVO> storagePoolVOListMatchedTags = checkIfStoragePoolWithMatchingTags(storagePoolsInScopeWithVirtualMachine, Arrays.asList(diskOffering.getTagsArray()));
+        final List<StoragePoolVO> storagePoolVOListMatchedTags =
+                checkIfStoragePoolWithMatchingTags(storagePoolsInScopeWithVirtualMachine, Arrays.asList(diskOffering.getTagsArray()));
 
         final List<StoragePoolVO> storagePoolVOListSufficientResources = checkIfStoragePoolHasSufficientResources(storagePoolVOListMatchedTags, volumeInfo);
 
@@ -897,7 +899,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     private StoragePoolVO findMostSpecificStoragePoolForVirtualMachine(final UserVm userVm) {
         final List<VolumeVO> volumesOfVirtualMachine = this._volsDao.findByInstance(userVm.getId());
 
-        final List<StoragePoolVO> storagePoolVOList = volumesOfVirtualMachine.stream().map(volumeVO -> this._storagePoolDao.findById(volumeVO.getPoolId())).collect(Collectors.toList());
+        final List<StoragePoolVO> storagePoolVOList =
+                volumesOfVirtualMachine.stream().map(volumeVO -> this._storagePoolDao.findById(volumeVO.getPoolId())).filter(Objects::nonNull).collect(Collectors.toList());
 
         final Optional<StoragePoolVO> volumeWithStoragePoolHost = storagePoolVOList.stream().filter(storagePoolVO -> storagePoolVO.getScope().equals(HOST)).findFirst();
         if (volumeWithStoragePoolHost.isPresent()) {
@@ -926,8 +929,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         storagePools.addAll(this._storagePoolDao.listByScopeAndZone(ScopeType.ZONE, host.getDataCenterId()));
 
         // Only return "Up" storage pools
-        return storagePools.stream().filter(storagePool -> storagePool.getStatus().equals(StoragePoolStatus.Up) && !storagePool.isInMaintenance() && storagePool.getRemoved() == null).collect
-                (Collectors.toList());
+        return storagePools.stream()
+                           .filter(storagePool -> storagePool.getStatus().equals(StoragePoolStatus.Up) && !storagePool.isInMaintenance() && storagePool.getRemoved() == null)
+                           .collect
+                                   (Collectors.toList());
     }
 
     private List<StoragePoolVO> listStoragePoolsInScopeWithStoragePool(final StoragePoolVO storagePoolVO) {
@@ -969,8 +974,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         }
 
         // Only return "Up" storage pools
-        return storagePools.stream().filter(storagePool -> storagePool.getStatus().equals(StoragePoolStatus.Up) && !storagePool.isInMaintenance() && storagePool.getRemoved() == null).collect
-                (Collectors.toList());
+        return storagePools.stream()
+                           .filter(storagePool -> storagePool.getStatus().equals(StoragePoolStatus.Up) && !storagePool.isInMaintenance() && storagePool.getRemoved() == null)
+                           .collect
+                                   (Collectors.toList());
     }
 
     private StoragePoolVO getStoragePoolLeastResourcesUsed(final List<StoragePoolVO> storagePoolVOList) {
@@ -1171,7 +1178,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 volumeToAttach.setDiskController(diskController);
             }
 
-            final DiskTO disk = new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType(), volumeToAttach.getDiskController(), volumeToAttach.getFormat());
+            final DiskTO disk =
+                    new DiskTO(volTO, deviceId, volumeToAttach.getPath(), volumeToAttach.getVolumeType(), volumeToAttach.getDiskController(), volumeToAttach.getFormat());
 
             final AttachCommand cmd = new AttachCommand(disk, vm.getInstanceName());
 
@@ -2814,7 +2822,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         return Transaction.execute(new TransactionCallback<VolumeVO>() {
             @Override
             public VolumeVO doInTransaction(final TransactionStatus status) {
-                VolumeVO volume = new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, StorageProvisioningType.THIN, 0, VolumeType.DATADISK, getDiskControllerType());
+                VolumeVO volume =
+                        new VolumeVO(volumeName, zoneId, -1, -1, -1, new Long(-1), null, null, StorageProvisioningType.THIN, 0, VolumeType.DATADISK, getDiskControllerType());
                 volume.setPoolId(null);
                 volume.setDataCenterId(zoneId);
                 volume.setPodId(null);

@@ -1025,24 +1025,26 @@
                                                     });
                                                 }
 
-                                                $(['Running', 'Stopped']).each(function () {
+                                                $(['Running', 'Stopped']).each(function (_ignore, value) {
                                                     $.ajax({
                                                         url: createURL('listVirtualMachines'),
                                                         data: $.extend(data, {
-                                                            state: this.toString()
+                                                            state: value
                                                         }),
                                                         async: false,
                                                         success: function (json) {
                                                             var instanceObjs = json.listvirtualmachinesresponse.virtualmachine;
-                                                            instanceObjs.sort(function (a, b) {
-                                                                return a.name.localeCompare(b.name);
-                                                            });
-                                                            $(instanceObjs).each(function () {
-                                                                items.push({
-                                                                    id: this.id,
-                                                                    description: this.displayname ? this.displayname : this.name
+                                                            if (instanceObjs !== undefined) {
+                                                                instanceObjs.sort(function (a, b) {
+                                                                    return a.name.localeCompare(b.name);
                                                                 });
-                                                            });
+                                                                $(instanceObjs).each(function () {
+                                                                    items.push({
+                                                                        id: this.id,
+                                                                        description: this.displayname ? this.displayname : this.name
+                                                                    });
+                                                                });
+                                                            }
                                                         }
                                                     });
                                                 });
