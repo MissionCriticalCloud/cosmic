@@ -61,6 +61,8 @@ class SecondaryStorageVM:
         if self.cmdline['setrfc1918routes'] == 'true':
             logging.info("Setting rfc1918 routes")
             Utils(self.cmdline).set_rfc1918_routes()
+        logging.info("Setting local routes")
+        Utils(self.cmdline).set_local_routes()
 
         os.system("systemctl start cosmic-agent")
 
