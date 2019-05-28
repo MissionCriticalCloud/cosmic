@@ -38,7 +38,7 @@ class App:
         self.cmdline = {}
 
         with open(AGENT_PROPERTIES, "r") as f:
-            config = yaml.load(f)
+            config = yaml.load(stream=f, Loader=yaml.FullLoader)
             self.cmdline = config['cosmic']
 
     def write_cmdline_json(self):

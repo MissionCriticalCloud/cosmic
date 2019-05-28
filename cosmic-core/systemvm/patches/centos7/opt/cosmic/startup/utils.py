@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 import subprocess
-
+import ipaddress
 import yaml
 
 
@@ -264,3 +264,16 @@ Cosmic sytemvm powered by %s
         os.system("ip route add 10.0.0.0/8 via %s" % self.cmdline["localgw"])
         os.system("ip route add 172.16.0.0/12 via %s" % self.cmdline["localgw"])
         os.system("ip route add 192.168.0.0/16 via %s" % self.cmdline["localgw"])
+
+    def set_local_routes(self):
+        # Internal DNS
+        if "internaldns1" in self.cmdline and ipaddress.ip_address(self.cmdline["internaldns1"]).is_private:
+            print("Set route for internal DNS1 to localgw")
+            os.system("ip route add %s via %s" % (self.cmdline["internaldns1"], self.cmdline["localgw"]))
+        if "internaldns2" in self.cmdline and ipaddress.ip_address(self.cmdline["internaldns2"]).is_private:
+            print("Set route for internal DNS2 to localgw")
+            os.system("ip route add %s via %s" % (self.cmdline["internaldns2"], self.cmdline["localgw"]))
+        # Management Servers
+        for mgt in self.cmdline.get('hosts', []):
+            print("Set route for management server %s to localgw" % mgt)
+            os.system("ip route add %s via %s" % (mgt, self.cmdline["localgw"]))
