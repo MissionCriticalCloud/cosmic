@@ -2257,12 +2257,6 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             throw new InvalidParameterValueException("Unable to find host with ID: " + hostId + ". Please specify a valid host ID.");
         }
 
-        final List<VMInstanceVO> vmsRunningOnHost = this._vmDao.listByHostId(hostId);
-
-        if (!vmsRunningOnHost.isEmpty()) {
-            throw new InvalidParameterValueException("There are active VMs on this host. Please migrate all VMs on this host to another host before starting maintenance.");
-        }
-
         if (this._hostDao.countBy(host.getClusterId(), ResourceState.PrepareForMaintenance, ResourceState.ErrorInMaintenance) > 0) {
             throw new InvalidParameterValueException("There are other servers in PrepareForMaintenance OR ErrorInMaintenance STATUS in cluster " + host.getClusterId());
         }
