@@ -50,7 +50,7 @@
         </encoder>
     </appender>
 
-    <include resource="logback-custom.xml"/>
+    <include resource="logback-custom.xml" />
     <!-- Include your custom logback configuration in /etc/cosmic/management/logback-custom.xml -->
 
     <logger name="com.cloud.utils.db.GenericDaoBase" level="WARN" />
@@ -59,6 +59,8 @@
     <logger name="org.springframework" level="WARN" />
 
     <logger name="org.hibernate" level="WARN" />
+
+    <logger name="org.flywaydb" level="WARN" />
 
     <logger name="com.cloud.api.ApiServlet" level="DEBUG" additivity="false">
         <appender-ref ref="API" />

@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -62,12 +61,7 @@ public class ConfigurationServerImplTest {
             temp.delete();
         }
     }
-
-    @Test
-    public void testScript() {
-        Assert.assertEquals("scripts/vm/systemvm/injectkeys.sh", linuxImpl.getInjectScript());
-    }
-
+    
     @Test
     public void testUpdateSystemvmPassword() {
         //setup

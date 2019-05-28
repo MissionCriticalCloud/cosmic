@@ -348,7 +348,8 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         });
     }
 
-    private ServiceOfferingVO createServiceOffering(final long userId, final String name, final int cpu, final int ramSize, final String displayText, final StorageProvisioningType provisioningType,
+    private ServiceOfferingVO createServiceOffering(final long userId, final String name, final int cpu, final int ramSize, final String displayText,
+                                                    final StorageProvisioningType provisioningType,
                                                     final
                                                     boolean localStorageRequired, final boolean offerHA, String tags) {
         tags = cleanupTags(tags);
@@ -892,32 +893,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         }
     }
 
-    protected void injectSshKeysIntoSystemVmIsoPatch(final String publicKeyPath, final String privKeyPath) {
-        s_logger.info("Trying to inject public and private keys into systemvm iso");
-        final String injectScript = getInjectScript();
-        final String scriptPath = Script.findScript("", injectScript);
-        final String systemVmIsoPath = Script.findScript("", "vms/systemvm.iso");
-        if (scriptPath == null) {
-            throw new CloudRuntimeException("Unable to find key inject script " + injectScript);
-        }
-        if (systemVmIsoPath == null) {
-            throw new CloudRuntimeException("Unable to find systemvm iso vms/systemvm.iso");
-        }
-        final Script command = new Script("/bin/bash", s_logger);
-
-        command.add(scriptPath);
-        command.add(publicKeyPath);
-        command.add(privKeyPath);
-        command.add(systemVmIsoPath);
-
-        final String result = command.execute();
-        s_logger.info("Injected public and private keys into systemvm iso with result : " + result);
-        if (result != null) {
-            s_logger.warn("Failed to inject generated public key into systemvm iso " + result);
-            throw new CloudRuntimeException("Failed to inject generated public key into systemvm iso " + result);
-        }
-    }
-
     private void templateDetailsInitIfNotExist(final long id, final String name, final String value) {
         final TransactionLegacy txn = TransactionLegacy.currentTxn();
         PreparedStatement stmt = null;
@@ -974,10 +949,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
                 throw new CloudRuntimeException("Failed to update keypairs on disk: cannot write to  key file " + keyPath);
             }
         }
-    }
-
-    protected String getInjectScript() {
-        return "scripts/vm/systemvm/injectkeys.sh";
     }
 
     @Override
@@ -1085,14 +1056,6 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
         } else {
             s_logger.info("Keypairs already in database, updating local copy");
             updateKeyPairsOnDisk(homeDir);
-        }
-        s_logger.info("Going to update systemvm iso with generated keypairs if needed");
-        try {
-            injectSshKeysIntoSystemVmIsoPatch(pubkeyfile.getAbsolutePath(), privkeyfile.getAbsolutePath());
-        } catch (final CloudRuntimeException e) {
-            if (!devel) {
-                throw new CloudRuntimeException(e.getMessage());
-            }
         }
     }
 
