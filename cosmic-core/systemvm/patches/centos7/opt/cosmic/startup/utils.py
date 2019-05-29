@@ -274,6 +274,10 @@ Cosmic sytemvm powered by %s
             print("Set route for internal DNS2 to localgw")
             os.system("ip route add %s via %s" % (self.cmdline["internaldns2"], self.cmdline["localgw"]))
         # Management Servers
-        for mgt in self.cmdline.get('hosts', []):
+        mgtservers = self.cmdline.get('hosts', [])
+        if len(mgtservers) == 0:
+            print("Unable to find hosts in 'hosts' var, trying 'host' instead.")
+            mgtservers = self.cmdline.get('host', '').split(',')
+        for mgt in mgtservers:
             print("Set route for management server %s to localgw" % mgt)
             os.system("ip route add %s via %s" % (mgt, self.cmdline["localgw"]))
