@@ -2371,6 +2371,7 @@
                                                     $.ajax({
                                                         url: createURL('listNetworks'),
                                                         data: {
+                                                            zoneid: args.context.instances[0].zoneid,
                                                             issystem: true,
                                                             trafficType: "Public"
                                                         },
@@ -2395,7 +2396,7 @@
                                                                     }
                                                                     itemsPub.push({
                                                                         id: networkObj.id,
-                                                                        description: "Public Network"
+                                                                        description: "Public Network [" + networkObj.zonename + "]"
                                                                     });
                                                                 }
                                                             }
