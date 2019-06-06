@@ -269,10 +269,10 @@ Cosmic sytemvm powered by %s
         # Internal DNS
         if "internaldns1" in self.cmdline and ipaddress.ip_address(self.cmdline["internaldns1"]).is_private:
             print("Set route for internal DNS1 to localgw")
-            os.system("ip route add %s via %s" % (self.cmdline["internaldns1"], self.cmdline["localgw"]))
+            self.set_route(cidr=self.cmdline["internaldns1"], nexthop=self.cmdline["localgw"])
         if "internaldns2" in self.cmdline and ipaddress.ip_address(self.cmdline["internaldns2"]).is_private:
             print("Set route for internal DNS2 to localgw")
-            os.system("ip route add %s via %s" % (self.cmdline["internaldns2"], self.cmdline["localgw"]))
+            self.set_route(cidr=self.cmdline["internaldns2"], nexthop=self.cmdline["localgw"])
         # Management Servers
         mgtservers = self.cmdline.get('hosts', [])
         if len(mgtservers) == 0:
@@ -280,4 +280,14 @@ Cosmic sytemvm powered by %s
             mgtservers = self.cmdline.get('host', '').split(',')
         for mgt in mgtservers:
             print("Set route for management server %s to localgw" % mgt)
-            os.system("ip route add %s via %s" % (mgt, self.cmdline["localgw"]))
+            self.set_route(cidr=mgt, nexthop=self.cmdline["localgw"])
+
+    def set_route(self, cidr, nexthop):
+        # Only set routes if we are not in the same subnet
+        if ipaddress.ip_address(cidr) not in ipaddress.IPv4Network("%s/%s" % (self.cmdline['mgtip'], self.cmdline['mgtmask']), strict=False):
+            os.system("ip route add %s via %s" % (cidr, nexthop))
+        else:
+            print("Not setting route for network %s to %s because it is already part of the same subnet." % (
+                cidr,
+                nexthop
+            ))
