@@ -3,11 +3,11 @@
     <artifactId>cloud-client-ui</artifactId>
     <name>Cosmic Client UI</name>
     <packaging>war</packaging>
-    <version>6.4.2</version>
+    <version>6.4.3-SNAPSHOT</version>
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic</artifactId>
-        <version>6.4.2</version>
+        <version>6.4.3-SNAPSHOT</version>
     </parent>
 
     <distributionManagement>
@@ -30,58 +30,58 @@
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-systemvm</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-spring-lifecycle</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-server</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-scripts</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-framework-ipc</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-api</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-components-api</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-orchestration</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-schema</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cloud-engine-storage-default</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-scripts</artifactId>
-            <version>6.4.2</version>
+            <version>6.4.3-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
     </dependencies>
