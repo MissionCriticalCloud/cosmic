@@ -142,7 +142,7 @@ NETMASK="%s"
 Port %s
 AddressFamily inet
 ListenAddress %s
-
+UseDNS no
 PermitRootLogin yes
 PasswordAuthentication no
 PubkeyAuthentication yes
