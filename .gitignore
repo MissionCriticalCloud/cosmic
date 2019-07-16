@@ -438,6 +438,7 @@ fabric.properties
 # Python virtualenv
 virtualenv/
 env/
+venv/
 
 # Smoke tests results
 /cosmic-core/test/integration/smoke/results.txt
