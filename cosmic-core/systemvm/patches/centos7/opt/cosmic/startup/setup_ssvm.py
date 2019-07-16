@@ -12,6 +12,10 @@ def setup_html():
 
 def setup_iptable_rules(cmdline):
 
+    external_rules = ""
+    for cidr in cmdline['allowedcidrs'].split(','):
+        external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
+
     iptables_rules = """
 *nat
 :PREROUTING ACCEPT [0:0]
@@ -30,12 +34,14 @@ COMMIT
 -A INPUT -p icmp --icmp-type 13 -j DROP
 -A INPUT -p icmp -j ACCEPT
 -A INPUT -i %s -p tcp -m state --state NEW -s 169.254.0.1/32 --dport 3922 -j ACCEPT
+%s
 COMMIT
 """ % (
         cmdline['controlnic'],
         cmdline['mgtnic'],
         cmdline['publicnic'],
         cmdline['controlnic'],
+        external_rules
     )
 
     with open("/tmp/iptables-secstorage", "w") as f:

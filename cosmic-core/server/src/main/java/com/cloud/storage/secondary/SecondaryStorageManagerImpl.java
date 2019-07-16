@@ -400,6 +400,14 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             setRfc1918Routes = false;
         }
 
+        // External firewall
+        this._allowedExternalCidrs = this._configDao.getValue("secstorage.allowed.external.cidrs");
+        if (this._allowedExternalCidrs != null) {
+            final List<String> allowedCidrs = this.GenerateAllowedCidrs(this._allowedExternalCidrs);
+            String listString = String.join(",", allowedCidrs);
+            buf.append(" allowedcidrs=").append(listString);
+        }
+
         if (Boolean.valueOf(this._configDao.getValue("system.vm.random.password"))) {
             buf.append(" vmpassword=").append(this._configDao.getValue("system.vm.password"));
         }
@@ -961,17 +969,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
 
         final SecStorageVMSetupCommand setupCmd = new SecStorageVMSetupCommand();
-        this._allowedInternalSites = this._configDao.getValue("secstorage.allowed.internal.sites");
-        if (this._allowedInternalSites != null) {
-            final List<String> allowedCidrs = this.GenerateAllowedCidrs(this._allowedInternalSites);
-            setupCmd.setAllowedInternalSites(allowedCidrs.toArray(new String[allowedCidrs.size()]));
-        }
-
-        this._allowedExternalCidrs = this._configDao.getValue("secstorage.allowed.external.cidrs");
-        if (this._allowedExternalCidrs != null) {
-            final List<String> allowedCidrs = this.GenerateAllowedCidrs(this._allowedExternalCidrs);
-            setupCmd.setAllowedExternalCidrs(allowedCidrs.toArray(new String[allowedCidrs.size()]));
-        }
 
         final String copyPasswd = this._configDao.getValue("secstorage.copy.password");
         setupCmd.setCopyPassword(copyPasswd);
