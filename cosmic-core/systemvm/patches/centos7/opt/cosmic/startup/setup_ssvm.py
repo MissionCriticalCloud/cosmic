@@ -13,8 +13,10 @@ def setup_html():
 def setup_iptable_rules(cmdline):
 
     external_rules = ""
-    for cidr in cmdline['allowedcidrs'].split(','):
-        external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
+    if 'allowedcidrs' in cmdline:
+        external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cmdline['allowedcidrs'] + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
+    else:
+        print('allowedcidrs not in cmdline')
 
     iptables_rules = """
 *nat

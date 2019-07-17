@@ -177,8 +177,12 @@ AcceptEnv XMODIFIERS
 
         agent_properties = {}
         for key, value in self.cmdline.items():
+            print("Processing key %s with value %s" % (key, value))
+            # These keys are lists
             if key == 'host':
                 agent_properties['hosts'] = value.split(',')
+            elif key in ('hosts', 'allowedcidrs'):
+                continue
             else:
                 agent_properties[key] = value
 
