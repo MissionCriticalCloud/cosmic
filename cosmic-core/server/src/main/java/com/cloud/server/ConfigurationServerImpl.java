@@ -144,14 +144,31 @@ public class ConfigurationServerImpl extends ManagerBase implements Configuratio
 
     @Override
     public void persistDefaultValues() {
+        String init = "ToBeOverwritten";
 
         // Create system user and admin user
         saveUser();
 
         // Get init
-        final String init = _configDao.getValue("init");
+        try {
+            init = _configDao.getValue("init");
+        } catch (Exception e) {
+            s_logger.error("==============================================================");
+            s_logger.error("==                  APPLICATION HALTED                      ==");
+            s_logger.error("==============================================================");
+            s_logger.error("==        Configuration key \"init\" should be of value       ==");
+            s_logger.error("==                 \"true\" or \"false\"!                       ==");
+            s_logger.error("==  Check if \"db.cloud.encryption.type\" in \"db.properties\"  ==");
+            s_logger.error("==    has the correct value or if you have the correct      ==");
+            s_logger.error("==                    encryption key!                       ==");
+            s_logger.error("==============================================================");
+        }
 
-        if (init == null || init.equals("false")) {
+        if (!init.equals("false") && !init.equals("true")) {
+            throw new CloudRuntimeException("Failed to read configuration key 'init', value not 'true' or 'false'");
+        }
+
+        if (init.equals("false")) {
             s_logger.debug("ConfigurationServer is saving default values to the database.");
 
             // Save default Configuration Table values
