@@ -13,7 +13,7 @@ def setup_html():
 def setup_iptable_rules(cmdline):
 
     external_rules = ""
-    for cidr in cmdline['allowedcidrs'].split(','):
+    for cidr in cmdline.get('allowedcidrs', '').split(','):
         external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
 
     iptables_rules = """
