@@ -187,7 +187,7 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     }
 
     public Boolean getMacLearning() {
-        return macLearning;
+        return macLearning != null && macLearning;
     }
 
     public Map getDetails() {

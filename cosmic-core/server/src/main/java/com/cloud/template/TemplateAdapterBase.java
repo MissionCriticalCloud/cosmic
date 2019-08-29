@@ -420,6 +420,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         template.setMaintenancePolicy(profile.getMaintenancePolicy());
         template.setManufacturerString(profile.getManufacturerString());
         template.setOptimiseFor(profile.getOptimiseFor());
+        template.setMacLearning(false);
 
         if (zoneId == null || zoneId.longValue() == -1) {
             final List<DataCenterVO> dcs = _dcDao.listAll();
