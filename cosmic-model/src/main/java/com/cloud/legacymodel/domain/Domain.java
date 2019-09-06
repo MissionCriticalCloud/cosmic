@@ -37,6 +37,8 @@ public interface Domain extends OwnedBy, Identity, InternalIdentity {
 
     String getEmail();
 
+    String getSlackChannelName();
+
     enum State {
         Active, Inactive
     }

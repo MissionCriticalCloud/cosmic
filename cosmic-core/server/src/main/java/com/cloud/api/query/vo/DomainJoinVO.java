@@ -128,6 +128,9 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
     @Column(name = "email")
     private String email;
 
+    @Column(name = "slack_channel_name")
+    private String slackChannelName;
+
     public DomainJoinVO() {
     }
 
@@ -431,5 +434,13 @@ public class DomainJoinVO extends BaseViewVO implements InternalIdentity, Identi
 
     public void setEmail(final String email) {
         this.email = email;
+    }
+
+    public String getSlackChannelName() {
+        return slackChannelName;
+    }
+
+    public void setSlackChannelName(final String slackChannelName) {
+        this.slackChannelName = slackChannelName;
     }
 }

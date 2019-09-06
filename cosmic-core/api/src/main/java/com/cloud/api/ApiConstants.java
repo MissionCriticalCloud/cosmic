@@ -235,6 +235,7 @@ public class ApiConstants {
     public static final String SIGNATURE = "signature";
     public static final String SIGNATURE_VERSION = "signatureversion";
     public static final String SIZE = "size";
+    public static final String SLACK_CHANNEL_NAME = "slackchannelname";
     public static final String SNAPSHOT = "snapshot";
     public static final String SNAPSHOT_ID = "snapshotid";
     public static final String SNAPSHOT_TYPE = "snapshottype";

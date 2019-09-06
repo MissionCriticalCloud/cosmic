@@ -41,6 +41,10 @@ public class UpdateDomainCmd extends BaseCmd {
             type = CommandType.STRING,
             description = "Email address associated with this domain")
     private String email;
+    @Parameter(name = ApiConstants.SLACK_CHANNEL_NAME,
+            type = CommandType.STRING,
+            description = "Slack channel name associated with this domain")
+    private String slackChannelName;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -56,6 +60,10 @@ public class UpdateDomainCmd extends BaseCmd {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getSlackChannelName() {
+        return slackChannelName;
     }
 
     @Override

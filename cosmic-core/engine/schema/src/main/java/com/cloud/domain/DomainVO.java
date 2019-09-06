@@ -61,6 +61,9 @@ public class DomainVO implements Domain {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "slack_channel_name")
+    private String slackChannelName;
+
     public DomainVO() {
     }
 
@@ -75,7 +78,7 @@ public class DomainVO implements Domain {
         this.uuid = UUID.randomUUID().toString();
     }
 
-    public DomainVO(final String name, final long owner, final Long parentId, final String networkDomain, final String uuid, final String email) {
+    public DomainVO(final String name, final long owner, final Long parentId, final String networkDomain, final String uuid, final String email, final String slackChannelName) {
         this.parent = parentId;
         this.name = name;
         this.accountId = owner;
@@ -85,6 +88,7 @@ public class DomainVO implements Domain {
         this.networkDomain = networkDomain;
         this.uuid = uuid;
         this.email = email;
+        this.slackChannelName = slackChannelName;
     }
 
     @Override
@@ -207,5 +211,13 @@ public class DomainVO implements Domain {
 
     public void setEmail(final String email) {
         this.email = email;
+    }
+
+    public String getSlackChannelName() {
+        return slackChannelName;
+    }
+
+    public void setSlackChannelName(final String slackChannelName) {
+        this.slackChannelName = slackChannelName;
     }
 }

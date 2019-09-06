@@ -40,6 +40,7 @@ public class DomainJoinDaoImpl extends GenericDaoBase<DomainJoinVO, Long> implem
         domainResponse.setLevel(domain.getLevel());
         domainResponse.setNetworkDomain(domain.getNetworkDomain());
         domainResponse.setEmail(domain.getEmail());
+        domainResponse.setSlackChannelName(domain.getSlackChannelName());
         final Domain parentDomain = ApiDBUtils.findDomainById(domain.getParent());
         if (parentDomain != null) {
             domainResponse.setParentDomainId(parentDomain.getUuid());

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface DomainService {
 
-    Domain createDomain(String name, Long parentId, String networkDomain, String domainUUID, String email);
+    Domain createDomain(String name, Long parentId, String networkDomain, String domainUUID, String email, String slackChannelName);
 
     Domain getDomain(long id);
 

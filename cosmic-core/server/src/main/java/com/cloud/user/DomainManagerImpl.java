@@ -109,7 +109,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
     @Override
     @DB
-    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, String domainUUID, final String email) {
+    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, String domainUUID, final String email, final String slackChannelName) {
         // Verify network domain
         if (networkDomain != null) {
             if (!NetUtils.verifyDomainName(networkDomain)) {
@@ -142,7 +142,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
         final DomainVO domain = Transaction.execute(new TransactionCallback<DomainVO>() {
             @Override
             public DomainVO doInTransaction(final TransactionStatus status) {
-                final DomainVO domain = _domainDao.create(new DomainVO(name, ownerId, parentId, networkDomain, domainUUIDFinal, email));
+                final DomainVO domain = _domainDao.create(new DomainVO(name, ownerId, parentId, networkDomain, domainUUIDFinal, email, slackChannelName));
                 _resourceCountDao.createResourceCounts(domain.getId(), ResourceLimit.ResourceOwnerType.Domain);
                 return domain;
             }
@@ -272,6 +272,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
         final String domainName = cmd.getDomainName();
         final String networkDomain = cmd.getNetworkDomain();
         final String email = cmd.getEmail();
+        final String slackChannelName = cmd.getSlackChannelName();
 
         // check if domain exists in the system
         final DomainVO domain = _domainDao.findById(domainId);
@@ -345,6 +346,14 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
                     }
                 }
 
+                if (slackChannelName != null) {
+                    if (slackChannelName.isEmpty()) {
+                        domain.setSlackChannelName(null);
+                    } else {
+                        domain.setSlackChannelName(slackChannelName);
+                    }
+                }
+
                 _domainDao.update(domainId, domain);
                 CallContext.current().putContextParameter(Domain.class, domain.getUuid());
             }
@@ -375,7 +384,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_DOMAIN_CREATE, eventDescription = "creating Domain")
-    public Domain createDomain(final String name, Long parentId, final String networkDomain, final String domainUUID, final String email) {
+    public Domain createDomain(final String name, Long parentId, final String networkDomain, final String domainUUID, final String email, final String slackChannelName) {
         final Account caller = CallContext.current().getCallingAccount();
 
         if (parentId == null) {
@@ -393,7 +402,7 @@ public class DomainManagerImpl extends ManagerBase implements DomainManager, Dom
 
         _accountMgr.checkAccess(caller, parentDomain);
 
-        return createDomain(name, parentId, caller.getId(), networkDomain, domainUUID, email);
+        return createDomain(name, parentId, caller.getId(), networkDomain, domainUUID, email, slackChannelName);
     }
 
     @Override

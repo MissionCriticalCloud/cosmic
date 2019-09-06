@@ -13,7 +13,7 @@ public interface DomainManager extends DomainService {
 
     Set<Long> getDomainChildrenIds(String parentDomainPath);
 
-    Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID, String email);
+    Domain createDomain(String name, Long parentId, Long ownerId, String networkDomain, String domainUUID, String email, String slackChannelName);
 
     Set<Long> getDomainParentIds(long domainId);
 
