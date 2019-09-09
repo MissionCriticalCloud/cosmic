@@ -105,7 +105,13 @@
                                 });
                             }
 
-                            if ('name' in data || 'networkdomain' in data || 'email' in data) {
+                            if (args.data.slackchannelname != null) {
+                                $.extend(data, {
+                                    slackchannelname: args.data.slackchannelname
+                                });
+                            }
+
+                            if ('name' in data || 'networkdomain' in data || 'email' in data || 'slackchannelname' in data) {
                                 $.ajax({
                                     url: createURL("updateDomain"),
                                     async: false,
@@ -251,7 +257,8 @@
                             var data = {
                                 parentdomainid: args.context.domains[0].id,
                                 name: args.data.name,
-                                email: args.data.email
+                                email: args.data.email,
+                                slackchannelname: args.data.slackchannelname
                             };
 
                             if (args.data.networkdomain != null && args.data.networkdomain.length > 0) {
@@ -298,6 +305,13 @@
                                     docID: 'helpDomainEmail',
                                     validation: {
                                         email: true
+                                    }
+                                },
+                                slackchannelname: {
+                                    label: 'label.slackchannelname',
+                                    docID: 'helpDomainSlackchannelname',
+                                    validation: {
+                                        required: false
                                     }
                                 },
                                 networkdomain: {
@@ -460,6 +474,10 @@
                                 isEditable: function () {
                                     return !!isAdmin();
                                 }
+                            },
+                            slackchannelname: {
+                                label: 'label.slackchannelname',
+                                isEditable: true
                             }
                         }, {
                             id: {

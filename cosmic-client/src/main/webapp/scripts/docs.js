@@ -908,6 +908,10 @@ cloudStack.docs = {
         desc: 'The domain\'s email address',
         externalLink: ''
     },
+    helpDomainSlackchannelname: {
+        desc: 'The domain\'s Slack Channel Name',
+        externalLink: ''
+    },
     helpUserFirstName: {
         desc: 'The user\'s first name, also known as the given name',
         externalLink: ''
