@@ -1391,6 +1391,7 @@ var dictionary = {
     "label.site.to.site.VPN": "Site-to-site VPN",
     "label.size": "Size",
     "label.skip.guide": "I have used Cosmic before, skip this guide",
+    "label.slackchannelname": "Slack Channel Name",
     "label.smb.domain": "SMB Domain",
     "label.smb.password": "SMB Password",
     "label.smb.username": "SMB Username",

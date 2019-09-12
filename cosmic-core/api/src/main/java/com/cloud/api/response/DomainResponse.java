@@ -194,6 +194,10 @@ public class DomainResponse extends BaseResponse implements ResourceLimitAndCoun
     @Param(description = "the email address associated with the domain")
     private String email;
 
+    @SerializedName("slackchannelname")
+    @Param(description = "the slack channel name associated with the domain")
+    private String slackChannelName;
+
     public String getId() {
         return this.id;
     }
@@ -268,6 +272,10 @@ public class DomainResponse extends BaseResponse implements ResourceLimitAndCoun
 
     public void setEmail(final String email) {
         this.email = email;
+    }
+
+    public void setSlackChannelName(final String slackChannelName) {
+        this.slackChannelName = slackChannelName;
     }
 
     @Override

@@ -46,6 +46,11 @@ public class CreateDomainCmd extends BaseCmd {
             description = "Email address associated with this domain")
     private String email;
 
+    @Parameter(name = ApiConstants.SLACK_CHANNEL_NAME,
+            type = CommandType.STRING,
+            description = "Email address associated with this domain")
+    private String slackChannelName;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -53,7 +58,7 @@ public class CreateDomainCmd extends BaseCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Domain Name: " + getDomainName() + ((getParentDomainId() != null) ? ", Parent DomainId :" + getParentDomainId() : ""));
-        final Domain domain = _domainService.createDomain(getDomainName(), getParentDomainId(), getNetworkDomain(), getDomainUUID(), getEmail());
+        final Domain domain = _domainService.createDomain(getDomainName(), getParentDomainId(), getNetworkDomain(), getDomainUUID(), getEmail(), getSlackChannelName());
         if (domain != null) {
             final DomainResponse response = _responseGenerator.createDomainResponse(domain);
             response.setResponseName(getCommandName());
@@ -77,6 +82,10 @@ public class CreateDomainCmd extends BaseCmd {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getSlackChannelName() {
+        return slackChannelName;
     }
 
     /////////////////////////////////////////////////////

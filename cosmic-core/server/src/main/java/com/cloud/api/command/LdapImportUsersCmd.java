@@ -199,7 +199,7 @@ public class LdapImportUsersCmd extends BaseListCmd {
             if (StringUtils.isNotBlank(domainName)) {
                 domain = _domainService.getDomainByName(domainName, Domain.ROOT_DOMAIN);
                 if (domain == null) {
-                    domain = _domainService.createDomain(domainName, Domain.ROOT_DOMAIN, domainName, UUID.randomUUID().toString(), null);
+                    domain = _domainService.createDomain(domainName, Domain.ROOT_DOMAIN, domainName, UUID.randomUUID().toString(), null, null);
                 }
             }
         }

@@ -26,7 +26,7 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
     }
 
     @Override
-    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, final String domainUUID, final String email) {
+    public Domain createDomain(final String name, final Long parentId, final Long ownerId, final String networkDomain, final String domainUUID, final String email, final String slackChannelName) {
         return null;
     }
 
@@ -90,7 +90,7 @@ public class MockDomainManagerImpl extends ManagerBase implements DomainManager,
     }
 
     @Override
-    public Domain createDomain(final String name, final Long parentId, final String networkDomain, final String domainUUID, final String email) {
+    public Domain createDomain(final String name, final Long parentId, final String networkDomain, final String domainUUID, final String email, final String slackChannelName) {
         return null;
     }
 
