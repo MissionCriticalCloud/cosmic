@@ -94,7 +94,7 @@ def full_start(application):
 
 
 def reboot_start(application):
-    application.create_cmdline_json_from_properties()
+    application.write_cmdline_json()
 
     application.start_app()
 
