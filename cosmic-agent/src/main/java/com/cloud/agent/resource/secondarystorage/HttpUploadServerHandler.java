@@ -38,7 +38,6 @@ import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.IncompatibleDataDecoderException;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
@@ -183,7 +182,7 @@ public class HttpUploadServerHandler extends SimpleChannelInboundHandler<HttpObj
                 try {
                     //initialize the decoder
                     this.decoder = new HttpPostRequestDecoder(factory, request);
-                } catch (final ErrorDataDecoderException | IncompatibleDataDecoderException e) {
+                } catch (final ErrorDataDecoderException e) {
                     logger.error("exception while initialising the decoder", e);
                     this.responseContent.append(e.getMessage());
                     writeResponse(ctx.channel(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
