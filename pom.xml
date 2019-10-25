@@ -92,7 +92,7 @@
         <cs.mail.version>1.4.7</cs.mail.version>
         <cs.mockito-all.version>1.10.19</cs.mockito-all.version>
         <cs.mycila.license.version>2.7</cs.mycila.license.version>
-        <cs.netty-all.version>4.0.46.Final</cs.netty-all.version>
+        <cs.netty-all.version>4.1.42.Final</cs.netty-all.version>
         <cs.org.jacoco.agent.rt.version>0.7.6.201602180812</cs.org.jacoco.agent.rt.version>
         <cs.org.jacoco.agent.version>0.7.6.201602180812</cs.org.jacoco.agent.version>
         <cs.powermock-api-mockito.version>1.7.4</cs.powermock-api-mockito.version>
