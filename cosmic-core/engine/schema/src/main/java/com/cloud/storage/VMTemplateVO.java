@@ -108,6 +108,8 @@ public class VMTemplateVO implements VirtualMachineTemplate {
     private Boolean macLearning;
     @Column(name = "maintenance_policy")
     private MaintenancePolicy maintenancePolicy;
+    @Column(name = "is_remote_gateway_template")
+    private boolean isRemoteGatewayTemplate;
 
     public VMTemplateVO() {
         uuid = UUID.randomUUID().toString();
@@ -230,12 +232,13 @@ public class VMTemplateVO implements VirtualMachineTemplate {
         hypervisorType = hyperType;
         uuid = UUID.randomUUID().toString();
         state = State.Active;
-        // TODO: FIXME
+        // These are default values
         this.manufacturerString = "Mission Critical Cloud";
         this.optimiseFor = OptimiseFor.Generic;
         this.macLearning = false;
         this.cpuFlags = "";
         this.maintenancePolicy = MaintenancePolicy.LiveMigrate;
+        this.isRemoteGatewayTemplate = false;
     }
 
     public static VMTemplateVO createPreHostIso(final Long id, final String uniqueName, final String name, final ImageFormat format, final boolean isPublic, final boolean
@@ -605,5 +608,13 @@ public class VMTemplateVO implements VirtualMachineTemplate {
 
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public Boolean getRemoteGatewayTemplate() {
+        return isRemoteGatewayTemplate;
+    }
+
+    public void setRemoteGatewayTemplate(final Boolean isRemoteGatewayTemplate) {
+        this.isRemoteGatewayTemplate = isRemoteGatewayTemplate;
     }
 }

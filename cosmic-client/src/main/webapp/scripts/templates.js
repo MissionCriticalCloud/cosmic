@@ -361,6 +361,11 @@
                                         docID: 'helpRegisterTemplateRouting',
                                         isBoolean: true,
                                         isHidden: true
+                                    },
+                                    isremotegatewaytemplate: {
+                                        label: 'label.isremotegatewaytemplate',
+                                        docID: 'helpIsremotegatewaytemplate',
+                                        isBoolean: true
                                     }
                                 }
                             },
@@ -386,6 +391,7 @@
                                     optimisefor: args.data.optimisefor,
                                     hypervisor: args.data.hypervisor,
                                     maintenancepolicy: args.data.maintenancepolicy,
+                                    isremotegatewaytemplate: (args.data.isremotegatewaytemplate == "on"),
                                     maclearning: (args.data.maclearning === "on")
                                 };
 
@@ -807,7 +813,8 @@
                                         isdynamicallyscalable: (args.data.isdynamicallyscalable == "on"),
                                         url: args.data.url,
                                         maintenancepolicy: args.data.maintenancepolicy,
-                                        maclearning: (args.data.maclearning === "on")
+                                        maclearning: (args.data.maclearning === "on"),
+                                        isremotegatewaytemplate: (args.data.isremotegatewaytemplate == "on")
                                     };
                                     $.ajax({
                                         url: createURL('updateTemplate'),
@@ -1085,6 +1092,12 @@
                                     },
                                     isdynamicallyscalable: {
                                         label: 'label.dynamically.scalable',
+                                        isBoolean: true,
+                                        isEditable: true,
+                                        converter: cloudStack.converters.toBooleanText
+                                    },
+                                    isremotegatewaytemplate: {
+                                        label: 'label.isremotegatewaytemplate',
                                         isBoolean: true,
                                         isEditable: true,
                                         converter: cloudStack.converters.toBooleanText

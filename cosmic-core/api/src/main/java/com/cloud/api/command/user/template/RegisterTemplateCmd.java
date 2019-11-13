@@ -113,6 +113,8 @@ public class RegisterTemplateCmd extends BaseCmd {
     private String manufacturerString;
     @Parameter(name = ApiConstants.OPTIMISE_FOR, type = CommandType.STRING, description = "Optimise for 'Windows' or 'Generic'")
     private String optimiseFor;
+    @Parameter(name = ApiConstants.IS_REMOTE_GATEWAY_TEMPLATE, type = CommandType.BOOLEAN, description = "true if the template is allowed to acquire the network gateway IP and act as the default gateway for VMs; default is false")
+    private Boolean isRemoteGatewayTemplate;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -187,23 +189,31 @@ public class RegisterTemplateCmd extends BaseCmd {
     }
 
     public String getManufacturerString() {
-        return manufacturerString;
+        if (manufacturerString != null) {
+            return manufacturerString;
+        }
+        return "Mission Critical Cloud";
+    }
+
+    public Boolean getIsRemoteGatewayTemplate() {
+        if (isRemoteGatewayTemplate != null) {
+            return isRemoteGatewayTemplate;
+        }
+        return false;
     }
 
     public MaintenancePolicy getMaintenancePolicy() {
         if (maintenancePolicy != null) {
             return MaintenancePolicy.valueOf(maintenancePolicy);
-        } else {
-            return null;
         }
+        return MaintenancePolicy.LiveMigrate;
     }
 
     public OptimiseFor getOptimiseFor() {
         if (optimiseFor != null) {
             return OptimiseFor.valueOf(optimiseFor);
-        } else {
-            return OptimiseFor.Generic;
         }
+        return OptimiseFor.Generic;
     }
 
     public Map getDetails() {

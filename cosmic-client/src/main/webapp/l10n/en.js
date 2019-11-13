@@ -806,6 +806,7 @@ var dictionary = {
     "label.ip.ranges": "IP Ranges",
     "label.ipaddress": "IP Address",
     "label.ipexclusionlist": "IP Exclusion List",
+    "label.isremotegatewaytemplate": "Is Remote Gateway Template",
     "label.ips": "IPs",
     "label.ipv4.cidr": "IPv4 CIDR",
     "label.ipv4.dns1": "IPv4 DNS1",

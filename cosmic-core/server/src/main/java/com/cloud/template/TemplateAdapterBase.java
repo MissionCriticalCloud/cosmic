@@ -119,7 +119,8 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         return prepare(false, CallContext.current().getCallingUserId(), cmd.getTemplateName(), cmd.getDisplayText(), cmd.getBits(), cmd.isPasswordEnabled(),
                 cmd.getUrl(), cmd.isPublic(), cmd.isFeatured(), cmd.isExtractable(), cmd.getFormat(), cmd.getOsTypeId(), zoneId,
                 HypervisorType.getType(cmd.getHypervisor()), cmd.getChecksum(), true, cmd.getTemplateTag(), owner, cmd.getDetails(), cmd.isSshKeyEnabled(), null,
-                cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER, cmd.getManufacturerString(), cmd.getOptimiseFor(), cmd.getMaintenancePolicy());
+                cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER, cmd.getManufacturerString(), cmd.getOptimiseFor(), cmd.getMaintenancePolicy(),
+                cmd.getIsRemoteGatewayTemplate());
     }
 
     @Override
@@ -141,7 +142,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         return prepare(false, CallContext.current().getCallingUserId(), cmd.getName(), cmd.getDisplayText(), cmd.getBits(), cmd.isPasswordEnabled(),
                 null, cmd.isPublic(), cmd.isFeatured(), cmd.isExtractable(), cmd.getFormat(), cmd.getOsTypeId(), zoneId,
                 HypervisorType.getType(cmd.getHypervisor()), cmd.getChecksum(), true, cmd.getTemplateTag(), owner, cmd.getDetails(), cmd.isSshKeyEnabled(), null,
-                cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER, "Mission Critical Cloud", OptimiseFor.Generic, MaintenancePolicy.LiveMigrate);
+                cmd.isDynamicallyScalable(), isRouting ? TemplateType.ROUTING : TemplateType.USER, "Mission Critical Cloud", OptimiseFor.Generic, MaintenancePolicy.LiveMigrate, false);
     }
 
     @Override
@@ -160,7 +161,8 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
 
         return prepare(true, CallContext.current().getCallingUserId(), cmd.getIsoName(), cmd.getDisplayText(), 64, false, cmd.getUrl(), cmd.isPublic(),
                 cmd.isFeatured(), cmd.isExtractable(), ImageFormat.ISO.toString(), cmd.getOsTypeId(), zoneId, HypervisorType.None, cmd.getChecksum(), cmd.isBootable(), null,
-                owner, null, false, cmd.getImageStoreUuid(), cmd.isDynamicallyScalable(), TemplateType.USER, cmd.getManufacturerString(), cmd.getOptimiseFor(), cmd.getMaintenancePolicy());
+                owner, null, false, cmd.getImageStoreUuid(), cmd.isDynamicallyScalable(), TemplateType.USER, cmd.getManufacturerString(), cmd.getOptimiseFor(),
+                cmd.getMaintenancePolicy(), false) ;
     }
 
     @Override
@@ -280,7 +282,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
                                    final HypervisorType hypervisorType, final String accountName,
                                    final Long domainId, final String chksum, final Boolean bootable, final Map details) throws ResourceAllocationException {
         return prepare(isIso, userId, name, displayText, bits, passwordEnabled, url, isPublic, featured, isExtractable, format, guestOSId, zoneId,
-                hypervisorType, chksum, bootable, null, null, details, false, null, false, TemplateType.USER, "Mission Critical Cloud", OptimiseFor.Generic, MaintenancePolicy.LiveMigrate);
+                hypervisorType, chksum, bootable, null, null, details, false, null, false, TemplateType.USER, "Mission Critical Cloud", OptimiseFor.Generic, MaintenancePolicy.LiveMigrate, false);
     }
 
     @Override
@@ -288,7 +290,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
                                    Boolean isPublic, Boolean featured, Boolean isExtractable, final String format, Long guestOSId, Long zoneId, final HypervisorType hypervisorType,
                                    final String chksum, Boolean bootable, final String templateTag, final Account templateOwner, Map details, Boolean sshkeyEnabled,
                                    final String imageStoreUuid, final Boolean isDynamicallyScalable, final TemplateType templateType, final String manufacturerString,
-                                   final OptimiseFor optimiseFor, final MaintenancePolicy maintenancePolicy) throws ResourceAllocationException {
+                                   final OptimiseFor optimiseFor, final MaintenancePolicy maintenancePolicy, Boolean isRemoteGatewayTemplate) throws ResourceAllocationException {
         //Long accountId = null;
         // parameters verification
 
@@ -325,6 +327,9 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         }
         if (sshkeyEnabled == null) {
             sshkeyEnabled = Boolean.FALSE;
+        }
+        if (isRemoteGatewayTemplate == null) {
+            isRemoteGatewayTemplate = Boolean.FALSE;
         }
 
         final boolean isAdmin = _accountMgr.isRootAdmin(templateOwner.getId());
@@ -406,7 +411,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         CallContext.current().setEventDetails("Id: " + id + " name: " + name);
         return new TemplateProfile(id, userId, name, displayText, bits, passwordEnabled, url, isPublic, featured, isExtractable, imgfmt, guestOSId, zoneId,
                 hypervisorType, templateOwner.getAccountName(), templateOwner.getDomainId(), templateOwner.getAccountId(), chksum, bootable, templateTag, details,
-                sshkeyEnabled, null, isDynamicallyScalable, templateType, manufacturerString, optimiseFor, maintenancePolicy);
+                sshkeyEnabled, null, isDynamicallyScalable, templateType, manufacturerString, optimiseFor, maintenancePolicy, isRemoteGatewayTemplate);
     }
 
     protected VMTemplateVO persistTemplate(final TemplateProfile profile, final VirtualMachineTemplate.State initialState) {
@@ -421,6 +426,7 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
         template.setManufacturerString(profile.getManufacturerString());
         template.setOptimiseFor(profile.getOptimiseFor());
         template.setMacLearning(false);
+        template.setRemoteGatewayTemplate(profile.getRemoteGatewayTemplate());
 
         if (zoneId == null || zoneId.longValue() == -1) {
             final List<DataCenterVO> dcs = _dcDao.listAll();

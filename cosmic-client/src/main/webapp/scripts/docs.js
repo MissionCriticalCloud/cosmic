@@ -1170,6 +1170,10 @@ cloudStack.docs = {
         desc: 'Check this if the template is used for deploying router.',
         externalLink: ''
     },
+    helpIsremotegatewaytemplate: {
+        desc: 'Check this if the template is allowed to be the gateway of the network.',
+        externalLink: ''
+    },
     helpRegisterTemplateHvm: {
         desc: 'Check this if the template requires hvm.',
         externalLink: ''
