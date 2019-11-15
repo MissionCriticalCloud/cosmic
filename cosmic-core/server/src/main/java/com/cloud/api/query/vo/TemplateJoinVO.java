@@ -181,6 +181,8 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
     private String cpuFlags;
     @Column(name = "maintenance_policy")
     private MaintenancePolicy maintenancePolicy;
+    @Column(name = "is_remote_gateway_template")
+    private boolean isRemoteGatewayTemplate;
 
     public TemplateJoinVO() {
     }
@@ -771,6 +773,14 @@ public class TemplateJoinVO extends BaseViewVO implements ControlledViewEntity {
 
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public boolean getIsRemoteGatewayTemplate() {
+        return isRemoteGatewayTemplate;
+    }
+
+    public void setRemoteGatewayTemplate(final boolean isRemoteGatewayTemplate) {
+        this.isRemoteGatewayTemplate = isRemoteGatewayTemplate;
     }
 
     @Override

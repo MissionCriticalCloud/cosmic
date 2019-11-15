@@ -37,6 +37,7 @@ public class TemplateProfile {
     MaintenancePolicy maintenancePolicy;
     OptimiseFor optimiseFor;
     String manufacturerString;
+    Boolean isRemoteGatewayTemplate;
 
     public TemplateProfile(final Long userId, final VMTemplateVO template, final Long zoneId) {
         this.userId = userId;
@@ -48,7 +49,8 @@ public class TemplateProfile {
                            final Boolean isPublic, final Boolean featured, final Boolean isExtractable, final ImageFormat format, final Long guestOsId, final Long zoneId,
                            final HypervisorType hypervisorType, final String accountName, final Long domainId, final Long accountId, final String chksum, final Boolean bootable,
                            final String templateTag, final Map details, final Boolean sshKeyEnabled, final Long imageStoreId, final Boolean isDynamicallyScalable,
-                           final TemplateType templateType, final String manufacturerString, final OptimiseFor optimiseFor, final MaintenancePolicy maintenancePolicy) {
+                           final TemplateType templateType, final String manufacturerString, final OptimiseFor optimiseFor, final MaintenancePolicy maintenancePolicy,
+                           final Boolean isRemoteGatewayTemplate) {
         this(templateId,
                 userId,
                 name,
@@ -76,6 +78,7 @@ public class TemplateProfile {
         this.manufacturerString = manufacturerString;
         this.optimiseFor = optimiseFor;
         this.maintenancePolicy = maintenancePolicy;
+        this.isRemoteGatewayTemplate = isRemoteGatewayTemplate;
     }
 
     public TemplateProfile(final Long templateId, final Long userId, final String name, final String displayText, final Integer bits, final Boolean passwordEnabled, final String url,
@@ -319,5 +322,13 @@ public class TemplateProfile {
 
     public void setManufacturerString(final String manufacturerString) {
         this.manufacturerString = manufacturerString;
+    }
+
+    public Boolean getRemoteGatewayTemplate() {
+        return isRemoteGatewayTemplate;
+    }
+
+    public void setRemoteGatewayTemplate(final Boolean isRemoteGatewayTemplate) {
+        this.isRemoteGatewayTemplate = isRemoteGatewayTemplate;
     }
 }

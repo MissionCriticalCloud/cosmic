@@ -96,7 +96,7 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         templateResponse.setCpuFlags(template.getCpuFlags());
         templateResponse.setOptimiseFor(template.getOptimiseFor());
         templateResponse.setMaintenancePolicy(template.getMaintenancePolicy());
-
+        templateResponse.setIsRemoteGatewayTemplate(template.getIsRemoteGatewayTemplate());
         if (template.getTemplateType() != null) {
             templateResponse.setTemplateType(template.getTemplateType().toString());
         }
@@ -281,6 +281,7 @@ public class TemplateJoinDaoImpl extends GenericDaoBase<TemplateJoinVO, Long> im
         response.setOsTypeName(result.getGuestOSName());
         response.setBootable(result.isBootable());
         response.setHypervisor(result.getHypervisorType().toString());
+        response.setIsRemoteGatewayTemplate(result.getIsRemoteGatewayTemplate());
 
         // populate owner.
         ApiResponseHelper.populateOwner(response, result);

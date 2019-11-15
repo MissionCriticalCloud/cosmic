@@ -191,6 +191,10 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
     @Param(description = "The URL where the templates originally was downloaded from")
     private String url;
 
+    @SerializedName(ApiConstants.IS_REMOTE_GATEWAY_TEMPLATE)
+    @Param(description = "true if the template is allowed to take the network gateway ip, false otherwise")
+    private Boolean isRemoteGatewayTemplate;
+
     public TemplateResponse() {
         //  zones = new LinkedHashSet<TemplateZoneResponse>();
         tags = new LinkedHashSet<>();
@@ -412,5 +416,16 @@ public class TemplateResponse extends BaseResponse implements ControlledViewEnti
 
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
+    }
+
+    public Boolean getIsRemoteGatewayTemplate() {
+        if (isRemoteGatewayTemplate != null) {
+            return isRemoteGatewayTemplate;
+        }
+        return false;
+    }
+
+    public void setIsRemoteGatewayTemplate(final Boolean isRemoteGatewayTemplate) {
+        this.isRemoteGatewayTemplate = isRemoteGatewayTemplate;
     }
 }

@@ -47,7 +47,11 @@ import com.cloud.network.dao.PhysicalNetworkDao;
 import com.cloud.network.dao.PhysicalNetworkVO;
 import com.cloud.network.vpc.dao.VpcDao;
 import com.cloud.offering.NetworkOffering;
+import com.cloud.offerings.dao.NetworkOfferingDao;
+import com.cloud.offerings.dao.NetworkOfferingServiceMapDao;
 import com.cloud.server.ConfigurationServer;
+import com.cloud.storage.VMTemplateVO;
+import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.utils.component.AdapterBase;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.Transaction;
@@ -92,6 +96,12 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
     protected VlanDao _vlanDao;
     @Inject
     protected NicDao _nicDao;
+    @Inject
+    protected VMTemplateDao _templateDao;
+    @Inject
+    protected NetworkOfferingDao _networkOfferingDao;
+    @Inject
+    protected NetworkOfferingServiceMapDao _networkOfferingServiceMapDao;
     @Inject
     protected NetworkDao _networkDao;
     @Inject
@@ -287,7 +297,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
             nic.setIsolationUri(network.getBroadcastUri());
             nic.setIPv4Gateway(network.getGateway());
 
-            final String guestIp;
+            String guestIp;
             if (network.getSpecifyIpRanges()) {
                 _ipAddrMgr.allocateDirectIp(nic, zone, vm, network, nic.getRequestedIPv4(), null);
             } else {
@@ -295,7 +305,8 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
 
                 switch (vmtype) {
                     case User:
-                        guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
+                        guestIp = assignGuestOrGatewayIp(network, nic, vm, zone);
+
                         break;
                     case DomainRouter:
                         if (_networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.Gateway, Provider.VPCVirtualRouter)) {
@@ -345,6 +356,43 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
         }
 
         return nic;
+    }
+
+    private String assignGuestOrGatewayIp(final Network network, final NicProfile nic, final VirtualMachineProfile vm, final Zone zone) throws InsufficientVirtualNetworkCapacityException {
+        String guestIp;
+        // Default assign new ip
+        guestIp = _ipAddrMgr.acquireGuestIpAddress(network, nic.getRequestedIPv4());
+
+        // Is our user VM supposed to be a remote gateway?
+        final long templateId = vm.getTemplateId();
+        final VMTemplateVO vmTemplateVO = _templateDao.findById(templateId);
+        final Boolean isRemoteGatewayTemplate = vmTemplateVO.getRemoteGatewayTemplate();
+        s_logger.debug("isRemoteGatewayTemplate has value " + isRemoteGatewayTemplate.toString());
+        final long networkOfferingId = network.getNetworkOfferingId();
+        NetworkOffering networkOffering = _networkOfferingDao.findById(networkOfferingId);
+
+        s_logger.debug("Check if the gateway ip is requested");
+        // Check if we can assign the gateway
+        if (nic.getIPv4Gateway().equals(nic.getRequestedIPv4())) {
+            s_logger.debug("VM requests gateway ip address for network " + network.getName() + " with offering " + networkOffering.getName() + " . Check service offering");
+
+            final boolean networkOfferingSupportsGatewayService = _networkOfferingServiceMapDao.areServicesSupportedByNetworkOffering(networkOfferingId, Service.Gateway);
+            s_logger.debug("networkOfferingSupportsGatewayService has value " + networkOfferingSupportsGatewayService);
+
+            // The VM we start is based on a template that is a RemoteGateway AND the network itself does not have the Gateway service (so the vm can be the gateway)
+            if (isRemoteGatewayTemplate && !networkOfferingSupportsGatewayService) {
+                // Assign gateway
+                guestIp = nic.getIPv4Gateway();
+                s_logger.debug("VM requests gateway ip address for network " + network.getName() + " with offering " + networkOffering.getName() + ". " +
+                        "Allowed! IP address " + guestIp + " (aka gateway) will be assigned.");
+            } else {
+                s_logger.debug("Requested network ip is gateway but either template is not RemoteGateway enabled or network VPC router has Gateway service.");
+                throw new InsufficientVirtualNetworkCapacityException("Unable to acquire Gateway IP address. Template needs to be RemoteGateway enabled" +
+                        " or network VPC router already has Gateway service. Network: " + network, DataCenter.class, zone.getId());
+            }
+        }
+        s_logger.debug("Acquired guest ip is " + guestIp);
+        return guestIp;
     }
 
     @Override

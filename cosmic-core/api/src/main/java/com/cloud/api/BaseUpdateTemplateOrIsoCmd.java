@@ -60,6 +60,8 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
     private Boolean macLearning;
     @Parameter(name = ApiConstants.MAINTENANCE_POLICY, type = CommandType.STRING, description = "Set maintenance policy to 'LiveMigrate' or 'ShutdownAndStart'")
     private String maintenancePolicy;
+    @Parameter(name = ApiConstants.IS_REMOTE_GATEWAY_TEMPLATE, type = CommandType.BOOLEAN, description = "true if the template is allowed to acquire the network gateway IP and act as the default gateway for VMs; default is false")
+    private Boolean isRemoteGatewayTemplate;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -136,6 +138,13 @@ public abstract class BaseUpdateTemplateOrIsoCmd extends BaseCmd {
 
     public Boolean getMacLearning() {
         return macLearning;
+    }
+
+    public Boolean getIsRemoteGatewayTemplate() {
+        if (isRemoteGatewayTemplate != null) {
+            return isRemoteGatewayTemplate;
+        }
+        return false;
     }
 
     public Map getDetails() {

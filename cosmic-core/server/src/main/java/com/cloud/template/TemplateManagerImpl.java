@@ -1667,6 +1667,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
         final String cpuFlags = cmd.getCpuFlags();
         final Boolean macLearning = cmd.getMacLearning();
         final MaintenancePolicy maintenancePolicy = cmd.getMaintenancePolicy();
+        final Boolean isRemoteGatewayTemplate = cmd.getIsRemoteGatewayTemplate();
 
         // verify that template exists
         VMTemplateVO template = this._tmpltDao.findById(id);
@@ -1694,6 +1695,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                         guestOSId == null &&
                         optimiseFor == null &&
                         manufacturerString == null &&
+                        isRemoteGatewayTemplate == null &&
                         cpuFlags == null &&
                         macLearning == null &&
                         passwordEnabled == null &&
@@ -1739,6 +1741,10 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
 
         if (maintenancePolicy != null) {
             template.setMaintenancePolicy(maintenancePolicy);
+        }
+
+        if (isRemoteGatewayTemplate != null) {
+            template.setRemoteGatewayTemplate(isRemoteGatewayTemplate);
         }
 
         final ImageFormat imageFormat;
