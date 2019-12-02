@@ -407,11 +407,18 @@ public abstract class TemplateAdapterBase extends AdapterBase implements Templat
             }
         }
 
+        // When template contains Win, it should be set to OptimiseFor Windows
+        OptimiseFor correctedOptimiseFor = optimiseFor;
+        if (name != null && name.toLowerCase().contains("win") && optimiseFor != OptimiseFor.Windows) {
+            s_logger.debug("Template name '" + name + "' contains 'win' so setting OptimiseFor to Windows");
+            correctedOptimiseFor = OptimiseFor.Windows;
+        }
+
         final Long id = _tmpltDao.getNextInSequence(Long.class, "id");
         CallContext.current().setEventDetails("Id: " + id + " name: " + name);
         return new TemplateProfile(id, userId, name, displayText, bits, passwordEnabled, url, isPublic, featured, isExtractable, imgfmt, guestOSId, zoneId,
                 hypervisorType, templateOwner.getAccountName(), templateOwner.getDomainId(), templateOwner.getAccountId(), chksum, bootable, templateTag, details,
-                sshkeyEnabled, null, isDynamicallyScalable, templateType, manufacturerString, optimiseFor, maintenancePolicy, isRemoteGatewayTemplate);
+                sshkeyEnabled, null, isDynamicallyScalable, templateType, manufacturerString, correctedOptimiseFor, maintenancePolicy, isRemoteGatewayTemplate);
     }
 
     protected VMTemplateVO persistTemplate(final TemplateProfile profile, final VirtualMachineTemplate.State initialState) {
