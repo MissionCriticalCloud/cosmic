@@ -81,6 +81,7 @@ import com.cloud.legacymodel.storage.TemplateType;
 import com.cloud.legacymodel.storage.Upload;
 import com.cloud.legacymodel.storage.VMTemplateStatus;
 import com.cloud.legacymodel.storage.VirtualMachineTemplate;
+import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DataTO;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.NfsTO;
@@ -88,6 +89,7 @@ import com.cloud.legacymodel.to.TemplateObjectTO;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.BootloaderType;
+import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
@@ -1364,7 +1366,7 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             // will not be active when the private template is
             // created
             if (!this._volumeMgr.volumeInactive(volume)) {
-                final String msg = "Unable to create private template for volume: " + volume.getName() + "; volume is attached to a non-stopped VM, please stop the VM first";
+                final String msg = "Unable to create private template for volume: " + volume.getName() + "; volume is detached or attached to a Running VM";
                 if (s_logger.isInfoEnabled()) {
                     s_logger.info(msg);
                 }
@@ -1509,17 +1511,17 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
     @ActionEvent(eventType = EventTypes.EVENT_TEMPLATE_CREATE, eventDescription = "creating template", async = true)
     public VirtualMachineTemplate createPrivateTemplate(final CreateTemplateCmd command) throws CloudRuntimeException {
         final long templateId = command.getEntityId();
-        final Long volumeId = command.getVolumeId();
+        Long volumeId = command.getVolumeId();
         final Long snapshotId = command.getSnapshotId();
         VMTemplateVO privateTemplate = null;
         final Long accountId = CallContext.current().getCallingAccountId();
         SnapshotVO snapshot = null;
         VolumeVO volume = null;
-        final OptimiseFor optimiseFor = command.getOptimiseFor();
-        final String manufacturerString = command.getManufacturerString();
-        final String cpuFlags = command.getCpuFlags();
-        final Boolean macLearning = command.getMacLearning();
-        final MaintenancePolicy maintenancePolicy = command.getMaintenancePolicy();
+        OptimiseFor optimiseFor = command.getOptimiseFor();
+        String manufacturerString = command.getManufacturerString();
+        String cpuFlags = command.getCpuFlags();
+        Boolean macLearning = command.getMacLearning();
+        MaintenancePolicy maintenancePolicy = command.getMaintenancePolicy();
 
         try {
             final TemplateInfo tmplInfo = this._tmplFactory.getTemplate(templateId, DataStoreRole.Image);
@@ -1548,6 +1550,9 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                         if (snapInfo == null) {
                             throw new CloudRuntimeException("Cannot find snapshot " + snapshotId);
                         }
+                        if (volumeId == null) {
+                            volumeId = snapInfo.getVolumeId();
+                        }
                         // We need to copy the snapshot onto secondary.
                         final SnapshotStrategy snapshotStrategy = this._storageStrategyFactory.getSnapshotStrategy(snapshot, SnapshotOperation.BACKUP);
                         snapshotStrategy.backupSnapshot(snapInfo);
@@ -1573,11 +1578,31 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                 throw new CloudRuntimeException("Creating private Template need to specify snapshotId or volumeId");
             }
 
+            if (volume != null) {
+                final VMInstanceVO vm = this._vmInstanceDao.findById(volume.getInstanceId());
+
+                if (vm != null) {
+                    if(optimiseFor == null) {
+                        optimiseFor = vm.getOptimiseFor();
+                    }
+                    if(manufacturerString == null) {
+                        manufacturerString = vm.getManufacturerString();
+                    }
+                    if(cpuFlags == null) {
+                        cpuFlags = vm.getCpuFlags();
+                    }
+                    if(macLearning == null) {
+                        macLearning = vm.getMacLearning();
+                    }
+                    if(maintenancePolicy == null) {
+                        maintenancePolicy = vm.getMaintenancePolicy();
+                    }
+                }
+            }
             final CommandResult result;
             try {
                 result = future.get();
                 if (result.isFailed()) {
-                    privateTemplate = null;
                     s_logger.debug("Failed to create template" + result.getResult());
                     throw new CloudRuntimeException("Failed to create template" + result.getResult());
                 }
@@ -1591,12 +1616,19 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
                     this._tmpltZoneDao.persist(templateZone);
                 }
 
+                if (optimiseFor == null) {
+                    optimiseFor = OptimiseFor.Generic;
+                }
+                if (maintenancePolicy == null) {
+                    maintenancePolicy = MaintenancePolicy.LiveMigrate;
+                }
                 privateTemplate = this._tmpltDao.findById(templateId);
                 privateTemplate.setCpuFlags(cpuFlags);
                 privateTemplate.setMacLearning(macLearning);
                 privateTemplate.setManufacturerString(manufacturerString);
                 privateTemplate.setOptimiseFor(optimiseFor);
                 privateTemplate.setMaintenancePolicy(maintenancePolicy);
+                this._tmpltDao.persist(privateTemplate);
 
             } catch (final InterruptedException | ExecutionException e) {
                 s_logger.debug("Failed to create template", e);
