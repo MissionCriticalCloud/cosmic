@@ -1,13 +1,17 @@
 package com.cloud.network.router;
 
+import com.cloud.affinity.AffinityGroup;
+import com.cloud.affinity.dao.AffinityGroupDao;
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.manager.Commands;
 import com.cloud.alert.AlertManager;
 import com.cloud.context.CallContext;
+import com.cloud.dc.dao.DedicatedResourceDao;
 import com.cloud.deploy.DataCenterDeployment;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner.ExcludeList;
+import com.cloud.domain.dao.DomainDao;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.host.HostVO;
@@ -58,6 +62,7 @@ import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.user.AccountManager;
+import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.maint.Version;
@@ -134,6 +139,12 @@ public class NetworkHelperImpl implements NetworkHelper {
     private UserIpv6AddressDao _ipv6Dao;
     @Inject
     private UserDao _userDao;
+    @Inject
+    private AffinityGroupDao _affinityGroupDao;
+    @Inject
+    private DomainDao _domainDao;
+    @Inject
+    protected DedicatedResourceDao _dedicatedDao;
 
     public static void setSystemAccount(final Account systemAccount) {
         s_systemAccount = systemAccount;
@@ -347,11 +358,6 @@ public class NetworkHelperImpl implements NetworkHelper {
             throws InsufficientCapacityException, ConcurrentOperationException, ResourceUnavailableException {
         logger.info("Starting Virtual Router {}", router);
 
-        if (router.getRole() != Role.VIRTUAL_ROUTER || !router.getIsRedundantRouter()) {
-            logger.debug("Will start to deploy router {} without any avoidance rules", router);
-            return start(router, params, null);
-        }
-
         if (router.getState() == State.Running) {
             logger.debug("Redundant router {} is already running!", router);
             return router;
@@ -390,24 +396,38 @@ public class NetworkHelperImpl implements NetworkHelper {
                 }
             }
         }
-        if (routerToBeAvoid == null) {
-            logger.debug("Will start to deploy router {} without any avoidance rules (no router to be avoided)", router);
-            return start(router, params, null);
+
+        // Look for dedication
+        List<Long> dedicatedAvoidSet = _dedicatedDao.listAllHosts();
+        final AffinityGroup affinityGroup = findDedicatedAffinityGroup(router.getDomainId(), router.getAccountId());
+        if (affinityGroup != null) {
+            logger.debug("Found affinity group: " + affinityGroup + " for domainId " + router.getDomainId() + " and/or accountId " + router.getAccountId());
+
+            // All hosts in zone
+            final List<Long> allHostsInDc = _hostDao.listAllHosts(router.getDataCenterId());
+            logger.debug("All hosts: " + allHostsInDc);
+            // All dedicated ones
+            final List<Long> allDedicatedHosts = _dedicatedDao.listAllHosts();
+            logger.debug("All dedicated hosts: " + allDedicatedHosts);
+
+            // All non-decicated ones need to be in avoid set
+            allHostsInDc.removeAll(allDedicatedHosts);
+            dedicatedAvoidSet = allHostsInDc;
         }
+        logger.debug("All hosts to avoid: " + dedicatedAvoidSet);
 
         // We would try best to deploy the router to another place
-        final int retryIndex = 5;
-        final ExcludeList[] avoids = getExcludeLists(routerToBeAvoid, retryIndex);
+        final ExcludeList[] avoids = getExcludeLists(routerToBeAvoid, dedicatedAvoidSet);
 
-        logger.debug("Will start to deploy router {} with the most strict avoidance rules first (total number of attempts = {})", router, retryIndex);
+        logger.debug("Will start to deploy router {} with the most strict avoidance rules first (total number of attempts = {})", router, avoids.length);
         DomainRouterVO result = null;
-        for (int i = 0; i < retryIndex; i++) {
+        for (int i = 0; i < avoids.length; i++) {
             plan.setAvoids(avoids[i]);
             try {
                 logger.debug("Starting router {} while trying to {}", router, avoids[i]);
                 result = start(router, params, plan);
             } catch (final CloudException | CloudRuntimeException e) {
-                logger.debug("Failed to start virtual router {} while trying to {} ({} attempts to go)", avoids[i], retryIndex - i);
+                logger.debug("Failed to start virtual router {} while trying to {} ({} attempts to go)", router, avoids[i], avoids.length - i);
                 result = null;
             }
             if (result != null) {
@@ -417,21 +437,45 @@ public class NetworkHelperImpl implements NetworkHelper {
         return result;
     }
 
-    private ExcludeList[] getExcludeLists(final DomainRouterVO routerToBeAvoid, final int retryIndex) {
-        final ExcludeList[] avoids = new ExcludeList[retryIndex];
-        avoids[0] = new ExcludeList();
-        avoids[0].addPod(routerToBeAvoid.getPodIdToDeployIn());
-        avoids[1] = new ExcludeList();
-        avoids[1].addCluster(_hostDao.findById(routerToBeAvoid.getHostId()).getClusterId());
-        avoids[2] = new ExcludeList();
-        final List<VolumeVO> volumes = _volumeDao.findByInstanceAndType(routerToBeAvoid.getId(), VolumeType.ROOT);
-        if (volumes != null && volumes.size() != 0) {
-            avoids[2].addPool(volumes.get(0).getPoolId());
+    private AffinityGroup findDedicatedAffinityGroup(final Long domainId, final Long accountId) {
+        if (domainId != null) {
+            // domain level group
+            return _affinityGroupDao.findDomainLevelGroupByTypeAndRouterFlag(domainId, "ExplicitDedication", 1L);
         }
-        avoids[2].addHost(routerToBeAvoid.getHostId());
+
+        if (accountId != null) {
+            // account level group
+            return _affinityGroupDao.findByAccountAndTypeAndRouterFlag(accountId, "ExplicitDedication", 1L);
+        }
+
+        return null;
+    }
+
+    private ExcludeList[] getExcludeLists(final DomainRouterVO routerToBeAvoid, final List<Long> dedicatedAvoidSet) {
+        final ExcludeList[] avoids = new ExcludeList[5];
+        avoids[0] = new ExcludeList();
+        avoids[1] = new ExcludeList();
+        avoids[2] = new ExcludeList();
         avoids[3] = new ExcludeList();
-        avoids[3].addHost(routerToBeAvoid.getHostId());
         avoids[4] = new ExcludeList();
+
+        if (routerToBeAvoid != null) {
+            avoids[0].addPod(routerToBeAvoid.getPodIdToDeployIn());
+            avoids[1].addCluster(_hostDao.findById(routerToBeAvoid.getHostId()).getClusterId());
+            avoids[2].addHost(routerToBeAvoid.getHostId());
+            final List<VolumeVO> volumes = _volumeDao.findByInstanceAndType(routerToBeAvoid.getId(), VolumeType.ROOT);
+            if (volumes != null && volumes.size() != 0) {
+                avoids[2].addPool(volumes.get(0).getPoolId());
+            }
+            avoids[3].addHost(routerToBeAvoid.getHostId());
+        }
+
+        avoids[0].addHostList(dedicatedAvoidSet);
+        avoids[1].addHostList(dedicatedAvoidSet);
+        avoids[2].addHostList(dedicatedAvoidSet);
+        avoids[3].addHostList(dedicatedAvoidSet);
+        avoids[4].addHostList(dedicatedAvoidSet);
+
         return avoids;
     }
 

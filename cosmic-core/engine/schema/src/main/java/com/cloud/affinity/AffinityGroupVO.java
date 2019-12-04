@@ -34,6 +34,8 @@ public class AffinityGroupVO implements AffinityGroup {
     private long accountId;
     @Column(name = "uuid")
     private String uuid;
+    @Column(name = "allow_router_deployments")
+    private long allowRouterDeployments;
 
     public AffinityGroupVO() {
         uuid = UUID.randomUUID().toString();
@@ -103,5 +105,9 @@ public class AffinityGroupVO implements AffinityGroup {
     @Override
     public Class<?> getEntityType() {
         return AffinityGroup.class;
+    }
+
+    public long getAllowRouterDeployments() {
+        return allowRouterDeployments;
     }
 }
