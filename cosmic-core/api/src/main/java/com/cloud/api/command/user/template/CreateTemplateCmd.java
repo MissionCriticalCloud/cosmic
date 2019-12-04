@@ -169,17 +169,15 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
     public OptimiseFor getOptimiseFor() {
         if (optimiseFor != null) {
             return OptimiseFor.valueOf(optimiseFor);
-        } else {
-            return OptimiseFor.Generic;
         }
+        return null;
     }
 
     public MaintenancePolicy getMaintenancePolicy() {
         if (maintenancePolicy != null) {
             return MaintenancePolicy.valueOf(maintenancePolicy);
-        } else {
-            return MaintenancePolicy.LiveMigrate;
         }
+        return null;
     }
 
     public String getCpuFlags() {
