@@ -156,7 +156,7 @@ class Firewall:
 
         # create ingress chain filter (load balancing)
         self.fw.append(["filter", "", "-N ACL_PUBLIC_IP_%s" % device])
-        self.fw.append(["filter", "", "-A INPUT -m state --state NEW -i %s -j ACL_PUBLIC_IP_%s" % (device, device)])
+        self.fw.append(["filter", "", "-A INPUT -m state --state NEW -j ACL_PUBLIC_IP_%s" % device])
 
         # create egress chain
         self.fw.append(["mangle", "front", "-N ACL_OUTBOUND_%s" % device])
