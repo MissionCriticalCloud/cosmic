@@ -53,6 +53,7 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
 
         AccountIdTypeSearch = createSearchBuilder();
         AccountIdTypeSearch.and("accountId", AccountIdTypeSearch.entity().getAccountId(), SearchCriteria.Op.EQ);
+        AccountIdTypeSearch.and("allowRouterDeployments", AccountIdTypeSearch.entity().getAllowRouterDeployments(), SearchCriteria.Op.EQ);
         AccountIdTypeSearch.and("type", AccountIdTypeSearch.entity().getType(), SearchCriteria.Op.EQ);
 
         final SearchBuilder<AffinityGroupDomainMapVO> domainTypeSearch = _groupDomainDao.createSearchBuilder();
@@ -60,6 +61,7 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         DomainLevelTypeSearch = createSearchBuilder();
         DomainLevelTypeSearch.and("type", DomainLevelTypeSearch.entity().getType(), SearchCriteria.Op.EQ);
         DomainLevelTypeSearch.and("aclType", DomainLevelTypeSearch.entity().getAclType(), SearchCriteria.Op.EQ);
+        DomainLevelTypeSearch.and("allowRouterDeployments", DomainLevelTypeSearch.entity().getAllowRouterDeployments(), SearchCriteria.Op.EQ);
         DomainLevelTypeSearch.join("domainTypeSearch", domainTypeSearch, domainTypeSearch.entity().getAffinityGroupId(), DomainLevelTypeSearch.entity().getId(),
                 JoinType.INNER);
         DomainLevelTypeSearch.done();
@@ -127,7 +129,7 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         final SearchCriteria<AffinityGroupVO> sc = AccountIdTypeSearch.create();
         sc.setParameters("accountId", accountId);
         sc.setParameters("type", type);
-
+        sc.setParameters("allowRouterDeployments", 0L);
         return findOneBy(sc);
     }
 
@@ -136,6 +138,26 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         final SearchCriteria<AffinityGroupVO> sc = DomainLevelTypeSearch.create();
         sc.setParameters("aclType", ControlledEntity.ACLType.Domain);
         sc.setParameters("type", type);
+        sc.setParameters("allowRouterDeployments", 0L);
+        sc.setJoinParameters("domainTypeSearch", "domainId", domainId);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public AffinityGroupVO findByAccountAndTypeAndRouterFlag(final Long accountId, final String type, final Long routerFlag) {
+        final SearchCriteria<AffinityGroupVO> sc = AccountIdTypeSearch.create();
+        sc.setParameters("accountId", accountId);
+        sc.setParameters("type", type);
+        sc.setParameters("allowRouterDeployments", routerFlag);
+        return findOneBy(sc);
+    }
+
+    @Override
+    public AffinityGroupVO findDomainLevelGroupByTypeAndRouterFlag(final Long domainId, final String type, final Long routerFlag) {
+        final SearchCriteria<AffinityGroupVO> sc = DomainLevelTypeSearch.create();
+        sc.setParameters("aclType", ControlledEntity.ACLType.Domain);
+        sc.setParameters("type", type);
+        sc.setParameters("allowRouterDeployments", routerFlag);
         sc.setJoinParameters("domainTypeSearch", "domainId", domainId);
         return findOneBy(sc);
     }

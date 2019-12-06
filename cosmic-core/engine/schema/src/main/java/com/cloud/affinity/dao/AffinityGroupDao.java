@@ -20,5 +20,9 @@ public interface AffinityGroupDao extends GenericDao<AffinityGroupVO, Long> {
 
     AffinityGroupVO findByAccountAndType(Long accountId, String string);
 
+    AffinityGroupVO findByAccountAndTypeAndRouterFlag(Long accountId, String string, Long routerFlag);
+
+    AffinityGroupVO findDomainLevelGroupByTypeAndRouterFlag(Long accountId, String string, Long routerFlag);
+
     AffinityGroupVO findDomainLevelGroupByType(Long domainId, String string);
 }
