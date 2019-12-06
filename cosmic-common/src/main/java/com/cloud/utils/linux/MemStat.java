@@ -12,25 +12,32 @@ public class MemStat {
     protected static final String FREE_KEY = "MemFree";
     protected static final String CACHE_KEY = "Cached";
     protected static final String TOTAL_KEY = "MemTotal";
+    long reservedMemory;
 
-    private final Map<String, Double> memStats = new HashMap<>();
+    private final Map<String, Long> memStats = new HashMap<>();
 
     public MemStat() {
+        this(0);
     }
 
-    public Double getTotal() {
-        return memStats.get(TOTAL_KEY);
+    public MemStat(long reservedMemory) {
+        this.reservedMemory = reservedMemory;
+        this.refresh();
     }
 
-    public Double getAvailable() {
+    public Long getTotal() {
+        return memStats.get(TOTAL_KEY) - reservedMemory;
+    }
+
+    public Long getAvailable() {
         return getFree() + getCache();
     }
 
-    public Double getFree() {
-        return memStats.get(FREE_KEY);
+    public Long getFree() {
+        return memStats.get(FREE_KEY) - reservedMemory;
     }
 
-    public Double getCache() {
+    public Long getCache() {
         return memStats.get(CACHE_KEY);
     }
 
@@ -48,7 +55,7 @@ public class MemStat {
         while (scanner.hasNext()) {
             final String[] stats = scanner.next().split("\\:\\s+");
             if (stats.length == 2) {
-                memStats.put(stats[0], Double.valueOf(stats[1].replaceAll("\\s+\\w+", "")));
+                memStats.put(stats[0], Long.valueOf(stats[1].replaceAll("\\s+\\w+", ""))  * 1024L);
             }
         }
     }

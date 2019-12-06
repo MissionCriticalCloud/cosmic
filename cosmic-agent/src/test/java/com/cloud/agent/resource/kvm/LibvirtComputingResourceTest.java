@@ -880,8 +880,8 @@ public class LibvirtComputingResourceTest {
         when(this.libvirtComputingResource.getMemStat()).thenReturn(memStat);
         when(this.libvirtComputingResource.getNicStats(Matchers.anyString())).thenReturn(new Pair<>(1.0d, 1.0d));
         when(cpuStat.getCpuUsedPercent()).thenReturn(0.5d);
-        when(memStat.getAvailable()).thenReturn(1500.5d);
-        when(memStat.getTotal()).thenReturn(15000d);
+        when(memStat.getAvailable()).thenReturn(1500L);
+        when(memStat.getTotal()).thenReturn(15000L);
 
         final LibvirtRequestWrapper wrapper = LibvirtRequestWrapper.getInstance();
         assertNotNull(wrapper);

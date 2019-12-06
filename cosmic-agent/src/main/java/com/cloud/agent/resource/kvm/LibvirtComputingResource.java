@@ -511,7 +511,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
     }
 
     public MemStat getMemStat() {
-        return this.memStat;
+        final long dom0MinMem = getHostReservedMemMb();
+        return new MemStat(dom0MinMem);
     }
 
     public VirtualRoutingResource getVirtRouterResource() {
