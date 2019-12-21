@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cloud.cosmic</groupId>
@@ -88,7 +89,7 @@
         <cs.jna.version>4.4.0</cs.jna.version>
         <cs.jsch.version>0.1.54</cs.jsch.version>
         <cs.jstl.version>1.2</cs.jstl.version>
-        <cs.libvirt.version>1.0.3</cs.libvirt.version>
+        <cs.libvirt.version>1.0.5</cs.libvirt.version>
         <cs.mail.version>1.4.7</cs.mail.version>
         <cs.mockito-all.version>1.10.19</cs.mockito-all.version>
         <cs.mycila.license.version>2.7</cs.mycila.license.version>
