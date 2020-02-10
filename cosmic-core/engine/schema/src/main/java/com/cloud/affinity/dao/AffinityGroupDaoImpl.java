@@ -129,7 +129,6 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         final SearchCriteria<AffinityGroupVO> sc = AccountIdTypeSearch.create();
         sc.setParameters("accountId", accountId);
         sc.setParameters("type", type);
-        sc.setParameters("allowRouterDeployments", 0L);
         return findOneBy(sc);
     }
 
@@ -138,7 +137,6 @@ public class AffinityGroupDaoImpl extends GenericDaoBase<AffinityGroupVO, Long> 
         final SearchCriteria<AffinityGroupVO> sc = DomainLevelTypeSearch.create();
         sc.setParameters("aclType", ControlledEntity.ACLType.Domain);
         sc.setParameters("type", type);
-        sc.setParameters("allowRouterDeployments", 0L);
         sc.setJoinParameters("domainTypeSearch", "domainId", domainId);
         return findOneBy(sc);
     }
