@@ -500,7 +500,7 @@
                         },
 
                         uploadVolumefromLocal: {
-                            isHeader: true,
+                            isHeader: false,
                             label: 'label.upload.from.local',
                             preFilter: function (args) {
                                 return !args.context.instances;
