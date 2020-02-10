@@ -440,7 +440,7 @@
                         },
 
                         uploadTemplateFromLocal: {
-                            isHeader: true,
+                            isHeader: false,
                             label: 'label.upload.from.local',
                             messages: {
                                 notification: function (args) {
