@@ -163,6 +163,8 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
     private String _storageNetmask;
     private String _storageGateway;
     private String _ssvmPSK = null;
+    private String _localNic;
+    private String _localMask;
 
     public int getTimeout() {
         return this._timeout;
@@ -1359,6 +1361,8 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
 
         if (this._inSystemVM) {
             this._localgw = (String) params.get("localgw");
+            this._localNic = (String) params.get("mgtnic");
+            this._localMask = (String) params.get("mgtmask");
 
             startAdditionalServices();
             this._params.put("install.numthreads", "50");
@@ -1645,12 +1649,53 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             return;
         }
 
+        try {
+            attemptRoute(uri);
+        } catch (final Exception e) {
+            s_logger.debug("Failed to resolve hostname from " + uri);
+        }
         attemptMount(localRootPath, remoteDevice, uri);
 
         // XXX: Adding the check for creation of snapshots dir here. Might have
         // to move it somewhere more logical later.
         checkForSnapshotsDir(localRootPath);
         checkForVolumesDir(localRootPath);
+    }
+
+    protected void attemptRoute(final URI uri) {
+        final String result;
+        final String nfsHostname = uri.getHost().toLowerCase();
+        s_logger.debug("Got hostname " + nfsHostname);
+
+        String ipAddress;
+        try {
+            final InetAddress inetAddressResult = InetAddress.getByName(nfsHostname);
+            ipAddress = inetAddressResult.getHostAddress();
+        } catch (final Exception e) {
+            s_logger.debug("Failed to resolve " + nfsHostname);
+            return;
+        }
+        s_logger.debug("Attempting to route " + ipAddress + " to " + this._localgw);
+
+        if (NetUtils.sameSubnet(ipAddress, this._localgw, this._localMask)) {
+            final String errMsg = "No need to route " + ipAddress + " to " + this._localgw;
+            s_logger.error(errMsg);
+            return;
+        }
+
+        final Script command = new Script(!this._inSystemVM, "/usr/sbin/route", this._timeout, s_logger);
+        command.add("add");
+        command.add("-host", ipAddress);
+        command.add("gw", this._localgw);
+
+        result = command.execute();
+
+        if (result != null) {
+            final String errMsg = "Failed to route " + ipAddress + " to " + this._localgw;
+            s_logger.error(errMsg);
+            return;
+        }
+        s_logger.debug("Successfully routed " + ipAddress + " to " + this._localgw);
     }
 
     protected void attemptMount(final String localRootPath, final String remoteDevice, final URI uri) {
