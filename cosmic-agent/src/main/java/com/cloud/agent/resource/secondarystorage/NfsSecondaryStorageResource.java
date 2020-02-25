@@ -1683,10 +1683,10 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             return;
         }
 
-        final Script command = new Script(!this._inSystemVM, "/usr/sbin/route", this._timeout, s_logger);
-        command.add("add");
-        command.add("-host", ipAddress);
-        command.add("gw", this._localgw);
+        final Script command = new Script(!this._inSystemVM, "/usr/sbin/ip", this._timeout, s_logger);
+        command.add("route");
+        command.add("add", ipAddress + "/32");
+        command.add("via", this._localgw);
 
         result = command.execute();
 
