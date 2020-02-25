@@ -165,6 +165,7 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
     private String _ssvmPSK = null;
     private String _localNic;
     private String _localMask;
+    private String _setSecStorageRoute;
 
     public int getTimeout() {
         return this._timeout;
@@ -1363,6 +1364,7 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             this._localgw = (String) params.get("localgw");
             this._localNic = (String) params.get("mgtnic");
             this._localMask = (String) params.get("mgtmask");
+            this._setSecStorageRoute = (String) params.get("setsecstorageroute");
 
             startAdditionalServices();
             this._params.put("install.numthreads", "50");
@@ -1649,11 +1651,18 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             return;
         }
 
-        try {
-            attemptRoute(uri);
-        } catch (final Exception e) {
-            s_logger.debug("Failed to resolve hostname from " + uri);
+        // Check if we need to set a route for the sec storage ip to the mgt network
+        s_logger.debug("Value of _setSecStorageRoute is: " + this._setSecStorageRoute);
+
+        if ("true".equalsIgnoreCase(this._setSecStorageRoute)) {
+            s_logger.debug("Setting route for Secondary Storage ip towards management is enabled");
+            try {
+                attemptRoute(uri);
+            } catch (final Exception e) {
+                s_logger.debug("Failed to resolve hostname from " + uri);
+            }
         }
+
         attemptMount(localRootPath, remoteDevice, uri);
 
         // XXX: Adding the check for creation of snapshots dir here. Might have
