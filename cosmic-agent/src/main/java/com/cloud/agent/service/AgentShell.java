@@ -108,6 +108,7 @@ public class AgentShell {
         addNotNull(this.allProperties, "type", this.agentConfiguration.getType());
         addNotNull(this.allProperties, "workers", this.agentConfiguration.getWorkers());
         addNotNull(this.allProperties, "zone", this.agentConfiguration.getZone());
+        addNotNull(this.allProperties, "setsecstorageroute", this.agentConfiguration.getSetsecstorageroute());
     }
 
     /**

@@ -400,6 +400,13 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
             setRfc1918Routes = false;
         }
 
+        // Secondary Storage Route
+        Boolean setSecStorageRoute = false;
+        final String setSecStorageRouteStr = this._configDao.getValue("secstorage.set.route.to.management.network");
+        if (setSecStorageRouteStr != null && setSecStorageRouteStr.equalsIgnoreCase("true")) {
+            setSecStorageRoute = true;
+        }
+
         // External firewall
         this._allowedExternalCidrs = this._configDao.getValue("secstorage.allowed.external.cidrs");
         if (this._allowedExternalCidrs != null) {
@@ -450,6 +457,8 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         /* Set RFC1918 routes to MGT nic */
         buf.append(" setrfc1918routes=").append(setRfc1918Routes.toString().toLowerCase());
+
+        buf.append(" setsecstorageroute=").append(setSecStorageRoute.toString().toLowerCase());
 
         final DataCenterVO dc = this._dcDao.findById(profile.getVirtualMachine().getDataCenterId());
         buf.append(" internaldns1=").append(dc.getInternalDns1());

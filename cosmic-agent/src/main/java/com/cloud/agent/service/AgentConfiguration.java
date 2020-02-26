@@ -65,6 +65,7 @@ public class AgentConfiguration {
     private String sslcopy;
     private String template;
     private String type;
+    private String setsecstorageroute;
 
     public String getGuid() {
         return guid;
@@ -461,6 +462,14 @@ public class AgentConfiguration {
 
     public String getType() {
         return type;
+    }
+
+    public String getSetsecstorageroute() {
+        return setsecstorageroute;
+    }
+
+    public void setSetsecstorageroute(final String setsecstorageroute) {
+        this.setsecstorageroute = setsecstorageroute;
     }
 
     public void setType(final String type) {

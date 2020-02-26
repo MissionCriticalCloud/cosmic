@@ -163,6 +163,9 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
     private String _storageNetmask;
     private String _storageGateway;
     private String _ssvmPSK = null;
+    private String _localNic;
+    private String _localMask;
+    private String _setSecStorageRoute;
 
     public int getTimeout() {
         return this._timeout;
@@ -1359,6 +1362,9 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
 
         if (this._inSystemVM) {
             this._localgw = (String) params.get("localgw");
+            this._localNic = (String) params.get("mgtnic");
+            this._localMask = (String) params.get("mgtmask");
+            this._setSecStorageRoute = (String) params.get("setsecstorageroute");
 
             startAdditionalServices();
             this._params.put("install.numthreads", "50");
@@ -1645,12 +1651,60 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
             return;
         }
 
+        // Check if we need to set a route for the sec storage ip to the mgt network
+        s_logger.debug("Value of _setSecStorageRoute is: " + this._setSecStorageRoute);
+
+        if ("true".equalsIgnoreCase(this._setSecStorageRoute)) {
+            s_logger.debug("Setting route for Secondary Storage ip towards management is enabled");
+            try {
+                attemptRoute(uri);
+            } catch (final Exception e) {
+                s_logger.debug("Failed to resolve hostname from " + uri);
+            }
+        }
+
         attemptMount(localRootPath, remoteDevice, uri);
 
         // XXX: Adding the check for creation of snapshots dir here. Might have
         // to move it somewhere more logical later.
         checkForSnapshotsDir(localRootPath);
         checkForVolumesDir(localRootPath);
+    }
+
+    protected void attemptRoute(final URI uri) {
+        final String result;
+        final String nfsHostname = uri.getHost().toLowerCase();
+        s_logger.debug("Got hostname " + nfsHostname);
+
+        String ipAddress;
+        try {
+            final InetAddress inetAddressResult = InetAddress.getByName(nfsHostname);
+            ipAddress = inetAddressResult.getHostAddress();
+        } catch (final Exception e) {
+            s_logger.debug("Failed to resolve " + nfsHostname);
+            return;
+        }
+        s_logger.debug("Attempting to route " + ipAddress + " to " + this._localgw);
+
+        if (NetUtils.sameSubnet(ipAddress, this._localgw, this._localMask)) {
+            final String errMsg = "No need to route " + ipAddress + " to " + this._localgw;
+            s_logger.error(errMsg);
+            return;
+        }
+
+        final Script command = new Script(!this._inSystemVM, "/usr/sbin/ip", this._timeout, s_logger);
+        command.add("route");
+        command.add("add", ipAddress + "/32");
+        command.add("via", this._localgw);
+
+        result = command.execute();
+
+        if (result != null) {
+            final String errMsg = "Failed to route " + ipAddress + " to " + this._localgw;
+            s_logger.error(errMsg);
+            return;
+        }
+        s_logger.debug("Successfully routed " + ipAddress + " to " + this._localgw);
     }
 
     protected void attemptMount(final String localRootPath, final String remoteDevice, final URI uri) {
