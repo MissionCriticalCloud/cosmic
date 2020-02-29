@@ -58,6 +58,7 @@ import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
 import com.cloud.legacymodel.communication.answer.ClusterVMMetaDataSyncAnswer;
+import com.cloud.legacymodel.communication.answer.MigrationProgressAnswer;
 import com.cloud.legacymodel.communication.answer.PlugNicAnswer;
 import com.cloud.legacymodel.communication.answer.RebootAnswer;
 import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
@@ -198,6 +199,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -719,14 +721,32 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
             }
 
-            final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(vm.getInstanceName());
-            try {
-                _agentMgr.send(srcHost.getId(), migrationProgressCommand);
-            } catch (OperationTimedoutException e) {
-                s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
-            }
+            AtomicBoolean migrationRunning = new AtomicBoolean();
+            migrationRunning.set(true);
+            Runnable bla = () -> {
+                final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(vm.getInstanceName());
+                while (migrationRunning.get()) {
+                    try {
+                        Answer answer = _agentMgr.send(srcHost.getId(), migrationProgressCommand);
+                        if (answer instanceof MigrationProgressAnswer) {
+                            MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
+                            s_logger.debug(migrationProgressAnswer.String());
+                        }
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (OperationTimedoutException e) {
+                        s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
+                    } catch (AgentUnavailableException e) {
+                        s_logger.debug("Agent unavailable while executing command migrationProgressCommand " + e.getMessage());
+                    } catch (InterruptedException e) {
+                        s_logger.debug("Runnable interrupted " + e.getMessage());
+                    }
+                }
+            };
+            new Thread(bla).start();
+
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
+            migrationRunning.set(false);
 
             // Put the vm back to running state.
             moveVmOutofMigratingStateOnSuccess(vm, destHost.getId(), work);

@@ -82,4 +82,20 @@ public class MigrationProgressAnswer extends Answer {
     public long getFileRemaining() {
         return fileRemaining;
     }
+
+    public String String() {
+        return "MigrationProgressAnswer{" +
+                "timeElapsed=" + timeElapsed +
+                ", timeRemaining=" + timeRemaining +
+                ", dataTotal=" + dataTotal +
+                ", dataProcessed=" + dataProcessed +
+                ", dataRemaining=" + dataRemaining +
+                ", memTotal=" + memTotal +
+                ", memProcessed=" + memProcessed +
+                ", memRemaining=" + memRemaining +
+                ", fileTotal=" + fileTotal +
+                ", fileProcessed=" + fileProcessed +
+                ", fileRemaining=" + fileRemaining +
+                '}';
+    }
 }
