@@ -15,9 +15,6 @@ public class MigrationProgressAnswer extends Answer {
     long fileProcessed;
     long fileRemaining;
 
-    protected MigrationProgressAnswer() {
-    }
-
     public MigrationProgressAnswer(final MigrationProgressCommand cmd, final boolean success, final String details) {
         super(cmd, success, details);
     }

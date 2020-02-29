@@ -69,6 +69,7 @@ import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
 import com.cloud.legacymodel.communication.command.ClusterVMMetaDataSyncCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.MigrateCommand;
+import com.cloud.legacymodel.communication.command.MigrationProgressCommand;
 import com.cloud.legacymodel.communication.command.PingRoutingCommand;
 import com.cloud.legacymodel.communication.command.PlugNicCommand;
 import com.cloud.legacymodel.communication.command.PrepareForMigrationCommand;
@@ -718,6 +719,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
             }
 
+            final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(vm.getInstanceName());
+            try {
+                _agentMgr.send(srcHost.getId(), migrationProgressCommand);
+            } catch (OperationTimedoutException e) {
+                s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
+            }
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
 
@@ -1014,7 +1021,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                             _routerService.startRouter(vmInstanceVO.getId());
                         }
                     } catch (final InsufficientCapacityException | ResourceUnavailableException e) {
-                        s_logger.error("Unable to start instance: " + vmInstanceVO.getInstanceName() + " of type " + vmInstanceVO.getType() + ", after retrieving a ShutdownEventCommand");
+                        s_logger.error("Unable to start instance: " + vmInstanceVO.getInstanceName() + " of type " + vmInstanceVO.getType() + ", after retrieving a " +
+                                "ShutdownEventCommand");
                     }
                 } else {
                     s_logger.info("Not starting instance: " + vmInstanceVO.getInstanceName() + ", due to HA not enabled for this instance");
@@ -2941,8 +2949,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final VirtualMachineTO vmTO = hvGuru.implement(vmProfile);
 
         final NicProfile nicProfile =
-                new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(network.getId(), vm.getId()), _networkModel.getNetworkTag(vmProfile
-                        .getVirtualMachine().getHypervisorType(), network));
+                new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(network.getId(), vm.getId()),
+                        _networkModel.getNetworkTag(vmProfile
+                                .getVirtualMachine().getHypervisorType(), network));
 
         //1) Unplug the nic
         if (vm.getState() == State.Running) {
@@ -3119,8 +3128,9 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         try {
             final NicProfile nicProfile =
-                    new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(network.getId(), vm.getId()), _networkModel.getNetworkTag(vmProfile
-                            .getVirtualMachine().getHypervisorType(), network));
+                    new NicProfile(nic, network, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(network.getId(), vm.getId()),
+                            _networkModel.getNetworkTag(vmProfile
+                                    .getVirtualMachine().getHypervisorType(), network));
 
             //1) Unplug the nic
             if (vm.getState() == State.Running) {
@@ -3338,7 +3348,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final Float cpuOvercommitRatio = CapacityManager.CpuOverprovisioningFactor.valueIn(hostVo.getClusterId());
         final long minMemory = (long) (newServiceOffering.getRamSize() / memoryOvercommitRatio);
         final ScaleVmCommand reconfigureCmd =
-                new ScaleVmCommand(vm.getInstanceName(), newServiceOffering.getCpu(), minMemory * 1024L * 1024L, newServiceOffering.getRamSize() * 1024L * 1024L, newServiceOffering.getLimitCpuUse());
+                new ScaleVmCommand(vm.getInstanceName(), newServiceOffering.getCpu(), minMemory * 1024L * 1024L, newServiceOffering.getRamSize() * 1024L * 1024L, newServiceOffering
+                        .getLimitCpuUse());
 
         final Long dstHostId = vm.getHostId();
 
