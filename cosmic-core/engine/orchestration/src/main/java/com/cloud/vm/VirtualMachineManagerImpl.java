@@ -45,6 +45,7 @@ import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDispatcher;
 import com.cloud.framework.messagebus.MessageHandler;
+import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.gpu.dao.VGPUTypesDao;
 import com.cloud.ha.HaWork;
 import com.cloud.ha.HaWork.HaWorkType;
@@ -199,7 +200,6 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -346,6 +346,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     Map<VirtualMachineType, VirtualMachineGuru> _vmGurus = new HashMap<>();
+    Map<String, Long> migrationProgressQueue = new HashMap<>();
     ScheduledExecutorService _executor = null;
 
     protected VirtualMachineManagerImpl() {
@@ -392,6 +393,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         // TODO, initial delay is hardcoded
         _executor.scheduleAtFixedRate(new CleanupTask(), 5, VmJobStateReportInterval.value(), TimeUnit.SECONDS);
         _executor.scheduleAtFixedRate(new TransitionTask(), VmOpCleanupInterval.value(), VmOpCleanupInterval.value(), TimeUnit.SECONDS);
+        _executor.scheduleAtFixedRate(new MonitorMigrationTask(), 1, 1, TimeUnit.SECONDS);
         cancelWorkItems(_nodeId);
 
         volumeMgr.cleanupStorageJobs();
@@ -721,32 +723,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
             }
 
-            AtomicBoolean migrationRunning = new AtomicBoolean();
-            migrationRunning.set(true);
-            Runnable bla = () -> {
-                final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(vm.getInstanceName());
-                while (migrationRunning.get()) {
-                    try {
-                        Answer answer = _agentMgr.send(srcHost.getId(), migrationProgressCommand);
-                        if (answer instanceof MigrationProgressAnswer) {
-                            MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
-                            s_logger.debug(migrationProgressAnswer.String());
-                        }
-                        TimeUnit.SECONDS.sleep(1);
-                    } catch (OperationTimedoutException e) {
-                        s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
-                    } catch (AgentUnavailableException e) {
-                        s_logger.debug("Agent unavailable while executing command migrationProgressCommand " + e.getMessage());
-                    } catch (InterruptedException e) {
-                        s_logger.debug("Runnable interrupted " + e.getMessage());
-                    }
-                }
-            };
-            new Thread(bla).start();
+            migrationProgressQueue.put(vm.getInstanceName(), srcHost.getId());
 
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
-            migrationRunning.set(false);
+            migrationProgressQueue.remove(vm.getInstanceName());
 
             // Put the vm back to running state.
             moveVmOutofMigratingStateOnSuccess(vm, destHost.getId(), work);
@@ -4689,6 +4670,43 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 return workInfoNetworkId != null && workInfoNetworkId == networkId;
             } else {
                 return false;
+            }
+        }
+    }
+
+    private class MonitorMigrationTask implements Runnable {
+        @Inject
+        protected MessageBus _messageBus;
+
+        final String topic = "job.migration";
+
+        public MonitorMigrationTask() {
+            this._messageBus.subscribe(this.topic, MessageDispatcher.getDispatcher(this));
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    if (!migrationProgressQueue.isEmpty()) {
+                        for (Map.Entry<String, Long> entry : migrationProgressQueue.entrySet()) {
+                            final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(entry.getKey());
+                            Answer answer = _agentMgr.send(entry.getValue(), migrationProgressCommand);
+                            if (answer instanceof MigrationProgressAnswer) {
+                                MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
+                                this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
+                                s_logger.debug(migrationProgressAnswer.String());
+                            }
+                        }
+                    }
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (OperationTimedoutException e) {
+                    s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
+                } catch (AgentUnavailableException e) {
+                    s_logger.debug("Agent unavailable while executing command migrationProgressCommand " + e.getMessage());
+                } catch (InterruptedException e) {
+                    s_logger.debug("Runnable interrupted " + e.getMessage());
+                }
             }
         }
     }
