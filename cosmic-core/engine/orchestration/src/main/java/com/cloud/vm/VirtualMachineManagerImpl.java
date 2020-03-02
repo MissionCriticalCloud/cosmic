@@ -45,7 +45,6 @@ import com.cloud.framework.jobs.impl.VmWorkJobVO;
 import com.cloud.framework.messagebus.MessageBus;
 import com.cloud.framework.messagebus.MessageDispatcher;
 import com.cloud.framework.messagebus.MessageHandler;
-import com.cloud.framework.messagebus.PublishScope;
 import com.cloud.gpu.dao.VGPUTypesDao;
 import com.cloud.ha.HaWork;
 import com.cloud.ha.HaWork.HaWorkType;
@@ -4680,7 +4679,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         final String topic = "job.migration";
 
         public MonitorMigrationTask() {
-            this._messageBus.subscribe(this.topic, MessageDispatcher.getDispatcher(this));
+            //            this._messageBus.subscribe(this.topic, MessageDispatcher.getDispatcher(this));
         }
 
         @Override
@@ -4692,7 +4691,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         Answer answer = _agentMgr.send(entry.getValue(), migrationProgressCommand);
                         if (answer instanceof MigrationProgressAnswer) {
                             MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
-                            this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
+                            //                            this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
                             s_logger.debug(migrationProgressAnswer.String());
                         }
                     }
