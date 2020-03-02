@@ -30,10 +30,13 @@ import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
 import com.cloud.engine.subsystem.api.storage.DataStoreManager;
 import com.cloud.engine.subsystem.api.storage.StoragePoolAllocator;
+import com.cloud.event.EventCategory;
 import com.cloud.framework.config.ConfigDepot;
 import com.cloud.framework.config.ConfigKey;
 import com.cloud.framework.config.Configurable;
 import com.cloud.framework.config.dao.ConfigurationDao;
+import com.cloud.framework.events.EventBus;
+import com.cloud.framework.events.EventBusException;
 import com.cloud.framework.jobs.AsyncJob;
 import com.cloud.framework.jobs.AsyncJobExecutionContext;
 import com.cloud.framework.jobs.AsyncJobManager;
@@ -159,6 +162,7 @@ import com.cloud.utils.DateUtil;
 import com.cloud.utils.Journal;
 import com.cloud.utils.Predicate;
 import com.cloud.utils.ReflectionUse;
+import com.cloud.utils.component.ComponentContext;
 import com.cloud.utils.component.ManagerBase;
 import com.cloud.utils.concurrency.NamedThreadFactory;
 import com.cloud.utils.db.DB;
@@ -185,6 +189,7 @@ import java.net.URI;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -202,6 +207,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMachineManager, VmWorkJobHandler, Listener, Configurable {
     public static final String VM_WORK_JOB_HANDLER = VirtualMachineManagerImpl.class.getSimpleName();
@@ -345,7 +351,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     Map<VirtualMachineType, VirtualMachineGuru> _vmGurus = new HashMap<>();
-    Map<String, Long> migrationProgressQueue = new HashMap<>();
+    Map<String, Pair<Long, String>> migrationProgressQueue = new HashMap<>();
     ScheduledExecutorService _executor = null;
 
     protected VirtualMachineManagerImpl() {
@@ -722,7 +728,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
             }
 
-            migrationProgressQueue.put(vm.getInstanceName(), srcHost.getId());
+            migrationProgressQueue.put(vm.getInstanceName(), new Pair<>(srcHost.getId(), vm.getUuid()));
 
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
@@ -4674,23 +4680,43 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     protected class MonitorMigrationTask extends ManagedContextRunnable {
-        protected MessageBus _messageBus;
+        protected EventBus s_eventBus = null;
+        com.cloud.framework.events.Event eventMsg = null;
 
         final String topic = "job.migration";
 
         public MonitorMigrationTask() {
-            //            this._messageBus.subscribe(this.topic, MessageDispatcher.getDispatcher(this));
+            try {
+                s_eventBus = ComponentContext.getComponent(EventBus.class);
+            } catch (final NoSuchBeanDefinitionException nbe) {
+                // no provider is configured to provide events bus, so just ignore the exception
+            }
         }
 
         @Override
         protected void runInContext() {
             try {
                 if (!migrationProgressQueue.isEmpty()) {
-                    for (Map.Entry<String, Long> entry : migrationProgressQueue.entrySet()) {
+                    for (Map.Entry<String, Pair<Long, String>> entry : migrationProgressQueue.entrySet()) {
                         final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(entry.getKey());
-                        Answer answer = _agentMgr.send(entry.getValue(), migrationProgressCommand);
+                        Answer answer = _agentMgr.send(entry.getValue().first(), migrationProgressCommand);
                         if (answer instanceof MigrationProgressAnswer) {
                             MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
+                            if (s_eventBus != null) {
+                                try {
+                                    eventMsg = new com.cloud.framework.events.Event("migration-task", EventCategory.ASYNC_JOB_CHANGE_EVENT.getName(), "bla1", "bla2",
+                                            entry.getValue().second(), this.topic);
+
+                                    final Map<String, String> eventDescription = new HashMap<>();
+                                    final String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
+                                    eventDescription.put("eventDateTime", eventDate);
+                                    eventDescription.put("test", String.valueOf(migrationProgressAnswer.getFileProcessed()));
+
+                                    s_eventBus.publish(eventMsg);
+                                } catch (EventBusException e) {
+                                    s_logger.debug("Unable to send message to bus " + e.getMessage());
+                                }
+                            }
                             //                            this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
                             s_logger.debug(migrationProgressAnswer.String());
                         }
