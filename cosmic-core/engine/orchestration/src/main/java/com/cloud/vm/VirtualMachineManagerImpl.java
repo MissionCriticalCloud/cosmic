@@ -4674,7 +4674,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
     }
 
-    private class MonitorMigrationTask implements Runnable {
+    protected class MonitorMigrationTask extends ManagedContextRunnable {
         @Inject
         protected MessageBus _messageBus;
 
@@ -4685,7 +4685,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         }
 
         @Override
-        public void run() {
+        protected void runInContext() {
             while (true) {
                 try {
                     if (!migrationProgressQueue.isEmpty()) {
