@@ -4686,27 +4686,25 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
         @Override
         protected void runInContext() {
-            while (true) {
-                try {
-                    if (!migrationProgressQueue.isEmpty()) {
-                        for (Map.Entry<String, Long> entry : migrationProgressQueue.entrySet()) {
-                            final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(entry.getKey());
-                            Answer answer = _agentMgr.send(entry.getValue(), migrationProgressCommand);
-                            if (answer instanceof MigrationProgressAnswer) {
-                                MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
-                                this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
-                                s_logger.debug(migrationProgressAnswer.String());
-                            }
+            try {
+                if (!migrationProgressQueue.isEmpty()) {
+                    for (Map.Entry<String, Long> entry : migrationProgressQueue.entrySet()) {
+                        final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(entry.getKey());
+                        Answer answer = _agentMgr.send(entry.getValue(), migrationProgressCommand);
+                        if (answer instanceof MigrationProgressAnswer) {
+                            MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
+                            this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
+                            s_logger.debug(migrationProgressAnswer.String());
                         }
                     }
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (OperationTimedoutException e) {
-                    s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
-                } catch (AgentUnavailableException e) {
-                    s_logger.debug("Agent unavailable while executing command migrationProgressCommand " + e.getMessage());
-                } catch (InterruptedException e) {
-                    s_logger.debug("Runnable interrupted " + e.getMessage());
                 }
+                TimeUnit.SECONDS.sleep(1);
+            } catch (OperationTimedoutException e) {
+                s_logger.debug("Timeout occurred while executing command migrationProgressCommand " + e.getMessage());
+            } catch (AgentUnavailableException e) {
+                s_logger.debug("Agent unavailable while executing command migrationProgressCommand " + e.getMessage());
+            } catch (InterruptedException e) {
+                s_logger.debug("Runnable interrupted " + e.getMessage());
             }
         }
     }
