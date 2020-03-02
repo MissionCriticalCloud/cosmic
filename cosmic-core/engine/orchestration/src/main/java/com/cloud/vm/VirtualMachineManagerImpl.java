@@ -4675,7 +4675,6 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
     }
 
     protected class MonitorMigrationTask extends ManagedContextRunnable {
-        @Inject
         protected MessageBus _messageBus;
 
         final String topic = "job.migration";
