@@ -4704,20 +4704,30 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                             MigrationProgressAnswer migrationProgressAnswer = (MigrationProgressAnswer) answer;
                             if (s_eventBus != null) {
                                 try {
-                                    eventMsg = new com.cloud.framework.events.Event("migration-task", EventCategory.ASYNC_JOB_CHANGE_EVENT.getName(), "bla1", "bla2",
-                                            entry.getValue().second(), this.topic);
+                                    eventMsg = new com.cloud.framework.events.Event("migration-task", EventCategory.ASYNC_JOB_CHANGE_EVENT.getName(),
+                                            "migration-progress", this.getClass().getName(), entry.getValue().second(), this.topic);
 
                                     final Map<String, String> eventDescription = new HashMap<>();
                                     final String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
+                                    eventDescription.put("timeElapsed", String.valueOf(migrationProgressAnswer.getTimeElapsed()));
+                                    eventDescription.put("timeRemaining", String.valueOf(migrationProgressAnswer.getTimeRemaining()));
+                                    eventDescription.put("dataTotal", String.valueOf(migrationProgressAnswer.getDataTotal()));
+                                    eventDescription.put("dataProcessed", String.valueOf(migrationProgressAnswer.getDataProcessed()));
+                                    eventDescription.put("dataRemaining", String.valueOf(migrationProgressAnswer.getDataRemaining()));
+                                    eventDescription.put("memTotal", String.valueOf(migrationProgressAnswer.getMemTotal()));
+                                    eventDescription.put("memProcessed", String.valueOf(migrationProgressAnswer.getMemProcessed()));
+                                    eventDescription.put("memRemaining", String.valueOf(migrationProgressAnswer.getMemRemaining()));
+                                    eventDescription.put("fileTotal", String.valueOf(migrationProgressAnswer.getFileTotal()));
+                                    eventDescription.put("fileProcessed", String.valueOf(migrationProgressAnswer.getFileProcessed()));
+                                    eventDescription.put("fileRemaining", String.valueOf(migrationProgressAnswer.getFileRemaining()));
                                     eventDescription.put("eventDateTime", eventDate);
-                                    eventDescription.put("test", String.valueOf(migrationProgressAnswer.getFileProcessed()));
+
                                     eventMsg.setDescription(eventDescription);
                                     s_eventBus.publish(eventMsg);
                                 } catch (EventBusException e) {
                                     s_logger.debug("Unable to send message to bus " + e.getMessage());
                                 }
                             }
-                            //                            this._messageBus.publish(null, entry.getKey(), PublishScope.LOCAL, migrationProgressAnswer.String());
                             s_logger.debug(migrationProgressAnswer.String());
                         }
                     }
