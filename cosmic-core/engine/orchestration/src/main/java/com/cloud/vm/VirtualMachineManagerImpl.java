@@ -4711,7 +4711,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                                     final String eventDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(new Date());
                                     eventDescription.put("eventDateTime", eventDate);
                                     eventDescription.put("test", String.valueOf(migrationProgressAnswer.getFileProcessed()));
-
+                                    eventMsg.setDescription(eventDescription);
                                     s_eventBus.publish(eventMsg);
                                 } catch (EventBusException e) {
                                     s_logger.debug("Unable to send message to bus " + e.getMessage());
