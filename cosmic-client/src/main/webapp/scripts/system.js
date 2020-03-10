@@ -4964,7 +4964,7 @@
                                                             //if account is specified in advanced search, don't search project-owned routers
                                                             var accountIsNotSpecifiedInAdvSearch = true;
                                                             if (args.filterBy != null) {
-                                                                if (args.filterBy.advSearch != null && typeof(args.filterBy.advSearch) == "object") { //advanced search
+                                                                if (args.filterBy.advSearch != null && typeof (args.filterBy.advSearch) == "object") { //advanced search
                                                                     if ('account' in args.filterBy.advSearch && args.filterBy.advSearch.account.length > 0) {
                                                                         accountIsNotSpecifiedInAdvSearch = false;  //since account and projectid can't be specified together
                                                                     }
@@ -6927,8 +6927,7 @@
                                                     $.extend(data1, {
                                                         systemvmtype: 'secondarystoragevm'
                                                     });
-                                                }
-                                                else if (args.context.systemVMs[0].systemvmtype == "consoleproxy") {
+                                                } else if (args.context.systemVMs[0].systemvmtype == "consoleproxy") {
                                                     $.extend(data1, {
                                                         systemvmtype: 'consoleproxy'
                                                     });
@@ -10799,8 +10798,7 @@
                                     }
 
                                     array1.push("&url=" + todb(url));
-                                }
-                                else {
+                                } else {
                                     array1.push("&managed=" + (args.data.isManaged == "on").toString());
 
                                     if (args.data.capacityBytes != null && args.data.capacityBytes.length > 0) {
@@ -11464,7 +11462,7 @@
                                 },
                                 action: function (args) {
                                     $.ajax({
-                                        url: createURL("deleteImageStore&id=" + args.context.secondaryStorage[0].id),
+                                        url: createURL("deleteImageStore&id=" + args.context.secondarystorages[0].id),
                                         dataType: "json",
                                         async: true,
                                         success: function (json) {
