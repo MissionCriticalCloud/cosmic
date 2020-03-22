@@ -4,12 +4,13 @@ from conntrackd import Conntrackd
 from dhcp_service import DhcpService
 from dhcp_vm import DhcpVm
 from firewall import Firewall
+from haproxy import HaProxy
 from keepalived import Keepalived
 from metadata_service import MetadataService
 from metadata_vm import MetadataVm
 from password_service import PasswordService
-from vpn import Vpn
 from rsyslog import Rsyslog
+from vpn import Vpn
 
 
 class Network:
@@ -27,6 +28,7 @@ class Network:
         self.dhcp_vm = DhcpVm(self.config)
         self.vpn = Vpn(self.config)
         self.rsyslog = Rsyslog(self.config)
+        self.haproxy = HaProxy(self.config)
 
     def sync(self):
         logging.debug("Starting sync of network!")
@@ -42,3 +44,4 @@ class Network:
         self.dhcp_vm.sync()
         self.vpn.sync()
         self.rsyslog.sync()
+        self.haproxy.sync()

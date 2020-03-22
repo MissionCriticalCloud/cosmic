@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -- coding: utf-8 --
 import logging
-import sys
 from collections import OrderedDict
+
+import sys
 
 from cs.CsAcl import CsAcl
 from cs.CsForwardingRules import CsForwardingRules
-from cs.CsLoadBalancer import CsLoadBalancer
 from cs.CsNetfilter import CsNetfilters
 from cs.CsVrConfig import CsVrConfig
 from cs.config import Config
@@ -35,9 +35,6 @@ class IpTablesExecutor:
 
         vr = CsVrConfig(self.config)
         vr.process()
-
-        lb = CsLoadBalancer(self.config)
-        lb.process()
 
         logging.debug("Configuring iptables rules")
         nf = CsNetfilters(self.config, False)

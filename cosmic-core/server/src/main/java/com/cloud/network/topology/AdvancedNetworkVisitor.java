@@ -113,6 +113,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
                     ipsToExclude,
                     new ArrayList<>(),
                     null,
+                    null,
                     null
             );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -136,6 +137,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                null,
                 null,
                 null
         );
@@ -175,6 +177,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
                     new ArrayList<>(),
                     ipsToExclude,
                     new ArrayList<>(),
+                    null,
                     null,
                     null
             );
@@ -245,6 +248,7 @@ public class AdvancedNetworkVisitor extends BasicNetworkVisitor {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
+                null,
                 null,
                 null
         );

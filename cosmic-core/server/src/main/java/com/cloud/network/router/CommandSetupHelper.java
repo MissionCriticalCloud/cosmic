@@ -22,6 +22,7 @@ import com.cloud.legacymodel.communication.command.UpdateVmOverviewCommand;
 import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.network.FirewallRule.Purpose;
 import com.cloud.legacymodel.network.Ip;
+import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.network.LoadBalancingRule;
 import com.cloud.legacymodel.network.LoadBalancingRule.LbDestination;
 import com.cloud.legacymodel.network.LoadBalancingRule.LbStickinessPolicy;
@@ -56,6 +57,10 @@ import com.cloud.network.Site2SiteVpnConnection;
 import com.cloud.network.dao.FirewallRulesDao;
 import com.cloud.network.dao.IPAddressDao;
 import com.cloud.network.dao.IPAddressVO;
+import com.cloud.network.dao.LBStickinessPolicyDao;
+import com.cloud.network.dao.LoadBalancerDao;
+import com.cloud.network.dao.LoadBalancerVMMapDao;
+import com.cloud.network.dao.LoadBalancerVO;
 import com.cloud.network.dao.NetworkDao;
 import com.cloud.network.dao.NetworkVO;
 import com.cloud.network.dao.RemoteAccessVpnDao;
@@ -97,6 +102,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -150,6 +156,12 @@ public class CommandSetupHelper {
     private ZoneRepository zoneRepository;
     @Inject
     private NetworkACLItemDao _networkACLItemDao;
+    @Inject
+    private LoadBalancerDao _loadBalancerDao;
+    @Inject
+    private LoadBalancerVMMapDao _loadBalancerVMMapDao;
+    @Inject
+    private LBStickinessPolicyDao _lbStickinessPolicyDao;
 
     public void createApplyLoadBalancingRulesCommands(final List<LoadBalancingRule> rules, final VirtualRouter router, final Commands cmds, final long guestNetworkId) {
         final LoadBalancerTO[] lbs = new LoadBalancerTO[rules.size()];
@@ -202,8 +214,9 @@ public class CommandSetupHelper {
 
         final Network guestNetwork = _networkModel.getNetwork(guestNetworkId);
         final Nic nic = _nicDao.findByNtwkIdAndInstanceId(guestNetwork.getId(), router.getId());
-        final NicProfile nicProfile = new NicProfile(nic, guestNetwork, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(guestNetwork.getId(), router.getId()),
-                _networkModel.getNetworkTag(router.getHypervisorType(), guestNetwork));
+        final NicProfile nicProfile =
+                new NicProfile(nic, guestNetwork, nic.getBroadcastUri(), nic.getIsolationUri(), _networkModel.getNetworkRate(guestNetwork.getId(), router.getId()),
+                        _networkModel.getNetworkTag(router.getHypervisorType(), guestNetwork));
         final NetworkOffering offering = _networkOfferingDao.findById(guestNetwork.getNetworkOfferingId());
         final String maxconn;
         if (offering.getConcurrentConnections() == null) {
@@ -506,7 +519,8 @@ public class CommandSetupHelper {
             final List<Ip> ipsToExclude,
             final List<StaticRouteProfile> staticRoutesToExclude,
             final RemoteAccessVpn remoteAccessVpnToExclude,
-            final Site2SiteVpnConnection site2siteVpnToExclude
+            final Site2SiteVpnConnection site2siteVpnToExclude,
+            final LoadBalancer loadBalancerExclude
     ) {
         final NetworkOverviewTO networkOverviewTO = new NetworkOverviewTO();
         final List<NetworkOverviewTO.InterfaceTO> interfacesTO = new ArrayList<>();
@@ -526,6 +540,10 @@ public class CommandSetupHelper {
         networkOverviewTO.setVpn(vpnTO);
 
         configureSyslog(router, networkOverviewTO);
+
+        final NetworkOverviewTO.LoadBalancerTO loadBalancerTO = new NetworkOverviewTO.LoadBalancerTO();
+        configureLoadBalancer(router, loadBalancerTO);
+        networkOverviewTO.setLoadbalancer(loadBalancerTO);
 
         return networkOverviewTO;
     }
@@ -663,6 +681,85 @@ public class CommandSetupHelper {
             syslogTO.setServers(vpc.getSyslogServerList().split(","));
             networkOverviewTO.setSyslog(syslogTO);
         }
+    }
+
+    private void configureLoadBalancer(final VirtualRouter router, final NetworkOverviewTO.LoadBalancerTO loadBalancerTO) {
+        ArrayList<NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO> loadBalancers = new ArrayList<>();
+        final List<NetworkVO> networks = _networkDao.listByVpc(router.getVpcId());
+        List<Long> networkIds = networks.stream().map(NetworkVO::getId).collect(Collectors.toList());
+        List<LoadBalancerVO> loadBalancerVO = _loadBalancerDao.listAll().stream().filter(lb -> networkIds.contains(lb.getNetworkId())).collect(Collectors.toList());
+        List<FirewallRuleVO> loadBalancingRuleList = _rulesDao.listAll().stream()
+                                                              .filter(rule -> networkIds.contains(rule.getNetworkId()) &&
+                                                                      rule.getPurpose().toString().equals("LoadBalancing") &&
+                                                                      (rule.getState().equals(FirewallRule.State.Active) ||
+                                                                              rule.getState().equals(FirewallRule.State.Add)))
+                                                              .collect(Collectors.toList());
+        loadBalancingRuleList.forEach(rule -> {
+            final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
+            final Optional<LoadBalancerVO> ruleVO = loadBalancerVO.stream().filter(r -> r.getId() == rule.getId()).findFirst();
+
+            ruleVO.ifPresent(balancerVO -> {
+                final NetworkOverviewTO.LoadBalancerTO.StickinessPolicy lbStickinessPolicy =
+                        _lbStickinessPolicyDao.listByLoadBalancerId(balancerVO.getId(), false)
+                                              .stream()
+                                              .map(policy -> new NetworkOverviewTO.LoadBalancerTO.StickinessPolicy(
+                                                      policy.getMethodName(),
+                                                      policy.getParams()
+                                              )).findFirst().orElse(null);
+
+                final List<NetworkOverviewTO.LoadBalancerTO.LBDestinations> lbDestinationList =
+                        _loadBalancerVMMapDao.listByLoadBalancerId(balancerVO.getId())
+                                             .stream()
+                                             .map(vm -> new NetworkOverviewTO.LoadBalancerTO.LBDestinations(
+                                                     vm.getInstanceIp(),
+                                                     balancerVO.getDefaultPortStart()
+                                             )).collect(Collectors.toList());
+
+                loadBalancers.add(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO(
+                        rule.getUuid(),
+                        balancerVO.getName(),
+                        sourceIp.getAddress().addr(),
+                        rule.getSourcePortStart(),
+                        rule.getProtocol(),
+                        balancerVO.getLbProtocol(),
+                        balancerVO.getAlgorithm(),
+                        lbDestinationList,
+                        lbStickinessPolicy,
+                        balancerVO.getClientTimeout(),
+                        balancerVO.getServerTimeout()
+                ));
+            });
+        });
+
+        String routerPublicIp = null;
+
+        if (router instanceof DomainRouterVO) {
+            final DomainRouterVO domr = _routerDao.findById(router.getId());
+            routerPublicIp = domr.getPublicIpAddress();
+            if (routerPublicIp == null) {
+                routerPublicIp = router.getPublicIpAddress();
+            }
+        }
+        // TODO: is networkIds.get(0) the right way
+        final Network guestNetwork = _networkModel.getNetwork(networkIds.get(0));
+        final NetworkOffering offering = _networkOfferingDao.findById(guestNetwork.getNetworkOfferingId());
+        final String maxconn;
+        if (offering.getConcurrentConnections() == null) {
+            maxconn = _configDao.getValue(Config.NetworkLBHaproxyMaxConn.key());
+        } else {
+            maxconn = offering.getConcurrentConnections().toString();
+        }
+
+        loadBalancerTO.setLbStatsVisibility(_configDao.getValue(Config.NetworkLBHaproxyStatsVisbility.key()));
+        loadBalancerTO.setLbStatsUri(_configDao.getValue(Config.NetworkLBHaproxyStatsUri.key()));
+        loadBalancerTO.setLbStatsAuth(_configDao.getValue(Config.NetworkLBHaproxyStatsAuth.key()));
+        loadBalancerTO.setLbStatsPort(_configDao.getValue(Config.NetworkLBHaproxyStatsPort.key()));
+
+        loadBalancerTO.setLbStatsPublicIp(routerPublicIp);
+        loadBalancerTO.setLbStatsGuestIp(_routerControlHelper.getRouterIpInNetwork(networkIds.get(0), router.getId())); // TODO: Same as above
+        loadBalancerTO.setLbStatsPrivateIp(router.getPrivateIpAddress());
+        loadBalancerTO.setMaxconn(maxconn);
+        loadBalancerTO.setLoadBalancers(loadBalancers.toArray(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO[0]));
     }
 
     public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {
