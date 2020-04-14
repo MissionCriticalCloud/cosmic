@@ -67,7 +67,7 @@ public interface VolumeApiService {
 
     Snapshot allocSnapshot(Long volumeId, Long policyId, String snapshotName) throws ResourceAllocationException;
 
-    Volume updateVolume(long volumeId, String path, String state, Long storageId, Boolean displayVolume, String customId, long owner, String chainInfo, DiskControllerType diskControllerType);
+    Volume updateVolume(long volumeId, String name, String path, String state, Long storageId, Boolean displayVolume, String customId, long owner, String chainInfo, DiskControllerType diskControllerType);
 
     /**
      * Extracts the volume to a particular location.

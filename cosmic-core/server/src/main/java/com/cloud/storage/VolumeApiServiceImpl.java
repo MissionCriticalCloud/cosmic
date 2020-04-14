@@ -2470,7 +2470,7 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VOLUME_UPDATE, eventDescription = "updating volume", async = true)
-    public Volume updateVolume(final long volumeId, final String path, final String state, final Long storageId, final Boolean displayVolume, final String customId, final long
+    public Volume updateVolume(final long volumeId, final String name, final String path, final String state, final Long storageId, final Boolean displayVolume, final String customId, final long
             entityOwnerId, final String chainInfo, final DiskControllerType diskControllerType) {
 
         final VolumeVO volume = this._volsDao.findById(volumeId);
@@ -2485,6 +2485,10 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
 
         if (volume == null) {
             throw new InvalidParameterValueException("The volume id doesn't exist");
+        }
+
+        if (name != null) {
+            volume.setName(name);
         }
 
         if (path != null) {

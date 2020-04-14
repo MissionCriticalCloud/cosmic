@@ -395,6 +395,12 @@ public class VolumeApiServiceImplTest {
         }
     }
 
+    @Test
+    public void testUpdateVolume() {
+        _svc.updateVolume(2L, "toor", null, null, null, null, null, 1L, null, null);
+        Assert.assertEquals("toor", _svc._volsDao.findById(2L).getName());
+    }
+
     @After
     public void tearDown() {
         CallContext.unregister();

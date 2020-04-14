@@ -928,6 +928,10 @@
                                     title: 'label.action.edit.disk',
                                     desc: 'label.action.edit.disk',
                                     fields: {
+                                        name: {
+                                            label: 'label.name',
+                                            defaultValue: function(args) { return args.volumes[0].name }
+                                        },
                                         diskController: {
                                             label: 'label.disk.controller',
                                             docID: 'helpDiskController',
@@ -956,7 +960,8 @@
                                 action: function (args) {
                                     var data = {
                                         id: args.context.volumes[0].id,
-                                        diskcontroller: args.data.diskController
+                                        diskcontroller: args.data.diskController,
+                                        name: args.data.name
                                     };
 
                                     $.ajax({
