@@ -13,9 +13,9 @@ import com.google.gson.annotations.SerializedName;
 
 @EntityReference(value = JobInfo.class)
 public class AsyncJobResponse extends BaseResponse {
-    @SerializedName(ApiConstants.JOB_STATUS)
-    @Param(description = "The current status of the latest async job acting on this object, should be 0 for PENDING")
-    private Integer jobStatus;
+    //    @SerializedName(ApiConstants.JOB_STATUS)
+    //    @Param(description = "The current status of the latest async job acting on this object, should be 0 for PENDING")
+    //    private Integer jobStatus;
 
     @SerializedName("accountid")
     @Param(description = "the account that executed the async command")
@@ -69,10 +69,10 @@ public class AsyncJobResponse extends BaseResponse {
         this.cmd = cmd;
     }
 
-    @Override
-    public void setJobStatus(final Integer jobStatus) {
-        this.jobStatus = jobStatus;
-    }
+    //    @Override
+    //    public void setJobStatus(final Integer jobStatus) {
+    //        this.jobStatus = jobStatus;
+    //    }
 
     public void setJobProcStatus(final Integer jobProcStatus) {
         this.jobProcStatus = jobProcStatus;
