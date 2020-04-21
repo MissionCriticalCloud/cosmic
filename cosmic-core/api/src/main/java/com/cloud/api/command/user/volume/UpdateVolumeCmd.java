@@ -68,6 +68,12 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
             description = "the disk controller to use. Either 'IDE', 'VIRTIO' or 'SCSI'")
     private String diskController;
 
+    @Parameter(name = ApiConstants.NAME,
+            required = false,
+            type = CommandType.STRING,
+            description = "the name of the disk volume")
+    private String volumeName;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -91,6 +97,11 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
         if (getState() != null) {
             desc.append(", state " + getState());
         }
+
+        if (getVolumeName() != null) {
+            desc.append(", name " + getVolumeName());
+        }
+
         return desc.toString();
     }
 
@@ -111,6 +122,10 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
     public String getPath() {
         return path;
     }
+
+    public String getVolumeName() {
+        return volumeName;
+    }
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////
     /////////////////////////////////////////////////////
@@ -126,8 +141,8 @@ public class UpdateVolumeCmd extends BaseAsyncCustomIdCmd {
     @Override
     public void execute() {
         CallContext.current().setEventDetails("Volume Id: " + getId());
-        final Volume result = _volumeService.updateVolume(getId(), getPath(), getState(), getStorageId(), getDisplayVolume(),
-                getCustomId(), getEntityOwnerId(), getChainInfo(), getDiskController());
+        final Volume result = _volumeService.updateVolume(getId(), getVolumeName(), getPath(), getState(), getStorageId(),
+                getDisplayVolume(), getCustomId(), getEntityOwnerId(), getChainInfo(), getDiskController());
         if (result != null) {
             final VolumeResponse response = _responseGenerator.createVolumeResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
