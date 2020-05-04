@@ -360,7 +360,9 @@
                                         label: 'label.routing',
                                         docID: 'helpRegisterTemplateRouting',
                                         isBoolean: true,
-                                        isHidden: true
+                                        isHidden: function () {
+                                            return !isAdmin();
+                                        }
                                     },
                                     isremotegatewaytemplate: {
                                         label: 'label.isremotegatewaytemplate',
@@ -392,7 +394,8 @@
                                     hypervisor: args.data.hypervisor,
                                     maintenancepolicy: args.data.maintenancepolicy,
                                     isremotegatewaytemplate: (args.data.isremotegatewaytemplate == "on"),
-                                    maclearning: (args.data.maclearning === "on")
+                                    maclearning: (args.data.maclearning === "on"),
+                                    isrouting: (args.data.isrouting === "on")
                                 };
 
                                 if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {

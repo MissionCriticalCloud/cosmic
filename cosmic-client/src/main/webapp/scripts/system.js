@@ -121,43 +121,6 @@
         return trafficType;
     };
 
-    var updateTrafficLabels = function (trafficType, labels, complete) {
-        var array1 = [];
-        if (labels.xennetworklabel != _l('label.network.label.display.for.blank.value'))
-            array1.push("&xennetworklabel=" + labels.xennetworklabel);
-        if (labels.kvmnetworklabel != _l('label.network.label.display.for.blank.value'))
-            array1.push("&kvmnetworklabel=" + labels.kvmnetworklabel);
-
-        $.ajax({
-            url: createURL('updateTrafficType' + array1.join("")),
-            data: {
-                id: trafficType.id
-            },
-            success: function (json) {
-                var jobID = json.updatetraffictyperesponse.jobid;
-
-                cloudStack.ui.notifications.add({
-                        desc: 'Update traffic labels',
-                        poll: pollAsyncJobResult,
-                        section: 'System',
-                        _custom: {
-                            jobId: jobID
-                        }
-                    },
-                    complete ? complete : function () {
-                    },
-                    {},
-                    function (data) {
-                        // Error
-                        cloudStack.dialog.notice({
-                            message: parseXMLHttpResponse(data)
-                        });
-                    },
-                    {});
-            }
-        })
-    };
-
     function virtualRouterProviderActionFilter(args) {
         var allowedActions = [];
         var jsonObj = args.context.item; //args.context.item == nspMap["virtualRouter"]
@@ -566,18 +529,6 @@
             mainNetworks: {
                 'public': {
                     detailView: {
-                        actions: {
-                            edit: {
-                                label: 'label.edit',
-                                action: function (args) {
-                                    var trafficType = getTrafficType(selectedPhysicalNetworkObj, 'Public');
-
-                                    updateTrafficLabels(trafficType, args.data, function () {
-                                        args.response.success();
-                                    });
-                                }
-                            }
-                        },
                         tabs: {
                             details: {
                                 title: 'label.details',
@@ -588,17 +539,7 @@
                                     broadcastdomaintype: {
                                         label: 'label.broadcast.domain.type'
                                     }
-                                },
-                                    {
-                                        xennetworklabel: {
-                                            label: 'label.xenserver.traffic.label',
-                                            isEditable: true
-                                        },
-                                        kvmnetworklabel: {
-                                            label: 'label.kvm.traffic.label',
-                                            isEditable: true
-                                        }
-                                    }],
+                                }],
 
                                 dataProvider: function (args) {
                                     $.ajax({
@@ -860,18 +801,6 @@
 
                 'storage': {
                     detailView: {
-                        actions: {
-                            edit: {
-                                label: 'label.edit',
-                                action: function (args) {
-                                    var trafficType = getTrafficType(selectedPhysicalNetworkObj, 'Storage');
-
-                                    updateTrafficLabels(trafficType, args.data, function () {
-                                        args.response.success();
-                                    });
-                                }
-                            }
-                        },
                         tabs: {
                             details: {
                                 title: 'label.details',
@@ -882,17 +811,7 @@
                                     broadcastdomaintype: {
                                         label: 'label.broadcast.domain.type'
                                     }
-                                },
-                                    {
-                                        xennetworklabel: {
-                                            label: 'label.xenserver.traffic.label',
-                                            isEditable: true
-                                        },
-                                        kvmnetworklabel: {
-                                            label: 'label.kvm.traffic.label',
-                                            isEditable: true
-                                        }
-                                    }],
+                                }],
 
                                 dataProvider: function (args) {
                                     $.ajax({
@@ -1051,18 +970,7 @@
 
                 'management': {
                     detailView: {
-                        actions: {
-                            edit: {
-                                label: 'label.edit',
-                                action: function (args) {
-                                    var trafficType = getTrafficType(selectedPhysicalNetworkObj, 'Management');
 
-                                    updateTrafficLabels(trafficType, args.data, function () {
-                                        args.response.success();
-                                    });
-                                }
-                            }
-                        },
                         tabs: {
                             details: {
                                 title: 'label.details',
@@ -1073,17 +981,7 @@
                                     broadcastdomaintype: {
                                         label: 'label.broadcast.domain.type'
                                     }
-                                },
-                                    {
-                                        xennetworklabel: {
-                                            label: 'label.xenserver.traffic.label',
-                                            isEditable: true
-                                        },
-                                        kvmnetworklabel: {
-                                            label: 'label.kvm.traffic.label',
-                                            isEditable: true
-                                        }
-                                    }],
+                                }],
                                 dataProvider: function (args) {
                                     $.ajax({
                                         url: createURL("listNetworks&listAll=true&issystem=true&trafficType=Management&zoneId=" + selectedZoneObj.id),
@@ -1181,16 +1079,14 @@
                                         url: createURL('updatePhysicalNetwork'),
                                         data: data,
                                         success: function (json) {
-                                            var jobId = json.updatephysicalnetworkresponse.jobid;
-
-                                            var trafficType = getTrafficType(selectedPhysicalNetworkObj, 'Guest');
-
-                                            updateTrafficLabels(trafficType, args.data, function () {
-                                                args.response.success({
-                                                    _custom: {
-                                                        jobId: jobId
-                                                    }
-                                                });
+                                            args.response.success({
+                                                _custom: {
+                                                    jobId: json.updatephysicalnetworkresponse.jobid
+                                                },
+                                                notification: {
+                                                    label: 'changed.item.properties',
+                                                    poll: pollAsyncJobResult
+                                                }
                                             });
                                         }
                                     });
@@ -1240,18 +1136,7 @@
                                     broadcastdomainrange: {
                                         label: 'label.broadcast.domain.range'
                                     }
-                                },
-                                    {
-                                        //updateTrafficType API
-                                        xennetworklabel: {
-                                            label: 'label.xenserver.traffic.label',
-                                            isEditable: true
-                                        },
-                                        kvmnetworklabel: {
-                                            label: 'label.kvm.traffic.label',
-                                            isEditable: true
-                                        }
-                                    }],
+                                }],
                                 dataProvider: function (args) {
                                     //physical network + Guest traffic type
                                     //refresh physical network
@@ -4964,7 +4849,7 @@
                                                             //if account is specified in advanced search, don't search project-owned routers
                                                             var accountIsNotSpecifiedInAdvSearch = true;
                                                             if (args.filterBy != null) {
-                                                                if (args.filterBy.advSearch != null && typeof(args.filterBy.advSearch) == "object") { //advanced search
+                                                                if (args.filterBy.advSearch != null && typeof (args.filterBy.advSearch) == "object") { //advanced search
                                                                     if ('account' in args.filterBy.advSearch && args.filterBy.advSearch.account.length > 0) {
                                                                         accountIsNotSpecifiedInAdvSearch = false;  //since account and projectid can't be specified together
                                                                     }
@@ -6927,8 +6812,7 @@
                                                     $.extend(data1, {
                                                         systemvmtype: 'secondarystoragevm'
                                                     });
-                                                }
-                                                else if (args.context.systemVMs[0].systemvmtype == "consoleproxy") {
+                                                } else if (args.context.systemVMs[0].systemvmtype == "consoleproxy") {
                                                     $.extend(data1, {
                                                         systemvmtype: 'consoleproxy'
                                                     });
@@ -10799,8 +10683,7 @@
                                     }
 
                                     array1.push("&url=" + todb(url));
-                                }
-                                else {
+                                } else {
                                     array1.push("&managed=" + (args.data.isManaged == "on").toString());
 
                                     if (args.data.capacityBytes != null && args.data.capacityBytes.length > 0) {
@@ -11464,7 +11347,7 @@
                                 },
                                 action: function (args) {
                                     $.ajax({
-                                        url: createURL("deleteImageStore&id=" + args.context.secondaryStorage[0].id),
+                                        url: createURL("deleteImageStore&id=" + args.context.secondarystorages[0].id),
                                         dataType: "json",
                                         async: true,
                                         success: function (json) {
