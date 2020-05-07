@@ -2713,7 +2713,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         for (final Long jobId : jobIds) {
             final UpgradeRouterTemplateResponse routerResponse = new UpgradeRouterTemplateResponse();
             final AsyncJob job = this._entityMgr.findById(AsyncJob.class, jobId);
-            routerResponse.setAsyncJobId(job.getUuid());
+            routerResponse.setJobId(job.getUuid());
             routerResponse.setObjectName("asyncjobs");
             responses.add(routerResponse);
         }
