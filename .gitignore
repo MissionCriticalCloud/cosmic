@@ -442,3 +442,6 @@ venv/
 
 # Smoke tests results
 /cosmic-core/test/integration/smoke/results.txt
+
+# JENV version file
+.java-version
