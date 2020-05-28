@@ -62,6 +62,10 @@ class Firewall:
         if not vpn_open:
             self.block_vpn_rules(public_device)
 
+        if public_device is not None and 'loadbalancer' in self.config.dbag_network_overview:
+            if len(self.config.dbag_network_overview['loadbalancer']) > 0:
+                self.add_loadbalancer_rules(public_device, public_ip, self.config.dbag_network_overview['loadbalancer'])
+
     def add_default_vpc_rules(self):
         logging.info("Configuring default VPC rules")
 
@@ -293,3 +297,12 @@ class Firewall:
         self.config.fw.append(["", "", "-A INPUT -i %s -p esp -j REJECT" % device])
         self.config.fw.append(["", "", "-A INPUT -i ppp+ -m udp -p udp --dport 53 -j REJECT"])
         self.config.fw.append(["", "", "-A INPUT -i ppp+ -m tcp -p tcp --dport 53 -j REJECT"])
+
+    def add_loadbalancer_rules(self, device, publicip, loadbalancer):
+        logging.info("Configuring Loadbalancer rules")
+        for lb in loadbalancer['load_balancers']:
+            self.config.fw.append(["", "", "-I INPUT -i %s --dst %s -p %s -m %s --dport %s -j ACCEPT" % (device,
+                                                                                                         publicip.split("/")[0],
+                                                                                                         lb['protocol'],
+                                                                                                         lb['protocol'],
+                                                                                                         lb['src_port'])])
