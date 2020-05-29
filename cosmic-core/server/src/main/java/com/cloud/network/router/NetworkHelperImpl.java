@@ -41,6 +41,7 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.model.enumeration.BroadcastDomainType;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.VolumeType;
 import com.cloud.network.IpAddressManager;
@@ -309,6 +310,11 @@ public class NetworkHelperImpl implements NetworkHelper {
         // Set date and version we start this VM
         router.setLastStartDateTime(getCurrentLocalDateTimeStamp());
         router.setLastStartVersion(NetworkHelperImpl.class.getPackage().getImplementationVersion());
+
+        // Reset VM compliance state
+        if (router.getComplianceStatus() == ComplianceStatus.VMNeedsRestart) {
+            router.setComplianceStatus(ComplianceStatus.Compliant);
+        }
         router = _routerDao.persist(router);
 
         // We don't want the failure of VPN Connection affect the status of

@@ -7,6 +7,7 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.network.VirtualRouter;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
@@ -191,6 +192,9 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     @SerializedName(ApiConstants.RESTART_REQUIRED)
     @Param(description = "true if VM needs to a stop/start to receive updated VM specs on the hypervisor")
     private Boolean requiresRestart;
+    @SerializedName(ApiConstants.COMPLIANCE_STATUS)
+    @Param(description = "compliance status of the VM")
+    private ComplianceStatus complianceStatus;
 
     @SerializedName(ApiConstants.SSH_KEYPAIR)
     @Param(description = "ssh key-pair")
@@ -768,6 +772,10 @@ public class UserVmResponse extends BaseResponse implements ControlledEntityResp
     public void setMaintenancePolicy(final MaintenancePolicy maintenancePolicy) {
         this.maintenancePolicy = maintenancePolicy;
     }
+
+    public ComplianceStatus getComplianceStatus() { return complianceStatus; }
+
+    public void setComplianceStatus(final ComplianceStatus complianceStatus) { this.complianceStatus = complianceStatus; }
 
     public Long getBootMenuTimeout() {
         return bootMenuTimeout;

@@ -2287,6 +2287,7 @@ public class ApiResponseHelper implements ResponseGenerator {
         response.setSyslogServerList(vpc.getSyslogServerList());
         response.setAdvertInterval(vpc.getAdvertInterval());
         response.setAdvertMethod(vpc.getAdvertMethod());
+        response.setComplianceStatus(vpc.getComplianceStatus());
 
         final Map<Service, Set<Provider>> serviceProviderMap = ApiDBUtils.listVpcOffServices(vpc.getVpcOfferingId());
         final List<ServiceResponse> serviceResponses = getServiceResponses(serviceProviderMap);

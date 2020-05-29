@@ -1429,6 +1429,14 @@ div.list-view td.state.notsuitable-storage-migration-required span {
     width: 220px !important;
 }
 
+div.list-view td.state.needs-restart span {
+    background-image: url(../images/sprites.png);
+    background-repeat: no-repeat;
+    color: #B90606;
+    background-position: 1px -558px;
+    white-space: pre-wrap;
+}
+
 .horizontal-overflow tbody td, .horizontal-overflow thead th {
     min-width: 40px;
     padding: 10px 10px 5px 0px;

@@ -61,6 +61,9 @@ public class ListVPCsCmd extends BaseListTaggedResourcesCmd {
             since = "4.4", authorized = {RoleType.Admin})
     private Boolean display;
 
+    @Parameter(name = ApiConstants.COMPLIANCE_STATUS, type = CommandType.STRING, description = "list VPCs by compliance status")
+    private String complianceStatus;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -70,7 +73,7 @@ public class ListVPCsCmd extends BaseListTaggedResourcesCmd {
         final Pair<List<? extends Vpc>, Integer> vpcs =
                 _vpcService.listVpcs(getId(), getVpcName(), getDisplayText(), getSupportedServices(), getCidr(), getVpcOffId(), getState(), getAccountName(), getDomainId(),
                         getKeyword(), getStartIndex(), getPageSizeVal(), getZoneId(), isRecursive(), listAll(), getRestartRequired(), getTags(),
-                        getProjectId(), getDisplay());
+                        getProjectId(), getDisplay(), getComplianceStatus());
         final ListResponse<VpcResponse> response = new ListResponse<>();
         final List<VpcResponse> vpcResponses = new ArrayList<>();
         for (final Vpc vpc : vpcs.first()) {
@@ -118,6 +121,8 @@ public class ListVPCsCmd extends BaseListTaggedResourcesCmd {
     public Boolean getRestartRequired() {
         return restartRequired;
     }
+
+    public String getComplianceStatus() { return complianceStatus; }
 
     /////////////////////////////////////////////////////
     /////////////// API Implementation///////////////////

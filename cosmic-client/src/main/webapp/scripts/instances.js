@@ -98,6 +98,9 @@
                 stopped: {
                     label: 'state.Stopped'
                 },
+                needsRestart: {
+                    label: 'state.NeedsRestart'
+                },
                 hostname: {
                     label: 'label.hypervisor'
                 },
@@ -143,6 +146,7 @@
                     label: 'label.state',
                     indicator: {
                         'Running': 'on',
+                        'Running\n(needs restart)': 'needs-restart',
                         'Stopped': 'off',
                         'Destroyed': 'off',
                         'Error': 'off'
@@ -303,6 +307,11 @@
                                     state: 'Stopped'
                                 });
                                 break;
+                            case "needsRestart":
+                                $.extend(data, {
+                                    compliancestatus: 'VMNeedsRestart'
+                                });
+                                break;
                             case "destroyed":
                                 $.extend(data, {
                                     state: 'Destroyed'
@@ -392,6 +401,10 @@
                             $.each(items, function (idx, vm) {
                                 if (vm.nic && vm.nic.length > 0 && vm.nic[0].ipaddress) {
                                     items[idx].ipaddress = vm.nic[0].ipaddress;
+                                }
+
+                                if (vm.state == 'Running' && vm.compliancestatus == 'VMNeedsRestart') {
+                                    items[idx].state = 'Running\n(needs restart)';
                                 }
                             });
                         }

@@ -28,7 +28,7 @@ dashboardItemsToDisplay = 3;
                                 if (json.listvirtualmachinesresponse.count != undefined) {
                                     totalInstanceCount = json.listvirtualmachinesresponse.count;
                                     json.listvirtualmachinesresponse.virtualmachine.forEach(function (vm) {
-                                        if (vm.laststartversion.includes("Pre")) {
+                                        if (vm.compliancestatus != "Compliant") {
                                             nonCompliantCount++
                                         }
                                     });

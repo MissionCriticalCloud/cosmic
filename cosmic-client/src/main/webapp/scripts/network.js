@@ -305,6 +305,7 @@
                             label: 'label.state',
                             indicator: {
                                 'Enabled': 'on',
+                                'Enabled\n(needs restart)': 'needs-restart',
                                 'Disabled': 'off'
                             }
                         }
@@ -418,6 +419,14 @@
                                         function (vpc, i) {
                                             return vpc.regionlevelvpc;
                                         });
+
+                                if (items) {
+                                    $.each(items, function(idx, vpc) {
+                                       if (vpc.state == 'Enabled' && vpc.compliancestatus == 'VPCNeedsRestart') {
+                                           items[idx].state = 'Enabled\n(needs restart)';
+                                       }
+                                    });
+                                }
 
                                 args.response.success({
                                     data: items

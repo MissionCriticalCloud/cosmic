@@ -125,6 +125,7 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.Event;
 import com.cloud.legacymodel.vm.VirtualMachine.PowerState;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
@@ -417,6 +418,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         // Set date and version we start this VM
         vm.setLastStartDateTime(getCurrentLocalDateTimeStamp());
         vm.setLastStartVersion(VirtualMachineManagerImpl.class.getPackage().getImplementationVersion());
+
+        // Reset VM compliance state
+        if (vm.getComplianceStatus() == ComplianceStatus.VMNeedsRestart) {
+            vm.setComplianceStatus(ComplianceStatus.Compliant);
+        }
 
         assert plan.getClusterId() == null && plan.getPoolId() == null : "We currently don't support cluster and pool preset yet";
         final VMInstanceVO vmFinal = _vmDao.persist(vm);
@@ -1973,6 +1979,11 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     // Set date and version we start this VM
                     vm.setLastStartDateTime(getCurrentLocalDateTimeStamp());
                     vm.setLastStartVersion(VirtualMachineManagerImpl.class.getPackage().getImplementationVersion());
+
+                    // Reset VM compliance state
+                    if (vm.getComplianceStatus() == ComplianceStatus.VMNeedsRestart) {
+                        vm.setComplianceStatus(ComplianceStatus.Compliant);
+                    }
                     _vmDao.persist(vm);
 
                     if (startAnswer != null && startAnswer.getResult()) {

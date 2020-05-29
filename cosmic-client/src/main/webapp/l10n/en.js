@@ -2159,6 +2159,7 @@ var dictionary = {
     "state.Stopping": "Stopping",
     "state.Suspended": "Suspended",
     "state.detached": "Detached",
+    "state.NeedsRestart": "Needs Restart",
     "title.upload.volume": "Upload Volume",
     "ui.listView.filters.all": "All",
     "ui.listView.filters.mine": "Domain"

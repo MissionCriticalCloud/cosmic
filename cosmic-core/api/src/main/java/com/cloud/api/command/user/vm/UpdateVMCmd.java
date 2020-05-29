@@ -18,6 +18,7 @@ import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.vm.VirtualMachine;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.uservm.UserVm;
@@ -93,6 +94,8 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
     @Parameter(name = ApiConstants.BOOT_ORDER, type = CommandType.STRING, description = "Comma seperated list from which device to boot from first, can one of 'hd','cdrom'," +
             "'network'")
     private String bootOrder;
+    @Parameter(name = ApiConstants.COMPLIANCE_STATUS, type = CommandType.STRING, description = "compliance status of the vm", authorized = {RoleType.Admin})
+    private String complianceStatus;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -223,5 +226,17 @@ public class UpdateVMCmd extends BaseCustomIdCmd {
 
     public String getBootOrder() {
         return bootOrder;
+    }
+
+    public ComplianceStatus getComplianceStatus() {
+        if (complianceStatus == null || complianceStatus.isEmpty()) {
+            return null;
+        }
+
+        if (getHttpMethod() == HTTPMethod.POST) {
+            complianceStatus = new String(Base64.decodeBase64(this.complianceStatus));
+        }
+
+        return ComplianceStatus.valueOf(complianceStatus);
     }
 }

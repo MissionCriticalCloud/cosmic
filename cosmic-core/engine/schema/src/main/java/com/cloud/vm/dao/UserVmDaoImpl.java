@@ -4,6 +4,7 @@ import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -243,7 +244,7 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
     public void updateVM(final long id, final String displayName, final boolean enable, final Long osTypeId, final String userData, final boolean displayVm,
                          final boolean isDynamicallyScalable, final String customId, final String hostName, final String instanceName, final String manufacturerString,
                          final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy, final Long bootMenuTimeout,
-                         final String bootOrder) {
+                         final String bootOrder, final ComplianceStatus complianceStatus) {
 
         final UserVmVO vo = createForUpdate();
         vo.setDisplayName(displayName);
@@ -278,6 +279,9 @@ public class UserVmDaoImpl extends GenericDaoBase<UserVmVO, Long> implements Use
         }
         if (instanceName != null) {
             vo.setInstanceName(instanceName);
+        }
+        if (complianceStatus != null) {
+            vo.setComplianceStatus(complianceStatus);
         }
 
         update(id, vo);

@@ -791,6 +791,7 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
         final Object affinityGroupId = cmd.getAffinityGroupId();
         final Object keyPairName = cmd.getKeyPairName();
         final Object serviceOffId = cmd.getServiceOfferingId();
+        final String complianceStatus = cmd.getComplianceStatus();
         Object pod = null;
         Object hostId = null;
         Object storageId = null;
@@ -847,6 +848,10 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         if (keyPairName != null) {
             sb.and("keyPairName", sb.entity().getKeypairName(), SearchCriteria.Op.EQ);
+        }
+
+        if (complianceStatus != null) {
+            sb.and("complianceStatus", sb.entity().getComplianceStatus(), SearchCriteria.Op.EQ);
         }
 
         if (!isRootAdmin) {
@@ -947,6 +952,10 @@ public class QueryManagerImpl extends ManagerBase implements QueryService, Confi
 
         if (keyPairName != null) {
             sc.setParameters("keyPairName", keyPairName);
+        }
+
+        if (complianceStatus != null) {
+            sc.setParameters("complianceStatus", complianceStatus);
         }
 
         if (cmd instanceof ListVMsCmdByAdmin) {

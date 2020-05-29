@@ -2,6 +2,7 @@ package com.cloud.vm;
 
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
@@ -144,6 +145,8 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     protected Boolean requiresRestart;
     @Column(name = "disk_offering_id")
     protected Long diskOfferingId;
+    @Column(name = "compliance_status")
+    protected ComplianceStatus complianceStatus;
     //
     // Power state for VM state sync
     //
@@ -597,6 +600,11 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     public void setRequiresRestart(final Boolean requiresRestart) {
         this.requiresRestart = requiresRestart;
     }
+
+    @Override
+    public ComplianceStatus getComplianceStatus() { return complianceStatus; }
+
+    public void setComplianceStatus(final ComplianceStatus complianceStatus) { this.complianceStatus = complianceStatus; }
 
     public MaintenancePolicy getMaintenancePolicy() {
         return maintenancePolicy;

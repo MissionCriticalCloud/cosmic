@@ -125,6 +125,9 @@ public class ListVMsCmd extends BaseListTaggedResourcesCmd {
             "under the account that owns the VM")
     private Long userId;
 
+    @Parameter(name = ApiConstants.COMPLIANCE_STATUS, type = CommandType.STRING, description = "list vms by compliance status")
+    private String complianceStatus;
+
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
     /////////////////////////////////////////////////////
@@ -188,6 +191,8 @@ public class ListVMsCmd extends BaseListTaggedResourcesCmd {
     public String getKeyPairName() {
         return keypair;
     }
+
+    public String getComplianceStatus() { return complianceStatus; }
 
     public EnumSet<VMDetails> getDetails() throws InvalidParameterValueException {
         final EnumSet<VMDetails> dv;

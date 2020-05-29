@@ -2,6 +2,7 @@ package com.cloud.engine.cloud.entity.api.db;
 
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -152,6 +153,8 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State> {
     private Boolean macLearning;
     @Column(name = "requires_restart")
     private Boolean requiresRestart;
+    @Column(name = "compliance_status")
+    private ComplianceStatus complianceStatus;
 
     @Transient
     private VMReservationVO vmReservation;
@@ -575,4 +578,9 @@ public class VMEntityVO implements VirtualMachine, FiniteStateObject<State> {
     public void setRequiresRestart(final Boolean requiresRestart) {
         this.requiresRestart = requiresRestart;
     }
+
+    @Override
+    public ComplianceStatus getComplianceStatus() { return complianceStatus; }
+
+    public void setComplianceStatus(final ComplianceStatus complianceStatus) { this.complianceStatus = complianceStatus; }
 }

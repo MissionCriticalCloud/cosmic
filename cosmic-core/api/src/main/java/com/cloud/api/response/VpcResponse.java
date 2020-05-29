@@ -6,6 +6,7 @@ import com.cloud.api.BaseResponse;
 import com.cloud.api.EntityReference;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.model.enumeration.AdvertMethod;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.serializer.Param;
 
 import java.util.Date;
@@ -123,6 +124,10 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     @Param(description = "VRRP advertisement interval. Defaults to 1.", since = "6.1")
     private long advertInterval;
 
+    @SerializedName(ApiConstants.COMPLIANCE_STATUS)
+    @Param(description = "compliance status of the VPC")
+    private ComplianceStatus complianceStatus;
+
     public void setId(final String id) {
         this.id = id;
     }
@@ -239,4 +244,8 @@ public class VpcResponse extends BaseResponse implements ControlledEntityRespons
     public void setAdvertInterval(final long advertInterval) {
         this.advertInterval = advertInterval;
     }
+
+    public ComplianceStatus getComplianceStatus() { return complianceStatus; }
+
+    public void setComplianceStatus(final ComplianceStatus complianceStatus) { this.complianceStatus = complianceStatus; }
 }

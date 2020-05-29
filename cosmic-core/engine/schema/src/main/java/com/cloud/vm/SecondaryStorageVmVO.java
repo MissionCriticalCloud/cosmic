@@ -1,6 +1,7 @@
 package com.cloud.vm;
 
 import com.cloud.legacymodel.storage.SecondaryStorageVmRole;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
@@ -64,6 +65,7 @@ public class SecondaryStorageVmVO extends VMInstanceVO implements SystemVm {
         this.macLearning = macLearning;
         this.requiresRestart = requiresRestart;
         this.maintenancePolicy = maintenancePolicy;
+        this.complianceStatus = ComplianceStatus.Compliant;
     }
 
     protected SecondaryStorageVmVO() {

@@ -4,6 +4,7 @@ import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.model.enumeration.AdvertMethod;
+import com.cloud.model.enumeration.ComplianceStatus;
 
 public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
 
@@ -66,6 +67,11 @@ public interface Vpc extends ControlledEntity, Identity, InternalIdentity {
      * @return VRRP advert method
      */
     AdvertMethod getAdvertMethod();
+
+    /**
+     * @return VPC compliance status
+     */
+    ComplianceStatus getComplianceStatus();
 
     /**
      * @return true if restart is required for the VPC; false otherwise

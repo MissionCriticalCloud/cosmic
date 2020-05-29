@@ -25,7 +25,7 @@ public class ListVPCsCmdByAdmin extends ListVPCsCmd {
         final Pair<List<? extends Vpc>, Integer> vpcs =
                 _vpcService.listVpcs(getId(), getVpcName(), getDisplayText(), getSupportedServices(), getCidr(), getVpcOffId(), getState(), getAccountName(), getDomainId(),
                         getKeyword(), getStartIndex(), getPageSizeVal(), getZoneId(), isRecursive(), listAll(), getRestartRequired(), getTags(),
-                        getProjectId(), getDisplay());
+                        getProjectId(), getDisplay(), getComplianceStatus());
         final ListResponse<VpcResponse> response = new ListResponse<>();
         final List<VpcResponse> vpcResponses = new ArrayList<>();
         for (final Vpc vpc : vpcs.first()) {
