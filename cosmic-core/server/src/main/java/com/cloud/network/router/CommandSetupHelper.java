@@ -740,26 +740,28 @@ public class CommandSetupHelper {
                 routerPublicIp = router.getPublicIpAddress();
             }
         }
-        // TODO: is networkIds.get(0) the right way
-        final Network guestNetwork = _networkModel.getNetwork(networkIds.get(0));
-        final NetworkOffering offering = _networkOfferingDao.findById(guestNetwork.getNetworkOfferingId());
-        final String maxconn;
-        if (offering.getConcurrentConnections() == null) {
-            maxconn = _configDao.getValue(Config.NetworkLBHaproxyMaxConn.key());
-        } else {
-            maxconn = offering.getConcurrentConnections().toString();
+
+        if (networkIds.size() > 0) {
+            final Network guestNetwork = _networkModel.getNetwork(networkIds.get(0));
+            final NetworkOffering offering = _networkOfferingDao.findById(guestNetwork.getNetworkOfferingId());
+            final String maxconn;
+            if (offering.getConcurrentConnections() == null) {
+                maxconn = _configDao.getValue(Config.NetworkLBHaproxyMaxConn.key());
+            } else {
+                maxconn = offering.getConcurrentConnections().toString();
+            }
+
+            loadBalancerTO.setLbStatsVisibility(_configDao.getValue(Config.NetworkLBHaproxyStatsVisbility.key()));
+            loadBalancerTO.setLbStatsUri(_configDao.getValue(Config.NetworkLBHaproxyStatsUri.key()));
+            loadBalancerTO.setLbStatsAuth(_configDao.getValue(Config.NetworkLBHaproxyStatsAuth.key()));
+            loadBalancerTO.setLbStatsPort(_configDao.getValue(Config.NetworkLBHaproxyStatsPort.key()));
+
+            loadBalancerTO.setLbStatsPublicIp(routerPublicIp);
+            loadBalancerTO.setLbStatsGuestIp(_routerControlHelper.getRouterIpInNetwork(networkIds.get(0), router.getId()));
+            loadBalancerTO.setLbStatsPrivateIp(router.getPrivateIpAddress());
+            loadBalancerTO.setMaxconn(maxconn);
+            loadBalancerTO.setLoadBalancers(loadBalancers.toArray(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO[0]));
         }
-
-        loadBalancerTO.setLbStatsVisibility(_configDao.getValue(Config.NetworkLBHaproxyStatsVisbility.key()));
-        loadBalancerTO.setLbStatsUri(_configDao.getValue(Config.NetworkLBHaproxyStatsUri.key()));
-        loadBalancerTO.setLbStatsAuth(_configDao.getValue(Config.NetworkLBHaproxyStatsAuth.key()));
-        loadBalancerTO.setLbStatsPort(_configDao.getValue(Config.NetworkLBHaproxyStatsPort.key()));
-
-        loadBalancerTO.setLbStatsPublicIp(routerPublicIp);
-        loadBalancerTO.setLbStatsGuestIp(_routerControlHelper.getRouterIpInNetwork(networkIds.get(0), router.getId())); // TODO: Same as above
-        loadBalancerTO.setLbStatsPrivateIp(router.getPrivateIpAddress());
-        loadBalancerTO.setMaxconn(maxconn);
-        loadBalancerTO.setLoadBalancers(loadBalancers.toArray(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO[0]));
     }
 
     public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {
