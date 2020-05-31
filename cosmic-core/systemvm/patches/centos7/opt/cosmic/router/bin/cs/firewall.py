@@ -300,7 +300,7 @@ class Firewall:
 
     def add_loadbalancer_rules(self, device, publicip, loadbalancer):
         logging.info("Configuring Loadbalancer rules")
-        for lb in loadbalancer['load_balancers']:
+        for lb in loadbalancer.get('load_balancers', {}):
             self.config.fw.append(["", "", "-I INPUT -i %s --dst %s -p %s -m %s --dport %s -j ACCEPT" % (device,
                                                                                                          publicip.split("/")[0],
                                                                                                          lb['protocol'],
