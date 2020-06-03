@@ -27,8 +27,11 @@ import com.cloud.dao.EntityManager;
 import com.cloud.db.model.Zone;
 import com.cloud.db.repository.ZoneRepository;
 import com.cloud.deploy.DeployDestination;
+import com.cloud.engine.cloud.entity.api.VirtualMachineEntity;
+import com.cloud.engine.cloud.entity.api.db.VMEntityVO;
 import com.cloud.engine.orchestration.service.NetworkOrchestrationService;
 import com.cloud.engine.orchestration.service.VolumeOrchestrationService;
+import com.cloud.engine.service.api.OrchestrationService;
 import com.cloud.legacymodel.acl.ControlledEntity;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
@@ -43,6 +46,7 @@ import com.cloud.legacymodel.user.Account;
 import com.cloud.legacymodel.user.User;
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -90,12 +94,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class UserVmManagerTest {
 
@@ -176,6 +183,8 @@ public class UserVmManagerTest {
     @Mock
     NetworkOrchestrationService _networkMgr;
     @Mock
+    OrchestrationService _orchSrvc;
+    @Mock
     ZoneRepository zoneRepository;
     @Mock
     Zone zone;
@@ -211,6 +220,7 @@ public class UserVmManagerTest {
         _userVmMgr._networkOfferingDao = _networkOfferingDao;
         _userVmMgr._networkMgr = _networkMgr;
         _userVmMgr.zoneRepository = zoneRepository;
+        ReflectionTestUtils.setField(_userVmMgr, "_orchSrvc", _orchSrvc);
 
         doReturn(3L).when(_account).getId();
         doReturn(8L).when(_vmMock).getAccountId();
@@ -218,12 +228,17 @@ public class UserVmManagerTest {
         when(_userDao.findById(anyLong())).thenReturn(_userMock);
         doReturn(Account.State.enabled).when(_account).getState();
         when(_vmMock.getId()).thenReturn(314L);
+        when(_vmMock.getUuid()).thenReturn("uuid");
         when(_vmInstance.getId()).thenReturn(1L);
         when(_vmInstance.getServiceOfferingId()).thenReturn(2L);
         final List<VMSnapshotVO> mockList = mock(List.class);
         when(_vmSnapshotDao.findByVm(anyLong())).thenReturn(mockList);
         when(mockList.size()).thenReturn(0);
         when(_templateStoreDao.findByTemplateZoneReady(anyLong(), anyLong())).thenReturn(_templateDataStoreMock);
+
+        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
+        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
+        CallContext.register(user, account);
     }
 
     // Test restoreVm when VM state not in running/stopped case
@@ -233,15 +248,8 @@ public class UserVmManagerTest {
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
         when(_templateDao.findById(anyLong())).thenReturn(_templateMock);
         doReturn(VirtualMachine.State.Error).when(_vmMock).getState();
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
 
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.restoreVMInternal(_account, _vmMock, null);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.restoreVMInternal(_account, _vmMock, null);
     }
 
     // Test restoreVm when VM is in stopped state
@@ -263,21 +271,13 @@ public class UserVmManagerTest {
 
         when(_templateMock.getUuid()).thenReturn("e0552266-7060-11e2-bbaa-d55f5db67735");
 
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-
         final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
         when(_storagePoolDao.findById(anyLong())).thenReturn(storagePool);
 
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.restoreVMInternal(_account, _vmMock, null);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.restoreVMInternal(_account, _vmMock, null);
     }
 
     // Test restoreVM when VM is in running state
@@ -299,21 +299,13 @@ public class UserVmManagerTest {
 
         when(_templateMock.getUuid()).thenReturn("e0552266-7060-11e2-bbaa-d55f5db67735");
 
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-
         final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
         when(_storagePoolDao.findById(anyLong())).thenReturn(storagePool);
 
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.restoreVMInternal(_account, _vmMock, null);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.restoreVMInternal(_account, _vmMock, null);
     }
 
     // Test restoreVM on providing new template Id, when VM is in running state
@@ -343,21 +335,13 @@ public class UserVmManagerTest {
         when(mockList.size()).thenReturn(0);
         when(_templateMock.getUuid()).thenReturn("b1a3626e-72e0-4697-8c7c-a110940cc55d");
 
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-
         final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
         when(_storagePoolDao.findById(anyLong())).thenReturn(storagePool);
 
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.restoreVMInternal(_account, _vmMock, 14L);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.restoreVMInternal(_account, _vmMock, 14L);
     }
 
     // Test restoreVM on providing new ISO Id, when VM(deployed using ISO) is in running state
@@ -389,21 +373,13 @@ public class UserVmManagerTest {
         when(mockList.size()).thenReturn(0);
         when(_templateMock.getUuid()).thenReturn("b1a3626e-72e0-4697-8c7c-a110940cc55d");
 
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-
         final StoragePoolVO storagePool = new StoragePoolVO();
 
         storagePool.setManaged(false);
 
         when(_storagePoolDao.findById(anyLong())).thenReturn(storagePool);
 
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.restoreVMInternal(_account, _vmMock, 14L);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.restoreVMInternal(_account, _vmMock, 14L);
 
         verify(_vmMock, times(1)).setIsoId(14L);
     }
@@ -425,18 +401,9 @@ public class UserVmManagerTest {
 
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
 
-        // UserContext.current().setEventDetails("Vm Id: "+getId());
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, "uuid");
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        //AccountVO(String accountName, long domainId, String networkDomain, short type, int regionId)
         doReturn(VirtualMachine.State.Running).when(_vmInstance).getState();
 
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.upgradeVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.upgradeVirtualMachine(cmd);
     }
 
     // Test scaleVm on equal service offerings.
@@ -469,14 +436,7 @@ public class UserVmManagerTest {
         when(_offeringDao.findById(anyLong())).thenReturn((ServiceOfferingVO) so1);
         when(_offeringDao.findByIdIncludingRemoved(anyLong(), anyLong())).thenReturn((ServiceOfferingVO) so1);
 
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.upgradeVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.upgradeVirtualMachine(cmd);
     }
 
     private ServiceOfferingVO getSvcoffering(final int ramSize) {
@@ -524,16 +484,7 @@ public class UserVmManagerTest {
 
         doReturn(true).when(_itMgr).upgradeVmDb(anyLong(), anyLong());
 
-        //when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
-
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.upgradeVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.upgradeVirtualMachine(cmd);
     }
 
     // Test scaleVm for Running vm. Full positive test.
@@ -550,11 +501,6 @@ public class UserVmManagerTest {
         serviceOfferingIdField.setAccessible(true);
         serviceOfferingIdField.set(cmd, 1L);
 
-        //UserContext.current().setEventDetails("Vm Id: "+getId());
-        //Account account = (Account) new AccountVO("testaccount", 1L, "networkdomain", (short) 0, 1);
-        //AccountVO(String accountName, long domainId, String networkDomain, short type, int regionId)
-        //UserContext.registerContext(1, account, null, true);
-
         when(_vmInstanceDao.findById(anyLong())).thenReturn(_vmInstance);
         doReturn(HypervisorType.XenServer).when(_vmInstance).getHypervisorType();
 
@@ -566,7 +512,6 @@ public class UserVmManagerTest {
 
         doReturn(VirtualMachine.State.Running).when(_vmInstance).getState();
 
-        //when(ApiDBUtils.getCpuOverprovisioningFactor()).thenReturn(3f);
         when(_capacityMgr.checkIfHostHasCapacity(anyLong(), anyInt(), anyLong(), anyBoolean(), anyFloat(), anyFloat(), anyBoolean())).thenReturn(false);
         when(_itMgr.reConfigureVm(_vmInstance.getUuid(), so1, false)).thenReturn(_vmInstance);
 
@@ -574,14 +519,7 @@ public class UserVmManagerTest {
 
         when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
 
-        final Account account = new AccountVO("testaccount", 1L, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, account);
-        try {
-            _userVmMgr.upgradeVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.upgradeVirtualMachine(cmd);
     }
 
     // Test Move VM b/w accounts where caller is not ROOT/Domain admin
@@ -602,17 +540,7 @@ public class UserVmManagerTest {
         domainIdField.setAccessible(true);
         domainIdField.set(cmd, 1L);
 
-        // caller is of type 0
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-
-        CallContext.register(user, caller);
-        try {
-
-            _userVmMgr.moveVMToUser(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.moveVMToUser(cmd);
     }
 
     // Test Move VM b/w accounts where caller doesn't have access to the old or new account
@@ -633,10 +561,6 @@ public class UserVmManagerTest {
         domainIdField.setAccessible(true);
         domainIdField.set(cmd, 1L);
 
-        // caller is of type 0
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-
         final Account oldAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
         final Account newAccount = new AccountVO("testaccount", 1, "networkdomain", (short) 1, UUID.randomUUID().toString());
 
@@ -652,15 +576,9 @@ public class UserVmManagerTest {
         doThrow(new PermissionDeniedException("Access check failed")).when(_accountMgr).checkAccess(any(Account.class), any(AccessType.class), any(Boolean.class),
                 any(ControlledEntity.class));
 
-        CallContext.register(user, caller);
-
         when(_accountMgr.isRootAdmin(anyLong())).thenReturn(true);
 
-        try {
-            _userVmMgr.moveVMToUser(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.moveVMToUser(cmd);
     }
 
     @Test
@@ -702,14 +620,7 @@ public class UserVmManagerTest {
                 Mockito.eq(_networkOfferingMock));
         when(_nicDao.persist(any(NicVO.class))).thenReturn(nic);
 
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, caller);
-        try {
-            _userVmMgr.updateNicIpForVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.updateNicIpForVirtualMachine(cmd);
     }
 
     @Test
@@ -749,14 +660,7 @@ public class UserVmManagerTest {
         when(_ipAddressDao.findByIpAndSourceNetworkId(anyLong(), anyString())).thenReturn(null);
         when(_nicDao.persist(any(NicVO.class))).thenReturn(nic);
 
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, caller);
-        try {
-            _userVmMgr.updateNicIpForVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.updateNicIpForVirtualMachine(cmd);
     }
 
     // vm is running in network with dhcp support
@@ -787,14 +691,7 @@ public class UserVmManagerTest {
         when(_networkModel.listNetworkOfferingServices(anyLong())).thenReturn(services);
         when(_vmMock.getState()).thenReturn(State.Running);
 
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, caller);
-        try {
-            _userVmMgr.updateNicIpForVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.updateNicIpForVirtualMachine(cmd);
     }
 
     // vm is stopped in isolated network in advanced zone
@@ -834,14 +731,7 @@ public class UserVmManagerTest {
 
         when(_ipAddrMgr.allocateGuestIP(Mockito.eq(_networkMock), anyString())).thenReturn(null);
 
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, caller);
-        try {
-            _userVmMgr.updateNicIpForVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.updateNicIpForVirtualMachine(cmd);
     }
 
     // vm is stopped in shared network in advanced zone
@@ -881,13 +771,29 @@ public class UserVmManagerTest {
 
         when(_ipAddrMgr.allocatePublicIpForGuestNic(Mockito.eq(_networkMock), anyLong(), Mockito.eq(_accountMock), anyString())).thenReturn(null);
 
-        final Account caller = new AccountVO("testaccount", 1, "networkdomain", (short) 0, UUID.randomUUID().toString());
-        final UserVO user = new UserVO(1, "testuser", "password", "firstname", "lastName", "email", "timezone", UUID.randomUUID().toString(), User.Source.UNKNOWN);
-        CallContext.register(user, caller);
-        try {
-            _userVmMgr.updateNicIpForVirtualMachine(cmd);
-        } finally {
-            CallContext.unregister();
-        }
+        _userVmMgr.updateNicIpForVirtualMachine(cmd);
+    }
+
+    @Test
+    public void testStartVirtualMachine() throws Exception {
+        final VirtualMachineEntity vmEntity = mock(VirtualMachineEntity.class);
+        when(_vmDao.findById(anyLong())).thenReturn(_vmMock);
+        when(_orchSrvc.getVirtualMachine(any(String.class))).thenReturn(vmEntity);
+        when(_vmMock.isUpdateParameters()).thenReturn(true);
+        when(_templateDao.findByIdIncludingRemoved(anyLong())).thenReturn(_templateMock);
+
+        _userVmMgr.startVirtualMachine(1L, null, null, null);
+    }
+
+    @Test
+    public void testStartVirtualMachineResetsCompliance() throws Exception {
+        when(_vmMock.getComplianceStatus()).thenReturn(ComplianceStatus.VMNeedsRestart);
+        testStartVirtualMachine();
+        verify(_vmMock).setComplianceStatus(ComplianceStatus.Compliant);
+    }
+
+    @After
+    public void tearDown() {
+        CallContext.unregister();
     }
 }

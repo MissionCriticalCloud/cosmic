@@ -13,6 +13,7 @@ import com.cloud.legacymodel.network.vpc.PrivateGateway;
 import com.cloud.legacymodel.network.vpc.StaticRoute;
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.utils.Pair;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.network.IpAddress;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public interface VpcService {
      * @return
      */
     public Vpc updateVpc(long vpcId, String vpcName, String displayText, String customId, Boolean displayVpc, Long vpcOfferingId, String sourceNatList, String syslogServerList,
-                         Long advertInterval, AdvertMethod advertMethod);
+                         Long advertInterval, AdvertMethod advertMethod, ComplianceStatus complianceStatus);
 
     /**
      * Lists VPC(s) based on the parameters passed to the method call
@@ -89,7 +90,7 @@ public interface VpcService {
     public Pair<List<? extends Vpc>, Integer> listVpcs(Long id, String vpcName, String displayText, List<String> supportedServicesStr, String cidr, Long vpcOffId, String state,
                                                        String accountName, Long domainId, String keyword, Long startIndex, Long pageSizeVal, Long zoneId, Boolean isRecursive,
                                                        Boolean listAll, Boolean restartRequired,
-                                                       Map<String, String> tags, Long projectId, Boolean display);
+                                                       Map<String, String> tags, Long projectId, Boolean display, String complianceStatus);
 
     /**
      * Starts VPC which includes starting VPC provider and applying all the neworking rules on the backend

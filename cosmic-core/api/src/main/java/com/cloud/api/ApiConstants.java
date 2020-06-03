@@ -30,6 +30,7 @@ public class ApiConstants {
     public static final String CERTIFICATE_FINGERPRINT = "fingerprint";
     public static final String CERTIFICATE_ID = "certid";
     public static final String CLIENT_TIMEOUT = "clienttimeout";
+    public static final String COMPLIANCE_STATUS = "compliancestatus";
     public static final String PRIVATE_KEY = "privatekey";
     public static final String DOMAIN_SUFFIX = "domainsuffix";
     public static final String DNS_SEARCH_ORDER = "dnssearchorder";

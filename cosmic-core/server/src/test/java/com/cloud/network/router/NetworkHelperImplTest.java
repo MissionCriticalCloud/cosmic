@@ -1,7 +1,10 @@
 package com.cloud.network.router;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -17,6 +20,10 @@ import com.cloud.legacymodel.exceptions.AgentUnavailableException;
 import com.cloud.legacymodel.exceptions.OperationTimedoutException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
 import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.model.enumeration.ComplianceStatus;
+import com.cloud.vm.DomainRouterVO;
+import com.cloud.vm.VirtualMachineManager;
+import com.cloud.vm.dao.DomainRouterDao;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +39,9 @@ public class NetworkHelperImplTest {
 
     @Mock
     protected AgentManager agentManager;
+
+    @Mock
+    protected DomainRouterVO router;
 
     @InjectMocks
     protected NetworkHelperImpl nwHelper = new NetworkHelperImpl();
@@ -151,5 +161,26 @@ public class NetworkHelperImplTest {
         verify(this.agentManager, times(1)).send(HOST_ID, commands);
         verify(answer1, times(0)).getResult();
         assertFalse(result);
+    }
+
+    @Test
+    public void testStart() throws Exception {
+        when(router.getId()).thenReturn(1L);
+        when(router.getVpcId()).thenReturn(null);
+        final DomainRouterDao routerDao = mock(DomainRouterDao.class);
+        when(routerDao.findById(anyLong())).thenReturn(router);
+        when(routerDao.persist(any(DomainRouterVO.class))).thenReturn(router);
+
+        nwHelper._itMgr = mock(VirtualMachineManager.class);
+        nwHelper._routerDao = routerDao;
+
+        assertEquals(router, nwHelper.start(router, null, null));
+    }
+
+    @Test
+    public void testStartResetsCompliance() throws Exception {
+        when(router.getComplianceStatus()).thenReturn(ComplianceStatus.VMNeedsRestart);
+        testStart();
+        verify(router).setComplianceStatus(ComplianceStatus.Compliant);
     }
 }

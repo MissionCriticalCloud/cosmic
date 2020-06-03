@@ -54,6 +54,7 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.common.managed.context.ManagedContextRunnable;
 import com.cloud.model.enumeration.AdvertMethod;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.network.IpAddress;
 import com.cloud.network.IpAddressManager;
@@ -948,7 +949,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
     @Override
     @ActionEvent(eventType = EventTypes.EVENT_VPC_UPDATE, eventDescription = "updating vpc")
     public Vpc updateVpc(final long vpcId, final String vpcName, final String displayText, final String customId, final Boolean displayVpc, final Long vpcOfferingId, final
-    String sourceNatList, final String syslogServerList, Long advertInterval, AdvertMethod advertMethod) {
+    String sourceNatList, final String syslogServerList, Long advertInterval, AdvertMethod advertMethod, final ComplianceStatus complianceStatus) {
         CallContext.current().setEventDetails(" Id: " + vpcId);
         final Account caller = CallContext.current().getCallingAccount();
 
@@ -991,6 +992,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         if (advertMethod != null) {
             vpc.setAdvertMethod(advertMethod);
             restartWithCleanupRequired = true;
+        }
+
+        if (complianceStatus != null) {
+            vpc.setComplianceStatus(complianceStatus);
         }
 
         if (vpcOfferingId != null) {
@@ -1134,7 +1139,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                                                        final Long startIndex, final Long pageSizeVal,
                                                        final Long zoneId, Boolean isRecursive, final Boolean listAll, final Boolean restartRequired,
                                                        final Map<String, String> tags, final Long projectId,
-                                                       final Boolean display) {
+                                                       final Boolean display, final String complianceStatus) {
         final Account caller = CallContext.current().getCallingAccount();
         final List<Long> permittedAccounts = new ArrayList<>();
         final Ternary<Long, Boolean, ListProjectResourcesCriteria> domainIdRecursiveListProject = new Ternary<>(
@@ -1159,6 +1164,7 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
         sb.and("restartRequired", sb.entity().isRestartRequired(), SearchCriteria.Op.EQ);
         sb.and("cidr", sb.entity().getCidr(), SearchCriteria.Op.EQ);
         sb.and("display", sb.entity().isDisplay(), SearchCriteria.Op.EQ);
+        sb.and("complianceStatus", sb.entity().getComplianceStatus(), SearchCriteria.Op.EQ);
 
         if (tags != null && !tags.isEmpty()) {
             final SearchBuilder<ResourceTagVO> tagSearch = _resourceTagDao.createSearchBuilder();
@@ -1228,6 +1234,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
 
         if (restartRequired != null) {
             sc.addAnd("restartRequired", SearchCriteria.Op.EQ, restartRequired);
+        }
+
+        if (complianceStatus != null) {
+            sc.addAnd("complianceStatus", SearchCriteria.Op.EQ, complianceStatus);
         }
 
         final List<VpcVO> vpcs = _vpcDao.search(sc, searchFilter);
@@ -1387,6 +1397,8 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             throw ex;
         }
 
+        final VpcVO vo = _vpcDao.findById(vpcId);
+
         _accountMgr.checkAccess(callerAccount, null, false, vpc);
 
         s_logger.debug("Restarting VPC " + vpc);
@@ -1413,6 +1425,10 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
                         }
                     }
                 }
+                // Reset VPC compliance state if it required a restart
+                if (vpc.getComplianceStatus() == ComplianceStatus.VPCNeedsRestart) {
+                    vo.setComplianceStatus(ComplianceStatus.Compliant);
+                }
             } else {
                 s_logger.info("Will not shutdown vpc as a part of VPC " + vpc + " restart process.");
             }
@@ -1427,13 +1443,12 @@ public class VpcManagerImpl extends ManagerBase implements VpcManager, VpcProvis
             return true;
         } finally {
             s_logger.debug("Updating VPC " + vpc + " with restartRequired=" + restartRequired);
-            final VpcVO vo = _vpcDao.findById(vpcId);
             vo.setRestartRequired(restartRequired);
             _vpcDao.update(vpc.getId(), vo);
         }
     }
 
-    private boolean rollingRestartVpc(final Vpc vpc, final List<DomainRouterVO> routers, final ReservationContext context) throws ResourceUnavailableException,
+    boolean rollingRestartVpc(final Vpc vpc, final List<DomainRouterVO> routers, final ReservationContext context) throws ResourceUnavailableException,
             ConcurrentOperationException,
             InsufficientCapacityException {
         final int sleepTimeInMsAfterRouterStart = 10000;

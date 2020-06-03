@@ -8,6 +8,7 @@ import com.cloud.legacymodel.statemachine.StateMachine2;
 import com.cloud.legacymodel.statemachine.StateObject;
 import com.cloud.legacymodel.statemachine.Transition;
 import com.cloud.legacymodel.statemachine.Transition.Impact;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -121,6 +122,8 @@ public interface VirtualMachine extends RunningOn, ControlledEntity, Identity, I
     Boolean getMacLearning();
 
     Boolean getRequiresRestart();
+
+    ComplianceStatus getComplianceStatus();
 
     long getUpdated();
 

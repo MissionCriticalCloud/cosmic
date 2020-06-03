@@ -2,6 +2,7 @@ package com.cloud.network.vpc;
 
 import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.model.enumeration.AdvertMethod;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -61,6 +62,8 @@ public class VpcVO implements Vpc {
     String unicastSubnet;
     @Column(name = "advert_method")
     AdvertMethod advertMethod;
+    @Column(name = "compliance_status")
+    ComplianceStatus complianceStatus;
 
     public VpcVO() {
         uuid = UUID.randomUUID().toString();
@@ -85,6 +88,7 @@ public class VpcVO implements Vpc {
         this.advertInterval = advertInterval;
         this.unicastSubnet = unicastSubnet;
         this.advertMethod = advertMethod;
+        this.complianceStatus = ComplianceStatus.Compliant;
     }
 
     @Override
@@ -239,6 +243,11 @@ public class VpcVO implements Vpc {
     public AdvertMethod getAdvertMethod() {
         return advertMethod;
     }
+
+    @Override
+    public ComplianceStatus getComplianceStatus() { return complianceStatus; }
+
+    public void setComplianceStatus(ComplianceStatus complianceStatus) { this.complianceStatus = complianceStatus; }
 
     public void setAdvertMethod(final AdvertMethod advertMethod) {
         this.advertMethod = advertMethod;

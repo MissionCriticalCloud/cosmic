@@ -19,7 +19,9 @@ import com.cloud.legacymodel.network.vpc.Vpc;
 import com.cloud.legacymodel.user.Account;
 import com.cloud.model.enumeration.AdvertMethod;
 
+import com.cloud.model.enumeration.ComplianceStatus;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.net.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,9 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
             description = "VRRP advertisement method to use: unicast / multicast. Defaults to multicast'")
     private String advertMethod;
 
+    @Parameter(name = ApiConstants.COMPLIANCE_STATUS, type = CommandType.STRING,
+            description = "compliance status of the VPC")
+    private String complianceStatus;
 
     /////////////////////////////////////////////////////
     /////////////////// Accessors ///////////////////////
@@ -74,7 +79,7 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
     @Override
     public void execute() {
         final Vpc result = _vpcService.updateVpc(getId(), getVpcName(), getDisplayText(), getCustomId(), getDisplayVpc(), getVpcOfferingId(), getSourceNatList(),
-                getSyslogServerList(), getAdvertInterval(), getAdvertMethod());
+                getSyslogServerList(), getAdvertInterval(), getAdvertMethod(), getComplianceStatus());
         if (result != null) {
             final VpcResponse response = _responseGenerator.createVpcResponse(ResponseView.Restricted, result);
             response.setResponseName(getCommandName());
@@ -173,5 +178,17 @@ public class UpdateVPCCmd extends BaseAsyncCustomIdCmd {
         } else {
             return null;
         }
+    }
+
+    public ComplianceStatus getComplianceStatus() {
+        if (complianceStatus == null || complianceStatus.isEmpty()) {
+            return null;
+        }
+
+        if (getHttpMethod() == HTTPMethod.POST) {
+            complianceStatus = new String(Base64.decodeBase64(this.complianceStatus));
+        }
+
+        return ComplianceStatus.valueOf(complianceStatus);
     }
 }

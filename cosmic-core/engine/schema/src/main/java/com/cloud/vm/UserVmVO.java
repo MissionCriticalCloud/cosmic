@@ -1,5 +1,6 @@
 package com.cloud.vm;
 
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
@@ -49,6 +50,7 @@ public class UserVmVO extends VMInstanceVO implements UserVm {
         this.requiresRestart = Boolean.FALSE;
         this.bootMenuTimeout = bootMenuTimeout;
         this.bootOrder = bootOrder;
+        this.complianceStatus = ComplianceStatus.Compliant;
     }
 
     protected UserVmVO() {

@@ -2,6 +2,7 @@ package com.cloud.api.query.vo;
 
 import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.HypervisorType;
@@ -283,6 +284,8 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     protected String lastStartDateTime;
     @Column(name = "last_start_version")
     protected String lastStartVersion;
+    @Column(name = "compliance_status")
+    protected ComplianceStatus complianceStatus;
 
     public UserVmJoinVO() {
     }
@@ -1235,6 +1238,8 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
     public Boolean getRequiresRestart() {
         return requiresRestart;
     }
+
+    public ComplianceStatus getComplianceStatus() { return complianceStatus; }
 
     public MaintenancePolicy getMaintenancePolicy() {
         return maintenancePolicy;

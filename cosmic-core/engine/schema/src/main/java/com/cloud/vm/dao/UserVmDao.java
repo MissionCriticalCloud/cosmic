@@ -2,6 +2,7 @@ package com.cloud.vm.dao;
 
 import com.cloud.legacymodel.utils.Pair;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
 import com.cloud.model.enumeration.VirtualMachineType;
@@ -38,7 +39,7 @@ public interface UserVmDao extends GenericDao<UserVmVO, Long> {
      */
     void updateVM(long id, String displayName, boolean enable, Long osTypeId, String userData, boolean displayVm, boolean isDynamicallyScalable, String customId,
                   String hostName, String instanceName, String manufacturerString, OptimiseFor optimiseFor, Boolean requiresRestart, MaintenancePolicy maintenancePolicy,
-                  Long bootMenuTimeout, String bootOrder
+                  Long bootMenuTimeout, String bootOrder, ComplianceStatus complianceStatus
     );
 
     List<UserVmVO> findDestroyedVms(Date date);

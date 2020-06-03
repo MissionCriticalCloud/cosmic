@@ -1,6 +1,7 @@
 package com.cloud.vm;
 
 import com.cloud.legacymodel.network.VirtualRouter;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.MaintenancePolicy;
 import com.cloud.model.enumeration.OptimiseFor;
@@ -69,6 +70,7 @@ public class DomainRouterVO extends VMInstanceVO implements VirtualRouter {
         this.requiresRestart = requiresRestart;
         this.maintenancePolicy = maintenancePolicy;
         this.routerUnicastId = routerUnicastId;
+        this.complianceStatus = ComplianceStatus.Compliant;
     }
 
     protected DomainRouterVO() {

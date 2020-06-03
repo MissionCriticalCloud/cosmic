@@ -130,6 +130,7 @@ import com.cloud.legacymodel.vm.VirtualMachine;
 import com.cloud.legacymodel.vm.VirtualMachine.State;
 import com.cloud.legacymodel.vm.VmStatsEntry;
 import com.cloud.model.enumeration.AllocationState;
+import com.cloud.model.enumeration.ComplianceStatus;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.DiskControllerType;
 import com.cloud.model.enumeration.GuestType;
@@ -815,6 +816,10 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     _vmDetailsDao.remove(_vmDetailsDao.findDetail(vm.getId(), "password").getId());
                 }
             }
+            // Reset VM compliance state
+            if (vm.getComplianceStatus() == ComplianceStatus.VMNeedsRestart) {
+                vm.setComplianceStatus(ComplianceStatus.Compliant);
+            }
             _vmDao.update(vm.getId(), vm);
         }
 
@@ -1007,7 +1012,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
     public UserVm updateVirtualMachine(final long id, String displayName, final String group, Boolean ha, Boolean isDisplayVmEnabled, Long osTypeId, String userData,
                                        Boolean isDynamicallyScalable, final HTTPMethod httpMethod, final String customId, String hostName, final String instanceName,
                                        final String manufacturerString, final OptimiseFor optimiseFor, final Boolean requiresRestart, final MaintenancePolicy maintenancePolicy,
-                                       final Long bootMenuTimeout, final String bootOrder
+                                       final Long bootMenuTimeout, final String bootOrder, final ComplianceStatus complianceStatus
     ) throws ResourceUnavailableException, InsufficientCapacityException {
 
         final UserVmVO vm = _vmDao.findById(id);
@@ -1104,7 +1109,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         _vmDao.updateVM(id, displayName, ha, osTypeId, userData, isDisplayVmEnabled, isDynamicallyScalable, customId, hostName, instanceName, manufacturerString, optimiseFor,
-                requiresRestart, maintenancePolicy, bootMenuTimeout, bootOrder);
+                requiresRestart, maintenancePolicy, bootMenuTimeout, bootOrder, complianceStatus);
 
         if (updateUserdata) {
             final boolean result = updateUserDataInternal(_vmDao.findById(id));
@@ -1661,6 +1666,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         final MaintenancePolicy maintenancePolicy = cmd.getMaintenancePolicy();
         final Long bootMenuTimeout = cmd.getBootMenuTimeout();
         final String bootOrder = cmd.getBootOrder();
+        final ComplianceStatus complianceStatus = cmd.getComplianceStatus();
 
         // Input validation and permission checks
         final UserVmVO vmInstance = _vmDao.findById(id);
@@ -1707,7 +1713,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
 
         return updateVirtualMachine(id, displayName, group, ha, isDisplayVm, osTypeId, userData, isDynamicallyScalable, cmd.getHttpMethod(), cmd.getCustomId(), hostName,
-                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart, maintenancePolicy, bootMenuTimeout, bootOrder);
+                cmd.getInstanceName(), manufacturerString, optimiseFor, requiresRestart, maintenancePolicy, bootMenuTimeout, bootOrder, complianceStatus);
     }
 
     @Override
