@@ -691,8 +691,7 @@ public class CommandSetupHelper {
         List<FirewallRuleVO> loadBalancingRuleList = _rulesDao.listAll().stream()
                                                               .filter(rule -> networkIds.contains(rule.getNetworkId()) &&
                                                                       rule.getPurpose().toString().equals("LoadBalancing") &&
-                                                                      (rule.getState().equals(FirewallRule.State.Active) ||
-                                                                              rule.getState().equals(FirewallRule.State.Add)))
+                                                                      (rule.getState().equals(FirewallRule.State.Active) || rule.getState().equals(FirewallRule.State.Add)))
                                                               .collect(Collectors.toList());
         loadBalancingRuleList.forEach(rule -> {
             final IpAddress sourceIp = _networkModel.getIp(rule.getSourceIpAddressId());
@@ -708,26 +707,28 @@ public class CommandSetupHelper {
                                               )).findFirst().orElse(null);
 
                 final List<NetworkOverviewTO.LoadBalancerTO.LBDestinations> lbDestinationList =
-                        _loadBalancerVMMapDao.listByLoadBalancerId(balancerVO.getId())
+                        _loadBalancerVMMapDao.listByLoadBalancerId(balancerVO.getId(), false)
                                              .stream()
                                              .map(vm -> new NetworkOverviewTO.LoadBalancerTO.LBDestinations(
                                                      vm.getInstanceIp(),
                                                      balancerVO.getDefaultPortStart()
                                              )).collect(Collectors.toList());
 
-                loadBalancers.add(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO(
-                        rule.getUuid(),
-                        balancerVO.getName(),
-                        sourceIp.getAddress().addr(),
-                        rule.getSourcePortStart(),
-                        rule.getProtocol(),
-                        balancerVO.getLbProtocol(),
-                        balancerVO.getAlgorithm(),
-                        lbDestinationList,
-                        lbStickinessPolicy,
-                        balancerVO.getClientTimeout(),
-                        balancerVO.getServerTimeout()
-                ));
+                if (_loadBalancerVMMapDao.listByLoadBalancerId(balancerVO.getId()).size() > 0) {
+                    loadBalancers.add(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO(
+                            rule.getUuid(),
+                            balancerVO.getName(),
+                            sourceIp.getAddress().addr(),
+                            rule.getSourcePortStart(),
+                            rule.getProtocol(),
+                            balancerVO.getLbProtocol(),
+                            balancerVO.getAlgorithm(),
+                            lbDestinationList,
+                            lbStickinessPolicy,
+                            balancerVO.getClientTimeout(),
+                            balancerVO.getServerTimeout()
+                    ));
+                }
             });
         });
 
@@ -750,18 +751,18 @@ public class CommandSetupHelper {
             } else {
                 maxconn = offering.getConcurrentConnections().toString();
             }
-
-            loadBalancerTO.setLbStatsVisibility(_configDao.getValue(Config.NetworkLBHaproxyStatsVisbility.key()));
-            loadBalancerTO.setLbStatsUri(_configDao.getValue(Config.NetworkLBHaproxyStatsUri.key()));
-            loadBalancerTO.setLbStatsAuth(_configDao.getValue(Config.NetworkLBHaproxyStatsAuth.key()));
-            loadBalancerTO.setLbStatsPort(_configDao.getValue(Config.NetworkLBHaproxyStatsPort.key()));
-
-            loadBalancerTO.setLbStatsPublicIp(routerPublicIp);
-            loadBalancerTO.setLbStatsGuestIp(_routerControlHelper.getRouterIpInNetwork(networkIds.get(0), router.getId()));
-            loadBalancerTO.setLbStatsPrivateIp(router.getPrivateIpAddress());
             loadBalancerTO.setMaxconn(maxconn);
-            loadBalancerTO.setLoadBalancers(loadBalancers.toArray(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO[0]));
+            loadBalancerTO.setLbStatsGuestIp(_routerControlHelper.getRouterIpInNetwork(networkIds.get(0), router.getId()));
         }
+
+        loadBalancerTO.setLbStatsVisibility(_configDao.getValue(Config.NetworkLBHaproxyStatsVisbility.key()));
+        loadBalancerTO.setLbStatsUri(_configDao.getValue(Config.NetworkLBHaproxyStatsUri.key()));
+        loadBalancerTO.setLbStatsAuth(_configDao.getValue(Config.NetworkLBHaproxyStatsAuth.key()));
+        loadBalancerTO.setLbStatsPort(_configDao.getValue(Config.NetworkLBHaproxyStatsPort.key()));
+
+        loadBalancerTO.setLbStatsPublicIp(routerPublicIp);
+        loadBalancerTO.setLbStatsPrivateIp(router.getPrivateIpAddress());
+        loadBalancerTO.setLoadBalancers(loadBalancers.toArray(new NetworkOverviewTO.LoadBalancerTO.LoadBalancersTO[0]));
     }
 
     public VMOverviewTO createVmOverviewFromRouter(final VirtualRouter router) {
