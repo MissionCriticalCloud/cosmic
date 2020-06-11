@@ -4,15 +4,16 @@ from cosmic.cosmicLog import CosmicLog
 from cosmic.cosmicTestCase import cosmicTestCase
 
 
-class TestPublicIpAcl(cosmicTestCase):
+class TestIpExclusionList(cosmicTestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.logger = CosmicLog(CosmicLog.LOGGER_TEST).get_logger()
 
-        cls.test_client = super(TestPublicIpAcl, cls).getClsTestClient()
+        cls.test_client = super(TestIpExclusionList, cls).getClsTestClient()
         cls.api_client = cls.test_client.getApiClient()
-        cls.attributes = cls.test_client.getParsedTestDataConfig()
+        cls.test_data = cls.test_client.getParsedTestDataConfig()
+
         cls.class_cleanup = []
 
     @classmethod
@@ -36,47 +37,29 @@ class TestPublicIpAcl(cosmicTestCase):
         except Exception as e:
             raise Exception("Exception: %s" % e)
 
-    def _test_acls(self, first_time_retries=2):
-        self.define_acl(self.default_allow_acl)
-        self._test_connectivity(retries=first_time_retries)
-        self.define_acl(self.default_deny_acl)
-        self._test_no_connectivity()
-        self.define_custom_acl('acl1', 'entry1')
-        self._test_connectivity()
-        self.define_custom_acl('acl2', 'entry2')
-        self._test_no_connectivity()
-        self.define_acl(self.default_allow_acl)
-        self._test_connectivity()
-
     @attr(tags=['advanced'])
     def test_01(self):
 
         self.setup_infra(redundant=False)
-        self._test_acls(first_time_retries=10)
-
-    @attr(tags=['advanced'])
-    def test_02(self):
-
-        self.cleanup_vpc()
-        self._test_acls()
-
-    @attr(tags=['advanced'])
-    def test_03(self):
-
-        self.setup_infra(redundant=True)
-        self._test_acls(first_time_retries=10)
-
-    @attr(tags=['advanced'])
-    def test_04(self):
-
-        self.cleanup_vpc()
-        self._test_acls()
-
-    @attr(tags=['advanced'])
-    def test_05(self):
-        self.setup_infra(redundant=True)
-        self.stop_master_router(self.vpc1)
-        self._test_acls()
+        self.setup_new_network()
+        #
+        # Deploy and test new VM
+        #
+        self.vm2 = self.deploy_new_vm('vm2')
+        self._test_vm(self.vm2, '10.1.2.6')
+        #
+        # Try to deploy new VM without free IPs
+        # Test failure
+        #
+        self.vm3 = self.deploy_new_vm('vm3')
+        self._test_deploy_new_vm_failed(self.vm3)
+        #
+        # Update exlcluded IPs range
+        # Deploy and test new VM
+        #
+        self.expand_free_ips()
+        self.vm3 = self.deploy_new_vm('vm3')
+        self._test_vm(self.vm3, '10.1.2.5')
 
     @classmethod
     def setup_infra(cls, redundant=False):
@@ -94,12 +77,11 @@ class TestPublicIpAcl(cosmicTestCase):
         cls.template = get_template(
             cls.api_client,
             cls.zone.id)
-
         cls.logger.debug("Template '%s' selected" % cls.template.name)
 
         cls.account = Account.create(
             cls.api_client,
-            cls.attributes['account'],
+            cls.test_data['account'],
             admin=True,
             domainid=cls.domain.id)
 
@@ -122,19 +104,15 @@ class TestPublicIpAcl(cosmicTestCase):
         cls.logger.debug("ACL '%s' selected", cls.default_deny_acl.name)
 
         cls.vpc1 = VPC.create(cls.api_client,
-                              cls.attributes['vpcs']['vpc1'],
+                              cls.test_data['vpcs']['vpc1'],
                               vpcofferingid=cls.vpc_offering.id,
                               zoneid=cls.zone.id,
                               domainid=cls.domain.id,
                               account=cls.account.name)
         cls.logger.debug("VPC '%s' created, CIDR: %s", cls.vpc1.name, cls.vpc1.cidr)
-        retry = 12
-        while not cls.vpc1.is_state_ok() and retry > 0:
-            retry -= 1
-            time.sleep(5)
 
         cls.network1 = Network.create(cls.api_client,
-                                      cls.attributes['networks']['network1'],
+                                      cls.test_data['networks']['network1'],
                                       networkofferingid=cls.network_offering.id,
                                       aclid=cls.default_allow_acl.id,
                                       vpcid=cls.vpc1.id,
@@ -144,7 +122,7 @@ class TestPublicIpAcl(cosmicTestCase):
         cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
 
         cls.vm1 = VirtualMachine.create(cls.api_client,
-                                        cls.attributes['vms']['vm1'],
+                                        cls.test_data['vms']['vm1'],
                                         templateid=cls.template.id,
                                         serviceofferingid=cls.virtual_machine_offering.id,
                                         networkids=[cls.network1.id],
@@ -163,7 +141,7 @@ class TestPublicIpAcl(cosmicTestCase):
 
         cls.nat_rule1 = NATRule.create(cls.api_client,
                                        cls.vm1,
-                                       cls.attributes['nat_rule'],
+                                       cls.test_data['nat_rule'],
                                        vpcid=cls.vpc1.id,
                                        networkid=cls.network1.id,
                                        ipaddressid=cls.public_ip1.id)
@@ -173,79 +151,55 @@ class TestPublicIpAcl(cosmicTestCase):
                          cls.nat_rule1.publicport,
                          cls.nat_rule1.privateport)
 
-    def _test_connectivity(self, retries=2):
+    def setup_new_network(self):
+        self.network2 = Network.create(self.api_client,
+                                       self.test_data['networks']['network2'],
+                                       networkofferingid=self.network_offering.id,
+                                       aclid=self.default_allow_acl.id,
+                                       vpcid=self.vpc1.id,
+                                       zoneid=self.zone.id,
+                                       domainid=self.domain.id,
+                                       accountid=self.account.name,
+                                       ipexclusionlist='10.1.2.2-10.1.2.5')
+        self.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s, Excluded IPs: %s",
+                          self.network2.name, self.network2.cidr, self.network2.gateway,
+                          self.network2.ipexclusionlist)
+
+    def deploy_new_vm(self, vm_name):
+        self.logger.debug('Try to deploy new VM')
 
         try:
-            self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress, reconnect=True, retries=retries)
-            self.logger.debug('Ensure connectivity: OK')
-
+            new_vm = VirtualMachine.create(self.api_client,
+                                           self.test_data['vms'][vm_name],
+                                           templateid=self.template.id,
+                                           serviceofferingid=self.virtual_machine_offering.id,
+                                           networkids=[self.network2.id],
+                                           zoneid=self.zone.id,
+                                           domainid=self.domain.id,
+                                           accountid=self.account.name,
+                                           mode='advanced')
+            self.logger.debug("VM '%s' created, Network: %s, IP %s", new_vm.name, self.network2.name,
+                              new_vm.nic[0].ipaddress)
+            return new_vm
         except Exception as e:
-            raise Exception("Exception: %s" % e)
+            if not 'Unable to acquire Guest IP address for network Ntwk' in str(e.error['errortext']):
+                self.logger.debug('Unexpected Exception: %s', e.error['errortext'])
+                raise Exception("Exception: %s" % e.error['errortext'])
+            return None
 
-    def _test_no_connectivity(self):
+    def _test_deploy_new_vm_failed(self, vm):
+        self.assertTrue(vm is None, "VM deployment should fail due to no IPs available")
+        self.logger.debug('Check (fail) VM deployment without available IPs: OK')
 
-        failed = False
-        try:
-            self.vm1.get_ssh_client(ipaddress=self.public_ip1.ipaddress, reconnect=True, retries=5)
+    def expand_free_ips(self):
+        self.network2.update(self.api_client,
+                             ipexclusionlist='10.1.2.2-10.1.2.4')
+        self.logger.debug('IP list expanded')
 
-        except Exception as e:
-            self.logger.debug('Ensure no connectivity: OK')
-            failed = True
-
-        self.assertTrue(failed)
-
-    def cleanup_vpc(self):
-
-        self.logger.debug("Restarting VPC '%s' with 'cleanup=True'", self.vpc1.name)
-        self.vpc1.restart(self.api_client, True)
-        self.logger.debug("VPC '%s' restarted", self.vpc1.name)
-
-    def define_acl(self, acl):
-
-        try:
-            command = {'aclid': acl.id, 'publicipid': self.public_ip1.id}
-            response = Response(self.api_client.replaceNetworkACLList(**command))
-            waitforjob(self.api_client, response.jobid)
-
-        except Exception as e:
-            raise Exception("Exception: %s" % e)
-
-        self.logger.debug("Public IP '%s' ACL replaced with '%s'", self.public_ip1.ipaddress, acl.name)
-
-    def define_custom_acl(self, acl_config, acl_entry_config):
-
-        acl = NetworkACLList.create(self.api_client,
-                                    self.attributes['acls'][acl_config],
-                                    vpcid=self.vpc1.id)
-
-        NetworkACL.create(self.api_client,
-                          self.attributes['acls'][acl_config]['entries'][acl_entry_config],
-                          networkid=self.network1.id,
-                          aclid=acl.id)
-        self.define_acl(acl)
-
-    def stop_master_router(self, vpc):
-
-        self.logger.debug("Stopping Master Router of VPC '%s'...", vpc.name)
-        routers = list_routers(self.api_client, domainid=self.domain.id, account=self.account.name, vpcid=vpc.id)
-        for router in routers:
-            if router.redundantstate == 'MASTER':
-                cmd = {'id': router.id, 'forced': 'true'}
-                self.api_client.stopRouter(**cmd)
-                break
-
-        routers = list_routers(self.api_client, domainid=self.domain.id, account=self.account.name, vpcid=vpc.id)
-        for router in routers:
-            if router.state == 'Running':
-                hosts = list_hosts(self.api_client, zoneid=router.zoneid, type='Routing', state='Up', id=router.hostid)
-                self.assertTrue(isinstance(hosts, list))
-                host = next(iter(hosts or []), None)
-
-                try:
-                    host['user'], host['passwd'] = get_host_credentials(self.config, host['name'])
-                    get_process_status(host['ipaddress'], 22, host['user'], host['passwd'], router.linklocalip, "sh /opt/cosmic/router/scripts/checkrouter.sh ")
-
-                except KeyError as e:
-                    raise Exception("Exception: %s" % e)
-
-        self.logger.debug("Master Router of VPC '%s' stopped", vpc.name)
+    def _test_vm(self, vm, expected_value):
+        self.assertTrue(vm.nic[0].ipaddress == expected_value, "VM should be assigned the only IP available")
+        ssh_client = vm.get_ssh_client(reconnect=True, retries=10)
+        result = ssh_client.execute("/sbin/ip addr show")
+        self.assertTrue(expected_value in str(result),
+                        "VM should implement the only IP available, ip addr show: " + str(result))
+        self.logger.debug('Check implemented IP: OK')
