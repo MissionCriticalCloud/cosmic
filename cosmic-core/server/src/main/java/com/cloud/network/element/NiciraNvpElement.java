@@ -312,7 +312,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
                 s_logger.warn("Existing Logical Switchport found for nic " + nic.getName() + " with uuid " + existingNicMap.getLogicalSwitchPortUuid());
                 final UpdateLogicalSwitchPortCommand cmd =
                         new UpdateLogicalSwitchPortCommand(existingNicMap.getLogicalSwitchPortUuid(), BroadcastDomainType.getValue(network.getBroadcastUri()),
-                                nicVO.getUuid(), context.getDomain().getName() + "-" + context.getAccount().getAccountName(), nic.getName(), nic.getMirrorIpAddress(), nic.getMirrorKey());
+                                nicVO.getUuid(), context.getDomain().getName() + "-" + context.getAccount().getAccountName(), nic.getName(), nic.getMirrorIpAddressList(), nic.getMirrorKeyList());
                 this.agentMgr.easySend(niciraNvpHost.getId(), cmd);
                 return true;
             } else {
@@ -327,8 +327,8 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
         Long mirror_key = null;
         if (virtualMachine != null) {
             macLearning = virtualMachine.getMacLearning();
-            mirror_ip_address = nic.getMirrorIpAddress();
-            mirror_key = nic.getMirrorKey();
+            mirror_ip_address = nic.getMirrorIpAddressList();
+            mirror_key = nic.getMirrorKeyList();
         }
         final CreateLogicalSwitchPortCommand cmd = new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
                 context.getAccount().getAccountName(), nic.getName(), macLearning, mirror_ip_address, mirror_key);
