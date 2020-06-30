@@ -2601,9 +2601,6 @@
                                                     },
                                                     mirroripaddress: {
                                                         label: 'label.mirror.ipaddress'
-                                                    },
-                                                    mirrorkey: {
-                                                        label: 'label.mirror.key'
                                                     }
                                                 }],
                                                 dataProvider: function (args) {
@@ -5789,9 +5786,6 @@
                                             },
                                             mirroripaddress: {
                                                 label: 'label.mirror.ipaddress'
-                                            },
-                                            mirrorkey: {
-                                                label: 'label.mirror.key'
                                             }
                                         }],
                                         dataProvider: function (args) {

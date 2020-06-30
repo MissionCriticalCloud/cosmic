@@ -92,7 +92,7 @@ public final class NiciraNvpCreateLogicalRouterCommandWrapper extends CommandWra
                 lrpi = niciraNvpApi.createLogicalRouterPort(lrc.getUuid(), lrpi);
 
                 // Create the inside port on the lswitch
-                lsp = new LogicalSwitchPort(niciraNvpResource.truncate(routerName + "-inside-port", NAME_MAX_LEN), tags, true, null,null, null);
+                lsp = new LogicalSwitchPort(niciraNvpResource.truncate(routerName + "-inside-port", NAME_MAX_LEN), tags, true, null,null);
                 lsp = niciraNvpApi.createLogicalSwitchPort(logicalSwitchUuid, lsp);
 
                 // Attach the inside router port to the lswitch port with a PatchAttachment

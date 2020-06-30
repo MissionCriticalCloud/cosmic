@@ -15,7 +15,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -79,9 +82,7 @@ public class NicVO implements Nic {
     @Column(name = "secondary_ip")
     boolean secondaryIp;
     @Column(name = "mirror_ip_address")
-    String mirrorIpAddress;
-    @Column(name = "mirror_key")
-    Long mirrorKey;
+    String mirrorIpAddressList;
 
 
     protected NicVO() {
@@ -305,13 +306,14 @@ public class NicVO implements Nic {
         this.created = created;
     }
 
-    public String getMirrorIpAddress() { return mirrorIpAddress; }
+    public List<String> getMirrorIpAddressList() {
+        if (mirrorIpAddressList == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(mirrorIpAddressList.split("\\s*,\\s*"));
+    }
 
-    public void setMirrorIpAddress(final String mirrorIpAddress) { this.mirrorIpAddress = mirrorIpAddress; }
-
-    public Long getMirrorKey() { return mirrorKey; }
-
-    public void setMirrorKey(final Long mirrorKey) { this.mirrorKey = mirrorKey; }
+    public void setMirrorIpAddressList(final String mirrorIpAddressList) { this.mirrorIpAddressList = mirrorIpAddressList; }
 
     @Override
     public String toString() {
