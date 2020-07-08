@@ -49,10 +49,6 @@ public class NicResponse extends BaseResponse {
     @Param(description = "the mirror ip address for the nic")
     private String mirrorIpAddress;
 
-    @SerializedName("mirrorkey")
-    @Param(description = "the mirror key for the nic")
-    private Long mirrorKey;
-
     @SerializedName(ApiConstants.TRAFFIC_TYPE)
     @Param(description = "the traffic type of the nic")
     private String trafficType;
@@ -123,10 +119,6 @@ public class NicResponse extends BaseResponse {
 
     public void setMirrorIpAddress(final String mirrorIpAddress) {
         this.mirrorIpAddress = mirrorIpAddress;
-    }
-
-    public void setMirrorKey(final Long mirrorKey) {
-        this.mirrorKey = mirrorKey;
     }
 
     public void setTrafficType(final String trafficType) {

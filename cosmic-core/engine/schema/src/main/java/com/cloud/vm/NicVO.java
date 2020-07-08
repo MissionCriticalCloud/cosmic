@@ -83,8 +83,6 @@ public class NicVO implements Nic {
     boolean secondaryIp;
     @Column(name = "mirror_ip_address")
     String mirrorIpAddressList;
-    @Column(name = "mirror_key")
-    String mirrorKeyList;
 
 
     protected NicVO() {
@@ -316,15 +314,6 @@ public class NicVO implements Nic {
     }
 
     public void setMirrorIpAddressList(final String mirrorIpAddressList) { this.mirrorIpAddressList = mirrorIpAddressList; }
-
-    public List<String> getMirrorKeyList() {
-        if (mirrorKeyList == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList(mirrorKeyList.split("\\s*,\\s*"));
-    }
-
-    public void setMirrorKeyList(final String mirrorKeyList) { this.mirrorKeyList = mirrorKeyList; }
 
     @Override
     public String toString() {

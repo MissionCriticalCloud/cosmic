@@ -17,7 +17,7 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
         super();
     }
 
-    public LogicalSwitchPort(final String displayName, final List<NiciraNvpTag> tags, final boolean adminStatusEnabled, final Boolean macLearning, final List<String> mirrorIpAddress, final List<String> mirrorKeyList) {
+    public LogicalSwitchPort(final String displayName, final List<NiciraNvpTag> tags, final boolean adminStatusEnabled, final Boolean macLearning, final List<String> mirrorIpAddress) {
         super();
         this.displayName = displayName;
         this.tags = tags;
