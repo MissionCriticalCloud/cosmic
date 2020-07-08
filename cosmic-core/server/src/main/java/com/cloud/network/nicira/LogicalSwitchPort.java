@@ -24,18 +24,12 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
         this.adminStatusEnabled = adminStatusEnabled;
         this.macLearning = macLearning;
 
-        int counter = 0;
-        long mirror_key;
+        long counter = 0;
         for (final String mirror_ip_address : mirrorIpAddress) {
-            try {
-                mirror_key = Long.parseLong(mirrorKeyList.get(counter));
-            } catch (final IndexOutOfBoundsException | NumberFormatException ex) {
-                mirror_key = counter;
-            }
             if (mirror_ip_address != null && !mirror_ip_address.equals("")) {
                 final NiciraNvpCollectorConfig mirrorTarget = new NiciraNvpCollectorConfig();
                 mirrorTarget.setIpAddress(mirror_ip_address);
-                mirrorTarget.setMirrorKey(mirror_key);
+                mirrorTarget.setMirrorKey(counter);
 
                 this.mirrorTargets.add(mirrorTarget);
                 counter++;
