@@ -171,7 +171,7 @@ public class NiciraNvpApiIT {
         final List<NiciraNvpTag> tags = new ArrayList<>();
         tags.add(new NiciraNvpTag("cs_account", "OwnerName"));
 
-        LogicalSwitchPort logicalSwitchPort = new LogicalSwitchPort("LSwitchPort" + timestamp, tags, true, null, null, null);
+        LogicalSwitchPort logicalSwitchPort = new LogicalSwitchPort("LSwitchPort" + timestamp, tags, true, null, new ArrayList<>(), new ArrayList<>());
         logicalSwitchPort = api.createLogicalSwitchPort(logicalSwitch.getUuid(), logicalSwitchPort);
 
         logicalSwitchPort.setDisplayName("UpdatedLSwitchPort" + timestamp);

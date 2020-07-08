@@ -323,15 +323,15 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
 
         final VirtualMachine virtualMachine = vm.getVirtualMachine();
         boolean macLearning = false;
-        String mirror_ip_address = null;
-        Long mirror_key = null;
+        List mirrorIpAddressList = null;
+        List mirrorKeyList = null;
         if (virtualMachine != null) {
             macLearning = virtualMachine.getMacLearning();
-            mirror_ip_address = nic.getMirrorIpAddressList();
-            mirror_key = nic.getMirrorKeyList();
+            mirrorIpAddressList = nic.getMirrorIpAddressList();
+            mirrorKeyList = nic.getMirrorKeyList();
         }
         final CreateLogicalSwitchPortCommand cmd = new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
-                context.getAccount().getAccountName(), nic.getName(), macLearning, mirror_ip_address, mirror_key);
+                context.getAccount().getAccountName(), nic.getName(), macLearning, mirrorIpAddressList, mirrorKeyList);
         final CreateLogicalSwitchPortAnswer answer = (CreateLogicalSwitchPortAnswer) this.agentMgr.easySend(niciraNvpHost.getId(), cmd);
 
         if (answer == null || !answer.getResult()) {

@@ -216,7 +216,7 @@ public class NiciraNvpResourceTest {
         when(lsp.getUuid()).thenReturn("eeee");
         when(nvpApi.createLogicalSwitchPort(eq("cccc"), (LogicalSwitchPort) any())).thenReturn(lsp);
 
-        final CreateLogicalSwitchPortCommand clspc = new CreateLogicalSwitchPortCommand("cccc", "dddd", "owner", "nicname", false, null, null);
+        final CreateLogicalSwitchPortCommand clspc = new CreateLogicalSwitchPortCommand("cccc", "dddd", "owner", "nicname", false, new ArrayList<>(), new ArrayList<>());
         final CreateLogicalSwitchPortAnswer clspa = (CreateLogicalSwitchPortAnswer) resource.executeRequest(clspc);
         assertTrue(clspa.getResult());
         assertTrue("eeee".equals(clspa.getLogicalSwitchPortUuid()));
@@ -230,7 +230,7 @@ public class NiciraNvpResourceTest {
         when(lsp.getUuid()).thenReturn("eeee");
         when(nvpApi.createLogicalSwitchPort(eq("cccc"), (LogicalSwitchPort) any())).thenThrow(new NiciraNvpApiException());
 
-        final CreateLogicalSwitchPortCommand clspc = new CreateLogicalSwitchPortCommand("cccc", "dddd", "owner", "nicname", false, null, null);
+        final CreateLogicalSwitchPortCommand clspc = new CreateLogicalSwitchPortCommand("cccc", "dddd", "owner", "nicname", false, new ArrayList<>(), new ArrayList<>());
         final CreateLogicalSwitchPortAnswer clspa = (CreateLogicalSwitchPortAnswer) resource.executeRequest(clspc);
         assertFalse(clspa.getResult());
     }
@@ -244,7 +244,7 @@ public class NiciraNvpResourceTest {
         when(nvpApi.createLogicalSwitchPort(eq("cccc"), (LogicalSwitchPort) any())).thenReturn(lsp);
         doThrow(new NiciraNvpApiException()).when(nvpApi).updateLogicalSwitchPortAttachment((String) any(), (String) any(), (Attachment) any());
 
-        final CreateLogicalSwitchPortCommand clspc = new CreateLogicalSwitchPortCommand("cccc", "dddd", "owner", "nicname", false, null, null);
+        final CreateLogicalSwitchPortCommand clspc = new CreateLogicalSwitchPortCommand("cccc", "dddd", "owner", "nicname", false, new ArrayList<>(), new ArrayList<>());
         final CreateLogicalSwitchPortAnswer clspa = (CreateLogicalSwitchPortAnswer) resource.executeRequest(clspc);
         assertFalse(clspa.getResult());
         verify(nvpApi, atLeastOnce()).deleteLogicalSwitchPort((String) any(), (String) any());
@@ -265,7 +265,7 @@ public class NiciraNvpResourceTest {
 
         doThrow(new NiciraNvpApiException()).when(nvpApi).updateLogicalSwitchPortAttachment((String) any(), (String) any(), (Attachment) any());
         final UpdateLogicalSwitchPortAnswer dlspa =
-                (UpdateLogicalSwitchPortAnswer) resource.executeRequest(new UpdateLogicalSwitchPortCommand("aaaa", "bbbb", "cccc", "owner", "nicname", null, null));
+                (UpdateLogicalSwitchPortAnswer) resource.executeRequest(new UpdateLogicalSwitchPortCommand("aaaa", "bbbb", "cccc", "owner", "nicname", new ArrayList<>(), new ArrayList<>()));
         assertFalse(dlspa.getResult());
     }
 
