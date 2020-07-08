@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -308,12 +309,18 @@ public class NicVO implements Nic {
     }
 
     public List<String> getMirrorIpAddressList() {
+        if (mirrorIpAddressList == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(mirrorIpAddressList.split("\\s*,\\s*"));
     }
 
     public void setMirrorIpAddressList(final String mirrorIpAddressList) { this.mirrorIpAddressList = mirrorIpAddressList; }
 
     public List<String> getMirrorKeyList() {
+        if (mirrorKeyList == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(mirrorKeyList.split("\\s*,\\s*"));
     }
 
