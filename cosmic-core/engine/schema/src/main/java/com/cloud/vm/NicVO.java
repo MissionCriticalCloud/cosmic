@@ -307,13 +307,13 @@ public class NicVO implements Nic {
         this.created = created;
     }
 
-    public List getMirrorIpAddressList() {
+    public List<String> getMirrorIpAddressList() {
         return Arrays.asList(mirrorIpAddressList.split("\\s*,\\s*"));
     }
 
     public void setMirrorIpAddressList(final String mirrorIpAddressList) { this.mirrorIpAddressList = mirrorIpAddressList; }
 
-    public List getMirrorKeyList() {
+    public List<String> getMirrorKeyList() {
         return Arrays.asList(mirrorKeyList.split("\\s*,\\s*"));
     }
 
