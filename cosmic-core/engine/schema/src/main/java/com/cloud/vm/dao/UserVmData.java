@@ -595,10 +595,6 @@ public class UserVmData {
             this.mirrorIpAddress = mirrorIpAddress;
         }
 
-        public Long getMirrorKey() {
-            return mirrorKey;
-        }
-
         public void setMirrorKey(final Long mirrorKey) {
             this.mirrorKey = mirrorKey;
         }

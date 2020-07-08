@@ -1038,10 +1038,6 @@ public class UserVmJoinVO extends BaseViewVO implements ControlledViewEntity {
         return mirrorIpAddress;
     }
 
-    public Long getMirrorKey() {
-        return mirrorKey;
-    }
-
     public long getNetworkId() {
         return networkId;
     }
