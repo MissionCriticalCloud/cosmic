@@ -216,6 +216,7 @@ public class NiciraNvpResource implements ServerResource {
             return wrapper.execute(cmd, this);
         } catch (final Exception e) {
             s_logger.debug("Received unsupported command " + cmd.toString());
+            s_logger.debug("Got error " + e.toString());
             return Answer.createUnsupportedCommandAnswer(cmd);
         }
     }
