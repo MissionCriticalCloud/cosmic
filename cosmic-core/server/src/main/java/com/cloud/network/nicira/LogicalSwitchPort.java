@@ -17,7 +17,7 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
         super();
     }
 
-    public LogicalSwitchPort(final String displayName, final List<NiciraNvpTag> tags, final boolean adminStatusEnabled, final Boolean macLearning, final List<String> mirrorIpAddress) {
+    public LogicalSwitchPort(final String displayName, final List<NiciraNvpTag> tags, final boolean adminStatusEnabled, final Boolean macLearning, final List<String> mirrorIpAddressList) {
         super();
         this.displayName = displayName;
         this.tags = tags;
@@ -25,14 +25,16 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
         this.macLearning = macLearning;
 
         long counter = 0;
-        for (final String mirror_ip_address : mirrorIpAddress) {
-            if (mirror_ip_address != null && !mirror_ip_address.equals("")) {
-                final NiciraNvpCollectorConfig mirrorTarget = new NiciraNvpCollectorConfig();
-                mirrorTarget.setIpAddress(mirror_ip_address);
-                mirrorTarget.setMirrorKey(counter);
+        if (mirrorIpAddressList != null) {
+            for (final String mirrorIpAddress : mirrorIpAddressList) {
+                if (mirrorIpAddress != null && !mirrorIpAddress.equals("")) {
+                    final NiciraNvpCollectorConfig mirrorTarget = new NiciraNvpCollectorConfig();
+                    mirrorTarget.setIpAddress(mirrorIpAddress);
+                    mirrorTarget.setMirrorKey(counter);
 
-                this.mirrorTargets.add(mirrorTarget);
-                counter++;
+                    this.mirrorTargets.add(mirrorTarget);
+                    counter++;
+                }
             }
         }
     }

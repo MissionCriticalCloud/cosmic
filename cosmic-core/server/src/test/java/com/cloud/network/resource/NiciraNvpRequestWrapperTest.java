@@ -209,7 +209,7 @@ public class NiciraNvpRequestWrapperTest {
         final String ownerName = "admin";
         final String nicName = "eth0";
 
-        final UpdateLogicalSwitchPortCommand command = new UpdateLogicalSwitchPortCommand(logicalSwitchPortUuid, logicalSwitchUuid, attachmentUuid, ownerName, nicName, null, null);
+        final UpdateLogicalSwitchPortCommand command = new UpdateLogicalSwitchPortCommand(logicalSwitchPortUuid, logicalSwitchUuid, attachmentUuid, ownerName, nicName, null);
 
         when(niciraNvpResource.getNiciraNvpUtilities()).thenReturn(niciraNvpUtilities);
         when(niciraNvpResource.getNiciraNvpApi()).thenReturn(niciraNvpApi);
