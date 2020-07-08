@@ -34,8 +34,8 @@ public class NicProfile implements InternalIdentity, Serializable {
     Integer networkRate;
 
     // Nicira Traffic Mirroring
-    List mirrorIpAddressList;
-    List mirrorKeyList;
+    List<String> mirrorIpAddressList;
+    List<String> mirrorKeyList;
 
     // IPv4
     String iPv4Address;
@@ -223,19 +223,19 @@ public class NicProfile implements InternalIdentity, Serializable {
         this.broadcastUri = broadcastUri;
     }
 
-    public List getMirrorIpAddressList() {
+    public List<String> getMirrorIpAddressList() {
         return mirrorIpAddressList;
     }
 
-    public void setMirrorIpAddressList(final List mirrorIpAddressList) {
+    public void setMirrorIpAddressList(final List<String> mirrorIpAddressList) {
         this.mirrorIpAddressList = mirrorIpAddressList;
     }
 
-    public List getMirrorKeyList() {
+    public List<String> getMirrorKeyList() {
         return mirrorKeyList;
     }
 
-    public void setMirrorKeyList(final List mirrorKeyList) {
+    public void setMirrorKeyList(final List<String> mirrorKeyList) {
         this.mirrorKeyList = mirrorKeyList;
     }
 
