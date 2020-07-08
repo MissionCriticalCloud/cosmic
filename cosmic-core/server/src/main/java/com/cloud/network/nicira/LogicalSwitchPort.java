@@ -29,7 +29,7 @@ public class LogicalSwitchPort extends BaseNiciraNamedEntity {
         for (final String mirror_ip_address : mirrorIpAddress) {
             try {
                 mirror_key = Long.parseLong(mirrorKeyList.get(counter));
-            } catch (final NumberFormatException ex) {
+            } catch (final IndexOutOfBoundsException | NumberFormatException ex) {
                 mirror_key = counter;
             }
             if (mirror_ip_address != null && !mirror_ip_address.equals("")) {
