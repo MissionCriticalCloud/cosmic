@@ -276,9 +276,6 @@ public class UserVmJoinDaoImpl extends GenericDaoBase<UserVmJoinVO, Long> implem
             if (userVm.getMirrorIpAddress() != null) {
                 nicResponse.setMirrorIpAddress(userVm.getMirrorIpAddress());
             }
-            if (userVm.getMirrorKey() != null) {
-                nicResponse.setMirrorKey(userVm.getMirrorKey());
-            }
             if (userVm.getTrafficType() != null) {
                 nicResponse.setTrafficType(userVm.getTrafficType().toString());
             }

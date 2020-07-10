@@ -11,6 +11,7 @@ import com.cloud.model.enumeration.TrafficType;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.List;
 
 public class NicProfile implements InternalIdentity, Serializable {
     long id;
@@ -33,8 +34,7 @@ public class NicProfile implements InternalIdentity, Serializable {
     Integer networkRate;
 
     // Nicira Traffic Mirroring
-    String mirrorIpAddress;
-    Long mirrorKey;
+    List<String> mirrorIpAddressList;
 
     // IPv4
     String iPv4Address;
@@ -82,8 +82,7 @@ public class NicProfile implements InternalIdentity, Serializable {
         this.broadcastUri = broadcastUri;
         this.isolationUri = isolationUri;
 
-        this.mirrorIpAddress = nic.getMirrorIpAddress();
-        this.mirrorKey = nic.getMirrorKey();
+        this.mirrorIpAddressList = nic.getMirrorIpAddressList();
 
         vmId = nic.getInstanceId();
         this.name = name;
@@ -222,20 +221,12 @@ public class NicProfile implements InternalIdentity, Serializable {
         this.broadcastUri = broadcastUri;
     }
 
-    public String getMirrorIpAddress() {
-        return mirrorIpAddress;
+    public List<String> getMirrorIpAddressList() {
+        return mirrorIpAddressList;
     }
 
-    public void setMirrorIpAddress(final String mirrorIpAddress) {
-        this.mirrorIpAddress = mirrorIpAddress;
-    }
-
-    public Long getMirrorKey() {
-        return mirrorKey;
-    }
-
-    public void setMirrorKey(final Long mirrorKey) {
-        this.mirrorKey = mirrorKey;
+    public void setMirrorIpAddressList(final List<String> mirrorIpAddressList) {
+        this.mirrorIpAddressList = mirrorIpAddressList;
     }
 
     public ReservationStrategy getReservationStrategy() {

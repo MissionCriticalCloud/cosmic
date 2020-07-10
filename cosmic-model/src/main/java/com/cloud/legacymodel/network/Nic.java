@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.org.apache.xerces.internal.xs.StringList;
+
 /**
  * Nic represents one nic on the VM.
  */
@@ -62,9 +64,7 @@ public interface Nic extends Identity, InternalIdentity {
 
     URI getBroadcastUri();
 
-    String getMirrorIpAddress();
-
-    Long getMirrorKey();
+    List<String> getMirrorIpAddressList();
 
     VirtualMachineType getVmType();
 

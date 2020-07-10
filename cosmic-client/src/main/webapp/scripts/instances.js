@@ -2675,10 +2675,6 @@
                             mirroripaddress: {
                                 label: 'label.mirror.ipaddress'
                             },
-                            mirrorkey: {
-                                label: 'label.mirror.key'
-                            },
-
                             isdefault: {
                                 label: 'label.is.default',
                                 converter: function (data) {

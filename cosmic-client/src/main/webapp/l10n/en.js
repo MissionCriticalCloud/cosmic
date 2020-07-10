@@ -834,7 +834,6 @@ var dictionary = {
     "label.isolation.mode": "Isolation Mode",
     "label.isolation.uri": "Isolation URI",
     "label.mirror.ipaddress": "Mirror IP address",
-    "label.mirror.key": "Mirror key",
     "label.issue": "Report an issue",
     "label.item.listing": "Item listing",
     "label.japanese.keyboard": "Japanese keyboard",

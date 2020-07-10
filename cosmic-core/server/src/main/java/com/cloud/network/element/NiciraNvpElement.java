@@ -312,7 +312,7 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
                 s_logger.warn("Existing Logical Switchport found for nic " + nic.getName() + " with uuid " + existingNicMap.getLogicalSwitchPortUuid());
                 final UpdateLogicalSwitchPortCommand cmd =
                         new UpdateLogicalSwitchPortCommand(existingNicMap.getLogicalSwitchPortUuid(), BroadcastDomainType.getValue(network.getBroadcastUri()),
-                                nicVO.getUuid(), context.getDomain().getName() + "-" + context.getAccount().getAccountName(), nic.getName(), nic.getMirrorIpAddress(), nic.getMirrorKey());
+                                nicVO.getUuid(), context.getDomain().getName() + "-" + context.getAccount().getAccountName(), nic.getName(), nic.getMirrorIpAddressList());
                 this.agentMgr.easySend(niciraNvpHost.getId(), cmd);
                 return true;
             } else {
@@ -323,15 +323,13 @@ public class NiciraNvpElement extends AdapterBase implements ConnectivityProvide
 
         final VirtualMachine virtualMachine = vm.getVirtualMachine();
         boolean macLearning = false;
-        String mirror_ip_address = null;
-        Long mirror_key = null;
+        List<String> mirrorIpAddressList = null;
         if (virtualMachine != null) {
             macLearning = virtualMachine.getMacLearning();
-            mirror_ip_address = nic.getMirrorIpAddress();
-            mirror_key = nic.getMirrorKey();
+            mirrorIpAddressList = nic.getMirrorIpAddressList();
         }
         final CreateLogicalSwitchPortCommand cmd = new CreateLogicalSwitchPortCommand(BroadcastDomainType.getValue(network.getBroadcastUri()), nicVO.getUuid(), context.getDomain().getName() + "-" +
-                context.getAccount().getAccountName(), nic.getName(), macLearning, mirror_ip_address, mirror_key);
+                context.getAccount().getAccountName(), nic.getName(), macLearning, mirrorIpAddressList);
         final CreateLogicalSwitchPortAnswer answer = (CreateLogicalSwitchPortAnswer) this.agentMgr.easySend(niciraNvpHost.getId(), cmd);
 
         if (answer == null || !answer.getResult()) {
