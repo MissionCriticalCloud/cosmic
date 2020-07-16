@@ -992,17 +992,6 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
         }
     }
 
-    private List<String> GenerateAllowedCidrs(final String cidrList) {
-        final List<String> allowedCidrs = new ArrayList<>();
-        final String[] cidrs = cidrList.split(",");
-        for (final String cidr : cidrs) {
-            if (NetUtils.isValidIp4Cidr(cidr) || NetUtils.isValidIp4(cidr) || !cidr.startsWith("0.0.0.0")) {
-                allowedCidrs.add(cidr);
-            }
-        }
-        return allowedCidrs;
-    }
-
     @Override
     public Pair<HostVO, SecondaryStorageVmVO> assignSecStorageVm(final long zoneId, final Command cmd) {
         return null;

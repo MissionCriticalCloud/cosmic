@@ -684,6 +684,14 @@ public enum Config {
             "0.0.0.0/0",
             "Comma separated list of cidrs that the SSVM is accessible from",
             null),
+    ConsoleProxyAllowedExternalAccessCidrs(
+            "Advanced",
+            ManagementServer.class,
+            String.class,
+            "consoleproxy.allowed.external.cidrs",
+            "0.0.0.0/0",
+            "Comma separated list of cidrs that the CPVM is accessible from",
+            null),
     SecStorageEncryptCopy(
             "Advanced",
             ManagementServer.class,

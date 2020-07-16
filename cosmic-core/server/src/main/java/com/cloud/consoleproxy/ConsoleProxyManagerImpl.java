@@ -203,6 +203,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
     private Map<Long, ConsoleProxyLoadInfo> _zoneVmCountMap; // map <zone id, info about running VMs count in zone>
     private String _staticPublicIp;
     private int _staticPort;
+    private String _allowedExternalCidrs;
     @Inject
     private KeystoreDao _ksDao;
     @Inject
@@ -587,6 +588,14 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
         final String setRfc1918RoutesStr = this._configDao.getValue("systemvm.setrfc1918routes");
         if (setRfc1918RoutesStr != null && setRfc1918RoutesStr.equalsIgnoreCase("false")) {
             setRfc1918Routes = false;
+        }
+
+        // External firewall
+        this._allowedExternalCidrs = this._configDao.getValue("consoleproxy.allowed.external.cidrs");
+        if (this._allowedExternalCidrs != null) {
+            final List<String> allowedCidrs = this.GenerateAllowedCidrs(this._allowedExternalCidrs);
+            String listString = String.join(",", allowedCidrs);
+            buf.append(" allowedcidrs=").append(listString);
         }
 
         boolean externalDhcp = false;
