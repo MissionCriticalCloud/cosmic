@@ -8,7 +8,8 @@ def setup_iptable_rules(cmdline):
 
     external_rules = ""
     for cidr in cmdline.get('allowedcidrs', '').split(','):
-        external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cidr + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
+        if cidr != '':
+            external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cidr.strip() + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
 
 
     iptables_rules = """
