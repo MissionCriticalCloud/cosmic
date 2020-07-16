@@ -111,7 +111,7 @@
         <cs.logstash-gelf.version>1.11.2</cs.logstash-gelf.version>
 
         <!-- MySQL is also used in the plugin section -->
-        <cs.mysql.version>5.1.34</cs.mysql.version>
+        <cs.mysql.version>8.0.16</cs.mysql.version>
 
         <!-- Plugin management properties -->
         <cs.build-helper-maven-plugin.version>1.9.1</cs.build-helper-maven-plugin.version>
