@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 # This script connects to the system vm Qemu Guest Agent and writes the
 # authorized_keys and cmdline data to /var/cache/cloud. The system VM then
