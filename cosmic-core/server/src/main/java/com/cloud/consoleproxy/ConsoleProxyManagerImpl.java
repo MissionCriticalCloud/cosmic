@@ -975,7 +975,7 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
 
         final HypervisorType availableHypervisor = this._resourceMgr.getAvailableHypervisor(dataCenterId);
         final String templateName = retrieveTemplateName(dataCenterId);
-        final VMTemplateVO template = this._templateDao.findRoutingTemplate(availableHypervisor, templateName);
+        final VMTemplateVO template = this._templateDao.findRoutingTemplate(availableHypervisor, templateName, dataCenterId);
 
         if (template == null) {
             throw new CloudRuntimeException("Not able to find the System templates or not downloaded in zone " + dataCenterId);
@@ -1163,7 +1163,8 @@ public class ConsoleProxyManagerImpl extends SystemVmManagerBase implements Cons
             Transaction.execute(new TransactionCallbackNoReturn() {
                 @Override
                 public void doInTransactionWithoutResult(final TransactionStatus status) {
-                    ConsoleProxyManagerImpl.this._configDao.update(Config.ConsoleProxyManagementLastState.key(), Config.ConsoleProxyManagementLastState.getCategory(), lastState.toString());
+                    ConsoleProxyManagerImpl.this._configDao.update(Config.ConsoleProxyManagementLastState.key(), Config.ConsoleProxyManagementLastState.getCategory(),
+                            lastState.toString());
                     ConsoleProxyManagerImpl.this._configDao.update(Config.ConsoleProxyManagementState.key(), Config.ConsoleProxyManagementState.getCategory(), state.toString());
                 }
             });

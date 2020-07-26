@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class   VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implements VMTemplateDao {
+public class VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> implements VMTemplateDao {
     private static final Logger s_logger = LoggerFactory.getLogger(VMTemplateDaoImpl.class);
     protected SearchBuilder<VMTemplateVO> TemplateNameSearch;
     protected SearchBuilder<VMTemplateVO> UniqueNameSearch;
@@ -345,10 +345,11 @@ public class   VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> impl
     }
 
     @Override
-    public VMTemplateVO findRoutingTemplate(final HypervisorType hType, final String templateName) {
+    public VMTemplateVO findRoutingTemplate(final HypervisorType hType, final String templateName, final long zoneId) {
         SearchCriteria<VMTemplateVO> sc = this.tmpltTypeHyperSearch2.create();
         sc.setParameters("templateType", TemplateType.ROUTING);
         sc.setParameters("hypervisorType", hType);
+        sc.setJoinParameters("tmpltzone", "zoneId", zoneId);
         if (templateName != null) {
             sc.setParameters("templateName", templateName);
         }
@@ -363,6 +364,7 @@ public class   VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> impl
             sc = this.tmpltTypeHyperSearch2.create();
             sc.setParameters("templateType", TemplateType.SYSTEM);
             sc.setParameters("hypervisorType", hType);
+            sc.setJoinParameters("tmpltzone", "zoneId", zoneId);
             if (templateName != null) {
                 sc.setParameters("templateName", templateName);
             }
@@ -501,16 +503,21 @@ public class   VMTemplateDaoImpl extends GenericDaoBase<VMTemplateVO, Long> impl
         hostHyperSearch2.and("removed", hostHyperSearch2.entity().getRemoved(), SearchCriteria.Op.NULL);
         hostHyperSearch2.groupBy(hostHyperSearch2.entity().getHypervisorType());
 
-        this.readySystemTemplateSearch.join("tmplHyper", hostHyperSearch2, hostHyperSearch2.entity().getHypervisorType(), this.readySystemTemplateSearch.entity()
-                                                                                                                                                        .getHypervisorType(), JoinBuilder
-                .JoinType.INNER);
+        this.readySystemTemplateSearch.join("tmplHyper", hostHyperSearch2, hostHyperSearch2.entity().getHypervisorType(),
+                this.readySystemTemplateSearch.entity().getHypervisorType(), JoinBuilder.JoinType.INNER);
         hostHyperSearch2.done();
         this.readySystemTemplateSearch.done();
 
+        final SearchBuilder<VMTemplateZoneVO> tmpltZoneSearch2 = this._templateZoneDao.createSearchBuilder();
+        tmpltZoneSearch2.and("removed", tmpltZoneSearch2.entity().getRemoved(), SearchCriteria.Op.NULL);
+        tmpltZoneSearch2.and("zoneId", tmpltZoneSearch2.entity().getZoneId(), SearchCriteria.Op.EQ);
         this.tmpltTypeHyperSearch2 = createSearchBuilder();
         this.tmpltTypeHyperSearch2.and("templateType", this.tmpltTypeHyperSearch2.entity().getTemplateType(), SearchCriteria.Op.EQ);
         this.tmpltTypeHyperSearch2.and("hypervisorType", this.tmpltTypeHyperSearch2.entity().getHypervisorType(), SearchCriteria.Op.EQ);
         this.tmpltTypeHyperSearch2.and("templateName", this.tmpltTypeHyperSearch2.entity().getName(), SearchCriteria.Op.EQ);
+        this.tmpltTypeHyperSearch2.join("tmpltzone", tmpltZoneSearch2, tmpltZoneSearch2.entity().getTemplateId(),
+                this.tmpltTypeHyperSearch2.entity().getId(), JoinBuilder.JoinType.INNER);
+        this.tmpltTypeHyperSearch2.done();
 
         this.tmpltTypeSearch = createSearchBuilder();
         this.tmpltTypeSearch.and("state", this.tmpltTypeSearch.entity().getState(), SearchCriteria.Op.EQ);

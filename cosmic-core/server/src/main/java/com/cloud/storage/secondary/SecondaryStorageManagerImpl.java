@@ -1124,7 +1124,7 @@ public class SecondaryStorageManagerImpl extends SystemVmManagerBase implements 
 
         final HypervisorType availableHypervisor = this._resourceMgr.getAvailableHypervisor(dataCenterId);
         final String templateName = retrieveTemplateName(dataCenterId);
-        final VMTemplateVO template = this._templateDao.findRoutingTemplate(availableHypervisor, templateName);
+        final VMTemplateVO template = this._templateDao.findRoutingTemplate(availableHypervisor, templateName, dataCenterId);
 
         if (template == null) {
             throw new CloudRuntimeException("Not able to find the System templates or not downloaded in zone " + dataCenterId);
