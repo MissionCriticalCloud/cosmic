@@ -63,7 +63,6 @@ import com.cloud.storage.VolumeVO;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.user.AccountManager;
-import com.cloud.user.AccountVO;
 import com.cloud.user.UserVO;
 import com.cloud.user.dao.UserDao;
 import com.cloud.utils.maint.Version;
@@ -543,7 +542,7 @@ public class NetworkHelperImpl implements NetworkHelper {
                 logger.debug(String.format("Allocating the VR with id=%s in datacenter %s with the hypervisor type %s", id, routerDeploymentDefinition.getDest().getZone(), hType));
 
                 final String templateName = retrieveTemplateName(hType, routerDeploymentDefinition.getDest().getZone().getId());
-                final VMTemplateVO template = _templateDao.findRoutingTemplate(hType, templateName);
+                final VMTemplateVO template = _templateDao.findRoutingTemplate(hType, templateName, routerDeploymentDefinition.getDest().getZone().getId());
 
                 if (template == null) {
                     logger.debug(hType + " won't support system vm, skip it");
@@ -567,7 +566,8 @@ public class NetworkHelperImpl implements NetworkHelper {
                 router = new DomainRouterVO(id, routerOffering.getId(), routerDeploymentDefinition.getVirtualProvider().getId(), VirtualMachineName.getRouterName(id,
                         s_vmInstanceName), template.getId(), template.getHypervisorType(), template.getGuestOSId(), owner.getDomainId(), owner.getId(),
                         userId, routerDeploymentDefinition.isRedundant(), RedundantState.UNKNOWN, offerHA, false, vpcId,
-                        template.getOptimiseFor(), template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false, template.getMaintenancePolicy(), routerUnicastId);
+                        template.getOptimiseFor(), template.getManufacturerString(), template.getCpuFlags(), template.getMacLearning(), false, template.getMaintenancePolicy(),
+                        routerUnicastId);
 
                 router.setDynamicallyScalable(template.isDynamicallyScalable());
                 router.setRole(Role.VIRTUAL_ROUTER);
