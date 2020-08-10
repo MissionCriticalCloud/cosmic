@@ -2,9 +2,8 @@
     -Virtual machine, Volume, Snapshot etc
 """
 
-from abc import ABCMeta, abstractmethod
-
 import base64
+from abc import ABCMeta, abstractmethod
 
 from common import *
 from utils import *
@@ -2017,23 +2016,22 @@ class LoadBalancerRule(BaseAbstract):
 
     def assign(self, api_client, vms=None, vmidipmap=None):
         """Assign virtual machines to load balancing rule"""
-        cmd = {'id': self.id}
+        cmd = {'id': self.id, 'fetch_result': True}
         if vmidipmap:
             cmd['vmidipmap'] = vmidipmap
         if vms:
             cmd['virtualmachineids'] = [str(vm.id) for vm in vms]
-        api_client.assignToLoadBalancerRule(**cmd)
+        _results = api_client.assignToLoadBalancerRule(**cmd)
         return
 
     def remove(self, api_client, vms=None, vmidipmap=None):
         """Remove virtual machines from load balancing rule"""
-        cmd = {'id': self.id}
+        cmd = {'id': self.id, 'fetch_result': True}
         if vms:
             cmd['virtualmachineids'] = [str(vm.id) for vm in vms]
         if vmidipmap:
             cmd['vmidipmap'] = vmidipmap
-        resp = Response(api_client.removeFromLoadBalancerRule(**cmd))
-        waitforjob(api_client, resp.jobid)
+        _results = api_client.removeFromLoadBalancerRule(**cmd)
         return
 
     def update(self, api_client, algorithm=None,
