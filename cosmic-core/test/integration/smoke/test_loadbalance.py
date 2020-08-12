@@ -194,7 +194,7 @@ class TestLoadBalance(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_01_create_lb_rule_src_nat(self):
+    def _test_01_create_lb_rule_src_nat(self):
         """Test to create Load balancing rule with source NAT"""
 
         # Validate the Following:
@@ -288,7 +288,7 @@ class TestLoadBalance(cloudstackTestCase):
         return
 
     @attr(tags=['advanced'])
-    def test_02_create_lb_rule_non_nat(self):
+    def _test_02_create_lb_rule_non_nat(self):
         """Test to create Load balancing rule with non source NAT"""
 
         # Validate the Following:
@@ -431,8 +431,8 @@ class TestLoadBalance(cloudstackTestCase):
         )
 
         # Removing VM and assigning another VM to LB rule
-        self.remove_add_check(lb_rule_1, self.non_src_nat_ip_1.ipaddress, [self.vm_2, self.vm_3])
-        self.remove_add_check(lb_rule_1, self.non_src_nat_ip_1.ipaddress, [self.vm_4, self.vm_6])
+        self.remove_add_check(lb_rule_1, self.non_src_nat_ip_1, [self.vm_2, self.vm_3])
+        self.remove_add_check(lb_rule_2, self.non_src_nat_ip_2, [self.vm_4, self.vm_6])
         return
 
     def try_ssh(self, ip_addr, command):
@@ -554,11 +554,11 @@ class TestLoadBalance(cloudstackTestCase):
         try:
             self.logger.debug("SSHing into IP address: %s after removing VM (ID: %s)" %
                               (
-                                  ip_addr.ipaddress,
+                                  ip_addr.ipaddress.ipaddress,
                                   vms[0].id
                               ))
 
-            self.try_ssh(ip_addr.ipaddress, uname_results)
+            self.try_ssh(ip_addr.ipaddress.ipaddress, uname_results)
             self.assertIn(
                 vms[1].id.split("-", 3)[3].upper(),
                 uname_results,
@@ -566,13 +566,13 @@ class TestLoadBalance(cloudstackTestCase):
             )
         except Exception as e:
             self.fail("%s: SSH failed for VM with IP Address: %s" %
-                      (e, ip_addr.ipaddress))
+                      (e, ip_addr.ipaddress.ipaddress))
 
         lb_rule.remove(self.apiclient, [vms[1]])
 
         with self.assertRaises(Exception):
             self.logger.debug("Removed all VMs, trying to SSH")
-            self.try_ssh(ip_addr.ipaddress, uname_results)
+            self.try_ssh(ip_addr.ipaddress.ipaddress, uname_results)
 
         return uname_results
 
@@ -590,11 +590,11 @@ class TestLoadBalance(cloudstackTestCase):
         try:
             self.logger.debug("SSHing into IP address: %s after removing VM (ID: %s)" %
                               (
-                                  ip_addr.ipaddress,
+                                  ip_addr.ipaddress.ipaddress,
                                   vms[0].id
                               ))
 
-            self.try_ssh(ip_addr.ipaddress, results)
+            self.try_ssh(ip_addr.ipaddress.ipaddress, results)
             self.assertNotIn(
                 vms[0].id.split("-", 3)[3].upper(),
                 results,
@@ -602,13 +602,13 @@ class TestLoadBalance(cloudstackTestCase):
             )
         except Exception as e:
             self.fail("%s: SSH failed for VM with IP Address: %s" %
-                      (e, ip_addr.ipaddress))
+                      (e, ip_addr.ipaddress.ipaddress))
 
         lb_rule.assign(self.apiclient, [vms[1]])
 
         results[:] = []
         for x in range(0, 5):
-            self.try_ssh(ip_addr.ipaddress, results)
+            self.try_ssh(ip_addr.ipaddress.ipaddress, results)
         self.logger.debug("OUTPUT: %s" % str(results))
         self.assertIn(
             vms[1].id.split("-", 3)[3].upper(),
