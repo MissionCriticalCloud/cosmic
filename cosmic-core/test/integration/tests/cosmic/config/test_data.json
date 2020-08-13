@@ -1,0 +1,224 @@
+{
+  "timeout": 10,
+  "ostype": "tiny linux kvm",
+  "account": {
+    "username": "test-account",
+    "lastname": "test",
+    "password": "password",
+    "email": "test-account@test.com",
+    "firstname": "test"
+  },
+  "vpcs": {
+    "vpc1": {
+      "name": "vpc1",
+      "displaytext": "vpc1",
+      "cidr": "10.1.0.0/16"
+    },
+    "vpc2": {
+      "name": "vpc2",
+      "displaytext": "vpc2",
+      "cidr": "10.2.0.0/16"
+    }
+  },
+  "networks": {
+    "network1": {
+      "name": "network1",
+      "displaytext": "network1",
+      "gateway": "10.1.1.1",
+      "netmask": "255.255.255.0"
+    },
+    "network2": {
+      "name": "network2",
+      "displaytext": "network2",
+      "gateway": "10.1.2.1",
+      "netmask": "255.255.255.248"
+    },
+    "network3": {
+      "name": "network3",
+      "displaytext": "network3",
+      "gateway": "10.2.1.1",
+      "netmask": "255.255.255.0"
+    },
+    "private_gateways_network": {
+      "name": "private_gateways_network",
+      "displaytext": "private_gateways_network",
+      "cidr": "172.16.1.0/24"
+    }
+  },
+  "vms": {
+    "vm1": {
+      "name": "vm1",
+      "displayname": "vm1"
+    },
+    "vm2": {
+      "name": "vm2",
+      "displayname": "vm2",
+      "privateport": 22,
+      "publicport": 22,
+      "protocol": "TCP"
+    },
+    "vm3": {
+      "name": "vm3",
+      "displayname": "vm3",
+      "privateport": 22,
+      "publicport": 22,
+      "protocol": "TCP"
+    }
+  },
+  "virtual_machine": {
+    "username": "root",
+    "displayname": "Test VM",
+    "ssh_port": 22,
+    "privateport": 22,
+    "protocol": "TCP",
+    "password": "password",
+    "publicport": 22
+  },
+  "lbrule": {
+    "openfirewall": false,
+    "name": "SSH",
+    "privateport": 22,
+    "alg": "leastconn",
+    "cidrlist": "0.0.0.0/0",
+    "startport": 22,
+    "publicport": 2222,
+    "protocol": "TCP",
+    "endport": 2222
+  },
+  "nat_rule": {
+    "publicport": 22,
+    "protocol": "TCP",
+    "privateport": 22
+  },
+  "natrule": {
+    "startport": 80,
+    "endport": 80,
+    "cidrlist": "0.0.0.0/0",
+    "privateport": 80,
+    "protocol": "TCP",
+    "publicport": 80
+  },
+  "acls": {
+    "acl1": {
+      "entries": {
+        "entry1": {
+          "action": "Allow",
+          "traffictype": "Ingress",
+          "startport": 22,
+          "protocol": "TCP",
+          "endport": 22
+        }
+      },
+      "name": "acl1",
+      "description": "acl1"
+    },
+    "acl2": {
+      "entries": {
+        "entry2": {
+          "action": "Deny",
+          "traffictype": "Ingress",
+          "startport": 22,
+          "protocol": "TCP",
+          "endport": 22
+        }
+      },
+      "name": "acl2",
+      "description": "acl2"
+    }
+  },
+  "zones": [
+    {
+      "pods": [
+        {
+          "clusters": [
+            {
+              "hosts": [
+                {
+                  "username": "root",
+                  "password": "password",
+                  "url": "kvm1"
+                },
+                {
+                  "username": "root",
+                  "password": "password",
+                  "url": "kvm2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "configurableData": {
+    "host": {
+      "username": "root",
+      "password": "password",
+      "publicport": 22,
+      "port": 22
+    },
+    "input": "INPUT",
+    "forward": "FORWARD"
+  },
+  "private_gateways": {
+    "private_gateway1": "172.16.1.1",
+    "private_gateway2": "172.16.1.2"
+  },
+  "static_routes": {
+    "static_route1": {
+      "cidr": "10.2.0.0/16",
+      "nexthop": "172.16.1.2"
+    },
+    "static_route2": {
+      "cidr": "10.1.0.0/16",
+      "nexthop": "172.16.1.1"
+    }
+  },
+  "vpc": {
+    "name": "TestVPC",
+    "displaytext": "TestVPC",
+    "cidr": "10.0.0.1/24"
+  },
+  "network": {
+    "name": "Test Network",
+    "displaytext": "Test Network",
+    "netmask": "255.255.255.0"
+  },
+  "network_1": {
+    "name": "Test Network 1",
+    "displaytext": "Test Network 1",
+    "netmask": "255.255.255.0",
+    "gateway": "10.0.0.2"
+  },
+  "natrule_ssh": {
+    "privateport": 22,
+    "publicport": 22,
+    "startport": 22,
+    "endport": 22,
+    "protocol": "TCP",
+    "cidrlist": "0.0.0.0/0"
+  },
+  "vpcN": {
+    "name": "TestVPC{N}",
+    "displaytext": "VPC{N}",
+    "cidr": "10.{N}.0.0/16"
+  },
+  "network_N": {
+    "name": "Test Network {N}",
+    "displaytext": "Test Network {N}",
+    "netmask": "255.255.255.0",
+    "gateway": "10.{N}.1.1"
+  },
+  "vpn": {
+    "vpn_user": "root",
+    "vpn_pass": "Md1s#dc",
+    "vpn_pass_fail": "abc!123",
+    "iprange": "10.2.2.1-10.2.2.10",
+    "fordisplay": "true"
+  },
+  "vpncustomergateway": {
+    "esppolicy": "3des-md5;modp1536",
+    "ikepolicy": "3des-md5;modp1536",
+    "ipsecpsk": "ipsecpsk"
+  }
+}
