@@ -102,6 +102,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 new ArrayList<>(),
                 new ArrayList<>(),
                 null,
+                null,
                 null
         );
         final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -398,6 +399,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                     ipsToExclude,
                     staticRoutesToExclude,
                     null,
+                    null,
                     null
             );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(domainRouterVO, networkOverview);
@@ -538,6 +540,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                     new ArrayList<>(),
                     new ArrayList<>(),
                     null,
+                    null,
                     null
             );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -641,6 +644,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                     ipsToExclude,
                     new ArrayList<>(),
                     null,
+                    null,
                     null
             );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -700,6 +704,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 new ArrayList<>(),
                 new ArrayList<>(),
                 null,
+                null,
                 null
         );
         final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -740,6 +745,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 new ArrayList<>(),
                 new ArrayList<>(),
                 null,
+                null,
                 null
         );
         final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -764,6 +770,7 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                     new ArrayList<>(),
                     new ArrayList<>(),
                     vpn,
+                    null,
                     null
             );
             final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
@@ -793,7 +800,8 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                 new ArrayList<>(),
                 new ArrayList<>(),
                 null,
-                isCreate ? null : conn
+                isCreate ? null : conn,
+                null
         );
         final UpdateNetworkOverviewCommand updateNetworkOverviewCommand = _commandSetupHelper.createUpdateNetworkOverviewCommand(router, networkOverview);
         cmds.addCommand(updateNetworkOverviewCommand);

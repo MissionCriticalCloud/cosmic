@@ -1,10 +1,13 @@
 package com.cloud.legacymodel.to;
 
 import com.cloud.legacymodel.network.Network;
+import com.cloud.legacymodel.utils.Pair;
 import com.cloud.model.enumeration.GuestType;
 import com.cloud.model.enumeration.TrafficType;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class NetworkOverviewTO {
@@ -13,6 +16,7 @@ public class NetworkOverviewTO {
     private RouteTO[] routes;
     private VPNTO vpn;
     private SyslogTO syslog;
+    private LoadBalancerTO loadbalancer;
 
     public InterfaceTO[] getInterfaces() {
         return interfaces;
@@ -54,6 +58,14 @@ public class NetworkOverviewTO {
         this.syslog = syslog;
     }
 
+    public LoadBalancerTO getLoadbalancer() {
+        return loadbalancer;
+    }
+
+    public void setLoadbalancer(final LoadBalancerTO loadbalancer) {
+        this.loadbalancer = loadbalancer;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -65,12 +77,20 @@ public class NetworkOverviewTO {
         final NetworkOverviewTO that = (NetworkOverviewTO) o;
         return Arrays.equals(getInterfaces(), that.getInterfaces()) &&
                 Objects.equals(getServices(), that.getServices()) &&
-                Arrays.equals(getRoutes(), that.getRoutes());
+                Arrays.equals(getRoutes(), that.getRoutes()) &&
+                Objects.equals(getVpn(), that.getVpn()) &&
+                Objects.equals(getSyslog(), that.getSyslog()) &&
+                Objects.equals(getLoadbalancer(), that.getLoadbalancer());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInterfaces(), getServices(), getRoutes());
+        return Objects.hash(getInterfaces(),
+                getServices(),
+                getRoutes(),
+                getVpn(),
+                getSyslog(),
+                getLoadbalancer());
     }
 
     public static class InterfaceTO {
@@ -756,6 +776,137 @@ public class NetworkOverviewTO {
 
         public void setServers(final String[] servers) {
             this.servers = servers;
+        }
+    }
+
+    public static class LoadBalancerTO {
+        public String lbStatsVisibility = "guest-network";
+        public String lbStatsPublicIp;
+        public String lbStatsPrivateIp;
+        public String lbStatsGuestIp;
+        public String lbStatsPort = "8081";
+        public String lbStatsSrcCidrs = "0/0";
+        public String lbStatsAuth = "admin1:AdMiN123";
+        public String lbStatsUri = "/admin?stats";
+        public String maxconn = "";
+        public String lbProtocol;
+        public boolean keepAliveEnabled = false;
+        LoadBalancersTO[] loadBalancers;
+
+        public void setLbStatsVisibility(final String lbStatsVisibility) {
+            this.lbStatsVisibility = lbStatsVisibility;
+        }
+
+        public void setLbStatsPublicIp(final String lbStatsPublicIp) {
+            this.lbStatsPublicIp = lbStatsPublicIp;
+        }
+
+        public void setLbStatsPrivateIp(final String lbStatsPrivateIp) {
+            this.lbStatsPrivateIp = lbStatsPrivateIp;
+        }
+
+        public void setLbStatsGuestIp(final String lbStatsGuestIp) {
+            this.lbStatsGuestIp = lbStatsGuestIp;
+        }
+
+        public void setLbStatsPort(final String lbStatsPort) {
+            this.lbStatsPort = lbStatsPort;
+        }
+
+        public void setLbStatsSrcCidrs(final String lbStatsSrcCidrs) {
+            this.lbStatsSrcCidrs = lbStatsSrcCidrs;
+        }
+
+        public void setLbStatsAuth(final String lbStatsAuth) {
+            this.lbStatsAuth = lbStatsAuth;
+        }
+
+        public void setLbStatsUri(final String lbStatsUri) {
+            this.lbStatsUri = lbStatsUri;
+        }
+
+        public void setMaxconn(final String maxconn) {
+            this.maxconn = maxconn;
+        }
+
+        public String getLbProtocol() {
+            return lbProtocol;
+        }
+
+        public void setLbProtocol(final String lbProtocol) {
+            this.lbProtocol = lbProtocol;
+        }
+
+        public boolean isKeepAliveEnabled() {
+            return keepAliveEnabled;
+        }
+
+        public void setKeepAliveEnabled(final boolean keepAliveEnabled) {
+            this.keepAliveEnabled = keepAliveEnabled;
+        }
+
+        public void setLoadBalancers(final LoadBalancersTO[] loadBalancers) {
+            this.loadBalancers = loadBalancers;
+        }
+
+        public static class StickinessPolicy {
+            private String methodName;
+            private HashMap<String, String> paramList;
+
+            public StickinessPolicy(final String methodName, final HashMap<String, String> paramList) {
+                this.methodName = methodName;
+                this.paramList = paramList;
+            }
+
+            public StickinessPolicy(final String methodName, final List<Pair<String, String>> paramList) {
+                this.methodName = methodName;
+                if (paramList.size() > 0) {
+                    this.paramList = new HashMap<>();
+                    for (Pair<String, String> param : paramList) {
+                        this.paramList.put(param.first().replace("-", "_"), param.second());
+                    }
+                }
+            }
+        }
+
+        public static class LBDestinations {
+            String destIp;
+            int destPort;
+
+            public LBDestinations(final String destIp, final int destPort) {
+                this.destIp = destIp;
+                this.destPort = destPort;
+            }
+        }
+
+        public static class LoadBalancersTO {
+            String uuid;
+            String name;
+            String srcIp;
+            int srcPort;
+            String protocol;
+            String lbProtocol;
+            String algorithm;
+            LBDestinations[] destinations;
+            StickinessPolicy stickinessPolicies;
+            int clientTimeout;
+            int serverTimeout;
+
+            public LoadBalancersTO(final String uuid, final String name, final String srcIp, final int srcPort, final String protocol, final String lbProtocol,
+                                   final String algorithm, final List<LBDestinations> destinations, final StickinessPolicy stickinessPolicies, final int clientTimeout,
+                                   final int serverTimeout) {
+                this.uuid = uuid;
+                this.name = name;
+                this.srcIp = srcIp;
+                this.srcPort = srcPort;
+                this.protocol = protocol;
+                this.lbProtocol = lbProtocol;
+                this.algorithm = algorithm;
+                this.destinations = destinations.toArray(new LBDestinations[0]);
+                this.stickinessPolicies = stickinessPolicies;
+                this.clientTimeout = clientTimeout;
+                this.serverTimeout = serverTimeout;
+            }
         }
     }
 }

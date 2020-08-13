@@ -11,12 +11,12 @@ test_data = {
             "data": {
                 "domains": [
                     {
-                        "metadata": { },
+                        "metadata": {},
                         "data": {
                             "name": "ROOT",
                             "accounts": [
                                 {
-                                    "metadata": { },
+                                    "metadata": {},
                                     "data": {
                                         "accounttype": 2,
                                         "email": "john@doe.com",
@@ -27,7 +27,7 @@ test_data = {
                                         "vpcs": [
                                             # vpc01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "cidr": "10.1.0.0/16",
                                                     "displaytext": "vpc01",
@@ -35,7 +35,7 @@ test_data = {
                                                     "vpcofferingname": "Redundant VPC offering",
                                                     "networks": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc01-tier01",
                                                                 "name": "vpc01-tier01",
@@ -46,7 +46,7 @@ test_data = {
                                                             }
                                                         },
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc01-tier02",
                                                                 "name": "vpc01-tier02",
@@ -59,12 +59,12 @@ test_data = {
                                                     ],
                                                     "acls": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "name": "acl01",
                                                                 "rules": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "cidrlist": "0.0.0.0/0",
@@ -79,11 +79,11 @@ test_data = {
                                                     ],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -96,11 +96,11 @@ test_data = {
                                                             }
                                                         },
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -110,7 +110,7 @@ test_data = {
                                                                         }
                                                                     },
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2202,
@@ -125,14 +125,14 @@ test_data = {
                                                     ],
                                                     "privategateways": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "ip": "172.16.100.1",
                                                                 "aclname": "default_allow",
                                                                 "privatenetworkname": "private_gateways_network",
                                                                 "staticroutes": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "cidr": "10.3.0.0/16",
                                                                             "nexthop": "172.16.100.3"
@@ -147,7 +147,7 @@ test_data = {
                                             },
                                             # vpc02
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "cidr": "10.2.0.0/16",
                                                     "displaytext": "vpc02",
@@ -155,7 +155,7 @@ test_data = {
                                                     "vpcofferingname": "Default VPC offering",
                                                     "networks": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc02-tier01",
                                                                 "name": "vpc02-tier01",
@@ -169,11 +169,11 @@ test_data = {
                                                     "acls": [],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -192,7 +192,7 @@ test_data = {
                                             },
                                             # vpc03
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "cidr": "10.3.0.0/16",
                                                     "displaytext": "vpc03",
@@ -200,7 +200,7 @@ test_data = {
                                                     "vpcofferingname": "Default VPC offering",
                                                     "networks": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc03-tier01",
                                                                 "name": "vpc03-tier01",
@@ -213,12 +213,12 @@ test_data = {
                                                     ],
                                                     "acls": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "name": "acl03",
                                                                 "rules": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "cidrlist": "0.0.0.0/0",
@@ -233,11 +233,11 @@ test_data = {
                                                     ],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -252,14 +252,14 @@ test_data = {
                                                     ],
                                                     "privategateways": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "ip": "172.16.100.3",
                                                                 "aclname": "default_allow",
                                                                 "privatenetworkname": "private_gateways_network",
                                                                 "staticroutes": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "cidr": "10.1.0.0/16",
                                                                             "nexthop": "172.16.100.1"
@@ -274,7 +274,7 @@ test_data = {
                                             },
                                             # vpc04
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "cidr": "10.4.0.0/16",
                                                     "displaytext": "vpc04",
@@ -282,7 +282,7 @@ test_data = {
                                                     "vpcofferingname": "Redundant VPC offering",
                                                     "networks": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc04-tier01",
                                                                 "name": "vpc04-tier01",
@@ -295,12 +295,12 @@ test_data = {
                                                     ],
                                                     "acls": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "name": "acl04",
                                                                 "rules": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "cidrlist": "0.0.0.0/0",
@@ -315,11 +315,11 @@ test_data = {
                                                     ],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -340,7 +340,7 @@ test_data = {
                                         "isolatednetworks": [
                                             # isonet01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "isonet01",
                                                     "displaytext": "isonet01",
@@ -349,7 +349,7 @@ test_data = {
                                                     "netmask": "255.255.255.0",
                                                     "egressrules": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "protocol": "TCP",
                                                                 "cidrlist": "0.0.0.0/0",
@@ -360,11 +360,11 @@ test_data = {
                                                     ],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "firewallrules": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "cidrlist": "0.0.0.0/0",
@@ -375,7 +375,7 @@ test_data = {
                                                                 ],
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "privateport": 22,
@@ -386,7 +386,7 @@ test_data = {
                                                                         }
                                                                     },
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "privateport": 22,
@@ -404,7 +404,7 @@ test_data = {
                                             },
                                             # isonet02
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "isonet02",
                                                     "displaytext": "isonet02",
@@ -413,7 +413,7 @@ test_data = {
                                                     "netmask": "255.255.255.0",
                                                     "egressrules": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "protocol": "TCP",
                                                                 "cidrlist": "0.0.0.0/0",
@@ -424,11 +424,11 @@ test_data = {
                                                     ],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "firewallrules": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "cidrlist": "0.0.0.0/0",
@@ -439,7 +439,7 @@ test_data = {
                                                                 ],
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "privateport": 22,
@@ -458,7 +458,7 @@ test_data = {
                                         ],
                                         "privatenetworks": [
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "private_gateways_network",
                                                     "displaytext": "private_gateways_network",
@@ -471,7 +471,7 @@ test_data = {
                                         "virtualmachines": [
                                             # vpc01-tier01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc01-tier01-vm011",
                                                     "displayname": "vpc01-tier01-vm01",
@@ -479,7 +479,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.1.1.11",
                                                                 "networkname": "vpc01-tier01"
@@ -490,7 +490,7 @@ test_data = {
                                             },
                                             # vpc01-tier02-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc01-tier02-vm01",
                                                     "displayname": "vpc01-tier02-vm011",
@@ -498,7 +498,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.1.2.11",
                                                                 "networkname": "vpc01-tier02"
@@ -509,7 +509,7 @@ test_data = {
                                             },
                                             # vpc01-tier02-vm02
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc01-tier02-vm02",
                                                     "displayname": "vpc01-tier02-vm02",
@@ -517,7 +517,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.1.2.12",
                                                                 "networkname": "vpc01-tier02"
@@ -528,7 +528,7 @@ test_data = {
                                             },
                                             # vpc02-tier01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc02-tier01-vm01",
                                                     "displayname": "vpc02-tier01-vm01",
@@ -536,7 +536,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.2.1.11",
                                                                 "networkname": "vpc02-tier01"
@@ -547,7 +547,7 @@ test_data = {
                                             },
                                             # vpc03-tier01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc03-tier01-vm01",
                                                     "displayname": "vpc03-tier01-vm01",
@@ -555,7 +555,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.3.1.11",
                                                                 "networkname": "vpc03-tier01"
@@ -566,7 +566,7 @@ test_data = {
                                             },
                                             # vpc04-tier01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc04-tier01-vm01",
                                                     "displayname": "vpc04-tier01-vm01",
@@ -574,7 +574,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.4.1.11",
                                                                 "networkname": "vpc04-tier01"
@@ -585,7 +585,7 @@ test_data = {
                                             },
                                             # isonet01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "isonet01-vm01",
                                                     "displayname": "isonet01-vm01",
@@ -593,7 +593,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "172.16.1.11",
                                                                 "networkname": "isonet01"
@@ -604,7 +604,7 @@ test_data = {
                                             },
                                             # isonet01-vm02
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "isonet01-vm02",
                                                     "displayname": "isonet01-vm02",
@@ -612,7 +612,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "172.16.1.12",
                                                                 "networkname": "isonet01"
@@ -623,7 +623,7 @@ test_data = {
                                             },
                                             # isonet02-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "isonet02-vm01",
                                                     "displayname": "isonet02-vm01",
@@ -631,7 +631,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "172.16.2.11",
                                                                 "networkname": "isonet02"
@@ -660,12 +660,12 @@ test_data = {
             "data": {
                 "domains": [
                     {
-                        "metadata": { },
+                        "metadata": {},
                         "data": {
                             "name": "ROOT",
                             "accounts": [
                                 {
-                                    "metadata": { },
+                                    "metadata": {},
                                     "data": {
                                         "accounttype": 2,
                                         "email": "jane@doe.com",
@@ -676,7 +676,7 @@ test_data = {
                                         "vpcs": [
                                             # vpc01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "cidr": "10.1.0.0/16",
                                                     "displaytext": "vpc01",
@@ -684,7 +684,7 @@ test_data = {
                                                     "vpcofferingname": "Redundant VPC offering",
                                                     "networks": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc01-tier01",
                                                                 "name": "vpc01-tier01",
@@ -697,12 +697,12 @@ test_data = {
                                                     ],
                                                     "acls": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "name": "acl01",
                                                                 "rules": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "protocol": "TCP",
                                                                             "cidrlist": "0.0.0.0/0",
@@ -717,11 +717,11 @@ test_data = {
                                                     ],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -740,7 +740,7 @@ test_data = {
                                             },
                                             # vpc02
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "cidr": "10.2.0.0/16",
                                                     "displaytext": "vpc02",
@@ -748,7 +748,7 @@ test_data = {
                                                     "vpcofferingname": "Default VPC offering",
                                                     "networks": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "displaytext": "vpc02-tier01",
                                                                 "name": "vpc02-tier01",
@@ -762,11 +762,11 @@ test_data = {
                                                     "acls": [],
                                                     "publicipaddresses": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "portforwards": [
                                                                     {
-                                                                        "metadata": { },
+                                                                        "metadata": {},
                                                                         "data": {
                                                                             "privateport": 22,
                                                                             "publicport": 2201,
@@ -789,7 +789,7 @@ test_data = {
                                         "virtualmachines": [
                                             # vpc01-tier01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc01-tier01-vm01",
                                                     "displayname": "vpc01-tier01-vm01",
@@ -797,7 +797,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.1.1.11",
                                                                 "networkname": "vpc01-tier01"
@@ -808,7 +808,7 @@ test_data = {
                                             },
                                             # vpc02-tier01-vm01
                                             {
-                                                "metadata": { },
+                                                "metadata": {},
                                                 "data": {
                                                     "name": "vpc02-tier01-vm01",
                                                     "displayname": "vpc02-tier01-vm01",
@@ -816,7 +816,7 @@ test_data = {
                                                     "serviceofferingname": "Small Instance",
                                                     "nics": [
                                                         {
-                                                            "metadata": { },
+                                                            "metadata": {},
                                                             "data": {
                                                                 "guestip": "10.2.1.11",
                                                                 "networkname": "vpc02-tier01"
@@ -878,7 +878,7 @@ test_data = {
     "vdomain": {
         "name": "domain"
     },
-    "domain": { "name": "domain" },
+    "domain": {"name": "domain"},
     "email": "test@test.com",
     "gateway": "172.1.1.1",
     "netmask": "255.255.255.0",
@@ -1458,8 +1458,8 @@ test_data = {
             "NetworkACL": "VpcVirtualRouter",
         },
         "serviceCapabilityList": {
-            "SourceNat": { "SupportedSourceNatTypes": "peraccount" },
-            "Lb": { "lbSchemes": "internal", "SupportedLbIsolation": "dedicated" }
+            "SourceNat": {"SupportedSourceNatTypes": "peraccount"},
+            "Lb": {"lbSchemes": "internal", "SupportedLbIsolation": "dedicated"}
         }
     },
     "egress_80": {
@@ -1638,20 +1638,20 @@ test_data = {
             "iscsi://192.168.100.21/iqn.2012-01.localdomain.clo-cstack-cos6:iser/1",
         "name": "Primary iSCSI"
     },
-    "volume": { "diskname": "Test Volume",
-                "size": 1
-                },
+    "volume": {"diskname": "Test Volume",
+               "size": 1
+               },
     "volume_write_path": {
         "diskname": "APP Data Volume",
         "size": 1,  # in GBs
-        "xenserver": { "rootdiskdevice": "/dev/xvda",
-                       "datadiskdevice_1": "/dev/xvdb",
-                       "datadiskdevice_2": "/dev/xvdc",  # Data Disk
-                       },
-        "kvm": { "rootdiskdevice": "/dev/vda",
-                 "datadiskdevice_1": "/dev/vdb",
-                 "datadiskdevice_2": "/dev/vdc"
-                 }
+        "xenserver": {"rootdiskdevice": "/dev/xvda",
+                      "datadiskdevice_1": "/dev/xvdb",
+                      "datadiskdevice_2": "/dev/xvdc",  # Data Disk
+                      },
+        "kvm": {"rootdiskdevice": "/dev/vda",
+                "datadiskdevice_1": "/dev/vdb",
+                "datadiskdevice_2": "/dev/vdc"
+                }
     },
     "data_write_paths": {
         "mount_dir": "/mnt/tmp",
@@ -1665,7 +1665,7 @@ test_data = {
         "diskname": "Custom disk",
     },
     "volume_offerings": {
-        0: { "diskname": "TestDiskServ" },
+        0: {"diskname": "TestDiskServ"},
     },
     "diskdevice": ["/dev/vdc", "/dev/vdb", "/dev/hdb", "/dev/hdc",
                    "/dev/xvdd", "/dev/cdrom", "/dev/sr0", "/dev/cdrom1"],
