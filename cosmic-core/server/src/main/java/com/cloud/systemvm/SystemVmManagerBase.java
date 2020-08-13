@@ -23,12 +23,14 @@ import com.cloud.network.router.VirtualNetworkApplianceManager;
 import com.cloud.network.rules.RulesManager;
 import com.cloud.utils.DateUtil;
 import com.cloud.utils.component.ManagerBase;
+import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.AfterScanAction;
 import com.cloud.vm.NicProfile;
 import com.cloud.vm.SystemVm;
 import com.cloud.vm.SystemVmLoadScanHandler;
 import com.cloud.vm.VirtualMachineProfile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -153,5 +155,16 @@ public abstract class SystemVmManagerBase extends ManagerBase implements SystemV
     protected String retrieveTemplateName(final long datacenterId) {
         final ConfigKey<String> hypervisorConfigKey = VirtualNetworkApplianceManager.RouterTemplateKvm;
         return hypervisorConfigKey.valueIn(datacenterId);
+    }
+
+    public List<String> GenerateAllowedCidrs(final String cidrList) {
+        final List<String> allowedCidrs = new ArrayList<>();
+        final String[] cidrs = cidrList.split(",");
+        for (final String cidr : cidrs) {
+            if (NetUtils.isValidIp4Cidr(cidr) || NetUtils.isValidIp4(cidr) || !cidr.startsWith("0.0.0.0")) {
+                allowedCidrs.add(cidr);
+            }
+        }
+        return allowedCidrs;
     }
 }

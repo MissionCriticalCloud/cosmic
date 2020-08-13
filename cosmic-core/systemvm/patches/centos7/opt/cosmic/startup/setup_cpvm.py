@@ -6,6 +6,12 @@ from utils import Utils
 
 def setup_iptable_rules(cmdline):
 
+    external_rules = ""
+    for cidr in cmdline.get('allowedcidrs', '').split(','):
+        if cidr != '':
+            external_rules += "-A INPUT -i " + cmdline['publicnic'] + " -s " + cidr.strip() + " -p tcp -m multiport --dports 80,443 -m tcp -j ACCEPT\n"
+
+
     iptables_rules = """
 *nat
 :PREROUTING ACCEPT [0:0]
@@ -25,8 +31,7 @@ COMMIT
 -A INPUT -i %s -p tcp -m state --state NEW -m tcp -s 169.254.0.1/32 --dport 3922 -j ACCEPT
 -A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 8001 -j ACCEPT
 -A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 8001 -j ACCEPT
--A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
--A INPUT -i %s -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+%s
 COMMIT
 """ % (
         cmdline['controlnic'],
@@ -35,8 +40,7 @@ COMMIT
         cmdline['controlnic'],
         cmdline['controlnic'],
         cmdline['mgtnic'],
-        cmdline['publicnic'],
-        cmdline['publicnic']
+        external_rules
     )
 
     with open("/tmp/iptables-consoleproxy", "w") as f:
