@@ -791,7 +791,7 @@ public class NetUtils {
     }
 
     public static boolean isValidAlgorithm(final String p) {
-        final String algo = p.toLowerCase();
+        final String algo = p;
         return algo.equals("roundrobin") || algo.equals("leastconn") || algo.equals("source");
     }
 

@@ -17,6 +17,7 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.network.FirewallRule;
 import com.cloud.legacymodel.network.LoadBalancer;
 import com.cloud.legacymodel.user.Account;
+import com.cloud.utils.net.NetUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,6 +132,9 @@ public class UpdateLoadBalancerRuleCmd extends BaseAsyncCustomIdCmd {
 
     @Override
     public void execute() {
+        if (algorithm != null && !NetUtils.isValidAlgorithm(algorithm)) {
+            throw new InvalidParameterValueException("Only source/roundrobin/leastconn are supported loadbalance algorithms.");
+        }
         CallContext.current().setEventDetails("Load balancer ID: " + getId());
         final LoadBalancer result = _lbService.updateLoadBalancerRule(this);
         if (result != null) {
