@@ -122,7 +122,7 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
     /////////////////////////////////////////////////////
 
     public String getAlgorithm() {
-        return algorithm;
+        return algorithm.toLowerCase();
     }
 
     public String getDescription() {
@@ -284,10 +284,14 @@ public class CreateLoadBalancerRuleCmd extends BaseAsyncCreateCmd /*implements L
             throw new InvalidParameterValueException(
                     "Only TCP protocol is supported because HAProxy can only do TCP.");
         }
+        if (getAlgorithm() != null && !NetUtils.isValidAlgorithm(getAlgorithm())) {
+            throw new InvalidParameterValueException("Only source/roundrobin/leastconn are supported loadbalance algorithms.");
+        }
         try {
             final LoadBalancer result =
                     _lbService.createPublicLoadBalancerRule(getXid(), getName(), getDescription(), getSourcePortStart(), getSourcePortEnd(), getDefaultPortStart(),
-                            getDefaultPortEnd(), getSourceIpAddressId(), getProtocol(), getAlgorithm(), getNetworkId(), getEntityOwnerId(), getOpenFirewall(), getLbProtocol(),
+                            getDefaultPortEnd(), getSourceIpAddressId(), getProtocol(), getAlgorithm(), getNetworkId(), getEntityOwnerId(), getOpenFirewall(),
+                            getLbProtocol(),
                             isDisplay(), getClientTimeout(), getServerTimeout());
             this.setEntityId(result.getId());
             this.setEntityUuid(result.getUuid());
