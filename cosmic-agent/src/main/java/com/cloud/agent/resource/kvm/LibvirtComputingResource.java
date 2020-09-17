@@ -1666,6 +1666,8 @@ public class LibvirtComputingResource extends AgentResourceBase implements Agent
                     disk.defBlockBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController());
                 } else if (pool.getType() == StoragePoolType.NetworkFilesystem) {
                     disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), volume.getDiskFormat());
+                } else {
+                    disk.defFileBasedDisk(physicalDisk.getPath(), devId, volume.getDiskController(), volume.getDiskFormat());
                 }
             }
 
