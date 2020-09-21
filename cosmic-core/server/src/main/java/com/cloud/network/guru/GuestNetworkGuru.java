@@ -373,7 +373,7 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
 
         s_logger.debug("Check if the gateway ip is requested");
         // Check if we can assign the gateway
-        if (nic.getIPv4Gateway().equals(nic.getRequestedIPv4())) {
+        if (nic.getIPv4Gateway() != null && nic.getIPv4Gateway().equals(nic.getRequestedIPv4())) {
             s_logger.debug("VM requests gateway ip address for network " + network.getName() + " with offering " + networkOffering.getName() + " . Check service offering");
 
             final boolean networkOfferingSupportsGatewayService = _networkOfferingServiceMapDao.areServicesSupportedByNetworkOffering(networkOfferingId, Service.Gateway);
