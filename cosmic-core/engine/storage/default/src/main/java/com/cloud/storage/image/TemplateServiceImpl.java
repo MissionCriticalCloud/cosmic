@@ -139,6 +139,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void createTemplateAsync(final TemplateInfo template, final DataStore store, final AsyncCompletionCallback<TemplateApiResult> callback) {
+        // remove old template_store_ref entry
+        store.delete(template);
         // persist template_store_ref entry
         final TemplateObject templateOnStore = (TemplateObject) store.create(template);
         // update template_store_ref and template state
