@@ -15,6 +15,7 @@ public class TemplateObjectTO implements DataTO {
     private String displayText;
     private DataStoreTO imageDataStore;
     private String name;
+    private String uniqueName;
     private String guestOsType;
     private Long size;
     private Long physicalSize;
@@ -25,7 +26,7 @@ public class TemplateObjectTO implements DataTO {
     }
 
     public TemplateObjectTO(final String path, final String origUrl, final String uuid, final long id, final ImageFormat format, final long accountId, final String checksum, final String
-            displayText, final DataStoreTO imageDataStore, final String name, final String guestOsType, final Long size, final Long physicalSize, final HypervisorType hypervisorType) {
+            displayText, final DataStoreTO imageDataStore, final String name, final String uniqueName, final String guestOsType, final Long size, final Long physicalSize, final HypervisorType hypervisorType) {
         this.path = path;
         this.origUrl = origUrl;
         this.uuid = uuid;
@@ -36,6 +37,7 @@ public class TemplateObjectTO implements DataTO {
         this.displayText = displayText;
         this.imageDataStore = imageDataStore;
         this.name = name;
+        this.uniqueName = uniqueName;
         this.guestOsType = guestOsType;
         this.size = size;
         this.physicalSize = physicalSize;
@@ -130,8 +132,16 @@ public class TemplateObjectTO implements DataTO {
         return name;
     }
 
+    public String getUniqueName() {
+        return uniqueName;
+    }
+
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public void setUniqueName(final String uniqueName) {
+        this.uniqueName = uniqueName;
     }
 
     public String getOrigUrl() {

@@ -404,12 +404,12 @@ public class TemplateObject implements TemplateInfo {
         }
         if (dataStore == null) {
             to = new TemplateObjectTO(this.getInstallPath(), this.getUrl(), this.getUuid(), this.getId(), this.getFormat(), this.getAccountId(), this.getChecksum(), this.getDisplayText(),
-                    dataStoreTO, this.getName(), null, null, null, this.getHypervisorType());
+                    dataStoreTO, this.getName(), this.getUniqueName(), null, null, null, this.getHypervisorType());
         } else {
             to = dataStore.getDriver().getTO(this);
             if (to == null) {
                 to = new TemplateObjectTO(this.getInstallPath(), this.getUrl(), this.getUuid(), this.getId(), this.getFormat(), this.getAccountId(), this.getChecksum(), this.getDisplayText(),
-                        dataStoreTO, this.getName(), null, null, null, this.getHypervisorType());
+                        dataStoreTO, this.getName(), this.getUniqueName(), null, null, null, this.getHypervisorType());
             }
         }
 
