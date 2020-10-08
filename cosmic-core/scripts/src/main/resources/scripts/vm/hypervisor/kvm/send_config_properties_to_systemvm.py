@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 # This script connects to the system vm Qemu Guest Agent and writes the
 # authorized_keys and cmdline data to /var/cache/cloud. The system VM then
@@ -27,7 +27,7 @@ FILE_READ = """{"execute":"guest-file-read", "arguments":{"handle":%s,"count":%s
 
 def EXE(param):
     cmd = """virsh qemu-agent-command %s '%s' """ % (arguments.name, param)
-    print "Exe command:%s" % cmd
+    print("Exe command:%s" % cmd)
     stream = os.popen(cmd).read()
     return None if not stream else json.loads(stream)
 
@@ -37,10 +37,10 @@ def write_guest_file(path, content):
     try:
         file_handle = EXE(FILE_OPEN_WRITE % path)["return"]
         write_count = EXE(FILE_WRITE % (file_handle, content))["return"]["count"]
-        print "Write count: " + str(write_count)
+        print("Write count: " + str(write_count))
     except Exception as ex:
-        print Exception, ":", ex
-        print "ERROR: Something went wrong, exiting."
+        print(Exception, ":", ex)
+        print("ERROR: Something went wrong, exiting.")
         sys.exit(1)
     finally:
         if file_handle > -1:
@@ -53,11 +53,11 @@ def read_guest_file(path, write_count):
         file_handle = EXE(FILE_OPEN_READ % path)["return"]
         result = EXE(FILE_READ % (file_handle, write_count))
         read_count = result["return"]["count"]
-        print "Read count: " + str(read_count)
-        print "Content from read-back: " + base64.b64decode(result["return"]["buf-b64"])
+        print("Read count: " + str(read_count))
+        print("Content from read-back: " + base64.b64decode(result["return"]["buf-b64"]))
     except Exception as ex:
-        print Exception, ":", ex
-        print "ERROR: Something went wrong, exiting."
+        print(Exception, ":", ex)
+        print("ERROR: Something went wrong, exiting.")
         sys.exit(1)
     finally:
         if file_handle > -1:
@@ -66,16 +66,16 @@ def read_guest_file(path, write_count):
 
 def get_key(key_file):
     if not os.path.exists(key_file):
-        print("ERROR: ssh public key not found on host at {0}".format(key_file))
-        print "ERROR: Something went wrong, exiting."
+        print(("ERROR: ssh public key not found on host at {0}".format(key_file)))
+        print("ERROR: Something went wrong, exiting.")
         sys.exit(1)
 
     try:
         with open(key_file, "r") as f:
             pub_key = f.read()
     except IOError as e:
-        print("ERROR: unable to open {0} - {1}".format(key_file, e.strerror))
-        print "ERROR: Something went wrong, exiting."
+        print(("ERROR: unable to open {0} - {1}".format(key_file, e.strerror)))
+        print("ERROR: Something went wrong, exiting.")
         sys.exit(1)
 
     return pub_key
@@ -87,15 +87,15 @@ def write_file(file_in_vm, data):
         write_count = write_guest_file(file_in_vm, content)
         return write_count
     except Exception as ex:
-        print "Warning: it was not possible to write to the Qemu Guest Agent at this time. Will try again later."
+        print("Warning: it was not possible to write to the Qemu Guest Agent at this time. Will try again later.")
 
 
 def compare_write_read(file, write_count, read_count):
-    print "Result for %s: write %d read %d" % (file, write_count, read_count)
+    print("Result for %s: write %d read %d" % (file, write_count, read_count))
     if write_count != read_count:
-        print "ERROR: Write count count doesn't match read count. File wasn't written successfully. Aborting."
+        print("ERROR: Write count count doesn't match read count. File wasn't written successfully. Aborting.")
         sys.exit(1)
-    print "All fine for %s, read count matches write count." % (file)
+    print("All fine for %s, read count matches write count." % (file))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Send configuration to system VM socket")
