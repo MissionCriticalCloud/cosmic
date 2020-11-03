@@ -54,7 +54,7 @@ public class DownloadCommand extends AbstractDownloadCommand implements Internal
 
     public DownloadCommand(final TemplateObjectTO template, final Long maxDownloadSizeInBytes) {
 
-        super(template.getName(), template.getOrigUrl(), template.getFormat(), template.getAccountId());
+        super(template.getUniqueName(), template.getOrigUrl(), template.getFormat(), template.getAccountId());
         _store = template.getDataStore();
         installPath = template.getPath();
         checksum = template.getChecksum();

@@ -365,7 +365,7 @@ public class NfsSecondaryStorageResource extends AgentResourceBase implements Se
                 ) {
                     // KVM didn't change template unique name, just used the template name passed from orchestration layer, so no need
                     // to send template name back.
-                    bufferWriter.write("uniquename=" + destData.getName());
+                    bufferWriter.write("uniquename=" + destData.getUniqueName());
                     bufferWriter.write("\n");
                     bufferWriter.write("filename=" + fileName);
                     bufferWriter.write("\n");
