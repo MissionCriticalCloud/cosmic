@@ -83,7 +83,8 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setCapabilities(host.getCapabilities());
         hostResponse.setClusterId(host.getClusterUuid());
         hostResponse.setCpuSockets(host.getCpuSockets());
-        hostResponse.setCpuNumber(host.getCpus());
+        hostResponse.setCpuNumber(host.getCpusWithoutHyperThreading());
+        hostResponse.setCpuNumberHyperThreading(host.getCpus());
         hostResponse.setZoneId(host.getZoneUuid());
         hostResponse.setDisconnectedOn(host.getDisconnectedOn());
         hostResponse.setHypervisor(host.getHypervisorType());
@@ -277,7 +278,8 @@ public class HostJoinDaoImpl extends GenericDaoBase<HostJoinVO, Long> implements
         hostResponse.setId(host.getUuid());
         hostResponse.setCapabilities(host.getCapabilities());
         hostResponse.setClusterId(host.getClusterUuid());
-        hostResponse.setCpuNumber(host.getCpus());
+        hostResponse.setCpuNumber(host.getCpusWithoutHyperThreading());
+        hostResponse.setCpuNumberHyperThreading(host.getCpus());
         hostResponse.setZoneId(host.getZoneUuid());
         hostResponse.setDisconnectedOn(host.getDisconnectedOn());
         hostResponse.setHypervisor(host.getHypervisorType());

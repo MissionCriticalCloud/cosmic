@@ -75,6 +75,10 @@ public class HostForMigrationResponse extends BaseResponse {
     @Param(description = "the CPU number of the host")
     private Integer cpuNumber;
 
+    @SerializedName("cpunumberht")
+    @Param(description = "the CPU number of the host including Hyper-Threading")
+    private Integer cpuNumberHyperThreading;
+
     @SerializedName("cpuallocated")
     @Param(description = "the amount of the host's CPU currently allocated")
     private String cpuAllocated;
@@ -283,6 +287,10 @@ public class HostForMigrationResponse extends BaseResponse {
 
     public void setCpuNumber(final Integer cpuNumber) {
         this.cpuNumber = cpuNumber;
+    }
+
+    public void setCpuNumberHyperThreading(Integer cpuNumberHyperThreading) {
+        this.cpuNumberHyperThreading = cpuNumberHyperThreading;
     }
 
     public String getCpuAllocated() {

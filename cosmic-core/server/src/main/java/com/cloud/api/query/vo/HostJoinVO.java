@@ -4,9 +4,11 @@ import com.cloud.legacymodel.Identity;
 import com.cloud.legacymodel.InternalIdentity;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.dc.HostStatus;
+import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.model.enumeration.HypervisorType;
+import com.cloud.storage.Snapshot;
 import com.cloud.utils.db.GenericDao;
 
 import javax.persistence.Column;
@@ -373,6 +375,14 @@ public class HostJoinVO extends BaseViewVO implements InternalIdentity, Identity
 
     public Integer getCpus() {
         return cpus;
+    }
+
+    public Integer getCpusWithoutHyperThreading() {
+        try {
+            return cpus / 2;
+        } catch (final NullPointerException e) {
+            return cpus;
+        }
     }
 
     public long getTotalMemory() {
