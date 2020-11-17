@@ -5,13 +5,13 @@
     <parent>
         <groupId>cloud.cosmic</groupId>
         <artifactId>cosmic</artifactId>
-        <version>6.9.4-SNAPSHOT</version>
+        <version>6.9.4</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>cloud.cosmic</groupId>
             <artifactId>cosmic-model</artifactId>
-            <version>6.9.4-SNAPSHOT</version>
+            <version>6.9.4</version>
         </dependency>
 
         <dependency>
