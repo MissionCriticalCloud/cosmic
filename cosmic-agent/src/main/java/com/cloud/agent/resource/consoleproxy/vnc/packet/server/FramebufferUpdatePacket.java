@@ -1,9 +1,9 @@
-package com.cloud.consoleproxy.vnc.packet.server;
+package com.cloud.agent.resource.consoleproxy.vnc.packet.server;
 
+import com.cloud.agent.resource.consoleproxy.vnc.BufferedImageCanvas;
+import com.cloud.agent.resource.consoleproxy.vnc.VncScreenDescription;
+import com.cloud.agent.resource.consoleproxy.vnc.RfbConstants;
 import com.cloud.agent.resource.consoleproxy.ConsoleProxyClientListener;
-import com.cloud.consoleproxy.vnc.BufferedImageCanvas;
-import com.cloud.consoleproxy.vnc.RfbConstants;
-import com.cloud.consoleproxy.vnc.VncScreenDescription;
 
 import java.io.DataInputStream;
 import java.io.IOException;

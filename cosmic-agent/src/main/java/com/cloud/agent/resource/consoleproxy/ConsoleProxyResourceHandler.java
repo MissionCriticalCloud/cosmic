@@ -1,5 +1,7 @@
 package com.cloud.agent.resource.consoleproxy;
 
+import static com.cloud.utils.security.SecurityHeaders.addSecurityHeaders;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -81,7 +83,7 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
                 s_logger.info("Resource access is forbidden, uri: " + path);
             }
             final Headers hds = t.getResponseHeaders();
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(403, -1);     // forbidden
             return;
         }
@@ -95,7 +97,7 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
                 if (d + 1000 >= lastModified) {
                     final Headers hds = t.getResponseHeaders();
                     hds.set("Content-Type", contentType);
-                    hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+                    addSecurityHeaders(hds);
                     t.sendResponseHeaders(304, -1);
 
                     if (s_logger.isInfoEnabled()) {
@@ -109,7 +111,7 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
             final Headers hds = t.getResponseHeaders();
             hds.set("Content-Type", contentType);
             hds.set("Last-Modified", new Date(lastModified).toGMTString());
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(200, length);
             responseFileContent(t, f);
 
@@ -121,7 +123,7 @@ public class ConsoleProxyResourceHandler implements HttpHandler {
                 s_logger.info("file does not exist" + path);
             }
             final Headers hds = t.getResponseHeaders();
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(404, -1);
         }
     }

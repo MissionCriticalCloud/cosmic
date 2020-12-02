@@ -1,6 +1,6 @@
-package com.cloud.consoleproxy.vnc.packet.client;
+package com.cloud.agent.resource.consoleproxy.vnc.packet.client;
 
-import com.cloud.consoleproxy.vnc.RfbConstants;
+import com.cloud.agent.resource.consoleproxy.vnc.RfbConstants;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

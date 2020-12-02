@@ -1,5 +1,7 @@
 package com.cloud.servlet;
 
+import static com.cloud.utils.security.SecurityHeaders.addSecurityHeaders;
+
 import com.cloud.dao.EntityManager;
 import com.cloud.framework.security.keys.KeysManager;
 import com.cloud.host.HostVO;
@@ -188,7 +190,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         String account = null;
         Account accountObj = null;
 
-        resp.addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        addSecurityHeaders(resp);
 
         final Map<String, Object[]> params = new HashMap<>();
         params.putAll(req.getParameterMap());
@@ -304,7 +306,7 @@ public class ConsoleProxyServlet extends HttpServlet {
         }
 
         try {
-            resp.addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(resp);
             resp.sendRedirect(composeThumbnailUrl(rootUrl, vm, host, w, h));
         } catch (final IOException e) {
             s_logger.info("Client may already close the connection", e);
@@ -499,7 +501,7 @@ public class ConsoleProxyServlet extends HttpServlet {
     private void sendResponse(final HttpServletResponse resp, final String content) {
         try {
             resp.setContentType("text/html");
-            resp.addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(resp);
             resp.getWriter().print(content);
         } catch (final IOException e) {
             s_logger.info("Client may already close the connection", e);

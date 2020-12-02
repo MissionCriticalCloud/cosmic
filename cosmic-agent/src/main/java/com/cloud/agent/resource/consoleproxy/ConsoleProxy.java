@@ -1,7 +1,11 @@
 package com.cloud.agent.resource.consoleproxy;
 
+import static com.cloud.utils.security.SecurityHeaders.addSecurityHeaders;
+
 import com.cloud.utils.PropertiesUtil;
 import com.google.gson.Gson;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -17,6 +21,7 @@ import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
@@ -222,13 +227,10 @@ public class ConsoleProxy {
         try {
             final Class<?> clz = Class.forName(factoryClzName);
             try {
-                final ConsoleProxyServerFactory factory = (ConsoleProxyServerFactory) clz.newInstance();
+                final ConsoleProxyServerFactory factory = (ConsoleProxyServerFactory) clz.getDeclaredConstructor().newInstance();
                 factory.init(ConsoleProxy.ksBits, ConsoleProxy.ksPassword);
                 return factory;
-            } catch (final InstantiationException e) {
-                s_logger.error(e.getMessage(), e);
-                return null;
-            } catch (final IllegalAccessException e) {
+            } catch (final InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 s_logger.error(e.getMessage(), e);
                 return null;
             }

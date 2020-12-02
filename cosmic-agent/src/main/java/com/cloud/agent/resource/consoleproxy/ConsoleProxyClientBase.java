@@ -1,8 +1,8 @@
 package com.cloud.agent.resource.consoleproxy;
 
-import com.cloud.consoleproxy.util.TileInfo;
-import com.cloud.consoleproxy.util.TileTracker;
-import com.cloud.consoleproxy.vnc.FrameBufferCanvas;
+import com.cloud.agent.resource.consoleproxy.util.TileInfo;
+import com.cloud.agent.resource.consoleproxy.util.TileTracker;
+import com.cloud.agent.resource.consoleproxy.vnc.FrameBufferCanvas;
 
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -344,7 +344,7 @@ public abstract class ConsoleProxyClientBase implements ConsoleProxyClient, Cons
                         "<span id=\"light\" class=\"dark\" cmd=\"toggle_logwin\"></span>", "</div>", "<div id=\"main_panel\" tabindex=\"1\"></div>",
                         "<script language=\"javascript\">", "var acceptLanguages = '" + sbLanguages.toString() + "';", "var tileMap = [ " + tileSequence + " ];",
                         "var ajaxViewer = new AjaxViewer('main_panel', '" + imgUrl + "', '" + updateUrl + "', '" + locale + "', '" + guest + "', tileMap, ",
-                        String.valueOf(width) + ", " + String.valueOf(height) + ", " + String.valueOf(tileWidth) + ", " + String.valueOf(tileHeight) + ");",
+                        width + ", " + height + ", " + tileWidth + ", " + tileHeight + ");",
 
                         "$(function() {", "ajaxViewer.start();", "});",
 

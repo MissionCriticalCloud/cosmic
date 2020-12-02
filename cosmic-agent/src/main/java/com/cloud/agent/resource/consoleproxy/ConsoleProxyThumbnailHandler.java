@@ -1,5 +1,7 @@
 package com.cloud.agent.resource.consoleproxy;
 
+import static com.cloud.utils.security.SecurityHeaders.addSecurityHeaders;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -60,7 +62,7 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
             final String response = "Bad query string";
             s_logger.error(response + ", request URI : " + t.getRequestURI());
             final Headers hds = t.getResponseHeaders();
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(200, response.length());
             final OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
@@ -122,7 +124,7 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
             hds.set("Content-Type", "image/jpeg");
             hds.set("Cache-Control", "no-cache");
             hds.set("Cache-Control", "no-store");
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(200, bs.length);
             final OutputStream os = t.getResponseBody();
             os.write(bs);
@@ -145,7 +147,7 @@ public class ConsoleProxyThumbnailHandler implements HttpHandler {
         hds.set("Content-Type", "image/jpeg");
         hds.set("Cache-Control", "no-cache");
         hds.set("Cache-Control", "no-store");
-        hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        addSecurityHeaders(hds);
         t.sendResponseHeaders(200, bs.length);
         final OutputStream os = t.getResponseBody();
         os.write(bs);
