@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.vnc;
+package com.cloud.agent.resource.consoleproxy.vnc;
 
 /**
  * VncScreenDescription - contains information about remote VNC screen.

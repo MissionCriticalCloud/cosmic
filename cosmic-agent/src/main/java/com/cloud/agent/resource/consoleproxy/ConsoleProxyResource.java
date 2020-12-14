@@ -15,8 +15,10 @@ import com.cloud.legacymodel.communication.command.PingCommand;
 import com.cloud.legacymodel.communication.command.ReadyCommand;
 import com.cloud.legacymodel.communication.command.StartConsoleProxyAgentHttpHandlerCommand;
 import com.cloud.legacymodel.communication.command.WatchConsoleProxyLoadCommand;
+import com.cloud.legacymodel.communication.command.agentcontrol.ConsoleProxyLoadReportCommand;
 import com.cloud.legacymodel.communication.command.startup.StartupCommand;
 import com.cloud.legacymodel.communication.command.startup.StartupProxyCommand;
+import com.cloud.legacymodel.exceptions.AgentControlChannelException;
 import com.cloud.model.enumeration.ExitStatus;
 import com.cloud.model.enumeration.HostType;
 import com.cloud.utils.NumbersUtil;
@@ -298,5 +300,22 @@ public class ConsoleProxyResource extends AgentResourceBase implements AgentReso
 
     @Override
     public void setName(final String name) {
+    }
+
+    public void reportLoadInfo(String gsonLoadInfo) {
+        ConsoleProxyLoadReportCommand cmd = new ConsoleProxyLoadReportCommand(_proxyVmId, gsonLoadInfo);
+        try {
+            getAgentControl().postRequest(cmd);
+
+            if (s_logger.isDebugEnabled())
+                s_logger.debug("Report proxy load info, proxy : " + _proxyVmId + ", load: " + gsonLoadInfo);
+        } catch (AgentControlChannelException e) {
+            s_logger.error("Unable to send out load info due to " + e.getMessage(), e);
+        }
+    }
+
+    public String ensureRoute(String address) {
+        // Unused
+        return null;
     }
 }

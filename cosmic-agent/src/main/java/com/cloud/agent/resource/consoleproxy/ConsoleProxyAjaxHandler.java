@@ -1,6 +1,7 @@
 package com.cloud.agent.resource.consoleproxy;
 
 import static com.cloud.utils.AutoCloseableUtil.closeAutoCloseable;
+import static com.cloud.utils.security.SecurityHeaders.addSecurityHeaders;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
         } catch (final IllegalArgumentException e) {
             s_logger.warn("Exception, ", e);
             final Headers hds = t.getResponseHeaders();
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(400, -1);     // bad request
         } finally {
             t.close();
@@ -209,7 +210,7 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
     private void sendResponse(final HttpExchange t, final String contentType, final String response) throws IOException {
         final Headers hds = t.getResponseHeaders();
         hds.set("Content-Type", contentType);
-        hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        addSecurityHeaders(hds);
 
         t.sendResponseHeaders(200, response.length());
         final OutputStream os = t.getResponseBody();
@@ -389,7 +390,7 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
     private void handleClientKickoff(final HttpExchange t, final ConsoleProxyClient viewer) throws IOException {
         final String response = viewer.onAjaxClientKickoff();
         final Headers hds = t.getResponseHeaders();
-        hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        addSecurityHeaders(hds);
         t.sendResponseHeaders(200, response.length());
         final OutputStream os = t.getResponseBody();
         try {
@@ -407,7 +408,7 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
         hds.set("Content-Type", "text/html");
         hds.set("Cache-Control", "no-cache");
         hds.set("Cache-Control", "no-store");
-        hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        addSecurityHeaders(hds);
         t.sendResponseHeaders(200, response.length());
 
         final OutputStream os = t.getResponseBody();
@@ -423,7 +424,7 @@ public class ConsoleProxyAjaxHandler implements HttpHandler {
 
         final Headers hds = t.getResponseHeaders();
         hds.set("Content-Type", "text/javascript");
-        hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+        addSecurityHeaders(hds);
         t.sendResponseHeaders(200, response.length());
 
         final OutputStream os = t.getResponseBody();

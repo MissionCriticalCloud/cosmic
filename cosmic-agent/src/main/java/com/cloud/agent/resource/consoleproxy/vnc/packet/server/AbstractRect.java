@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.vnc.packet.server;
+package com.cloud.agent.resource.consoleproxy.vnc.packet.server;
 
 public abstract class AbstractRect implements Rect {
 

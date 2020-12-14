@@ -1,5 +1,7 @@
 package com.cloud.agent.resource.consoleproxy;
 
+import static com.cloud.utils.security.SecurityHeaders.addSecurityHeaders;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -34,7 +36,7 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
         } catch (final IllegalArgumentException e) {
             s_logger.warn("Exception, ", e);
             final Headers hds = t.getResponseHeaders();
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(400, -1);     // bad request
         } finally {
             t.close();
@@ -115,7 +117,7 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
             hds.set("Content-Type", "image/jpeg");
             hds.set("Cache-Control", "no-cache");
             hds.set("Cache-Control", "no-store");
-            hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+            addSecurityHeaders(hds);
             t.sendResponseHeaders(200, bs.length);
             final OutputStream os = t.getResponseBody();
             os.write(bs);
@@ -127,7 +129,7 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
             if (img != null) {
                 final Headers hds = t.getResponseHeaders();
                 hds.set("Content-Type", "image/jpeg");
-                hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+                addSecurityHeaders(hds);
                 t.sendResponseHeaders(200, img.length);
 
                 final OutputStream os = t.getResponseBody();
@@ -141,7 +143,7 @@ public class ConsoleProxyAjaxImageHandler implements HttpHandler {
                     s_logger.info("Image has already been swept out, key: " + key);
                 }
                 final Headers hds = t.getResponseHeaders();
-                hds.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+                addSecurityHeaders(hds);
                 t.sendResponseHeaders(404, -1);
             }
         }

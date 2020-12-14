@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.util;
+package com.cloud.agent.resource.consoleproxy.util;
 
 import java.awt.Rectangle;
 import java.util.List;

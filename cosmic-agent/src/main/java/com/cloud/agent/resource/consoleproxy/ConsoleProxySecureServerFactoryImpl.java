@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsConfigurator;
@@ -50,7 +52,12 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
                 tmf.init(ks);
                 s_logger.info("Trust manager factory is initialized");
 
-                this.sslContext = SSLContext.getInstance("TLSv1.2");
+                try {
+                    this.sslContext = SSLContext.getInstance("TLSv1.3");
+                } catch (NoSuchAlgorithmException e) {
+                    s_logger.warn("TLSv1.3 not available, initializing TLSv1.2");
+                    this.sslContext = SSLContext.getInstance("TLSv1.2");
+                }
                 this.sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
                 s_logger.info("SSL context is initialized");
             } catch (final Exception e) {
@@ -74,6 +81,8 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
                     params.setSSLParameters(sslparams);
                     params.setProtocols(SSLUtils.getRecommendedProtocols());
                     params.setCipherSuites(SSLUtils.getRecommendedCiphers());
+                    s_logger.debug("SSL Recommended protocols: " + Arrays.toString(params.getProtocols()));
+                    s_logger.debug("SSL Recommended ciphers: " + Arrays.toString(params.getCipherSuites()));
                     // statement above could throw IAE if any params invalid.
                     // eg. if app has a UI and parameters supplied by a user.
                 }
@@ -94,6 +103,9 @@ public class ConsoleProxySecureServerFactoryImpl implements ConsoleProxyServerFa
             final SSLServerSocket srvSock = (SSLServerSocket) ssf.createServerSocket(port);
             srvSock.setEnabledProtocols(SSLUtils.getRecommendedProtocols());
             srvSock.setEnabledCipherSuites(SSLUtils.getRecommendedCiphers());
+
+            s_logger.debug("SSL Recommended protocols: " + Arrays.toString(srvSock.getEnabledProtocols()));
+            s_logger.debug("SSL Recommended ciphers: " + Arrays.toString(srvSock.getEnabledCipherSuites()));
 
             s_logger.info("create SSL server socket on port: " + port);
             return srvSock;

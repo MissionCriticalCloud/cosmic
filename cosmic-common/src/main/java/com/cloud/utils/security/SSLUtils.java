@@ -16,12 +16,12 @@ public class SSLUtils {
     public static String[] getSupportedProtocols(final String[] protocols) {
         final Set<String> set = new HashSet<>();
         for (final String s : protocols) {
-            if (s.equals("SSLv3") || s.equals("SSLv2Hello")) {
+            if (s.equals("SSLv3") || s.equals("SSLv2Hello") || s.equals("TLSv1") || s.equals("TLSv1.1")) {
                 continue;
             }
             set.add(s);
         }
-        return (String[]) set.toArray(new String[set.size()]);
+        return set.toArray(new String[0]);
     }
 
     public static String[] getSupportedCiphers() throws NoSuchAlgorithmException {
@@ -31,22 +31,33 @@ public class SSLUtils {
     }
 
     public static SSLContext getSSLContext() throws NoSuchAlgorithmException {
-        return SSLContext.getInstance("TLSv1.2");
+        try {
+            return SSLContext.getInstance("TLSv1.3");
+        } catch (NoSuchAlgorithmException e) {
+            return SSLContext.getInstance("TLSv1.2");
+        }
     }
 
     public static SSLContext getSSLContext(final String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
-        return SSLContext.getInstance("TLSv1.2", provider);
+        try {
+            return SSLContext.getInstance("TLSv1.3", provider);
+        } catch (NoSuchAlgorithmException e) {
+            return SSLContext.getInstance("TLSv1.2", provider);
+        }
     }
 
     public static String[] getRecommendedProtocols() {
-        return new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" };
+        return new String[] { "TLSv1.3", "TLSv1.2" };
     }
 
     public static String[] getRecommendedCiphers() {
-        return new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
-                "TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-                "TLS_DHE_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA", "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-                "TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_RSA_WITH_AES_256_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384" };
-
-        }
+        return new String[]{
+                "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+                "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+                "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256"
+        };
+    }
 }

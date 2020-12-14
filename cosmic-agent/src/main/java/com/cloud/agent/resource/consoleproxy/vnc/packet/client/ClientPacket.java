@@ -1,4 +1,4 @@
-package com.cloud.consoleproxy.vnc.packet.client;
+package com.cloud.agent.resource.consoleproxy.vnc.packet.client;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
