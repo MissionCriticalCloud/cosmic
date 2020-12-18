@@ -58,6 +58,7 @@ public class NioClient extends NioConnection {
             sslEngine = sslContext.createSSLEngine(_host, _port);
             sslEngine.setUseClientMode(true);
             sslEngine.setEnabledProtocols(SSLUtils.getSupportedProtocols(sslEngine.getEnabledProtocols()));
+            sslEngine.beginHandshake();
 
             Link.doHandshake(_clientConnection, sslEngine, true);
             s_logger.info("SSL: Handshake done");

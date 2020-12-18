@@ -6,6 +6,7 @@ import com.cloud.utils.db.TransactionLegacy;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import java.security.Security;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,6 +16,11 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class CloudStartupServlet extends HttpServlet {
     public static final Logger s_logger = LoggerFactory.getLogger(CloudStartupServlet.class.getName());
+
+    static {
+        Security.setProperty("jdk.tls.disabledAlgorithms", "SSLv3, TLSv1, TLSv1.1");
+        Security.setProperty("jdk.tls.ephemeralDHKeySize", "2048");
+    }
 
     Timer _timer = new Timer();
 
