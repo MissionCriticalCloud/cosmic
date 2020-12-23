@@ -901,6 +901,10 @@ public class NetworkServiceImpl extends ManagerBase implements NetworkService {
             ip6Gateway = NetUtils.getCidrHostAddress6(ip6Cidr);
         }
 
+        if (ntwkOff.getGuestType() == GuestType.Private && (dns1 != null || dns2 != null)) {
+            throw new InvalidParameterValueException("Network of type Private does not support setting DNS servers");
+        }
+
         Network network = commitNetwork(networkOfferingId, gateway, startIP, endIP, netmask, networkDomain, vlanId, name, displayText, caller, physicalNetworkId, zoneId, domainId,
                 isDomainSpecific, subdomainAccess, vpcId, startIPv6, endIPv6, ip6Gateway, ip6Cidr, displayNetwork, aclId, isolatedPvlan, ntwkOff, pNtwk, aclType, owner, cidr,
                 createVlan, dns1, dns2, ipExclusionList, getDhcpTftpServer, getDhcpBootfileName);

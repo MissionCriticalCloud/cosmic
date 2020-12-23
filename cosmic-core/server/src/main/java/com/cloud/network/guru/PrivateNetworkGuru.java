@@ -251,8 +251,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
             nic.setMacAddress(ip.getMacAddress());
         }
 
-        nic.setIPv4Dns1(dc.getDns1());
-        nic.setIPv4Dns2(dc.getDns2());
+        nic.setIPv4Dns1(null);
+        nic.setIPv4Dns2(null);
     }
 
     @Override
@@ -286,8 +286,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     public void updateNicProfile(final NicProfile profile, final Network network) {
         final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
         if (profile != null) {
-            profile.setIPv4Dns1(dc.getDns1());
-            profile.setIPv4Dns2(dc.getDns2());
+            profile.setIPv4Dns1(null);
+            profile.setIPv4Dns2(null);
         }
     }
 
@@ -304,8 +304,8 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
     @Override
     public void updateNetworkProfile(final NetworkProfile networkProfile) {
         final DataCenter dc = _entityMgr.findById(DataCenter.class, networkProfile.getDataCenterId());
-        networkProfile.setDns1(dc.getDns1());
-        networkProfile.setDns2(dc.getDns2());
+        networkProfile.setDns1(null);
+        networkProfile.setDns2(null);
     }
 
     @Override
