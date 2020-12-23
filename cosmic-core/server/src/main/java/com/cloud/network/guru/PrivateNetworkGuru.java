@@ -284,7 +284,6 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
 
     @Override
     public void updateNicProfile(final NicProfile profile, final Network network) {
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, network.getDataCenterId());
         if (profile != null) {
             profile.setIPv4Dns1(null);
             profile.setIPv4Dns2(null);
@@ -303,9 +302,6 @@ public class PrivateNetworkGuru extends AdapterBase implements NetworkGuru {
 
     @Override
     public void updateNetworkProfile(final NetworkProfile networkProfile) {
-        final DataCenter dc = _entityMgr.findById(DataCenter.class, networkProfile.getDataCenterId());
-        networkProfile.setDns1(null);
-        networkProfile.setDns2(null);
     }
 
     @Override
