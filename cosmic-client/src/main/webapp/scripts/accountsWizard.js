@@ -100,15 +100,18 @@
                     required: true
                 },
                 select: function (args) {
-                    var items = [];
-                    items.push({
+                    var items = [{
+                        //regular-user
                         id: 0,
                         description: "User"
-                    }); //regular-user
-                    items.push({
+                    },{
+                        //root-admin
                         id: 1,
                         description: "Admin"
-                    }); //root-admin
+                    },{
+                        id: 4,
+                        description: "ReadOnly-Admin"
+                    }];
                     args.response.success({
                         data: items
                     });
