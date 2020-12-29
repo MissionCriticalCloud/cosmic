@@ -19,6 +19,13 @@ class cosmicTestCase(unittest.TestCase):
     def getClsConfig(cls):
         return cls.config
 
+    @classmethod
+    def setUpClass(cls):
+        super(cosmicTestCase, cls).setUpClass()
+
+    def setUp(self):
+        super(cosmicTestCase, self).setUp()
+
     def tearDown(self):
         while self.clstestclient.getHaltOnFailure():
             time.sleep(0.2)
