@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +61,7 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
             throw new PermissionDeniedException("The API does not exist or is blacklisted. Role type=" + roleType.toString() + " is not allowed to request the api: " +
                     commandName);
         }
-        return isAllowed;
+        return true;
     }
 
     @Override
@@ -67,7 +69,11 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
         super.configure(name, params);
 
         for (final String commandPropertyFile : commandPropertyFiles) {
-            processMapping(PropertiesUtil.processConfigFile(new String[]{commandPropertyFile}));
+            Stream<Map.Entry<String, String>> stream = PropertiesUtil.processConfigFile(new String[]{commandPropertyFile}).entrySet().stream();
+            Map<String, Integer> props  = stream.collect(Collectors.toMap(
+               e -> String.valueOf(e.getKey()), e -> Integer.valueOf(e.getValue())
+            ));
+            processMapping(props);
         }
         return true;
     }
@@ -79,24 +85,21 @@ public class StaticRoleBasedAPIAccessChecker extends AdapterBase implements APIC
                 final APICommand command = clz.getAnnotation(APICommand.class);
                 for (final RoleType role : command.authorized()) {
                     final Set<String> commands = annotationRoleBasedApisMap.get(role);
-                    if (!commands.contains(command.name())) {
-                        commands.add(command.name());
-                    }
+                    commands.add(command.name());
                 }
             }
         }
         return super.start();
     }
 
-    private void processMapping(final Map<String, String> configMap) {
-        for (final Map.Entry<String, String> entry : configMap.entrySet()) {
+    private void processMapping(final Map<String, Integer> configMap) {
+        for (final Map.Entry<String, Integer> entry : configMap.entrySet()) {
             final String apiName = entry.getKey();
-            final String roleMask = entry.getValue();
+            final Integer roleMask = entry.getValue();
             commandsPropertiesOverrides.add(apiName);
             try {
-                final short cmdPermissions = Short.parseShort(roleMask);
                 for (final RoleType roleType : RoleType.values()) {
-                    if ((cmdPermissions & roleType.getValue()) != 0) {
+                    if ((roleMask & roleType.getValue()) != 0) {
                         commandsPropertiesRoleBasedApisMap.get(roleType).add(apiName);
                     }
                 }

@@ -1003,6 +1003,9 @@ public class AccountManagerImpl extends ManagerBase implements AccountManager, M
             case Account.ACCOUNT_TYPE_NORMAL:
                 roleType = RoleType.User;
                 break;
+            case Account.ACCOUNT_TYPE_READ_ONLY_ADMIN:
+                roleType = RoleType.ReadOnly;
+                break;
         }
         return roleType;
     }

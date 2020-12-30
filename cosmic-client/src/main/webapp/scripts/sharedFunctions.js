@@ -550,6 +550,8 @@ cloudStack.actionFilter = {
 var roleTypeUser = "0";
 var roleTypeAdmin = "1";
 var roleTypeDomainAdmin = "2";
+var roleTypeResourceDomainAdmin = "3";
+var roleTypeReadOnlyAdmin = "4";
 
 cloudStack.converters = {
     notConvert: function (value) {
@@ -674,12 +676,17 @@ cloudStack.converters = {
             return "Direct";
     },
     toRole: function (type) {
-        if (type == roleTypeUser) {
-            return "User";
-        } else if (type == roleTypeAdmin) {
-            return "Admin";
-        } else if (type == roleTypeDomainAdmin) {
-            return "Domain-Admin";
+        switch (String(type)) {
+            case roleTypeUser:
+                return "User";
+            case roleTypeAdmin:
+                return "Admin";
+            case roleTypeDomainAdmin:
+                return "Domain-Admin";
+            case roleTypeResourceDomainAdmin:
+                return "Resource-Admin";
+            case roleTypeReadOnlyAdmin:
+                return "Domain-Admin (RO)";
         }
     },
     toAlertType: function (alertCode) {

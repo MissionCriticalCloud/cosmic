@@ -49,10 +49,7 @@
                         add: {
                             label: 'label.add.account',
                             preFilter: function (args) {
-                                if (isAdmin() || isDomainAdmin())
-                                    return true;
-                                else
-                                    return false;
+                                return isAdmin() || isDomainAdmin();
                             },
                             messages: {
                                 notification: function (args) {
