@@ -1,5 +1,7 @@
 package com.cloud.agent.resource.kvm.wrapper;
 
+import static org.libvirt.flags.DomainSnapshotRevertFlags.*;
+
 import com.cloud.agent.resource.kvm.LibvirtComputingResource;
 import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
@@ -15,6 +17,7 @@ import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.DomainSnapshot;
 import org.libvirt.LibvirtException;
+import org.libvirt.flags.DomainSnapshotListFlags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +49,7 @@ public final class LibvirtRevertToVMSnapshotCommandWrapper extends LibvirtComman
                 return new RevertToVMSnapshotAnswer(cmd, false, "Cannot find vmSnapshot with name: " + cmd.getTarget().getSnapshotName());
             }
 
-            dm.revertToSnapshot(snapshot);
+            dm.revertToSnapshot(snapshot, VIR_DOMAIN_SNAPSHOT_REVERT_FORCE | VIR_DOMAIN_SNAPSHOT_REVERT_RUNNING);
             snapshot.free();
 
             if (!snapshotMemory) {
