@@ -2216,7 +2216,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         profile.setDns2(network.getDns2());
         profile.setDhcpTftpServer(network.getDhcpTftpServer());
         profile.setDhcpBootfileName(network.getDhcpBootfileName());
-        guru.updateNetworkProfile(profile);
 
         return profile;
     }

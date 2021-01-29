@@ -466,7 +466,6 @@ public abstract class GuestNetworkGuru extends AdapterBase implements NetworkGur
 
     @Override
     public void updateNetworkProfile(final NetworkProfile networkProfile) {
-        final DataCenter dc = _dcDao.findById(networkProfile.getDataCenterId());
         if (networkProfile.getDns1() != null && networkProfile.getDns1().equals("")) {
             networkProfile.setDns1(null);
         }
