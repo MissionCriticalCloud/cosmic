@@ -38,7 +38,7 @@ public final class LibvirtRestoreVMSnapshotCommandWrapper extends LibvirtCommand
             if (dm == null) {
                 return new RestoreVMSnapshotAnswer(cmd, false, "Restore VM Snapshot Failed due to can not find vm: " + vmName);
             }
-            final String xmlDesc = dm.getXMLDesc(0);
+            final String xmlDesc = dm.getXMLDesc(8);
 
             final List<VMSnapshotTO> snapshots = cmd.getSnapshots();
             final Map<Long, VMSnapshotTO> snapshotAndParents = cmd.getSnapshotAndParents();
