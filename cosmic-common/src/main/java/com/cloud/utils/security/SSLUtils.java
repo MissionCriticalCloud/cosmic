@@ -16,7 +16,7 @@ public class SSLUtils {
     public static String[] getSupportedProtocols(final String[] protocols) {
         final Set<String> set = new HashSet<>();
         for (final String s : protocols) {
-            if (s.equals("SSLv3") || s.equals("SSLv2Hello") || s.equals("TLSv1") || s.equals("TLSv1.1")) {
+            if (s.equals("SSLv3") || s.equals("SSLv2Hello") || s.equals("TLSv1") || s.equals("TLSv1.1") || s.equals("TLSv1.3")) {
                 continue;
             }
             set.add(s);
@@ -31,23 +31,15 @@ public class SSLUtils {
     }
 
     public static SSLContext getSSLContext() throws NoSuchAlgorithmException {
-        try {
-            return SSLContext.getInstance("TLSv1.3");
-        } catch (NoSuchAlgorithmException e) {
-            return SSLContext.getInstance("TLSv1.2");
-        }
+        return SSLContext.getInstance("TLSv1.2");
     }
 
     public static SSLContext getSSLContext(final String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
-        try {
-            return SSLContext.getInstance("TLSv1.3", provider);
-        } catch (NoSuchAlgorithmException e) {
-            return SSLContext.getInstance("TLSv1.2", provider);
-        }
+        return SSLContext.getInstance("TLSv1.2", provider);
     }
 
     public static String[] getRecommendedProtocols() {
-        return new String[] { "TLSv1.3", "TLSv1.2" };
+        return new String[] { "TLSv1.2" };
     }
 
     public static String[] getRecommendedCiphers() {
