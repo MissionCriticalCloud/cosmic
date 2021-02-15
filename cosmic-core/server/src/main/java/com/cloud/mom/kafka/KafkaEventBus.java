@@ -29,7 +29,8 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
     @Inject
     public VMInstanceDao _vmDao;
 
-    private String defaultTopic = "cosmic";
+    private static final String DEFAULT_TOPIC = "cosmic";
+    private String _topic = DEFAULT_TOPIC;
     private Producer<String,String> _producer;
     private static final Logger s_logger = LoggerFactory.getLogger(KafkaEventBus.class);
     @Override
@@ -40,13 +41,18 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
         try {
             final FileInputStream is = new FileInputStream(PropertiesUtil.findConfigFile("kafka.producer.properties"));
             props.load(is);
+
+            _topic = (String) props.remove("topic");
+            if (_topic == null) {
+                _topic = DEFAULT_TOPIC;
+            }
+
             is.close();
         } catch (Exception e) {
             // Fallback to default properties
             props.setProperty("bootstrap.servers", "192.168.22.1:9092");
             props.setProperty("acks", "all");
             props.setProperty("retries", "1");
-            props.setProperty("topic", "cosmic");
             props.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
             props.setProperty("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         }
@@ -75,13 +81,7 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
 
     @Override
     public void publish(Event event) throws EventBusException {
-
-        String topic = getDefaultTopic();
-        if (event.getTopic() != null) {
-            topic = event.getTopic();
-        }
-
-        ProducerRecord<String, String> record = new ProducerRecord<String,String>(topic, event.getResourceUUID(), event.getDescription());
+        ProducerRecord<String, String> record = new ProducerRecord<String,String>(_topic, event.getResourceUUID(), event.getDescription());
         _producer.send(record);
     }
 
@@ -98,9 +98,5 @@ public class KafkaEventBus extends ManagerBase implements EventBus {
     @Override
     public boolean stop() {
         return true;
-    }
-
-    public String getDefaultTopic() {
-        return defaultTopic;
     }
 }
