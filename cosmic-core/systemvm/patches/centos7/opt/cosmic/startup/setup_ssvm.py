@@ -83,7 +83,6 @@ class SecondaryStorageVM:
         vhost = """
 server {
     listen       %s:80;
-    listen       %s:443 ssl;
     server_name  _;
     root         /var/www/html;
 
@@ -93,7 +92,7 @@ server {
         autoindex off;
     }
 }
-""" % (self.cmdline["publicip"], self.cmdline["publicip"])
+""" % (self.cmdline["publicip"])
 
         filename = "/etc/nginx/conf.d/vhost-%s.conf" % (self.cmdline["publicip"])
 
