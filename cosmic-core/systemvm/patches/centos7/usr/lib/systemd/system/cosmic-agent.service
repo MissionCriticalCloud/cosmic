@@ -9,7 +9,7 @@ Environment=JAVA_HEAP_INITIAL=256m
 Environment=JAVA_HEAP_MAX=2048m
 WorkingDirectory=/opt/cosmic/agent/
 ExecStart=/bin/sh -ec '\
-    ${JAVA_HOME}/bin/java -Xms${JAVA_HEAP_INITIAL} -Xmx${JAVA_HEAP_MAX} ${JAVA_REMOTE_DEBUG} -jar /opt/cosmic/agent/cloud-agent-*.jar'
+    ${JAVA_HOME}/bin/java -Djdk.tls.acknowledgeCloseNotify=true -Xms${JAVA_HEAP_INITIAL} -Xmx${JAVA_HEAP_MAX} ${JAVA_REMOTE_DEBUG} -jar /opt/cosmic/agent/cloud-agent-*.jar'
 Restart=always
 RestartSec=10s
 SuccessExitStatus=143
