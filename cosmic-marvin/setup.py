@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '6.9.9-SNAPSHOT'
+VERSION = '6.9.10-SNAPSHOT'
 
 setup(
     name='Marvin',
