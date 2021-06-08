@@ -604,13 +604,12 @@ public class ConfigurationManagerTest {
         Mockito.when(hostPodVO.getDataCenterId()).thenReturn(new Random().nextLong());
         Mockito.when(_podDao.findById(anyLong())).thenReturn(hostPodVO);
 
-        final VMInstanceVO vMInstanceVO = Mockito.mock(VMInstanceVO.class);
-        final ArrayList<VMInstanceVO> arrayList = new ArrayList<>();
-        arrayList.add(vMInstanceVO);
+        final VolumeVO volume = Mockito.mock(VolumeVO.class);
+        final ArrayList<VolumeVO> arrayList = new ArrayList<>();
+        arrayList.add(volume);
         Mockito.when(_privateIpAddressDao.countIPs(anyLong(), anyLong(), anyBoolean())).thenReturn(0);
-        Mockito.when(_volumeDao.findByPod(anyLong())).thenReturn(new ArrayList<>());
+        Mockito.when(_volumeDao.findByPod(anyLong())).thenReturn(arrayList);
         Mockito.when(_hostDao.findByPodId(anyLong())).thenReturn(new ArrayList<>());
-        Mockito.when(_vmInstanceDao.listByPodId(anyLong())).thenReturn(arrayList);
         Mockito.when(_clusterDao.listByPodId(anyLong())).thenReturn(new ArrayList<>());
 
         configurationMgr.checkIfPodIsDeletable(new Random().nextLong());

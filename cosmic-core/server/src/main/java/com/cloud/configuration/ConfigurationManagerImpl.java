@@ -4560,11 +4560,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             throw new CloudRuntimeException(errorMsg + "there are servers in this pod.");
         }
 
-        // Check if there are any non-removed vms in the pod.
-        if (!_vmInstanceDao.listByPodId(podId).isEmpty()) {
-            throw new CloudRuntimeException(errorMsg + "there are virtual machines in this pod.");
-        }
-
         // Check if there are any non-removed clusters in the pod.
         if (!_clusterDao.listByPodId(podId).isEmpty()) {
             throw new CloudRuntimeException(errorMsg + "there are clusters in this pod.");
