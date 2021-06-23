@@ -6,6 +6,7 @@ import com.cloud.api.command.admin.vm.RecoverVMCmd;
 import com.cloud.api.command.user.vm.AddNicToVMCmd;
 import com.cloud.api.command.user.vm.DeployVMCmd;
 import com.cloud.api.command.user.vm.DestroyVMCmd;
+import com.cloud.api.command.user.vm.GetVMProgressCmd;
 import com.cloud.api.command.user.vm.RebootVMCmd;
 import com.cloud.api.command.user.vm.RemoveNicFromVMCmd;
 import com.cloud.api.command.user.vm.ResetVMPasswordCmd;
@@ -19,11 +20,15 @@ import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.command.user.vmgroup.CreateVMGroupCmd;
 import com.cloud.api.command.user.vmgroup.DeleteVMGroupCmd;
+import com.cloud.api.response.VmProgressResponse;
 import com.cloud.db.model.Zone;
+import com.cloud.legacymodel.communication.command.MigrationProgressCommand;
 import com.cloud.legacymodel.dc.Host;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.ExecutionException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
+import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.ManagementServerException;
 import com.cloud.legacymodel.exceptions.ResourceAllocationException;
 import com.cloud.legacymodel.exceptions.ResourceUnavailableException;
@@ -235,6 +240,7 @@ public interface UserVmService {
 
     UserVm expungeVm(long vmId) throws ResourceUnavailableException, ConcurrentOperationException;
 
+    VmProgressResponse getVmProgress(GetVMProgressCmd cmd) throws CloudRuntimeException, InvalidParameterValueException;
     /**
      * Finds and returns an encrypted password for a VM.
      *
