@@ -15,7 +15,7 @@ import com.cloud.uservm.UserVm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@APICommand(name = "getvmprogress", group = APICommandGroup.VirtualMachineService, description = "Get migration progress of VM", responseObject = VmProgressResponse.class)
+@APICommand(name = "getVmProgress", group = APICommandGroup.VirtualMachineService, description = "Get migration progress of VM", responseObject = VmProgressResponse.class)
 public class GetVMProgressCmd extends BaseCmd {
     public static final Logger s_logger = LoggerFactory.getLogger(GetVMProgressCmd.class.getName());
 
