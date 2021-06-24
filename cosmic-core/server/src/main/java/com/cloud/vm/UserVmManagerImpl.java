@@ -3572,6 +3572,7 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         }
         //check permissions
         _accountMgr.checkAccess(CallContext.current().getCallingAccount(), null, true, vm);
+
         try {
             MigrationProgressAnswer migrationProgressAnswer = _itMgr.getMigrationProgress(uuid);
 
