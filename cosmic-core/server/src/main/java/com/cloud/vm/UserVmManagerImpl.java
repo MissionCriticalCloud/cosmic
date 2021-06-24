@@ -3573,21 +3573,26 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
         //check permissions
         _accountMgr.checkAccess(CallContext.current().getCallingAccount(), null, true, vm);
 
-        MigrationProgressAnswer migrationProgressAnswer = _itMgr.getMigrationProgress(uuid);
+        try {
+            MigrationProgressAnswer migrationProgressAnswer = _itMgr.getMigrationProgress(uuid);
 
-        VmProgressResponse vmProgressResponse = new VmProgressResponse();
-        vmProgressResponse.setTimeElapsed(migrationProgressAnswer.getTimeElapsed());
-        vmProgressResponse.setTimeRemaining(migrationProgressAnswer.getTimeRemaining());
-        vmProgressResponse.setDataTotal(migrationProgressAnswer.getDataTotal());
-        vmProgressResponse.setDataProcessed(migrationProgressAnswer.getDataProcessed());
-        vmProgressResponse.setDataRemaining(migrationProgressAnswer.getDataRemaining());
-        vmProgressResponse.setMemTotal(migrationProgressAnswer.getMemTotal());
-        vmProgressResponse.setMemProcessed(migrationProgressAnswer.getMemProcessed());
-        vmProgressResponse.setMemRemaining(migrationProgressAnswer.getMemRemaining());
-        vmProgressResponse.setFileTotal(migrationProgressAnswer.getFileTotal());
-        vmProgressResponse.setFileProcessed(migrationProgressAnswer.getFileProcessed());
-        vmProgressResponse.setFileRemaining(migrationProgressAnswer.getFileRemaining());
-        return vmProgressResponse;
+            VmProgressResponse vmProgressResponse = new VmProgressResponse();
+            vmProgressResponse.setTimeElapsed(migrationProgressAnswer.getTimeElapsed());
+            vmProgressResponse.setTimeRemaining(migrationProgressAnswer.getTimeRemaining());
+            vmProgressResponse.setDataTotal(migrationProgressAnswer.getDataTotal());
+            vmProgressResponse.setDataProcessed(migrationProgressAnswer.getDataProcessed());
+            vmProgressResponse.setDataRemaining(migrationProgressAnswer.getDataRemaining());
+            vmProgressResponse.setMemTotal(migrationProgressAnswer.getMemTotal());
+            vmProgressResponse.setMemProcessed(migrationProgressAnswer.getMemProcessed());
+            vmProgressResponse.setMemRemaining(migrationProgressAnswer.getMemRemaining());
+            vmProgressResponse.setFileTotal(migrationProgressAnswer.getFileTotal());
+            vmProgressResponse.setFileProcessed(migrationProgressAnswer.getFileProcessed());
+            vmProgressResponse.setFileRemaining(migrationProgressAnswer.getFileRemaining());
+            return vmProgressResponse;
+        } catch (CloudRuntimeException e) {
+            // Virtual Machine exists but no job is running, return empty response
+            return new VmProgressResponse();
+        }
     }
 
     @Override
