@@ -136,7 +136,8 @@ known_categories = {
     'CacheStore': 'Cache Store',
     'listHAWorkers': 'CloudOps',
     'listWhoHasThisIp': 'CloudOps',
-    'listWhoHasThisMac': 'CloudOps'
+    'listWhoHasThisMac': 'CloudOps',
+    'getVmProgress': 'Virtual Machine'
 }
 
 categories = { }
