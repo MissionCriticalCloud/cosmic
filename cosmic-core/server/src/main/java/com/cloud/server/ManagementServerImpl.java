@@ -337,6 +337,7 @@ import com.cloud.api.command.user.vm.AddNicToVMCmd;
 import com.cloud.api.command.user.vm.DeployVMCmd;
 import com.cloud.api.command.user.vm.DestroyVMCmd;
 import com.cloud.api.command.user.vm.GetVMPasswordCmd;
+import com.cloud.api.command.user.vm.GetVMProgressCmd;
 import com.cloud.api.command.user.vm.ListNicsCmd;
 import com.cloud.api.command.user.vm.ListVMsCmd;
 import com.cloud.api.command.user.vm.RebootVMCmd;
@@ -3699,6 +3700,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         cmdList.add(ListHAWorkersCmd.class);
         cmdList.add(ListWhoHasThisIpCmd.class);
         cmdList.add(ListWhoHasThisMacCmd.class);
+        cmdList.add(GetVMProgressCmd.class);
         // separated admin commands
         cmdList.add(ListAccountsCmdByAdmin.class);
         cmdList.add(ListZonesCmdByAdmin.class);
