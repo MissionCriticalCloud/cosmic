@@ -29,6 +29,7 @@ public class GetVMProgressCmd extends BaseCmd {
         try {
             final VmProgressResponse response = _userVmService.getVmProgress(this);
             response.setResponseName(getCommandName());
+            response.setObjectName(getCommandName());
             setResponseObject(response);
         } catch (InvalidParameterValueException e) {
             s_logger.error("Invalid parameter: " + e.getMessage());
