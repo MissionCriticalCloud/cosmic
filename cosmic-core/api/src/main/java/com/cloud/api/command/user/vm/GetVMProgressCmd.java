@@ -3,8 +3,10 @@ package com.cloud.api.command.user.vm;
 import com.cloud.api.APICommand;
 import com.cloud.api.APICommandGroup;
 import com.cloud.api.ApiConstants;
+import com.cloud.api.ApiErrorCode;
 import com.cloud.api.BaseCmd;
 import com.cloud.api.Parameter;
+import com.cloud.api.ServerApiException;
 import com.cloud.api.response.VmProgressResponse;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
@@ -33,10 +35,13 @@ public class GetVMProgressCmd extends BaseCmd {
             setResponseObject(response);
         } catch (InvalidParameterValueException e) {
             s_logger.error("Invalid parameter: " + e.getMessage());
+            throw new ServerApiException(ApiErrorCode.PARAM_ERROR, "Invalid parameter");
         } catch (CloudRuntimeException e) {
             s_logger.error("CloudRuntimeException: " + e.getMessage());
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to get progress");
         } catch (Exception e) {
             s_logger.error("Unexpected exception: " + e.getMessage());
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Unexpected exception");
         }
     }
 
