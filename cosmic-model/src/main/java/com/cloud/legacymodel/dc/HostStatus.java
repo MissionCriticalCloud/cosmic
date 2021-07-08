@@ -34,6 +34,7 @@ public enum HostStatus {
         s_fsm.addTransition(HostStatus.Connecting, Event.AgentDisconnected, HostStatus.Alert);
         s_fsm.addTransition(HostStatus.Up, Event.PingTimeout, HostStatus.Alert);
         s_fsm.addTransition(HostStatus.Up, Event.AgentDisconnected, HostStatus.Alert);
+        s_fsm.addTransition(HostStatus.Up, Event.AgentUnreachable, HostStatus.Disconnected);
         s_fsm.addTransition(HostStatus.Up, Event.ShutdownRequested, HostStatus.Disconnected);
         s_fsm.addTransition(HostStatus.Up, Event.HostDown, HostStatus.Down);
         s_fsm.addTransition(HostStatus.Up, Event.Ping, HostStatus.Up);
@@ -56,10 +57,12 @@ public enum HostStatus {
         s_fsm.addTransition(HostStatus.Down, Event.PingTimeout, HostStatus.Down);
         s_fsm.addTransition(HostStatus.Alert, Event.AgentConnected, HostStatus.Connecting);
         s_fsm.addTransition(HostStatus.Alert, Event.Ping, HostStatus.Up);
+        s_fsm.addTransition(HostStatus.Alert, Event.PingTimeout, HostStatus.Alert);
         s_fsm.addTransition(HostStatus.Alert, Event.Remove, HostStatus.Removed);
         s_fsm.addTransition(HostStatus.Alert, Event.ManagementServerDown, HostStatus.Alert);
         s_fsm.addTransition(HostStatus.Alert, Event.AgentDisconnected, HostStatus.Alert);
         s_fsm.addTransition(HostStatus.Alert, Event.ShutdownRequested, HostStatus.Disconnected);
+        s_fsm.addTransition(HostStatus.Alert, Event.HostDown, HostStatus.Down);
         s_fsm.addTransition(HostStatus.Rebalancing, Event.RebalanceFailed, HostStatus.Disconnected);
         s_fsm.addTransition(HostStatus.Rebalancing, Event.RebalanceCompleted, HostStatus.Connecting);
         s_fsm.addTransition(HostStatus.Rebalancing, Event.ManagementServerDown, HostStatus.Disconnected);
