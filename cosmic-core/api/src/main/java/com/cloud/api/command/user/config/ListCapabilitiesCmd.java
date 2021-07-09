@@ -22,7 +22,7 @@ public class ListCapabilitiesCmd extends BaseCmd {
     public void execute() {
         final Map<String, Object> capabilities = _mgr.listCapabilities(this);
         final CapabilitiesResponse response = new CapabilitiesResponse();
-        response.setCloudStackVersion((String) capabilities.get("cloudStackVersion"));
+        response.setCosmicVersion((String) capabilities.get("cosmicVersion"));
         response.setCosmic((Boolean) true);
         response.setUserPublicTemplateEnabled((Boolean) capabilities.get("userPublicTemplateEnabled"));
         response.setSupportELB((String) capabilities.get("supportELB"));

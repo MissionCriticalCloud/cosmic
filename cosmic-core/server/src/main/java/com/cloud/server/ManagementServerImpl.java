@@ -2349,7 +2349,7 @@ public class ManagementServerImpl extends ManagerBase implements ManagementServe
         }
 
         capabilities.put("userPublicTemplateEnabled", userPublicTemplateEnabled);
-        capabilities.put("cloudStackVersion", getVersion());
+        capabilities.put("cosmicVersion", getVersion());
         capabilities.put("supportELB", supportELB);
         capabilities.put("projectInviteRequired", _projectMgr.projectInviteRequired());
         capabilities.put("allowusercreateprojects", _projectMgr.allowUserToCreateProject());
