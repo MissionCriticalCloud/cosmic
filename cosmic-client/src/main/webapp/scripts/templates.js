@@ -398,6 +398,10 @@
                                     isrouting: (args.data.isrouting === "on")
                                 };
 
+                                if (isAdmin()) {
+                                    data['isrouting'] = (args.data.isrouting === "on");
+                                }
+
                                 if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {
                                     $.extend(data, {
                                         ispublic: (args.data.isPublic == "on")
