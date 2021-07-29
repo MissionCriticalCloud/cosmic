@@ -1132,6 +1132,40 @@
                     $value.data('detail-view-is-password', value.isPassword);
                 }
 
+                if (typeof(value.pollAgainFn) === "function") {
+                    for(let state in value.pollAgainIfValueIsIn) {
+                        let interval_id = 0;
+                        if (content === state) {
+                            if (!value.pollAgainFn(data)) {
+                                if (value.pollMigrationProgress) {
+                                    interval_id = setInterval(function () {
+                                        $.ajax({
+                                           url: createURL("getVmProgress&uuid=" + context.instances[0].id),
+                                           dataType: "json",
+                                           async: false
+                                        }).done(function (jsonObj) {
+                                            let json = jsonObj.getvmprogressresponse.getvmprogressresponse;
+                                            if (json.timeremaining === 0) {
+                                                clearInterval(interval_id);
+                                            } else {
+                                                let percentage = (json.dataprocessed / (json.datatotal & 1) * 100);
+                                                if (percentage >= 100) {
+                                                    percentage = 100;
+                                                }
+                                                $("#migration-progress").progressbar({value: percentage})
+                                                    .children('.ui-progressbar-value')
+                                                    .html('<span>' + percentage + '%</span>');
+                                            }
+                                        }).fail(function (json) {
+                                            clearInterval(interval_id);
+                                        });
+                                    }, 1000);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 return true;
             });
         });

@@ -1,4 +1,4 @@
-#!/cygdrive/c/Python27
+#!/usr/bin/env python2.7
 
 
 import os.path

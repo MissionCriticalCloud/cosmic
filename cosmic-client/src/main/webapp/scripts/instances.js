@@ -2098,19 +2098,21 @@
                             },
                             state: {
                                 label: 'label.state',
+                                pollMigrationProgress: true,
                                 pollAgainIfValueIsIn: {
                                     'Starting': 1,
-                                    'Stopping': 1
+                                    'Stopping': 1,
+                                    'Migrating': 1
                                 },
                                 pollAgainFn: function (context) {
                                     var toClearInterval = false;
                                     $.ajax({
-                                        url: createURL("listVirtualMachines&id=" + context.instances[0].id),
+                                        url: createURL("listVirtualMachines&id=" + context.id),
                                         dataType: "json",
                                         async: false,
                                         success: function (json) {
                                             var jsonObj = json.listvirtualmachinesresponse.virtualmachine[0];
-                                            if (jsonObj.state != context.instances[0].state) {
+                                            if (jsonObj.state !== context.state) {
                                                 toClearInterval = true; //to clear interval
                                             }
                                         }
