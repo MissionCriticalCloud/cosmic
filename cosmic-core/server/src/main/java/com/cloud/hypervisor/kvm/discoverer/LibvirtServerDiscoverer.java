@@ -313,18 +313,6 @@ public abstract class LibvirtServerDiscoverer extends DiscovererBase implements 
             throw new IllegalArgumentException("cannot add host, due to can't find cluster: " + host.getClusterId());
         }
 
-        final List<HostVO> hostsInCluster = this._resourceMgr.listAllHostsInCluster(clusterVO.getId());
-        if (!hostsInCluster.isEmpty()) {
-            final HostVO oneHost = hostsInCluster.get(0);
-            this._hostDao.loadDetails(oneHost);
-            final String hostOsInCluster = oneHost.getDetail("Host.OS");
-            final String hostOs = ssCmd.getHostDetails().get("Host.OS");
-            if (!hostOsInCluster.equalsIgnoreCase(hostOs)) {
-                throw new IllegalArgumentException("Can't add host: " + firstCmd.getPrivateIpAddress() + " with hostOS: " + hostOs + " into a cluster," +
-                        "in which there are " + hostOsInCluster + " hosts added");
-            }
-        }
-
         this._hostDao.loadDetails(host);
 
         return this._resourceMgr.fillRoutingHostVO(host, ssCmd, getHypervisorType(), host.getDetails(), null);
