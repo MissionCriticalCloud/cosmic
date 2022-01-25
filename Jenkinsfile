@@ -18,8 +18,7 @@ TESTS_DEFAULTS = TESTS.join("\n")
 
 pipeline {
     agent {
-        // label "executor"
-        label "hv02"
+        label "executor"
     }
     options {
         timestamps()
