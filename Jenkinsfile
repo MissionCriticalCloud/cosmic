@@ -50,8 +50,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // checkout scm
-                git url: "https://github.com/sanderv32/cosmic.git", branch: "jenkinsfile"
+                checkout scm
+                // git url: "https://github.com/sanderv32/cosmic.git", branch: "jenkinsfile"
             }
         }
 
