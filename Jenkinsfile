@@ -63,6 +63,9 @@ pipeline {
         }
 
         stage('Run integration tests') {
+            environment {
+                PYTHONPATH = "${env.PYTHONPATH}:${env.WORKSPACE}/cosmic-core/test/integration/tests"
+            }
             steps {
                 executeTests(params.TESTS)
             }
