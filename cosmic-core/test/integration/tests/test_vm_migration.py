@@ -109,4 +109,4 @@ class TestVmMigration(cosmicTestCase):
     def get_dest_hypervisor(self, hostid=None):
         if hostid is None:
             hostid = self.vm.hostid
-        return filter(lambda x: x.id != hostid, self.hosts)
+        return list(filter(lambda x: x.id != hostid, self.hosts))

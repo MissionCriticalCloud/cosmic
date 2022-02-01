@@ -220,7 +220,7 @@ class TestPasswordService(cosmicTestCase):
         router_state = self.get_router_state(router)
 
         if router.isredundantrouter and router_state != "MASTER":
-            print "Found router in non-MASTER state '" + router.redundantstate + "' so skipping test."
+            print("Found router in non-MASTER state '" + router.redundantstate + "' so skipping test.")
             return True
 
         # Get the related passwd server logs for our vm

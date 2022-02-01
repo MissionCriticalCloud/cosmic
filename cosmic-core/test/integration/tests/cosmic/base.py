@@ -5,8 +5,8 @@
 import base64
 from abc import ABCMeta, abstractmethod
 
-from common import *
-from utils import *
+from .common import *
+from .utils import *
 
 
 class BaseAbstract:
@@ -503,7 +503,7 @@ class VirtualMachine(BaseAbstract):
             # TODO: This is probably not correct, fix it
             cmd['details[0]["memory"]'] = custommemory
 
-        if rootdisksize >= 0:
+        if rootdisksize and rootdisksize >= 0:
             cmd['details[0]["rootdisksize"]'] = rootdisksize
 
         if group:
@@ -655,7 +655,7 @@ class VirtualMachine(BaseAbstract):
 
     @staticmethod
     def state_check_function(objects, state):
-        return str(objects[0].state).lower().decode("string_escape") == str(state).lower()
+        return str(objects[0].state).lower() == str(state).lower()
 
     def resetSshKey(self, api_client, **kwargs):
         """Resets SSH key"""
@@ -3638,7 +3638,7 @@ class VPC(BaseAbstract):
         if "cidr" in services:
             cmd['cidr'] = services["cidr"]
         if account:
-            if isinstance(account, basestring):
+            if isinstance(account, str):
                 cmd['account'] = account
             else:
                 cmd['account'] = account.name
