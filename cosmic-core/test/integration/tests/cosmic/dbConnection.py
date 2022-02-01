@@ -47,7 +47,7 @@ class DbConnection(object):
 
 if __name__ == "__main__":
     db = DbConnection()
-    print db.execute("update vm_template set name='fjkd' where id=200")
+    print(db.execute("update vm_template set name='fjkd' where id=200"))
     for i in range(10):
         result = db.execute("select job_status, created, last_updated from async_job where id=%d" % i)
-        print result
+        print(result)

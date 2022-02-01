@@ -2,7 +2,7 @@ import unittest
 
 import time
 
-from cosmicTestClient import CosmicTestClient
+from .cosmicTestClient import CosmicTestClient
 
 
 class cosmicTestCase(unittest.TestCase):

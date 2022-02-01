@@ -3,10 +3,10 @@ import string
 import sys
 import time
 import traceback
-import urlparse
 
-from SshClient import SshClient
-from codes import *
+from urllib.parse import urlparse
+from .SshClient import SshClient
+from .codes import *
 
 
 class AttrDict(dict):
@@ -129,7 +129,7 @@ def attr(*args, **kwargs):
     def wrap_ob(ob):
         for name in args:
             setattr(ob, name, True)
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             setattr(ob, name, value)
         return ob
 

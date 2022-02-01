@@ -11,7 +11,7 @@ from paramiko import (
     SFTPClient
 )
 
-from codes import (
+from .codes import (
     SUCCESS,
     FAILED,
     INVALID_INPUT

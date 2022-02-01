@@ -6,9 +6,9 @@ import os
 import copy
 from cs import CloudStack
 
-from cosmicLog import CosmicLog
-from dbConnection import DbConnection
-from utils import *
+from .cosmicLog import CosmicLog
+from .dbConnection import DbConnection
+from .utils import *
 
 
 class Cosmic(CloudStack):
