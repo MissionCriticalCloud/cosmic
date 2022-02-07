@@ -51,7 +51,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                // git url: "https://github.com/sanderv32/cosmic.git", branch: "jenkinsfile"
             }
         }
 
@@ -86,6 +85,10 @@ pipeline {
         success {
             archiveArtifacts artifacts: "cosmic-client/target/cloud-client-ui-*.war", fingerprint: true
             archiveArtifacts artifacts: "cosmic-agent/target/cloud-agent-*.jar", fingerprint: true
+            withCredentials([string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'), string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh script: "aws s3 cp cosmic-client/target/cloud-client-ui-*.war $S3_BUCKET/client"
+                sh script: "aws s3 cp cosmic-agent/target/cloud-agent-*.jar $S3_BUCKET/agent"
+            }
         }
 
         always {
@@ -103,8 +106,8 @@ pipeline {
         cleanup {
             // Cleanup VM's
             sh script: "ansible-playbook -i /data/shared/configs/$CONFIG/inventory --extra-vars TERRAFORM_PLAN=/data/shared/terraform-plans/$CONFIG /data/shared/ci-cleanup.yml"
-        //     // Cleanup workspace
-        //     sh "test -d $WORKSPACE && rm -rf $WORKSPACE"
+            //     // Cleanup workspace
+            //     sh "test -d $WORKSPACE && rm -rf $WORKSPACE"
         }
     }
 }

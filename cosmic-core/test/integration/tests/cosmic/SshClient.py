@@ -31,7 +31,8 @@ class SshClient(object):
             timeout : Applies while executing command
     """
 
-    def __init__(self, host, port, user, password, retries=60, delay=10, key_pair_files=None, timeout=10.0):
+    def __init__(self, host, port, user, password, retries=60, delay=10, key_pair_files=None,
+                 timeout=10.0, banner_timeout=60.0):
         self.host = None
         self.port = 22
         self.user = user
@@ -39,21 +40,16 @@ class SshClient(object):
         self.keyPairFiles = key_pair_files
         self.ssh = SSHClient()
         self.ssh.set_missing_host_key_policy(AutoAddPolicy())
-        self.retryCnt = 0
-        self.delay = 0
-        self.timeout = 3.0
+        self.retryCnt = retries
+        self.delay = delay
+        self.timeout = timeout
+        self.banner_timeout = banner_timeout
         self.logger = CosmicLog('ssh').get_logger()
 
         # Check invalid host value and raise exception
         # At least host is required for connection
         if host is not None and host != '':
             self.host = host
-        if retries is not None and retries > 0:
-            self.retryCnt = retries
-        if delay is not None and delay > 0:
-            self.delay = delay
-        if timeout is not None and timeout > 0:
-            self.timeout = timeout
         if port is not None and port >= 0:
             self.port = port
         if self.create_connection() == FAILED:
@@ -88,34 +84,42 @@ class SshClient(object):
             try:
                 self.logger.debug("Trying SSH Connection to host %s on port %s as user %s. RetryCount: %s" %
                                   (self.host, str(self.port), self.user, str(self.retryCnt)))
-                if self.keyPairFiles is None:
-                    self.ssh.connect(hostname=self.host,
-                                     port=self.port,
-                                     username=self.user,
-                                     password=self.passwd,
-                                     timeout=self.timeout)
-                else:
-                    self.ssh.connect(hostname=self.host,
-                                     port=self.port,
-                                     username=self.user,
-                                     password=self.passwd,
-                                     key_filename=self.keyPairFiles,
-                                     timeout=self.timeout,
-                                     look_for_keys=False
-                                     )
-                self.logger.debug("Connection to host %s on port %s is SUCCESSFUL" % (str(self.host), str(self.port)))
-                ret = SUCCESS
-                break
+                if self._ssh_available():
+                    if self.keyPairFiles is None:
+                        self.ssh.connect(hostname=self.host,
+                                         port=self.port,
+                                         username=self.user,
+                                         password=self.passwd,
+                                         timeout=self.timeout,
+                                         banner_timeout=self.banner_timeout)
+                    else:
+                        self.ssh.connect(hostname=self.host,
+                                         port=self.port,
+                                         username=self.user,
+                                         password=self.passwd,
+                                         key_filename=self.keyPairFiles,
+                                         timeout=self.timeout,
+                                         banner_timeout=self.banner_timeout,
+                                         look_for_keys=False
+                                         )
+                    self.logger.debug("Connection to host %s on port %s is SUCCESSFUL" % (str(self.host), str(self.port)))
+                    ret = SUCCESS
+                    break
             except BadHostKeyException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
+                self.ssh.close()
             except AuthenticationException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
+                self.ssh.close()
             except SSHException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
+                self.ssh.close()
             except socket.error as e:
                 self.logger.debug("Failed to create connection: %s" % e)
+                self.ssh.close()
             except Exception as e:
                 self.logger.debug("Failed to create connection: %s" % e)
+                self.ssh.close()
             finally:
                 if self.retryCnt == 0 or ret == SUCCESS:
                     break
@@ -169,3 +173,13 @@ class SshClient(object):
         if self.ssh is not None:
             self.ssh.close()
             self.ssh = None
+
+    def _ssh_available(self):
+        """
+        Helper to check if SSH is available as paramiko has a bug doing this.
+        """
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((self.host, self.port))
+        data = s.recv(1024)
+        s.close()
+        return 'SSH-' in str(data[:4])

@@ -143,7 +143,7 @@ categories = { }
 
 
 def choose_category(fn):
-    for k, v in known_categories.items():
+    for k, v in list(known_categories.items()):
         if k in fn:
             return v
     raise Exception('Need to add a category for %s to %s:known_categories' %
@@ -185,10 +185,10 @@ for f in sys.argv:
 
 def xml_for(command):
     name = command['name']
-    async = command['async'] and ' (A)' or ''
+    a_sync = command['async'] and ' (A)' or ''
     dirname = command['dirname']
     return '''<xsl:if test="name=\'%(name)s\'">
-<li><a href="%(dirname)s/%(name)s.html"><xsl:value-of select="name"/>%(async)s</a></li>
+<li><a href="%(dirname)s/%(name)s.html"><xsl:value-of select="name"/>%(a_sync)s</a></li>
 </xsl:if>
 ''' % locals()
 
@@ -197,7 +197,7 @@ def write_xml(out, user):
     with open(out, 'w') as f:
         cat_strings = []
 
-        for category in categories.keys():
+        for category in list(categories.keys()):
             strings = []
             for command in categories[category]:
                 if command['user'] == user:
@@ -240,7 +240,7 @@ def java_for(command, user):
 
 def java_for_user(user):
     strings = []
-    for category in categories.keys():
+    for category in list(categories.keys()):
         for command in categories[category]:
             if command['user'] == user:
                 strings.append(java_for(command, user))
