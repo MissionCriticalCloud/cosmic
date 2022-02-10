@@ -84,27 +84,26 @@ class SshClient(object):
             try:
                 self.logger.debug("Trying SSH Connection to host %s on port %s as user %s. RetryCount: %s" %
                                   (self.host, str(self.port), self.user, str(self.retryCnt)))
-                if self._ssh_available():
-                    if self.keyPairFiles is None:
-                        self.ssh.connect(hostname=self.host,
-                                         port=self.port,
-                                         username=self.user,
-                                         password=self.passwd,
-                                         timeout=self.timeout,
-                                         banner_timeout=self.banner_timeout)
-                    else:
-                        self.ssh.connect(hostname=self.host,
-                                         port=self.port,
-                                         username=self.user,
-                                         password=self.passwd,
-                                         key_filename=self.keyPairFiles,
-                                         timeout=self.timeout,
-                                         banner_timeout=self.banner_timeout,
-                                         look_for_keys=False
-                                         )
-                    self.logger.debug("Connection to host %s on port %s is SUCCESSFUL" % (str(self.host), str(self.port)))
-                    ret = SUCCESS
-                    break
+                if self.keyPairFiles is None:
+                    self.ssh.connect(hostname=self.host,
+                                     port=self.port,
+                                     username=self.user,
+                                     password=self.passwd,
+                                     timeout=self.timeout,
+                                     banner_timeout=self.banner_timeout)
+                else:
+                    self.ssh.connect(hostname=self.host,
+                                     port=self.port,
+                                     username=self.user,
+                                     password=self.passwd,
+                                     key_filename=self.keyPairFiles,
+                                     timeout=self.timeout,
+                                     banner_timeout=self.banner_timeout,
+                                     look_for_keys=False
+                                     )
+                self.logger.debug("Connection to host %s on port %s is SUCCESSFUL" % (str(self.host), str(self.port)))
+                ret = SUCCESS
+                break
             except BadHostKeyException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
                 self.ssh.close()
