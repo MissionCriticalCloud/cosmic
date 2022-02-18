@@ -106,13 +106,10 @@ class SshClient(object):
                 break
             except BadHostKeyException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
-                self.ssh.close()
             except AuthenticationException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
-                self.ssh.close()
             except SSHException as e:
                 self.logger.debug("Failed to create connection: %s" % e)
-                self.ssh.close()
             except socket.error as e:
                 self.logger.debug("Failed to create connection: %s" % e)
             except Exception as e:
