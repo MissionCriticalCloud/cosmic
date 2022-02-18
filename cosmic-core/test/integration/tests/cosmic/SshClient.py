@@ -115,7 +115,6 @@ class SshClient(object):
                 self.ssh.close()
             except socket.error as e:
                 self.logger.debug("Failed to create connection: %s" % e)
-                self.ssh.close()
             except Exception as e:
                 self.logger.debug("Failed to create connection: %s" % e)
                 self.ssh.close()
