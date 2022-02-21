@@ -14,12 +14,12 @@
         <repository>
             <id>beta-nexus</id>
             <name>MCC Nexus</name>
-            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/releases/</url>
+            <url>https://nexus.mcc.schubergphilis.com/repository/releases/</url>
         </repository>
         <snapshotRepository>
             <id>beta-nexus</id>
             <name>MCC Nexus</name>
-            <url>https://beta-nexus.mcc.schubergphilis.com/content/repositories/snapshots/</url>
+            <url>https://nexus.mcc.schubergphilis.com/repository/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
