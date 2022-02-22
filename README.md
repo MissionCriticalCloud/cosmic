@@ -30,7 +30,7 @@ Cosmic officials Git repository is located at:
 
 Cosmic requires:
 - Java 8
-- Maven settings configured to use [Cosmic's Nexus repository](https://beta-nexus.mcc.schubergphilis.com) (see [Maven settings](#maven-settings) below)
+- Maven settings configured to use [Cosmic's Nexus repository](https://nexus.mcc.schubergphilis.com) (see [Maven settings](#maven-settings) below)
 
 In order to build Cosmic, you have to follow these steps:
 
@@ -38,7 +38,7 @@ In order to build Cosmic, you have to follow these steps:
     cd cosmic
     mvn clean install -P developer,systemvm
 
-The steps above will build the essentials to get Cosmic management server working. Besides that, you will also need a hypervisor. See our [build stream configuration](https://beta-jenkins.mcc.schubergphilis.com) for more details.
+The steps above will build the essentials to get Cosmic management server working. Besides that, you will also need a hypervisor. See our [build stream configuration](https://jenkins.mcc.schubergphilis.com) for more details.
 
 This will run the UI and API:
 
@@ -49,7 +49,7 @@ Go to your brouwser and type: [http://localhost:8080/client] (http://localhost:8
 
 ### Maven settings
 
-Configure maven to look for artefacts in [Cosmic's Nexus repository](https://beta-nexus.mcc.schubergphilis.com):
+Configure maven to look for artefacts in [Cosmic's Nexus repository](https://nexus.mcc.schubergphilis.com):
 
 ```vim ~/.m2/settings.xml ```
 
@@ -60,7 +60,7 @@ Configure maven to look for artefacts in [Cosmic's Nexus repository](https://bet
       <!--This sends everything else to /public -->
       <id>beta-nexus</id>
       <mirrorOf>*</mirrorOf>
-      <url>https://beta-nexus.mcc.schubergphilis.com/content/groups/public</url>
+      <url>https://nexus.mcc.schubergphilis.com/content/groups/public</url>
     </mirror>
   </mirrors>
   <profiles>

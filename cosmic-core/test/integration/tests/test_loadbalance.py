@@ -58,7 +58,8 @@ class TestLoadBalance(cosmicTestCase):
                                       zoneid=cls.zone.id,
                                       domainid=cls.domain.id,
                                       accountid=cls.account.name)
-        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr, cls.network1.gateway)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network1.name, cls.network1.cidr,
+                         cls.network1.gateway)
 
         cls.network2 = Network.create(cls.apiclient,
                                       cls.services['networks']['network2'],
@@ -68,7 +69,8 @@ class TestLoadBalance(cosmicTestCase):
                                       zoneid=cls.zone.id,
                                       domainid=cls.domain.id,
                                       accountid=cls.account.name)
-        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network2.name, cls.network2.cidr, cls.network2.gateway)
+        cls.logger.debug("Network '%s' created, CIDR: %s, Gateway: %s", cls.network2.name, cls.network2.cidr,
+                         cls.network2.gateway)
 
         cls.vm_1 = VirtualMachine.create(
             cls.apiclient,
@@ -131,7 +133,8 @@ class TestLoadBalance(cosmicTestCase):
                                                       accountid=cls.account.name,
                                                       vpcid=cls.vpc1.id,
                                                       networkid=cls.network1.id)
-        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.non_src_nat_ip_1.ipaddress, cls.vpc1.name, cls.network1.name)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.non_src_nat_ip_1.ipaddress, cls.vpc1.name,
+                         cls.network1.name)
 
         cls.non_src_nat_ip_2 = PublicIPAddress.create(cls.apiclient,
                                                       zoneid=cls.zone.id,
@@ -139,7 +142,8 @@ class TestLoadBalance(cosmicTestCase):
                                                       accountid=cls.account.name,
                                                       vpcid=cls.vpc1.id,
                                                       networkid=cls.network2.id)
-        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.non_src_nat_ip_2.ipaddress, cls.vpc1.name, cls.network2.name)
+        cls.logger.debug("Public IP '%s' acquired, VPC: %s, Network: %s", cls.non_src_nat_ip_2.ipaddress, cls.vpc1.name,
+                         cls.network2.name)
 
         command = {'aclid': cls.default_allow_acl.id, 'publicipid': cls.non_src_nat_ip_1.id}
         cls.apiclient.replaceNetworkACLList(**command)
@@ -184,8 +188,7 @@ class TestLoadBalance(cosmicTestCase):
             True,
             "Check list response returns a valid list"
         )
-        src_nat_ip_addr_1 = src_nat_ip_addrs[0]
-        src_nat_ip_addr_2 = src_nat_ip_addrs[1]
+        src_nat_ip_addr_1 = next(filter(lambda src_nat: src_nat.issourcenat, src_nat_ip_addrs))
 
         # Check if VM is in Running state before creating LB rule
         vm_response = VirtualMachine.list(
@@ -215,13 +218,9 @@ class TestLoadBalance(cosmicTestCase):
         # Create Load Balancer rule and assign VMs to rule
         lb_rule_1 = self.create_lb_rule(src_nat_ip_addr_1.id, self.vpc1.id, self.network1.id, [self.vm_1, self.vm_2])
 
-        # Create Load Balancer rule and assign VMs to rule
-        lb_rule_2 = self.create_lb_rule(src_nat_ip_addr_2.id, self.vpc1.id, self.network2.id, [self.vm_4, self.vm_5])
-
         # listLoadBalancerRuleInstances should list all
         # instances associated with that LB rule
         self.check_lb_rules(lb_rule_1.id, [self.vm_1.id, self.vm_2.id])
-        self.check_lb_rules(lb_rule_2.id, [self.vm_4.id, self.vm_5.id])
 
         uname_results = []
         for x in range(0, 5):
@@ -239,24 +238,7 @@ class TestLoadBalance(cosmicTestCase):
             "Check if ssh succeeded for server2"
         )
 
-        uname_results = []
-        for x in range(0, 5):
-            self.try_ssh(src_nat_ip_addr_2.ipaddress, uname_results)
-
-        self.logger.debug("OUTPUT: %s" % str(uname_results))
-        self.assertIn(
-            self.vm_4.id.split("-", 3)[3].upper(),
-            uname_results,
-            "Check if ssh succeeded for server4"
-        )
-        self.assertIn(
-            self.vm_5.id.split("-", 3)[3].upper(),
-            uname_results,
-            "Check if ssh succeeded for server5"
-        )
-
         uname_results.append(self.remove_and_check(lb_rule_1, src_nat_ip_addr_1, [self.vm_2, self.vm_1]))
-        uname_results.append(self.remove_and_check(lb_rule_2, src_nat_ip_addr_2, [self.vm_4, self.vm_5]))
         return
 
     @attr(tags=['advanced'])
