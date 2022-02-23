@@ -1,4 +1,4 @@
-[![Build Status](https://beta-jenkins.mcc.schubergphilis.com/buildStatus/icon?job=cosmic/0001-cosmic-master-build)](https://beta-jenkins.mcc.schubergphilis.com/job/cosmic/job/0001-cosmic-master-build/)
+[![Build Status](https://jenkins.mcc.schubergphilis.com/buildStatus/icon?job=cosmic/0001-cosmic-master-build)](https://jenkins.mcc.schubergphilis.com/job/cosmic/job/0001-cosmic-master-build/)
 
 # Cosmic
 
