@@ -9,6 +9,7 @@ import com.cloud.common.request.ResourceWrapper;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.MigrateAnswer;
 import com.cloud.legacymodel.communication.command.MigrateCommand;
+import com.cloud.legacymodel.to.VirtualMachineTO;
 import com.cloud.legacymodel.utils.Ternary;
 
 import java.util.List;
@@ -30,6 +31,9 @@ import org.slf4j.LoggerFactory;
 @ResourceWrapper(handles = MigrateCommand.class)
 public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<MigrateCommand, Answer, LibvirtComputingResource> {
 
+    private static final String GRAPHICS_ELEM_END = "/graphics>";
+    private static final String GRAPHICS_ELEM_START = "<graphics";
+    private static final String CONTENTS_WILDCARD = "(?s).*";
     private static final Logger s_logger = LoggerFactory.getLogger(LibvirtMigrateCommandWrapper.class);
 
     @Override
@@ -54,6 +58,9 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
             ifaces = libvirtComputingResource.getInterfaces(conn, vmName);
             disks = libvirtComputingResource.getDisks(conn, vmName);
             dm = conn.domainLookupByName(vmName);
+
+            VirtualMachineTO to = command.getVirtualMachine();
+
             /*
              * We replace the private IP address with the address of the destination host. This is because the VNC listens on
              * the private IP address of the hypervisor, but that address is ofcourse different on the target host.
@@ -72,7 +79,13 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
              */
             final int xmlFlag = conn.getLibVirVersion() >= 1000000 ? 8 : 1; // 1000000 equals v1.0.0
 
-            xmlDesc = dm.getXMLDesc(xmlFlag).replace(libvirtComputingResource.getPrivateIp(), command.getDestinationIp());
+            final String target = command.getDestinationIp();
+
+            // xmlDesc = dm.getXMLDesc(xmlFlag).replace(libvirtComputingResource.getPrivateIp(), command.getDestinationIp());
+
+            String vncPassword = to.getVncPassword();
+            xmlDesc = replaceIpForVNCInDescFileAndNormalizePassword(dm.getXMLDesc(xmlFlag), target, vncPassword);
+
             // delete the metadata of vm snapshots before migration
             vmsnapshots = libvirtComputingResource.cleanVMSnapshotMetadata(dm);
 
@@ -184,5 +197,32 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
         }
 
         return new MigrateAnswer(command, result == null, result, null);
+    }
+
+    /**
+     * This function assumes an qemu machine description containing a single graphics element like
+     *     <graphics type='vnc' port='5900' autoport='yes' listen='10.10.10.1'>
+     *       <listen type='address' address='10.10.10.1'/>
+     *     </graphics>
+     * @param xmlDesc the qemu xml description
+     * @param target the ip address to migrate to
+     * @param vncPassword if set, the VNC password truncated to 8 characters
+     * @return the new xmlDesc
+     */
+    String replaceIpForVNCInDescFileAndNormalizePassword(String xmlDesc, final String target, String vncPassword) {
+        final int begin = xmlDesc.indexOf(GRAPHICS_ELEM_START);
+        if (begin >= 0) {
+            final int end = xmlDesc.lastIndexOf(GRAPHICS_ELEM_END) + GRAPHICS_ELEM_END.length();
+            if (end > begin) {
+                String graphElem = xmlDesc.substring(begin, end);
+                graphElem = graphElem.replaceAll("listen='[a-zA-Z0-9\\.]*'", "listen='" + target + "'");
+                graphElem = graphElem.replaceAll("address='[a-zA-Z0-9\\.]*'", "address='" + target + "'");
+                if (!vncPassword.equals("")) {
+                    graphElem = graphElem.replaceAll("passwd='([^\\s]+)'", "passwd='" + vncPassword + "'");
+                }
+                xmlDesc = xmlDesc.replaceAll(GRAPHICS_ELEM_START + CONTENTS_WILDCARD + GRAPHICS_ELEM_END, graphElem);
+            }
+        }
+        return xmlDesc;
     }
 }
