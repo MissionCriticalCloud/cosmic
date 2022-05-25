@@ -192,7 +192,11 @@ public class VirtualMachineTO {
     }
 
     public String getVncPassword() {
-        return vncPassword;
+        // Libvirt 8.x only allows VPC passwd of 8 chars
+        if (vncPassword != null) {
+            return vncPassword.substring(0, 8);
+        }
+        return "FakeVNC8";
     }
 
     public void setVncPassword(final String vncPassword) {
