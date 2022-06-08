@@ -378,8 +378,10 @@ public class VMInstanceVO implements VirtualMachine, FiniteStateObject<State> {
     @Override
     public String getVncPassword() {
         // Libvirt 8.x only allows VPC passwd of 8 chars
-        if (vncPassword != null) {
+        if (vncPassword != null && vncPassword.length() > 8) {
             return vncPassword.substring(0, 8);
+        } else if (vncPassword != null && vncPassword.length() > 0) {
+            return vncPassword;
         }
         return "FakeVNC8";
     }
