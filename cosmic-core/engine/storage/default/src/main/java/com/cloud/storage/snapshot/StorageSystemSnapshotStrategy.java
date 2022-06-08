@@ -37,6 +37,7 @@ import com.cloud.storage.dao.SnapshotDetailsVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.db.DB;
 import com.cloud.vm.VMInstanceVO;
@@ -79,6 +80,10 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
     private VolumeDao _volumeDao;
     @Inject
     private VolumeService _volService;
+
+    private boolean isAcceptableRevertFormat(VolumeVO volumeVO) {
+        return ImageFormat.QCOW2.equals(volumeVO.getFormat());
+    }
 
     @Override
     public boolean deleteSnapshot(final Long snapshotId) {
@@ -141,17 +146,25 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
 
     @Override
     public StrategyPriority canHandle(final Snapshot snapshot, final SnapshotOperation op) {
+        final long volumeId = snapshot.getVolumeId();
+        final VolumeVO volumeVO = _volumeDao.findByIdIncludingRemoved(volumeId);
+        final long storagePoolId = volumeVO.getPoolId();
+        final DataStore dataStore = _dataStoreMgr.getDataStore(storagePoolId, DataStoreRole.Primary);
+
         if (SnapshotOperation.REVERT.equals(op)) {
+            boolean baseVolumeExists = volumeVO.getRemoved() == null;
+            if (baseVolumeExists) {
+                boolean acceptableFormat = isAcceptableRevertFormat(volumeVO);
+
+                if (acceptableFormat) {
+                    SnapshotDataStoreVO snapshotStoreVO = _snapshotStoreDao.findBySnapshot(snapshot.getId(), DataStoreRole.Primary);
+                    if (snapshotStoreVO != null) {
+                        return StrategyPriority.HIGHEST;
+                    }
+                }
+            }
             return StrategyPriority.CANT_HANDLE;
         }
-
-        final long volumeId = snapshot.getVolumeId();
-
-        final VolumeVO volumeVO = _volumeDao.findByIdIncludingRemoved(volumeId);
-
-        final long storagePoolId = volumeVO.getPoolId();
-
-        final DataStore dataStore = _dataStoreMgr.getDataStore(storagePoolId, DataStoreRole.Primary);
 
         if (dataStore != null) {
             final Map<String, String> mapCapabilities = dataStore.getDriver().getCapabilities();
