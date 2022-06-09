@@ -64,6 +64,8 @@ public class QemuImg {
             s.add(backingFile.getFormat().toString().toLowerCase());
             s.add("-b");
             s.add(backingFile.getFileName());
+            s.add("-F");
+            s.add(backingFile.getFormat().toString().toLowerCase());
         } else {
             s.add(file.getFormat().toString().toLowerCase());
         }
