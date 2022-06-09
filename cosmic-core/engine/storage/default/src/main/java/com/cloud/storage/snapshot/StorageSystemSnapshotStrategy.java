@@ -13,7 +13,9 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeService;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.SnapshotAndCopyAnswer;
+import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -23,6 +25,7 @@ import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
@@ -31,6 +34,7 @@ import com.cloud.server.ManagementService;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VolumeVO;
+import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.SnapshotDetailsDao;
 import com.cloud.storage.dao.SnapshotDetailsVO;
@@ -80,6 +84,8 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
     private VolumeDao _volumeDao;
     @Inject
     private VolumeService _volService;
+    @Inject
+    protected GuestOSDao _guestOsDao;
 
     private boolean isAcceptableRevertFormat(VolumeVO volumeVO) {
         return ImageFormat.QCOW2.equals(volumeVO.getFormat());
@@ -236,7 +242,21 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
 
     @Override
     public boolean revertSnapshot(final SnapshotInfo snapshot) {
-        throw new UnsupportedOperationException("Reverting not supported. Create a template or volume based on the snapshot instead.");
+        final SnapshotObjectTO snapshotTO = (SnapshotObjectTO) snapshot.getTO();
+        final RevertSnapshotCommand revertSnapshotCommand = new RevertSnapshotCommand(snapshotTO);
+
+        Answer result = null;
+        try {
+            result = _agentMgr.send(snapshot.getDataStore().getId(), revertSnapshotCommand);
+        } catch (final Exception ex) {
+            throw new CloudRuntimeException(ex.getMessage());
+        }
+
+        if (result == null || !result.getResult()) {
+            throw new CloudRuntimeException("Failed to revert snapshot: " + result.getDetails());
+        }
+
+        return true;
     }
 
     private void performSnapshotAndCopyOnHostSide(final VolumeInfo volumeInfo, final SnapshotInfo snapshotInfo) {
