@@ -79,12 +79,10 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
              */
             final int xmlFlag = conn.getLibVirVersion() >= 1000000 ? 8 : 1; // 1000000 equals v1.0.0
 
-            final String target = command.getDestinationIp();
-
             // xmlDesc = dm.getXMLDesc(xmlFlag).replace(libvirtComputingResource.getPrivateIp(), command.getDestinationIp());
 
             String vncPassword = to.getVncPassword();
-            xmlDesc = replaceIpForVNCInDescFileAndNormalizePassword(dm.getXMLDesc(xmlFlag), target, vncPassword);
+            xmlDesc = replaceIpForVNCInDescFileAndNormalizePassword(dm.getXMLDesc(xmlFlag), vncPassword);
 
             // delete the metadata of vm snapshots before migration
             vmsnapshots = libvirtComputingResource.cleanVMSnapshotMetadata(dm);
@@ -205,18 +203,17 @@ public final class LibvirtMigrateCommandWrapper extends LibvirtCommandWrapper<Mi
      *       <listen type='address' address='10.10.10.1'/>
      *     </graphics>
      * @param xmlDesc the qemu xml description
-     * @param target the ip address to migrate to
      * @param vncPassword if set, the VNC password truncated to 8 characters
      * @return the new xmlDesc
      */
-    String replaceIpForVNCInDescFileAndNormalizePassword(String xmlDesc, final String target, String vncPassword) {
+    String replaceIpForVNCInDescFileAndNormalizePassword(String xmlDesc, String vncPassword) {
         final int begin = xmlDesc.indexOf(GRAPHICS_ELEM_START);
         if (begin >= 0) {
             final int end = xmlDesc.lastIndexOf(GRAPHICS_ELEM_END) + GRAPHICS_ELEM_END.length();
             if (end > begin) {
                 String graphElem = xmlDesc.substring(begin, end);
-                graphElem = graphElem.replaceAll("listen='[a-zA-Z0-9\\.]*'", "listen='" + target + "'");
-                graphElem = graphElem.replaceAll("address='[a-zA-Z0-9\\.]*'", "address='" + target + "'");
+                graphElem = graphElem.replaceAll("listen='[a-zA-Z0-9\\.]*'", "listen='0.0.0.0'");
+                graphElem = graphElem.replaceAll("address='[a-zA-Z0-9\\.]*'", "address='0.0.0.0'");
                 if (!vncPassword.equals("")) {
                     graphElem = graphElem.replaceAll("passwd='([^\\s]+)'", "passwd='" + vncPassword + "'");
                 }
