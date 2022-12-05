@@ -242,28 +242,18 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
 
     @Override
     public boolean revertSnapshot(final SnapshotInfo snapshot) {
-        final SnapshotVO snapshotVO = _snapshotDao.findById(snapshot.getId());
+        final SnapshotObjectTO snapshotTO = (SnapshotObjectTO) snapshot.getTO();
+        final RevertSnapshotCommand revertSnapshotCommand = new RevertSnapshotCommand(snapshotTO);
 
-        if (!Snapshot.State.BackedUp.equals(snapshotVO.getState())) {
-            return false;
+        Answer result = null;
+        try {
+            result = _agentMgr.send(snapshot.getDataStore().getId(), revertSnapshotCommand);
+        } catch (final Exception ex) {
+            throw new CloudRuntimeException(ex.getMessage());
         }
 
-        final SnapshotObject snapshotObj = (SnapshotObject) _snapshotDataFactory.getSnapshot(snapshot.getId(), DataStoreRole.Primary);
-
-        try {
-            snapshotSvr.revertSnapshot(snapshotObj);
-
-            snapshotObj.processEvent(Snapshot.Event.OperationSucceeded);
-        } catch (final Exception e) {
-            s_logger.debug("Failed to revert snapshot: ", e);
-
-            try {
-                snapshotObj.processEvent(Snapshot.Event.OperationFailed);
-            } catch (final NoTransitionException e1) {
-                s_logger.debug("Failed to change snapshot state: " + e.toString());
-            }
-
-            return false;
+        if (result == null || !result.getResult()) {
+            throw new CloudRuntimeException("Failed to revert snapshot: " + result.getDetails());
         }
 
         return true;
