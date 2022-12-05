@@ -23,6 +23,7 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DiskTO;
 import com.cloud.legacymodel.to.SnapshotObjectTO;
@@ -30,6 +31,7 @@ import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.server.ManagementService;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
@@ -242,21 +244,40 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
 
     @Override
     public boolean revertSnapshot(final SnapshotInfo snapshot) {
-        final SnapshotObjectTO snapshotTO = (SnapshotObjectTO) snapshot.getTO();
-        final RevertSnapshotCommand revertSnapshotCommand = new RevertSnapshotCommand(snapshotTO);
-
-        Answer result = null;
+        final SnapshotVO snapshotVO = _snapshotDao.acquireInLockTable(snapshot.getId());
         try {
-            result = _agentMgr.send(snapshot.getDataStore().getId(), revertSnapshotCommand);
-        } catch (final Exception ex) {
-            throw new CloudRuntimeException(ex.getMessage());
-        }
+            final VolumeInfo volumeInfo = snapshot.getBaseVolume();
+            final StoragePool store = (StoragePool) volumeInfo.getDataStore();
 
-        if (result == null || !result.getResult()) {
-            throw new CloudRuntimeException("Failed to revert snapshot: " + result.getDetails());
-        }
+            if (store != null && store.getStatus() != StoragePoolStatus.Up) {
+                snapshot.processEvent(ObjectInDataStoreStateMachine.Event.OperationFailed);
+                throw new CloudRuntimeException("store is not in up state");
+            }
 
-        return true;
+            volumeInfo.stateTransit(Volume.Event.RevertSnapshotRequested);
+
+            boolean result = false;
+            try {
+                result = snapshotSvr.revertSnapshot(snapshot);
+
+                if (!result) {
+                    s_logger.debug("Failed to revert snapshot: " + snapshot.getId());
+
+                    throw new CloudRuntimeException("Failed to revert snapshot:" + snapshot.getId());
+                }
+            } finally {
+                if (result) {
+                    volumeInfo.stateTransit(Volume.Event.OperationSucceeded);
+                } else {
+                    volumeInfo.stateTransit(Volume.Event.OperationFailed);
+                }
+            }
+            return true;
+        } finally {
+            if (snapshotVO != null) {
+                _snapshotDao.releaseFromLockTable(snapshot.getId());
+            }
+        }
     }
 
     private void performSnapshotAndCopyOnHostSide(final VolumeInfo volumeInfo, final SnapshotInfo snapshotInfo) {
