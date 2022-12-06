@@ -422,7 +422,10 @@
                     label: 'label.volumes'
                 }, {
                     path: 'storage.vmsnapshots',
-                    label: 'label.snapshots'
+                    label: 'label.snapshots',
+                    preFilter: function () {
+                        return isAdmin();
+                    }
                 }, {
                     path: '_zone.hosts',
                     label: 'label.host',
