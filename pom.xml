@@ -70,7 +70,7 @@
         <cs.commons-net.version>3.9.0</cs.commons-net.version>
         <cs.commons-validator.version>1.6</cs.commons-validator.version>
         <cs.dbunit.version>2.4.9</cs.dbunit.version>
-        <cs.dependency-check-maven.version>3.1.2</cs.dependency-check-maven.version>
+        <cs.dependency-check-maven.version>3.2.0</cs.dependency-check-maven.version>
         <cs.ehcache-core.version>2.6.9</cs.ehcache-core.version>
         <cs.ejb-api.version>3.0</cs.ejb-api.version>
         <cs.flyway.version>5.2.0</cs.flyway.version>
