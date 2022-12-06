@@ -67,7 +67,7 @@
         <cs.commons-httpclient.version>3.1</cs.commons-httpclient.version>
         <cs.commons-io.version>2.7</cs.commons-io.version>
         <cs.commons-lang3.version>3.4</cs.commons-lang3.version>
-        <cs.commons-net.version>3.3</cs.commons-net.version>
+        <cs.commons-net.version>3.9.0</cs.commons-net.version>
         <cs.commons-validator.version>1.6</cs.commons-validator.version>
         <cs.dbunit.version>2.4.9</cs.dbunit.version>
         <cs.dependency-check-maven.version>3.1.2</cs.dependency-check-maven.version>
