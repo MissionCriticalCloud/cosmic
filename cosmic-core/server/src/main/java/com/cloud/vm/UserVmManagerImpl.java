@@ -2903,11 +2903,6 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                     + destinationHost.getResourceState());
         }
 
-        // Check that Vm does not have VM Snapshots
-        if (_vmSnapshotDao.findByVm(vmId).size() > 0) {
-            throw new InvalidParameterValueException("VM with VM Snapshots cannot be migrated with storage, please remove all VM snapshots");
-        }
-
         final List<VolumeVO> vmVolumes = _volsDao.findUsableVolumesForInstance(vm.getId());
         final Map<Long, Long> volToPoolObjectMap = new HashMap<>();
         if (!isVMUsingLocalStorage(vm) && destinationHost.getClusterId().equals(srcHost.getClusterId())) {
