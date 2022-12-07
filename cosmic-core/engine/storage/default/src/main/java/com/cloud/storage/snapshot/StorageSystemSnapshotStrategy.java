@@ -13,7 +13,9 @@ import com.cloud.engine.subsystem.api.storage.VolumeInfo;
 import com.cloud.engine.subsystem.api.storage.VolumeService;
 import com.cloud.host.HostVO;
 import com.cloud.host.dao.HostDao;
+import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.SnapshotAndCopyAnswer;
+import com.cloud.legacymodel.communication.command.RevertSnapshotCommand;
 import com.cloud.legacymodel.communication.command.SnapshotAndCopyCommand;
 import com.cloud.legacymodel.dc.Cluster;
 import com.cloud.legacymodel.exceptions.CloudRuntimeException;
@@ -21,22 +23,27 @@ import com.cloud.legacymodel.exceptions.InvalidParameterValueException;
 import com.cloud.legacymodel.exceptions.NoTransitionException;
 import com.cloud.legacymodel.resource.ResourceState;
 import com.cloud.legacymodel.storage.ObjectInDataStoreStateMachine;
+import com.cloud.legacymodel.storage.StoragePool;
 import com.cloud.legacymodel.storage.Volume;
 import com.cloud.legacymodel.to.DiskTO;
+import com.cloud.legacymodel.to.SnapshotObjectTO;
 import com.cloud.model.enumeration.AllocationState;
 import com.cloud.model.enumeration.DataStoreRole;
 import com.cloud.model.enumeration.HypervisorType;
 import com.cloud.model.enumeration.ImageFormat;
+import com.cloud.model.enumeration.StoragePoolStatus;
 import com.cloud.server.ManagementService;
 import com.cloud.storage.Snapshot;
 import com.cloud.storage.SnapshotVO;
 import com.cloud.storage.VolumeVO;
+import com.cloud.storage.dao.GuestOSDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.SnapshotDetailsDao;
 import com.cloud.storage.dao.SnapshotDetailsVO;
 import com.cloud.storage.dao.VolumeDao;
 import com.cloud.storage.datastore.db.PrimaryDataStoreDao;
 import com.cloud.storage.datastore.db.SnapshotDataStoreDao;
+import com.cloud.storage.datastore.db.SnapshotDataStoreVO;
 import com.cloud.storage.datastore.db.StoragePoolVO;
 import com.cloud.utils.db.DB;
 import com.cloud.vm.VMInstanceVO;
@@ -79,6 +86,12 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
     private VolumeDao _volumeDao;
     @Inject
     private VolumeService _volService;
+    @Inject
+    protected GuestOSDao _guestOsDao;
+
+    private boolean isAcceptableRevertFormat(VolumeVO volumeVO) {
+        return ImageFormat.QCOW2.equals(volumeVO.getFormat());
+    }
 
     @Override
     public boolean deleteSnapshot(final Long snapshotId) {
@@ -141,17 +154,25 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
 
     @Override
     public StrategyPriority canHandle(final Snapshot snapshot, final SnapshotOperation op) {
+        final long volumeId = snapshot.getVolumeId();
+        final VolumeVO volumeVO = _volumeDao.findByIdIncludingRemoved(volumeId);
+        final long storagePoolId = volumeVO.getPoolId();
+        final DataStore dataStore = _dataStoreMgr.getDataStore(storagePoolId, DataStoreRole.Primary);
+
         if (SnapshotOperation.REVERT.equals(op)) {
+            boolean baseVolumeExists = volumeVO.getRemoved() == null;
+            if (baseVolumeExists) {
+                boolean acceptableFormat = isAcceptableRevertFormat(volumeVO);
+
+                if (acceptableFormat) {
+                    SnapshotDataStoreVO snapshotStoreVO = _snapshotStoreDao.findBySnapshot(snapshot.getId(), DataStoreRole.Primary);
+                    if (snapshotStoreVO != null) {
+                        return StrategyPriority.HIGHEST;
+                    }
+                }
+            }
             return StrategyPriority.CANT_HANDLE;
         }
-
-        final long volumeId = snapshot.getVolumeId();
-
-        final VolumeVO volumeVO = _volumeDao.findByIdIncludingRemoved(volumeId);
-
-        final long storagePoolId = volumeVO.getPoolId();
-
-        final DataStore dataStore = _dataStoreMgr.getDataStore(storagePoolId, DataStoreRole.Primary);
 
         if (dataStore != null) {
             final Map<String, String> mapCapabilities = dataStore.getDriver().getCapabilities();
@@ -223,7 +244,40 @@ public class StorageSystemSnapshotStrategy extends SnapshotStrategyBase {
 
     @Override
     public boolean revertSnapshot(final SnapshotInfo snapshot) {
-        throw new UnsupportedOperationException("Reverting not supported. Create a template or volume based on the snapshot instead.");
+        final SnapshotVO snapshotVO = _snapshotDao.acquireInLockTable(snapshot.getId());
+        try {
+            final VolumeInfo volumeInfo = snapshot.getBaseVolume();
+            final StoragePool store = (StoragePool) volumeInfo.getDataStore();
+
+            if (store != null && store.getStatus() != StoragePoolStatus.Up) {
+                snapshot.processEvent(ObjectInDataStoreStateMachine.Event.OperationFailed);
+                throw new CloudRuntimeException("store is not in up state");
+            }
+
+            volumeInfo.stateTransit(Volume.Event.RevertSnapshotRequested);
+
+            boolean result = false;
+            try {
+                result = snapshotSvr.revertSnapshot(snapshot);
+
+                if (!result) {
+                    s_logger.debug("Failed to revert snapshot: " + snapshot.getId());
+
+                    throw new CloudRuntimeException("Failed to revert snapshot:" + snapshot.getId());
+                }
+            } finally {
+                if (result) {
+                    volumeInfo.stateTransit(Volume.Event.OperationSucceeded);
+                } else {
+                    volumeInfo.stateTransit(Volume.Event.OperationFailed);
+                }
+            }
+            return true;
+        } finally {
+            if (snapshotVO != null) {
+                _snapshotDao.releaseFromLockTable(snapshot.getId());
+            }
+        }
     }
 
     private void performSnapshotAndCopyOnHostSide(final VolumeInfo volumeInfo, final SnapshotInfo snapshotInfo) {

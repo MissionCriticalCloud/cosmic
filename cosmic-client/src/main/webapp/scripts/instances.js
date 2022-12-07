@@ -422,7 +422,10 @@
                     label: 'label.volumes'
                 }, {
                     path: 'storage.vmsnapshots',
-                    label: 'label.snapshots'
+                    label: 'label.snapshots',
+                    preFilter: function () {
+                        return isAdmin();
+                    }
                 }, {
                     path: '_zone.hosts',
                     label: 'label.host',
@@ -2864,7 +2867,9 @@
         } else if (jsonObj.state == 'Running') {
             allowedActions.push("stop");
             allowedActions.push("restart");
-            allowedActions.push("snapshot");
+            if (isAdmin()) {
+                allowedActions.push("snapshot");
+            }
             allowedActions.push("destroy");
             allowedActions.push("reinstall");
 
@@ -2902,7 +2907,9 @@
 
             allowedActions.push("destroy");
             allowedActions.push("reinstall");
-            allowedActions.push("snapshot");
+            if (isAdmin()) {
+                allowedActions.push("snapshot");
+            }
 
             // when vm is stopped, scaleUp is supported for all hypervisors
             allowedActions.push("scaleUp");
