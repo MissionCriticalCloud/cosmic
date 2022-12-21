@@ -349,7 +349,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     Map<VirtualMachineType, VirtualMachineGuru> _vmGurus = new HashMap<>();
-    ConcurrentHashMap<String, Long> migrationProgressQueue = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, Pair<Long, VMInstanceVO>> migrationProgressQueue = new ConcurrentHashMap<>();
     ConcurrentHashMap<String, MigrationProgressAnswer> migrationProgressAnswerMap = new ConcurrentHashMap<>();
     ScheduledExecutorService _executor = null;
 
@@ -727,17 +727,15 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         _agentMgr.send(srcHost.getId(), dettachCommand);
                         s_logger.debug("Deleted config drive ISO for  vm " + vm.getInstanceName() + " In host " + srcHost);
                     } catch (final OperationTimedoutException e) {
-                        s_logger.debug("TIme out occured while exeuting command AttachOrDettachConfigDrive " + e.getMessage());
+                        s_logger.debug("Time out occurred while executing command AttachOrDettachConfigDrive " + e.getMessage());
                     }
                 }
             }
 
-            migrationProgressQueue.put(vm.getUuid(), srcHost.getId());
+            migrationProgressQueue.put(vm.getUuid(), new Pair<>(srcHost.getId(), vm));
 
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
-
-            migrationProgressQueue.remove(vm.getUuid());
 
             // Put the vm back to running state.
             moveVmOutofMigratingStateOnSuccess(vm, destHost.getId(), work);
@@ -759,6 +757,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             migrated = true;
         } finally {
+            migrationProgressQueue.remove(vm.getUuid());
+
             if (!migrated) {
                 s_logger.info("Migration was unsuccessful.  Cleaning up: " + vm);
                 _alertMgr.sendAlert(alertType, srcHost.getDataCenterId(), srcHost.getPodId(),
@@ -4701,10 +4701,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         protected void runInContext() {
             try {
                 if (!migrationProgressQueue.isEmpty()) {
-                    for (Map.Entry<String, Long> entry: migrationProgressQueue.entrySet()) {
-                        final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(entry.getKey());
-                        Answer answer = _agentMgr.send(entry.getValue(), migrationProgressCommand);
-                        migrationProgressAnswerMap.put(entry.getKey(), (MigrationProgressAnswer) answer);
+                    for (Map.Entry<String, Pair<Long, VMInstanceVO>> entry: migrationProgressQueue.entrySet()) {
+                        VMInstanceVO vmInstanceVO = entry.getValue().second();
+                        final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(vmInstanceVO.getInstanceName());
+                        if (vmInstanceVO.getState() == State.Migrating) {
+                            Answer answer = _agentMgr.send(entry.getValue().first(), migrationProgressCommand);
+                            migrationProgressAnswerMap.put(entry.getKey(), (MigrationProgressAnswer) answer);
+                        }
                     }
                 }
                 TimeUnit.MILLISECONDS.sleep(VmOpProgressInterval.value());
