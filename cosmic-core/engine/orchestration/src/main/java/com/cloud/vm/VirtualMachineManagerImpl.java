@@ -732,12 +732,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 }
             }
 
-            migrationProgressQueue.put(vm.getInstanceName(), srcHost.getId());
+            migrationProgressQueue.put(vm.getUuid(), srcHost.getId());
 
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
 
-            migrationProgressQueue.remove(vm.getInstanceName());
+            migrationProgressQueue.remove(vm.getUuid());
 
             // Put the vm back to running state.
             moveVmOutofMigratingStateOnSuccess(vm, destHost.getId(), work);
