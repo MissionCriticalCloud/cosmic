@@ -1,4 +1,4 @@
-#!/cygdrive/c/Python27
+#!/usr/bin/env python2.7
 
 
 import os.path
@@ -136,7 +136,8 @@ known_categories = {
     'CacheStore': 'Cache Store',
     'listHAWorkers': 'CloudOps',
     'listWhoHasThisIp': 'CloudOps',
-    'listWhoHasThisMac': 'CloudOps'
+    'listWhoHasThisMac': 'CloudOps',
+    'getVmProgress': 'Virtual Machine'
 }
 
 categories = { }

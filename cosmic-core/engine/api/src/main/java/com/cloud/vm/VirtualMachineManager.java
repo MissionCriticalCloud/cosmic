@@ -4,7 +4,9 @@ import com.cloud.deploy.DeployDestination;
 import com.cloud.deploy.DeploymentPlan;
 import com.cloud.deploy.DeploymentPlanner;
 import com.cloud.framework.config.ConfigKey;
+import com.cloud.legacymodel.communication.answer.MigrationProgressAnswer;
 import com.cloud.legacymodel.exceptions.AgentUnavailableException;
+import com.cloud.legacymodel.exceptions.CloudRuntimeException;
 import com.cloud.legacymodel.exceptions.ConcurrentOperationException;
 import com.cloud.legacymodel.exceptions.InsufficientCapacityException;
 import com.cloud.legacymodel.exceptions.InsufficientServerCapacityException;
@@ -189,6 +191,8 @@ public interface VirtualMachineManager extends Manager {
     void migrateForScale(String vmUuid, long srcHostId, DeployDestination dest, Long newSvcOfferingId) throws ResourceUnavailableException, ConcurrentOperationException;
 
     boolean getExecuteInSequence(HypervisorType hypervisorType);
+
+    MigrationProgressAnswer getMigrationProgress(String vmUuid) throws CloudRuntimeException;
 
     public interface Topics {
         public static final String VM_POWER_STATE = "vm.powerstate";

@@ -58,6 +58,7 @@ import com.cloud.legacymodel.communication.answer.AgentControlAnswer;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.CheckVirtualMachineAnswer;
 import com.cloud.legacymodel.communication.answer.ClusterVMMetaDataSyncAnswer;
+import com.cloud.legacymodel.communication.answer.MigrationProgressAnswer;
 import com.cloud.legacymodel.communication.answer.PlugNicAnswer;
 import com.cloud.legacymodel.communication.answer.RebootAnswer;
 import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
@@ -69,6 +70,7 @@ import com.cloud.legacymodel.communication.command.CheckVirtualMachineCommand;
 import com.cloud.legacymodel.communication.command.ClusterVMMetaDataSyncCommand;
 import com.cloud.legacymodel.communication.command.Command;
 import com.cloud.legacymodel.communication.command.MigrateCommand;
+import com.cloud.legacymodel.communication.command.MigrationProgressCommand;
 import com.cloud.legacymodel.communication.command.PingRoutingCommand;
 import com.cloud.legacymodel.communication.command.PlugNicCommand;
 import com.cloud.legacymodel.communication.command.PrepareForMigrationCommand;
@@ -195,6 +197,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -235,6 +238,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
             "Interval to send application level pings to make sure the connection is still working", false);
     static final ConfigKey<String> DefaultDiskControllerName = new ConfigKey<>("Advanced", String.class, "vm.default.disk.controller", "SCSI",
             "Default disk controller type for routers, systemVMs and ", false);
+    static final ConfigKey<Long> VmOpProgressInterval = new ConfigKey<>("Advanced", Long.class, "vm.op.progress.interval", "1000",
+            "Time (in milliseconds) to wait before checking migration progress", false);
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachineManagerImpl.class);
     private static final String VM_SYNC_ALERT_SUBJECT = "VM state sync alert";
     @Inject
@@ -344,6 +349,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
     VmWorkJobHandlerProxy _jobHandlerProxy = new VmWorkJobHandlerProxy(this);
     Map<VirtualMachineType, VirtualMachineGuru> _vmGurus = new HashMap<>();
+    ConcurrentHashMap<String, Pair<Long, VMInstanceVO>> migrationProgressQueue = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, MigrationProgressAnswer> migrationProgressAnswerMap = new ConcurrentHashMap<>();
     ScheduledExecutorService _executor = null;
 
     protected VirtualMachineManagerImpl() {
@@ -390,6 +397,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         // TODO, initial delay is hardcoded
         _executor.scheduleAtFixedRate(new CleanupTask(), 5, VmJobStateReportInterval.value(), TimeUnit.SECONDS);
         _executor.scheduleAtFixedRate(new TransitionTask(), VmOpCleanupInterval.value(), VmOpCleanupInterval.value(), TimeUnit.SECONDS);
+        _executor.scheduleAtFixedRate(new MonitorMigrationTask(), VmOpProgressInterval.value(), VmOpProgressInterval.value(), TimeUnit.MILLISECONDS);
         cancelWorkItems(_nodeId);
 
         volumeMgr.cleanupStorageJobs();
@@ -719,10 +727,12 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                         _agentMgr.send(srcHost.getId(), dettachCommand);
                         s_logger.debug("Deleted config drive ISO for  vm " + vm.getInstanceName() + " In host " + srcHost);
                     } catch (final OperationTimedoutException e) {
-                        s_logger.debug("TIme out occured while exeuting command AttachOrDettachConfigDrive " + e.getMessage());
+                        s_logger.debug("Time out occurred while executing command AttachOrDettachConfigDrive " + e.getMessage());
                     }
                 }
             }
+
+            migrationProgressQueue.put(vm.getUuid(), new Pair<>(srcHost.getId(), vm));
 
             // Migrate the vm and its volume.
             volumeMgr.migrateVolumes(vm, to, srcHost, destHost, volumeToPoolMap);
@@ -747,6 +757,8 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
 
             migrated = true;
         } finally {
+            migrationProgressQueue.remove(vm.getUuid());
+
             if (!migrated) {
                 s_logger.info("Migration was unsuccessful.  Cleaning up: " + vm);
                 _alertMgr.sendAlert(alertType, srcHost.getDataCenterId(), srcHost.getPodId(),
@@ -2665,6 +2677,13 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         } else {
             return ExecuteInSequence.value();
         }
+    }
+
+    public MigrationProgressAnswer getMigrationProgress(String vmUuid) throws CloudRuntimeException {
+        if (migrationProgressAnswerMap.containsKey(vmUuid)) {
+            return migrationProgressAnswerMap.get(vmUuid);
+        }
+        throw new CloudRuntimeException("Unable get job for vm " + vmUuid);
     }
 
     private void orchestrateReboot(final String vmUuid, final Map<VirtualMachineProfile.Param, Object> params) throws InsufficientCapacityException, ConcurrentOperationException,
@@ -4669,6 +4688,35 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                 return workInfoNetworkId != null && workInfoNetworkId == networkId;
             } else {
                 return false;
+            }
+        }
+    }
+
+    protected class MonitorMigrationTask extends ManagedContextRunnable {
+        public MonitorMigrationTask() {
+            s_logger.info("Starting Monitor Migration task");
+        }
+
+        @Override
+        protected void runInContext() {
+            try {
+                if (!migrationProgressQueue.isEmpty()) {
+                    for (Map.Entry<String, Pair<Long, VMInstanceVO>> entry: migrationProgressQueue.entrySet()) {
+                        VMInstanceVO vmInstanceVO = entry.getValue().second();
+                        final MigrationProgressCommand migrationProgressCommand = new MigrationProgressCommand(vmInstanceVO.getInstanceName());
+                        if (vmInstanceVO.getState() == State.Migrating) {
+                            Answer answer = _agentMgr.send(entry.getValue().first(), migrationProgressCommand);
+                            migrationProgressAnswerMap.put(entry.getKey(), (MigrationProgressAnswer) answer);
+                        }
+                    }
+                }
+                TimeUnit.MILLISECONDS.sleep(VmOpProgressInterval.value());
+            } catch (AgentUnavailableException e) {
+                s_logger.error("Agent unavailable: " + e.getMessage());
+            } catch (OperationTimedoutException e) {
+                s_logger.error("Operation timeout: " + e.getMessage());
+            } catch (Exception e) {
+                s_logger.error("Unexpected exception: " + e.getMessage());
             }
         }
     }

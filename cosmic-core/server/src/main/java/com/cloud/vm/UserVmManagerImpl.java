@@ -16,6 +16,7 @@ import com.cloud.api.command.admin.vm.RecoverVMCmd;
 import com.cloud.api.command.user.vm.AddNicToVMCmd;
 import com.cloud.api.command.user.vm.DeployVMCmd;
 import com.cloud.api.command.user.vm.DestroyVMCmd;
+import com.cloud.api.command.user.vm.GetVMProgressCmd;
 import com.cloud.api.command.user.vm.RebootVMCmd;
 import com.cloud.api.command.user.vm.RemoveNicFromVMCmd;
 import com.cloud.api.command.user.vm.ResetVMPasswordCmd;
@@ -29,6 +30,7 @@ import com.cloud.api.command.user.vm.UpdateVmNicIpCmd;
 import com.cloud.api.command.user.vm.UpgradeVMCmd;
 import com.cloud.api.command.user.vmgroup.CreateVMGroupCmd;
 import com.cloud.api.command.user.vmgroup.DeleteVMGroupCmd;
+import com.cloud.api.response.VmProgressResponse;
 import com.cloud.capacity.Capacity;
 import com.cloud.capacity.CapacityManager;
 import com.cloud.common.managed.context.ManagedContextRunnable;
@@ -79,6 +81,7 @@ import com.cloud.legacymodel.acl.ControlledEntity.ACLType;
 import com.cloud.legacymodel.communication.answer.Answer;
 import com.cloud.legacymodel.communication.answer.GetVmDiskStatsAnswer;
 import com.cloud.legacymodel.communication.answer.GetVmStatsAnswer;
+import com.cloud.legacymodel.communication.answer.MigrationProgressAnswer;
 import com.cloud.legacymodel.communication.answer.RestoreVMSnapshotAnswer;
 import com.cloud.legacymodel.communication.answer.StartAnswer;
 import com.cloud.legacymodel.communication.command.Command;
@@ -86,6 +89,7 @@ import com.cloud.legacymodel.communication.command.DettachCommand;
 import com.cloud.legacymodel.communication.command.GetVmDiskStatsCommand;
 import com.cloud.legacymodel.communication.command.GetVmIpAddressCommand;
 import com.cloud.legacymodel.communication.command.GetVmStatsCommand;
+import com.cloud.legacymodel.communication.command.MigrationProgressCommand;
 import com.cloud.legacymodel.communication.command.PvlanSetupCommand;
 import com.cloud.legacymodel.communication.command.RestoreVMSnapshotCommand;
 import com.cloud.legacymodel.configuration.Resource.ResourceType;
@@ -3556,6 +3560,38 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
             final CloudRuntimeException ex = new CloudRuntimeException("Failed to expunge vm with specified vmId");
             ex.addProxyObject(String.valueOf(vmId), "vmId");
             throw ex;
+        }
+    }
+
+    @Override
+    public VmProgressResponse getVmProgress(final GetVMProgressCmd cmd) throws CloudRuntimeException, InvalidParameterValueException {
+        String uuid = cmd.getUuid();
+        final UserVmVO vm = _vmDao.findByUuid(uuid);
+        if (vm == null) {
+            throw new InvalidParameterValueException("Unable to find virtual machine with uuid: " + uuid);
+        }
+        //check permissions
+        _accountMgr.checkAccess(CallContext.current().getCallingAccount(), null, true, vm);
+
+        try {
+            MigrationProgressAnswer migrationProgressAnswer = _itMgr.getMigrationProgress(uuid);
+
+            VmProgressResponse vmProgressResponse = new VmProgressResponse();
+            vmProgressResponse.setTimeElapsed(migrationProgressAnswer.getTimeElapsed());
+            vmProgressResponse.setTimeRemaining(migrationProgressAnswer.getTimeRemaining());
+            vmProgressResponse.setDataTotal(migrationProgressAnswer.getDataTotal());
+            vmProgressResponse.setDataProcessed(migrationProgressAnswer.getDataProcessed());
+            vmProgressResponse.setDataRemaining(migrationProgressAnswer.getDataRemaining());
+            vmProgressResponse.setMemTotal(migrationProgressAnswer.getMemTotal());
+            vmProgressResponse.setMemProcessed(migrationProgressAnswer.getMemProcessed());
+            vmProgressResponse.setMemRemaining(migrationProgressAnswer.getMemRemaining());
+            vmProgressResponse.setFileTotal(migrationProgressAnswer.getFileTotal());
+            vmProgressResponse.setFileProcessed(migrationProgressAnswer.getFileProcessed());
+            vmProgressResponse.setFileRemaining(migrationProgressAnswer.getFileRemaining());
+            return vmProgressResponse;
+        } catch (CloudRuntimeException e) {
+            // Virtual Machine exists but no job is running, return empty response
+            return new VmProgressResponse();
         }
     }
 
