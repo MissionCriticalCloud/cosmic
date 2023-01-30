@@ -39,11 +39,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ComponentContext.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class HypervisorTemplateAdapterTest {
     List<Event> events = new ArrayList<>();
     @Mock

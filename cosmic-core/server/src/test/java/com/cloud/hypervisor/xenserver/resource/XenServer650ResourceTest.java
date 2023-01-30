@@ -6,10 +6,12 @@ import com.cloud.utils.script.Script;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class XenServer650ResourceTest extends CitrixResourceBaseTest {
 
     private final XenServer650Resource xenServer650Resource = new XenServer650Resource();

@@ -37,11 +37,13 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ComponentContext.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class ActionEventUtilsTest {
     //Predictable constants used throughout this test.
     public static final long EVENT_ID = 1;

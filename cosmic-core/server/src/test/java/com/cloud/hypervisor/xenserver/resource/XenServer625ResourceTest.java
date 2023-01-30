@@ -21,10 +21,12 @@ import com.xensource.xenapi.VM;
 import org.apache.xmlrpc.XmlRpcException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class XenServer625ResourceTest extends CitrixResourceBaseTest {
 
     private final Xenserver625Resource xenServer625Resource = new Xenserver625Resource();
