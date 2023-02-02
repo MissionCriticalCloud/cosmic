@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedChannelException;
@@ -138,8 +139,8 @@ public class Link {
 
         int processedLen = 0;
         while (processedLen < totalLen) {
-            headBuf.clear();
-            pkgBuf.clear();
+            ((Buffer)headBuf).clear();
+            ((Buffer)pkgBuf).clear();
             engResult = sslEngine.wrap(buffers, pkgBuf);
             if (engResult.getHandshakeStatus() != HandshakeStatus.FINISHED && engResult.getHandshakeStatus() != HandshakeStatus.NOT_HANDSHAKING &&
                     engResult.getStatus() != SSLEngineResult.Status.OK) {
@@ -154,12 +155,12 @@ public class Link {
             int dataRemaining = pkgBuf.position();
             int header = dataRemaining;
             int headRemaining = 4;
-            pkgBuf.flip();
+            ((Buffer)pkgBuf).flip();
             if (processedLen < totalLen) {
                 header = header | HEADER_FLAG_FOLLOWING;
             }
             headBuf.putInt(header);
-            headBuf.flip();
+            ((Buffer)headBuf).flip();
 
             while (headRemaining > 0) {
                 if (s_logger.isTraceEnabled()) {
@@ -253,11 +254,11 @@ public class Link {
             }
             engResult = null;
             if (hsStatus == SSLEngineResult.HandshakeStatus.NEED_WRAP) {
-                out_pkgBuf.clear();
-                out_appBuf.clear();
+                ((Buffer)out_pkgBuf).clear();
+                ((Buffer)out_appBuf).clear();
                 out_appBuf.put("Hello".getBytes());
                 engResult = sslEngine.wrap(out_appBuf, out_pkgBuf);
-                out_pkgBuf.flip();
+                ((Buffer)out_pkgBuf).flip();
                 int remain = out_pkgBuf.limit();
                 while (remain != 0) {
                     remain -= ch.write(out_pkgBuf);
@@ -266,10 +267,10 @@ public class Link {
                     }
                 }
             } else if (hsStatus == SSLEngineResult.HandshakeStatus.NEED_UNWRAP) {
-                in_appBuf.clear();
+                ((Buffer)in_appBuf).clear();
                 // One packet may contained multiply operation
                 if (in_pkgBuf.position() == 0 || !in_pkgBuf.hasRemaining()) {
-                    in_pkgBuf.clear();
+                    ((Buffer)in_pkgBuf).clear();
                     count = 0;
                     try {
                         count = readCh.read(in_pkgBuf);
@@ -282,7 +283,7 @@ public class Link {
                     if (count == -1) {
                         throw new IOException("Connection closed with -1 on reading size.");
                     }
-                    in_pkgBuf.flip();
+                    ((Buffer)in_pkgBuf).flip();
                 }
                 engResult = sslEngine.unwrap(in_pkgBuf, in_appBuf);
                 final ByteBuffer tmp_pkgBuf = ByteBuffer.allocate(sslSession.getPacketBufferSize() + 40);
@@ -296,12 +297,12 @@ public class Link {
                     if (s_logger.isTraceEnabled()) {
                         s_logger.trace("SSL: Buffer underflowed, getting more packets");
                     }
-                    tmp_pkgBuf.clear();
+                    ((Buffer)tmp_pkgBuf).clear();
                     count = ch.read(tmp_pkgBuf);
                     if (count == -1) {
                         throw new IOException("Connection closed with -1 on reading size.");
                     }
-                    tmp_pkgBuf.flip();
+                    ((Buffer)tmp_pkgBuf).flip();
 
                     in_pkgBuf.mark();
                     in_pkgBuf.position(in_pkgBuf.limit());
@@ -309,7 +310,7 @@ public class Link {
                     in_pkgBuf.put(tmp_pkgBuf);
                     in_pkgBuf.reset();
 
-                    in_appBuf.clear();
+                    ((Buffer)in_appBuf).clear();
                     engResult = sslEngine.unwrap(in_pkgBuf, in_appBuf);
                     loop_count++;
                 }
@@ -388,7 +389,7 @@ public class Link {
                 _gotFollowingPacket = false;
             }
 
-            _readBuffer.clear();
+            ((Buffer)_readBuffer).clear();
             _readHeader = false;
 
             if (_readBuffer.capacity() < readSize) {
@@ -411,7 +412,7 @@ public class Link {
             return null;
         }
 
-        _readBuffer.flip();
+        ((Buffer)_readBuffer).flip();
 
         ByteBuffer appBuf;
 
@@ -431,11 +432,11 @@ public class Link {
                 throw new IOException("SSL: Unable to unwrap received data! still remaining " + remaining + "bytes!");
             }
 
-            appBuf.flip();
+            ((Buffer)appBuf).flip();
             if (_plaintextBuffer.remaining() < appBuf.limit()) {
                 // We need to expand _plaintextBuffer for more data
                 final ByteBuffer newBuffer = ByteBuffer.allocate(_plaintextBuffer.capacity() + appBuf.limit() * 5);
-                _plaintextBuffer.flip();
+                ((Buffer)_plaintextBuffer).flip();
                 newBuffer.put(_plaintextBuffer);
                 _plaintextBuffer = newBuffer;
             }
@@ -445,7 +446,7 @@ public class Link {
             }
         }
 
-        _readBuffer.clear();
+        ((Buffer)_readBuffer).clear();
         _readHeader = true;
 
         if (!_gotFollowingPacket) {
@@ -479,7 +480,7 @@ public class Link {
 
         item[0] = ByteBuffer.allocate(4);
         item[0].putInt(remaining);
-        item[0].flip();
+        ((Buffer)item[0]).flip();
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Sending packet of length " + remaining);
