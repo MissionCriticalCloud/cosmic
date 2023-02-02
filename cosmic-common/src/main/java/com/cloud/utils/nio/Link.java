@@ -368,7 +368,7 @@ public class Link {
                 s_logger.trace("Need to read the rest of the packet length");
                 return null;
             }
-            _readBuffer.flip();
+            ((Buffer)_readBuffer).flip();
             final int header = _readBuffer.getInt();
             final int readSize = (short) header;
             if (s_logger.isTraceEnabled()) {
@@ -450,7 +450,7 @@ public class Link {
         _readHeader = true;
 
         if (!_gotFollowingPacket) {
-            _plaintextBuffer.flip();
+            ((Buffer)_plaintextBuffer).flip();
             final byte[] result = new byte[_plaintextBuffer.limit()];
             _plaintextBuffer.get(result);
             return result;
