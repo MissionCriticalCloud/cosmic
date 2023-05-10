@@ -11,6 +11,10 @@ public class CapabilitiesResponse extends BaseResponse {
     @Param(description = "version of the cloud stack")
     private String cloudStackVersion;
 
+    @SerializedName("cosmicversion")
+    @Param(description = "version of cosmic")
+    private String cosmicVersion;
+
     @SerializedName("cosmic")
     @Param(description = "Cosmic or not")
     private Boolean cosmic;
@@ -79,8 +83,9 @@ public class CapabilitiesResponse extends BaseResponse {
         this.kvmDeploymentsEnabled = kvmDeploymentsEnabled;
     }
 
-    public void setCloudStackVersion(final String cloudStackVersion) {
-        this.cloudStackVersion = cloudStackVersion;
+    public void setCosmicVersion(final String cosmicVersion) {
+        this.cloudStackVersion = cosmicVersion;
+        this.cosmicVersion = cosmicVersion;
     }
 
     public void setCosmic(final Boolean cosmic) {

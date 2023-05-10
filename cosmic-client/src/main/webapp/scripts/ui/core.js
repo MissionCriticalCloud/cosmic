@@ -318,7 +318,7 @@
             if (this == 'label.about.app') {
                 $link.addClass('about').click(function () {
                     var $logo = $('<div>').addClass('logo').text(_l('label.app.name')),
-                        $version = $('<div>').addClass('version').text(g_cloudstackversion),
+                        $version = $('<div>').addClass('version').text(g_cosmicversion),
                         $about = $('<div>').addClass('about').append($logo).append($version);
                     $about.dialog({
                         modal: true,
