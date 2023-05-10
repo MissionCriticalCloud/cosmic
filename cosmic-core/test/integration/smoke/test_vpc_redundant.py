@@ -80,16 +80,6 @@ class TestVPCRedundancy(cloudstackTestCase):
 
         self.vpc_off = get_default_redundant_vpc_offering(self.apiclient)
 
-        self.logger.debug("Creating a VPC network in the account: %s" % self.account.name)
-        self.services["vpc"]["cidr"] = '10.1.1.1/16'
-        self.vpc = VPC.create(
-            self.apiclient,
-            self.services["vpc"],
-            vpcofferingid=self.vpc_off.id,
-            zoneid=self.zone.id,
-            account=self.account.name,
-            domainid=self.account.domainid)
-
         self.cleanup = [self.account]
         return
 
@@ -104,28 +94,44 @@ class TestVPCRedundancy(cloudstackTestCase):
     def test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL(self):
         """ Create a redundant VPC with two networks with two VMs in each network """
         self.logger.debug("Starting test_01_create_redundant_VPC_2tiers_4VMs_4IPs_4PF_ACL")
-        self.query_routers()
-        net_off = get_default_network_offering(self.apiclient)
-        self.networks.append(self.create_network(net_off, "10.1.1.1"))
-        net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
-        self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
-        self.check_routers_state()
-        self.add_nat_rules()
-        self.do_vpc_test(False)
 
-        self.stop_router_by_type("MASTER")
-        self.check_routers_state(1)
-        self.do_vpc_test(False)
+        for method in ("MULTICAST", "UNICAST"):
 
-        self.delete_nat_rules()
-        self.check_routers_state(count=1)
-        self.do_vpc_test(True)
-        self.delete_public_ip()
+            self.logger.debug("Creating a %s VPC network in the account: %s" % (method, self.account.name))
+            self.services["vpc"]["cidr"] = '10.1.1.1/16'
+            self.vpc = VPC.create(
+                self.apiclient,
+                self.services["vpc"],
+                vpcofferingid=self.vpc_off.id,
+                zoneid=self.zone.id,
+                account=self.account.name,
+                domainid=self.account.domainid,
+                advertmethod=method,
+                advertinterval=1
+            )
 
-        self.start_routers()
-        self.add_nat_rules()
-        self.check_routers_state()
-        self.do_vpc_test(False)
+            self.query_routers()
+            net_off = get_default_network_offering(self.apiclient)
+            self.networks.append(self.create_network(net_off, "10.1.1.1"))
+            net_off_no_lb = get_default_network_offering_no_load_balancer(self.apiclient)
+            self.networks.append(self.create_network(net_off_no_lb, "10.1.2.1"))
+            self.check_routers_state()
+            self.add_nat_rules()
+            self.do_vpc_test(False)
+
+            self.stop_router_by_type("MASTER")
+            self.check_routers_state(1)
+            self.do_vpc_test(False)
+
+            self.delete_nat_rules()
+            self.check_routers_state(count=1)
+            self.do_vpc_test(True)
+            self.delete_public_ip()
+
+            self.start_routers()
+            self.add_nat_rules()
+            self.check_routers_state()
+            self.do_vpc_test(False)
 
     @attr(tags=['advanced'])
     def _test_02_redundant_VPC_default_routes(self):
@@ -196,6 +202,7 @@ class TestVPCRedundancy(cloudstackTestCase):
         self.routers = list_routers(self.apiclient,
                                     account=self.account.name,
                                     domainid=self.account.domainid,
+                                    vpcid=self.vpc.id
                                     )
         if not showall:
             self.routers = [r for r in self.routers if r.state != "Stopped"]
